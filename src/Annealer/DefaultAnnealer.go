@@ -1,14 +1,12 @@
+// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
 package Annealer
 
 import "fmt"
 
-type Annealer interface {
-	Anneal()
+type defaultAnnealer struct {
 }
 
-type DefaultAnnealer struct {
-}
-
-func (annealer *DefaultAnnealer) Anneal() {
+func (annealer *defaultAnnealer) Anneal() {
 	fmt.Println("I'm an annealer, annealing")
 }
