@@ -2,8 +2,9 @@ package Annealer
 
 import "fmt"
 
-type Annealer struct{}
+type DefaultAnnealer struct {
+}
 
-func (annealer *Annealer) Anneal() {
+func (annealer *DefaultAnnealer) Anneal() {
 	fmt.Println("I'm an annealer, annealing")
 }
