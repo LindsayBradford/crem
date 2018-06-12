@@ -2,9 +2,28 @@
 
 package Annealer
 
-type AnnealerBuilder struct{}
+type AnnealerBuilder struct {
+	annealer Annealer
+}
+
+func (builder *AnnealerBuilder) WithDefaultAnnealer() *AnnealerBuilder {
+	builder.annealer = &defaultAnnealer{}
+	return builder
+}
+
+func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
+	annealer := builder.annealer
+	annealer.setTemperature(temperature)
+	return builder
+}
+
+func (builder *AnnealerBuilder) WithIterations(iterations uint) *AnnealerBuilder {
+	annealer := builder.annealer
+	annealer.setIterationsLeft(iterations)
+	return builder
+}
 
 func (builder *AnnealerBuilder) Build() (Annealer, error) {
-	annealer := new(defaultAnnealer)
-	return annealer, nil
+	finalisedAnnealer := builder.annealer
+	return finalisedAnnealer, nil
 }
