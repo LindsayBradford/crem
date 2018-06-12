@@ -2,6 +2,10 @@ package Annealer
 
 import "fmt"
 
+type Annealer interface {
+	Anneal()
+}
+
 type DefaultAnnealer struct {
 }
 

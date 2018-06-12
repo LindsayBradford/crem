@@ -5,6 +5,7 @@ package main
 import "Annealer"
 
 func main() {
-	annealer := new(Annealer.DefaultAnnealer)
+	builder := new(Annealer.AnnealerBuilder)
+	annealer, _ := builder.Build()
 	annealer.Anneal()
 }
