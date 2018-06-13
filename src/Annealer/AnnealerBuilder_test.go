@@ -1,15 +1,13 @@
 package Annealer
 
-import (
-	"github.com/corbym/gocrest/is"
-	. "github.com/corbym/gocrest/then"
-	"testing"
-)
+import . "github.com/onsi/gomega"
+import "testing"
 
 func TestBuild(t *testing.T) {
+	g := NewGomegaWithT(t)
 
 	const expectedTemperature float64 = 1000.0
-	const expectedIterations uint = 2000
+	const expectedIterations uint = 5000
 
 	builder := new(AnnealerBuilder)
 
@@ -19,6 +17,11 @@ func TestBuild(t *testing.T) {
 		WithIterations(expectedIterations).
 		Build()
 
-	AssertThat(t, annealer.Temperature(), is.EqualTo(expectedTemperature).Reason("Build() Temperature"))
-	AssertThat(t, annealer.IterationsLeft(), is.EqualTo(expectedIterations).Reason("Build() IterationsLeft"))
+	g.Expect(
+		annealer.Temperature()).To(BeIdenticalTo(expectedTemperature),
+		"Annealer should have built with supplied Temperature")
+
+	g.Expect(
+		annealer.IterationsLeft()).To(BeIdenticalTo(expectedIterations),
+		"Annealer should have built with supplied Iterations")
 }
