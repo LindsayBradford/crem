@@ -1,11 +1,15 @@
 package Annealer
 
-import "testing"
+import (
+	"github.com/corbym/gocrest/is"
+	. "github.com/corbym/gocrest/then"
+	"testing"
+)
 
 func TestBuild(t *testing.T) {
 
-	const expectedTemperature = 1000.0
-	const expectedIterations = 5000
+	const expectedTemperature float64 = 1000.0
+	const expectedIterations uint = 2000
 
 	builder := new(AnnealerBuilder)
 
@@ -15,11 +19,6 @@ func TestBuild(t *testing.T) {
 		WithIterations(expectedIterations).
 		Build()
 
-	if annealer.Temperature() != expectedTemperature {
-		t.Errorf("Expecting temperature of %f, got %f", expectedTemperature, annealer.Temperature())
-	}
-
-	if annealer.IterationsLeft() != expectedIterations {
-		t.Errorf("Expecting iterations left of %d, got %d", expectedIterations, annealer.IterationsLeft())
-	}
+	AssertThat(t, annealer.Temperature(), is.EqualTo(expectedTemperature).Reason("Build() Temperature"))
+	AssertThat(t, annealer.IterationsLeft(), is.EqualTo(expectedIterations).Reason("Build() IterationsLeft"))
 }
