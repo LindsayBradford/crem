@@ -6,10 +6,12 @@ import "Annealer"
 
 func main() {
 	builder := new(Annealer.AnnealerBuilder)
+
 	annealer, _ := builder.
-		WithDefaultAnnealer().
+		SingleObjectiveAnnealer().
 		WithStartingTemperature(1000).
 		WithIterations(5000).
 		Build()
+
 	annealer.Anneal()
 }

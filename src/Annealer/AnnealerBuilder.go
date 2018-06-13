@@ -6,8 +6,8 @@ type AnnealerBuilder struct {
 	annealer Annealer
 }
 
-func (builder *AnnealerBuilder) WithDefaultAnnealer() *AnnealerBuilder {
-	builder.annealer = &defaultAnnealer{}
+func (builder *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
+	builder.annealer = &singleObjectiveAnnealer{}
 	return builder
 }
 
