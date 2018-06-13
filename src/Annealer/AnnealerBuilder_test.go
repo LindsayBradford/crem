@@ -1,11 +1,13 @@
 package Annealer
 
+import . "github.com/onsi/gomega"
 import "testing"
 
 func TestBuild(t *testing.T) {
+	g := NewGomegaWithT(t)
 
-	const expectedTemperature = 1000.0
-	const expectedIterations = 5000
+	const expectedTemperature float64 = 1000.0
+	const expectedIterations uint = 5000
 
 	builder := new(AnnealerBuilder)
 
@@ -15,11 +17,6 @@ func TestBuild(t *testing.T) {
 		WithIterations(expectedIterations).
 		Build()
 
-	if annealer.Temperature() != expectedTemperature {
-		t.Errorf("Expecting temperature of %f, got %f", expectedTemperature, annealer.Temperature())
-	}
-
-	if annealer.IterationsLeft() != expectedIterations {
-		t.Errorf("Expecting iterations left of %d, got %d", expectedIterations, annealer.IterationsLeft())
-	}
+	g.Expect(annealer.Temperature()).To(BeIdenticalTo(expectedTemperature), "Annealer should have built with supplied Temperature")
+	g.Expect(annealer.IterationsLeft()).To(BeIdenticalTo(expectedIterations), "Annealer should have built with supplied Iterations")
 }
