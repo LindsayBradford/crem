@@ -50,10 +50,25 @@ func (this *annealerBase) AddObserver(newObserver AnnealingObserver) {
 	this.observers = append(this.observers, newObserver)
 }
 
-func (this *annealerBase) notifyObservers(event AnnealingEvent) {
+func (this *annealerBase) notifyObserversWith(thisNote string) {
+	event := AnnealingEvent{
+		eventType: NOTE,
+		annealer:  this,
+		note:      thisNote}
+	this.notifyObserversWithEvent(event)
+}
+
+func (this *annealerBase) notifyObservers(thisEventType AnnealingEventType) {
+	event := AnnealingEvent{
+		eventType: thisEventType,
+		annealer:  this}
+	this.notifyObserversWithEvent(event)
+}
+
+func (this *annealerBase) notifyObserversWithEvent(event AnnealingEvent) {
 	for _, currObserver := range this.observers {
 		if currObserver != nil {
-			currObserver.ObserveAnnealingEvent(event, this)
+			currObserver.ObserveAnnealingEvent(event)
 		}
 	}
 }

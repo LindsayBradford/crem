@@ -31,12 +31,11 @@ func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder
 }
 
 func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
+	// PRE: observers supplied are not nil
 	annealer := this.annealer
 
 	for _, currObserver := range observers {
-		if currObserver != nil {
-			annealer.AddObserver(currObserver)
-		}
+		annealer.AddObserver(currObserver)
 	}
 
 	return this

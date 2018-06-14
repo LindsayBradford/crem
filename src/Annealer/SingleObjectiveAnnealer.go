@@ -2,13 +2,11 @@
 
 package Annealer
 
-import "fmt"
-
 type singleObjectiveAnnealer struct {
 	annealerBase
 }
 
 func (this *singleObjectiveAnnealer) Anneal() {
-	fmt.Println("I'm a single-objectve annealer")
+	this.notifyObserversWith("I'm a single-objectve annealer")
 	this.annealerBase.Anneal()
 }
