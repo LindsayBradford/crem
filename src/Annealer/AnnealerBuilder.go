@@ -30,6 +30,18 @@ func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder
 	return this
 }
 
+func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
+	annealer := this.annealer
+
+	for _, currObserver := range observers {
+		if currObserver != nil {
+			annealer.AddObserver(currObserver)
+		}
+	}
+
+	return this
+}
+
 func (this *AnnealerBuilder) Build() Annealer {
 	return this.annealer
 }

@@ -1,13 +1,12 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package Annealer
 
-import "fmt"
-
 type annealerBase struct {
 	temperature      float64
 	coolingFactor    float64
 	maxIterations    uint
 	currentIteration uint
+	observers        []AnnealingObserver
 }
 
 func (this *annealerBase) Initialise() {
@@ -47,16 +46,26 @@ func (this *annealerBase) CurrentIteration() uint {
 	return this.currentIteration
 }
 
-func (this *annealerBase) Anneal() {
-	fmt.Printf("Start Temperature: %f\n", this.temperature)
-	fmt.Printf("Max Iterations: %d\n", this.maxIterations)
+func (this *annealerBase) AddObserver(newObserver AnnealingObserver) {
+	this.observers = append(this.observers, newObserver)
+}
 
-	fmt.Println("Starting Annealing")
+func (this *annealerBase) notifyObservers(event AnnealingEvent) {
+	for _, currObserver := range this.observers {
+		if currObserver != nil {
+			currObserver.ObserveAnnealingEvent(event, this)
+		}
+	}
+}
+
+func (this *annealerBase) Anneal() {
+	this.notifyObservers(STARTED_ANNEALING)
 
 	for done := this.initialDoneValue(); !done; {
 		this.currentIteration++
+		this.notifyObservers(STARTED_ITERATION)
 
-		fmt.Printf("  currentIteration : %d\n", this.currentIteration)
+		// do the actual objective function work here.
 
 		this.cooldown()
 		if this.shouldFinish() {
@@ -64,7 +73,7 @@ func (this *annealerBase) Anneal() {
 		}
 	}
 
-	fmt.Println("Finished Annealing")
+	this.notifyObservers(FINISHED_ANNEALING)
 }
 
 func (this *annealerBase) initialDoneValue() bool {

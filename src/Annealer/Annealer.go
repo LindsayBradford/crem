@@ -11,6 +11,8 @@ type Annealer interface {
 	setMaxIterations(iterations uint)
 	MaxIterations() uint
 
+	AddObserver(observer AnnealingObserver)
+
 	Initialise()
 
 	CurrentIteration() uint

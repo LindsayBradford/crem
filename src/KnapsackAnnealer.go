@@ -12,6 +12,7 @@ func main() {
 		WithStartingTemperature(1000).
 		WithCoolingFactor(0.995).
 		WithMaxIterations(5).
+		WithObservers(new(Annealer.StdoutAnnealingObserver)).
 		Build()
 
 	annealer.Anneal()
