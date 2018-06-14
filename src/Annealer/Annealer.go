@@ -1,32 +1,91 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 package Annealer
 
+import "fmt"
+
 type Annealer interface {
-	Anneal()
 	setTemperature(temperature float64)
 	Temperature() float64
-	setIterationsLeft(iterations uint)
-	IterationsLeft() uint
+
+	setCoolingFactor(coolingFactor float64)
+	CoolingFactor() float64
+
+	setMaxIterations(iterations uint)
+	MaxIterations() uint
+
+	Initialise()
+
+	CurrentIteration() uint
+
+	Anneal()
 }
 
-type abstractAnnealer struct {
-	temperature    float64
-	iterationsLeft uint
+type annealerBase struct {
+	temperature      float64
+	coolingFactor    float64
+	maxIterations    uint
+	currentIteration uint
 }
 
-func (annealer *abstractAnnealer) setTemperature(temperature float64) {
-	annealer.temperature = temperature
+func (this *annealerBase) Initialise() {
+	this.temperature = 1
+	this.coolingFactor = 1
+	this.maxIterations = 0
+	this.currentIteration = 0
 }
 
-func (annealer *abstractAnnealer) Temperature() float64 {
-	return annealer.temperature
+func (this *annealerBase) setTemperature(temperature float64) {
+	this.temperature = temperature
 }
 
-func (annealer *abstractAnnealer) setIterationsLeft(iterations uint) {
-	annealer.iterationsLeft = iterations
+func (this *annealerBase) Temperature() float64 {
+	return this.temperature
 }
 
-func (annealer *abstractAnnealer) IterationsLeft() uint {
-	return annealer.iterationsLeft
+func (this *annealerBase) setCoolingFactor(coolingFactor float64) {
+	// PRE: 0 < coolingFactor <= 1
+	this.coolingFactor = coolingFactor
+}
+
+func (this *annealerBase) CoolingFactor() float64 {
+	return this.coolingFactor
+}
+
+func (this *annealerBase) setMaxIterations(iterations uint) {
+	// PRE: iterations >= 1
+	this.maxIterations = iterations
+}
+
+func (this *annealerBase) MaxIterations() uint {
+	return this.maxIterations
+}
+
+func (this *annealerBase) CurrentIteration() uint {
+	return this.currentIteration
+}
+
+func (this *annealerBase) Anneal() {
+	fmt.Printf("Start Temperature: %f\n", this.temperature)
+	fmt.Printf("Max Iterations: %d\n", this.maxIterations)
+
+	fmt.Println("Starting Annealing")
+	for done := false; !done; {
+		this.currentIteration++
+		fmt.Printf("  currentIteration : %d\n", this.currentIteration)
+
+		this.cooldown()
+		if this.shouldFinish() {
+			done = true
+		}
+	}
+
+	fmt.Println("Finished Annealing")
+}
+
+func (this *annealerBase) shouldFinish() bool {
+	return this.currentIteration == this.maxIterations
+}
+
+func (this *annealerBase) cooldown() {
+	this.temperature = this.temperature * this.coolingFactor
 }

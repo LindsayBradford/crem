@@ -8,6 +8,7 @@ type AnnealerBuilder struct {
 
 func (builder *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
 	builder.annealer = &singleObjectiveAnnealer{}
+	builder.annealer.Initialise()
 	return builder
 }
 
@@ -17,13 +18,18 @@ func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *An
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithIterations(iterations uint) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
 	annealer := builder.annealer
-	annealer.setIterationsLeft(iterations)
+	annealer.setCoolingFactor(coolingFactor)
 	return builder
 }
 
-func (builder *AnnealerBuilder) Build() (Annealer, error) {
-	finalisedAnnealer := builder.annealer
-	return finalisedAnnealer, nil
+func (builder *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
+	annealer := builder.annealer
+	annealer.setMaxIterations(iterations)
+	return builder
+}
+
+func (builder *AnnealerBuilder) Build() Annealer {
+	return builder.annealer
 }

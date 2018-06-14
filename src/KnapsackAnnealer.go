@@ -7,10 +7,11 @@ import "Annealer"
 func main() {
 	builder := new(Annealer.AnnealerBuilder)
 
-	annealer, _ := builder.
+	annealer := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(1000).
-		WithIterations(5000).
+		WithCoolingFactor(0.995).
+		WithMaxIterations(5).
 		Build()
 
 	annealer.Anneal()

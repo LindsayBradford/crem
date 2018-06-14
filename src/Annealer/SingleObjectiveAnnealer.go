@@ -5,11 +5,10 @@ package Annealer
 import "fmt"
 
 type singleObjectiveAnnealer struct {
-	abstractAnnealer
+	annealerBase
 }
 
-func (annealer *singleObjectiveAnnealer) Anneal() {
-	fmt.Println("I'm a single-objectve annealer, annealing")
-	fmt.Printf("Current Temperature: %f\n", annealer.Temperature())
-	fmt.Printf("Iterations left: %d\n", annealer.IterationsLeft())
+func (this *singleObjectiveAnnealer) Anneal() {
+	fmt.Println("I'm a single-objectve annealer")
+	this.annealerBase.Anneal()
 }
