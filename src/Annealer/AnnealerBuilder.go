@@ -6,30 +6,30 @@ type AnnealerBuilder struct {
 	annealer Annealer
 }
 
-func (builder *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
-	builder.annealer = &singleObjectiveAnnealer{}
-	builder.annealer.Initialise()
-	return builder
+func (this *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
+	this.annealer = &singleObjectiveAnnealer{}
+	this.annealer.Initialise()
+	return this
 }
 
-func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
-	annealer := builder.annealer
+func (this *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
+	annealer := this.annealer
 	annealer.setTemperature(temperature)
-	return builder
+	return this
 }
 
-func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
-	annealer := builder.annealer
+func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
+	annealer := this.annealer
 	annealer.setCoolingFactor(coolingFactor)
-	return builder
+	return this
 }
 
-func (builder *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
-	annealer := builder.annealer
+func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
+	annealer := this.annealer
 	annealer.setMaxIterations(iterations)
-	return builder
+	return this
 }
 
-func (builder *AnnealerBuilder) Build() Annealer {
-	return builder.annealer
+func (this *AnnealerBuilder) Build() Annealer {
+	return this.annealer
 }
