@@ -2,6 +2,7 @@
 package main
 
 import . "github.com/LindsayBradford/crm/annealing"
+import . "github.com/LindsayBradford/crm/logging"
 
 func main() {
 	builder := new(AnnealerBuilder)

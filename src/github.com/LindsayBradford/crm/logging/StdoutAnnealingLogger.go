@@ -1,16 +1,17 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package annealing
+package logging
 
 import "fmt"
+import . "github.com/LindsayBradford/crm/annealing"
 
 type StdoutAnnealingLogger struct{}
 
 func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
-	fmt.Printf("Annealing Event [%s]: ", event.eventType.String())
+	fmt.Printf("Annealing Event [%s]: ", event.EventType.String())
 
-	annealer := event.annealer
+	annealer := event.Annealer
 
-	switch event.eventType {
+	switch event.EventType {
 	case STARTED_ANNEALING:
 		fmt.Printf("Maximum Iterations [%d], Temperature [%f], Cooling Factor [%f], ",
 			annealer.MaxIterations(), annealer.Temperature(), annealer.CoolingFactor())
@@ -18,7 +19,7 @@ func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 		fmt.Printf("Iteration [%d/%d], Temperature [%f]",
 			annealer.CurrentIteration(), annealer.MaxIterations(), annealer.Temperature())
 	case NOTE:
-		fmt.Printf("[%s]", event.note)
+		fmt.Printf("[%s]", event.Note)
 	default:
 		// deliberately does nothing extra
 	}

@@ -6,9 +6,9 @@ type AnnealingObserver interface {
 }
 
 type AnnealingEvent struct {
-	eventType AnnealingEventType
-	annealer  Annealer
-	note      string
+	EventType AnnealingEventType
+	Annealer  Annealer
+	Note      string
 }
 
 type AnnealingEventType int

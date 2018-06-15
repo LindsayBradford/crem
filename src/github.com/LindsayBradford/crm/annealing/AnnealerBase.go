@@ -52,16 +52,16 @@ func (this *annealerBase) AddObserver(newObserver AnnealingObserver) {
 
 func (this *annealerBase) notifyObserversWith(thisNote string) {
 	event := AnnealingEvent{
-		eventType: NOTE,
-		annealer:  this,
-		note:      thisNote}
+		EventType: NOTE,
+		Annealer:  this,
+		Note:      thisNote}
 	this.notifyObserversWithEvent(event)
 }
 
 func (this *annealerBase) notifyObservers(thisEventType AnnealingEventType) {
 	event := AnnealingEvent{
-		eventType: thisEventType,
-		annealer:  this}
+		EventType: thisEventType,
+		Annealer:  this}
 	this.notifyObserversWithEvent(event)
 }
 
