@@ -1,5 +1,9 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package Annealer
+package annealing
+
+type AnnealingObserver interface {
+	ObserveAnnealingEvent(event AnnealingEvent)
+}
 
 type AnnealingEvent struct {
 	eventType AnnealingEventType

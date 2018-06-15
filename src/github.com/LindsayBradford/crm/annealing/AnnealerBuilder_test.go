@@ -1,5 +1,5 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package Annealer
+package annealing
 
 import . "github.com/onsi/gomega"
 import "testing"

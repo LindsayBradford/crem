@@ -1,18 +1,17 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 package main
 
-import "Annealer"
+import . "github.com/LindsayBradford/crm/annealing"
 
 func main() {
-	builder := new(Annealer.AnnealerBuilder)
+	builder := new(AnnealerBuilder)
 
 	annealer := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(1000).
 		WithCoolingFactor(0.995).
 		WithMaxIterations(5).
-		WithObservers(new(Annealer.StdoutAnnealingObserver)).
+		WithObservers(new(StdoutAnnealingLogger)).
 		Build()
 
 	annealer.Anneal()
