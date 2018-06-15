@@ -1,28 +1,45 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package logging
 
-import "fmt"
-import . "github.com/LindsayBradford/crm/annealing"
+import (
+	"fmt"
+	. "github.com/LindsayBradford/crm/annealing"
+	"github.com/LindsayBradford/crm/strings"
+)
 
 type StdoutAnnealingLogger struct{}
 
 func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
-	fmt.Printf("Annealing Event [%s]: ", event.EventType.String())
+
+	var builder strings.FluentBuilder
+
+	builder.Add("Annealing Event [", event.EventType.String(), "]: ")
 
 	annealer := event.Annealer
 
 	switch event.EventType {
 	case STARTED_ANNEALING:
-		fmt.Printf("Maximum Iterations [%d], Temperature [%f], Cooling Factor [%f], ",
-			annealer.MaxIterations(), annealer.Temperature(), annealer.CoolingFactor())
+		builder.
+			Add("Maximum Iterations [", uintToString(annealer.MaxIterations()), "], ").
+			Add("Temperature [", float64ToString(annealer.Temperature()), "], ").
+			Add("Cooling Factor [", float64ToString(annealer.CoolingFactor()), "]")
 	case STARTED_ITERATION, FINISHED_ANNEALING:
-		fmt.Printf("Iteration [%d/%d], Temperature [%f]",
-			annealer.CurrentIteration(), annealer.MaxIterations(), annealer.Temperature())
+		builder.
+			Add("Iteration [", uintToString(annealer.CurrentIteration()), "/", uintToString(annealer.MaxIterations()), "], ").
+			Add("Temperature [", float64ToString(annealer.Temperature()), "], ")
 	case NOTE:
-		fmt.Printf("[%s]", event.Note)
+		builder.Add("[", event.Note, "]")
 	default:
 		// deliberately does nothing extra
 	}
 
-	fmt.Println()
+	fmt.Println(builder.String())
+}
+
+func uintToString(value uint) string {
+	return fmt.Sprintf("%d", value)
+}
+
+func float64ToString(value float64) string {
+	return fmt.Sprintf("%f", value)
 }
