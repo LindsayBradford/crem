@@ -4,7 +4,6 @@
 
 package annealing
 
-
 import . "github.com/onsi/gomega"
 import "testing"
 

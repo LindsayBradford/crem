@@ -6,8 +6,6 @@ package annealing
 
 import (
 	"fmt"
-
-	. "github.com/LindsayBradford/crm/reflect"
 )
 
 type AnnealerStateFormatWrapper struct {
@@ -34,27 +32,19 @@ func NewAnnealerStateFormatWrapper(annealer Annealer) *AnnealerStateFormatWrappe
 }
 
 func (this *AnnealerStateFormatWrapper) Temperature() string {
-	thisMethodsName := DeriveMethodName()
-	valueNeedingFormatting := CallMethodReturningFloat64(this.annealerToFormat, thisMethodsName)
-	return this.applyFormatting(thisMethodsName, valueNeedingFormatting)
+	return this.applyFormatting("Temperature", this.annealerToFormat.Temperature())
 }
 
 func (this *AnnealerStateFormatWrapper) CoolingFactor() string {
-	thisMethodsName := DeriveMethodName()
-	valueNeedingFormatting := CallMethodReturningFloat64(this.annealerToFormat, thisMethodsName)
-	return this.applyFormatting(thisMethodsName, valueNeedingFormatting)
+	return this.applyFormatting("CoolingFactor", this.annealerToFormat.CoolingFactor())
 }
 
 func (this *AnnealerStateFormatWrapper) MaxIterations() string {
-	thisMethodsName := DeriveMethodName()
-	valueNeedingFormatting := CallMethodReturningUint(this.annealerToFormat, thisMethodsName)
-	return this.applyFormatting(thisMethodsName, valueNeedingFormatting)
+	return this.applyFormatting("MaxIterations", this.annealerToFormat.MaxIterations())
 }
 
 func (this *AnnealerStateFormatWrapper) CurrentIteration() string {
-	thisMethodsName := DeriveMethodName()
-	valueNeedingFormatting := CallMethodReturningUint(this.annealerToFormat, thisMethodsName)
-	return this.applyFormatting(thisMethodsName, valueNeedingFormatting)
+	return this.applyFormatting("CurrentIteration", this.annealerToFormat.CurrentIteration())
 }
 
 func (this *AnnealerStateFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
