@@ -63,5 +63,5 @@ func TestAnneal(t *testing.T) {
 
 	g.Expect(
 		annealer.Temperature()).To(BeIdenticalTo(expectedEndTemperature),
-		"Annealer should have ended with tempperature modified by cooling factor * iterations")
+		"Annealer should have ended with temperature modified by cooling factor * iterations")
 }
