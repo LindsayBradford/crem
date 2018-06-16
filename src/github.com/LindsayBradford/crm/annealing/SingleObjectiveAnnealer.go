@@ -6,6 +6,6 @@ type singleObjectiveAnnealer struct {
 }
 
 func (this *singleObjectiveAnnealer) Anneal() {
-	this.notifyObserversWith("I'm a single-objectve annealer")
+	this.notifyObserversWith("I'm a single-objective annealer")
 	this.annealerBase.Anneal()
 }

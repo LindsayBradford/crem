@@ -1,8 +1,10 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package main
 
-import . "github.com/LindsayBradford/crm/annealing"
-import . "github.com/LindsayBradford/crm/logging"
+import (
+	. "github.com/LindsayBradford/crm/annealing"
+	. "github.com/LindsayBradford/crm/logging"
+)
 
 func main() {
 	builder := new(AnnealerBuilder)
@@ -17,3 +19,4 @@ func main() {
 
 	annealer.Anneal()
 }
+

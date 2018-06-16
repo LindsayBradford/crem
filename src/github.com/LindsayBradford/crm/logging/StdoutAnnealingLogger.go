@@ -7,26 +7,24 @@ import (
 	"github.com/LindsayBradford/crm/strings"
 )
 
-type StdoutAnnealingLogger struct{}
+type StdoutAnnealingLogger struct {}
 
 func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+	annealer := wrap(event.Annealer)
 
 	var builder strings.FluentBuilder
-
 	builder.Add("Annealing Event [", event.EventType.String(), "]: ")
-
-	annealer := event.Annealer
 
 	switch event.EventType {
 	case STARTED_ANNEALING:
 		builder.
-			Add("Maximum Iterations [", uintToString(annealer.MaxIterations()), "], ").
-			Add("Temperature [", float64ToString(annealer.Temperature()), "], ").
-			Add("Cooling Factor [", float64ToString(annealer.CoolingFactor()), "]")
+			Add("Maximum Iterations [", annealer.MaxIterations(), "], ").
+			Add("Temperature [", annealer.Temperature(), "], ").
+			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
 	case STARTED_ITERATION, FINISHED_ANNEALING:
 		builder.
-			Add("Iteration [", uintToString(annealer.CurrentIteration()), "/", uintToString(annealer.MaxIterations()), "], ").
-			Add("Temperature [", float64ToString(annealer.Temperature()), "], ")
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
+			Add("Temperature [", annealer.Temperature(), "], ")
 	case NOTE:
 		builder.Add("[", event.Note, "]")
 	default:
@@ -36,10 +34,15 @@ func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 	fmt.Println(builder.String())
 }
 
-func uintToString(value uint) string {
-	return fmt.Sprintf("%d", value)
-}
-
-func float64ToString(value float64) string {
-	return fmt.Sprintf("%f", value)
+func wrap(eventAnnealer Annealer) *AnnealerStateFormatWrapper {
+	wrapper := AnnealerStateFormatWrapper{
+		AnnealerToFormat: eventAnnealer,
+		MethodFormats: map[string]string{
+			"Temperature":      "%0.4f",
+			"CoolingFactor":    "%0.3f",
+			"MaxIterations":    "%03d",
+			"CurrentIteration": "%03d",
+		},
+	}
+	return &wrapper
 }
