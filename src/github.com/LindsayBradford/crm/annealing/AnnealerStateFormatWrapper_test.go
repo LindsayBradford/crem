@@ -17,7 +17,7 @@ func TestAnnealerStateFormatWrapper_Defaults(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		Build()
 
@@ -50,7 +50,7 @@ func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		Build()
 

@@ -9,7 +9,7 @@ func TestBuild_usingDefaults(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		Build()
 
@@ -39,7 +39,7 @@ func TestBuild_OverrdingDefaults(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(expectedTemperature).
 		WithCoolingFactor(expectedCoolingFactor).

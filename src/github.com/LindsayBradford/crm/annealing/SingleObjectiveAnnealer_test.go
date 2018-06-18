@@ -11,7 +11,7 @@ func TestAnneal_Defaults(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		Build()
 
@@ -40,7 +40,7 @@ func TestAnneal(t *testing.T) {
 
 	builder := new(AnnealerBuilder)
 
-	annealer := builder.
+	annealer, _ := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(startTemperature).
 		WithCoolingFactor(coolingFactor).

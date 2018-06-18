@@ -1,6 +1,8 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package annealing
 
+import "errors"
+
 type annealerBase struct {
 	temperature      float64
 	coolingFactor    float64
@@ -16,17 +18,22 @@ func (this *annealerBase) Initialise() {
 	this.currentIteration = 0
 }
 
-func (this *annealerBase) setTemperature(temperature float64) {
-	this.temperature = temperature
+func (this *annealerBase) setTemperature(temperature float64) error {
+	if temperature <= 0 {
+		return errors.New("Invalid attempt to set annealer temperature to value <= 0")
+	}
+	this.temperature = temperature; return nil
 }
 
 func (this *annealerBase) Temperature() float64 {
 	return this.temperature
 }
 
-func (this *annealerBase) setCoolingFactor(coolingFactor float64) {
-	// PRE: 0 < coolingFactor <= 1
-	this.coolingFactor = coolingFactor
+func (this *annealerBase) setCoolingFactor(coolingFactor float64) error {
+	if coolingFactor <= 0 || coolingFactor > 1 {
+		return errors.New("Invalid attempt to set annealer cooling factor to value <= 0 or > 1")
+	}
+	this.coolingFactor = coolingFactor; return nil
 }
 
 func (this *annealerBase) CoolingFactor() float64 {
@@ -34,7 +41,6 @@ func (this *annealerBase) CoolingFactor() float64 {
 }
 
 func (this *annealerBase) setMaxIterations(iterations uint) {
-	// PRE: iterations >= 1
 	this.maxIterations = iterations
 }
 
@@ -46,8 +52,11 @@ func (this *annealerBase) CurrentIteration() uint {
 	return this.currentIteration
 }
 
-func (this *annealerBase) AddObserver(newObserver AnnealingObserver) {
-	this.observers = append(this.observers, newObserver)
+func (this *annealerBase) AddObserver(newObserver AnnealingObserver) error {
+	if newObserver == nil {
+		return errors.New("Invalid attempt to add non-existant observer to annealer")
+	}
+	this.observers = append(this.observers, newObserver); return nil
 }
 
 func (this *annealerBase) notifyObserversWith(thisNote string) {
@@ -92,7 +101,7 @@ func (this *annealerBase) Anneal() {
 }
 
 func (this *annealerBase) initialDoneValue() bool {
-	return !(this.maxIterations > 0)
+	return this.maxIterations == 0
 }
 
 func (this *annealerBase) shouldFinish() bool {
@@ -100,5 +109,5 @@ func (this *annealerBase) shouldFinish() bool {
 }
 
 func (this *annealerBase) cooldown() {
-	this.temperature = this.temperature * this.coolingFactor
+	this.temperature *= this.coolingFactor
 }
