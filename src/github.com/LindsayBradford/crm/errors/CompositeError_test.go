@@ -12,7 +12,7 @@ import "testing"
 func TestCompositeError_add(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	errorUnderTest := new(CompositeError)
+	errorUnderTest := NewComposite("testingComposite")
 
 	expectedSubError0 := errors.New("subError0")
 

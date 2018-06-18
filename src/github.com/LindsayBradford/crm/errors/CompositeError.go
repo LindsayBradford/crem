@@ -9,7 +9,7 @@ type CompositeError struct {
 	individualErrors[] error
 }
 
-func New(message string) *CompositeError {
+func NewComposite(message string) *CompositeError {
 	newError := new(CompositeError)
 	newError.compositeMessage = message
 	return newError

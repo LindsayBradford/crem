@@ -14,7 +14,7 @@ type AnnealerBuilder struct {
 func (this *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
 	this.annealer = &singleObjectiveAnnealer{}
 	this.annealer.Initialise()
-	this.buildErrors = crmerrors.New("AnnealerBuilder Error")
+	this.buildErrors = crmerrors.NewComposite("Failed to build valid single-objective annealer")
 	return this
 }
 
@@ -42,7 +42,7 @@ func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder
 
 func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
 	if (observers == nil) {
-		this.buildErrors.Add(errors.New("Attempt to assign an observers list to Annealer"))
+		this.buildErrors.Add(errors.New("Invalid attempt to supply a non-existant observers list to annealer"))
 	}
 
 	annealer := this.annealer
