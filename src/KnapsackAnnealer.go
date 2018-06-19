@@ -11,43 +11,59 @@ import (
 const ERROR_STATUS = 1
 
 var (
-	globalLogHandler LogHandler
+	log LogHandler
+	annealer Annealer
 )
 
 func init() {
+	buildLogger()
+	buildAnnealer()
+}
+
+func buildLogger() {
 	logBuilder := new(LogHandlerBuilder)
 	logFormatter := new(MessageFormatter)
-	logHandler, err := logBuilder.
+	newLogger, err := logBuilder.
 		ForNativeLibraryLogHandler().
 		WithFormatter(logFormatter).
 		WithLogLevelDestination(DEBUG, STDOUT).
+		// WithLogLevelDestination(ERROR, STDOUT).
 		Build()
 
 	if (err != nil) {
-		globalLogHandler.ErrorWithError(err)
+		log.ErrorWithError(err)
 		os.Exit(ERROR_STATUS)
 	}
-
-	globalLogHandler = logHandler
+	log = newLogger
 }
 
-func main() {
+func buildAnnealer() {
 	builder := new(AnnealerBuilder)
+	annealerLogger := new(JsonMessageAnnealingLogger).WithLogHandler(log)
 
-	annealer, err := builder.
+	log.Debug("About to call AnnealerBuilder.Build() ")
+
+	newAnnealer, err := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(1000).
 		WithCoolingFactor(0.995).
 		WithMaxIterations(5).
-		WithObservers(
-			new(JsonMessageAnnealingLogger).WithLogHandler(globalLogHandler)).
+		WithObservers(annealerLogger).
 		Build()
 
+	log.Debug("Call to AnnealerBuilder.Build() finished")
+
 	if (err != nil) {
-		globalLogHandler.ErrorWithError(err)
-		globalLogHandler.Error("Exiting due to failed Annealer build")
+		log.ErrorWithError(err)
+		log.Error("Exiting program due to failed Annealer build")
 		os.Exit(ERROR_STATUS)
 	}
 
+	annealer = newAnnealer
+}
+
+func main() {
+	log.Debug("About to call annealer.Anneal()")
 	annealer.Anneal()
+	log.Debug("Call to annealer.Anneal() finished. Exiting Program")
 }

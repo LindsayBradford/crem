@@ -37,6 +37,8 @@ type LogHandler interface {
 	ErrorWithAttributes(logAttributes LogAttributes)
 	ErrorWithError(err error)
 
+	Initialise()
+
 	SetDestinations(*LogLevelDestinations)
 	Destinations() *LogLevelDestinations
 

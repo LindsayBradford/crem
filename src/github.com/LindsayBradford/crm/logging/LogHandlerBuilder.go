@@ -18,8 +18,8 @@ func (this *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
 
 	defaultDestinations := new(LogLevelDestinations).Initialise()
 	newHandler.SetDestinations(defaultDestinations)
-
-	newHandler.Initialise().WithFormatter(new (NullFormatter))
+	newHandler.SetFormatter(new (NullFormatter))
+	newHandler.Initialise()
 
 	this.logHandler = newHandler
 	return this
@@ -32,6 +32,7 @@ func (this *LogHandlerBuilder) WithFormatter(formatter LogAttributeFormatter) *L
 }
 func (this *LogHandlerBuilder) WithLogLevelDestination(logLevel LogLevel, destination LogDestination) *LogHandlerBuilder {
 	this.logHandler.Destinations().Override(logLevel, destination)
+	this.logHandler.Initialise()
 	return this
 }
 

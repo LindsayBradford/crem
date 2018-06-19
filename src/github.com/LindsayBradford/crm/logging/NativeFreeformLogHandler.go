@@ -15,13 +15,11 @@ type NativeLibraryLogHandler struct {
 	error    *log.Logger
 }
 
-func (this *NativeLibraryLogHandler) Initialise() *NativeLibraryLogHandler {
-	this.debug = log.New(this.destinations.destinations[DEBUG], "", log.Ldate|log.Ltime|log.Lmicroseconds)
+func (this *NativeLibraryLogHandler) Initialise() {
+	this.debug = log.New(this.destinations.destinations[DEBUG], "", log.Lshortfile|log.Ldate|log.Ltime|log.Lmicroseconds)
 	this.info = log.New(this.destinations.destinations[INFO], "", log.Ldate|log.Ltime|log.Lmicroseconds)
 	this.warn = log.New(this.destinations.destinations[WARN], "", log.Ldate|log.Ltime|log.Lmicroseconds)
 	this.error = log.New(this.destinations.destinations[ERROR], "", log.Ldate|log.Ltime|log.Lmicroseconds)
-
-	return this
 }
 
 func (this *NativeLibraryLogHandler) WithFormatter(formatter LogAttributeFormatter) *NativeLibraryLogHandler {
