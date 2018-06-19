@@ -2,14 +2,20 @@
 package logging
 
 import (
-	"fmt"
 	. "github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/strings"
 )
 
-type StdoutAnnealingLogger struct {}
+type FreeformAnnealingLogger struct {
+	AnnealingLogger
+}
 
-func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+func (this *FreeformAnnealingLogger) WithLogHandler(handler LogHandler) *FreeformAnnealingLogger {
+	this.logHandler = handler
+	return this
+}
+
+func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 	annealer := wrap(event.Annealer)
 
 	var builder strings.FluentBuilder
@@ -31,7 +37,7 @@ func (this *StdoutAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 		// deliberately does nothing extra
 	}
 
-	fmt.Println(builder.String())
+	this.logHandler.Info(builder.String())
 }
 
 func wrap(eventAnnealer Annealer) *AnnealerStateFormatWrapper {

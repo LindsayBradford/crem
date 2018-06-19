@@ -3,27 +3,25 @@
 package logging
 
 import (
-	"log"
-
 	. "github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/strings"
-)
+	)
 
-type NativeLogLibraryAnnealingLogger struct{
-	logger *log.Logger
+type JsonMessageAnnealingLogger struct{
+	AnnealingLogger
 }
 
-func NewNativeLogLibraryAnnealingLogger(logger *log.Logger) *NativeLogLibraryAnnealingLogger {
-  newAnnealingLogger := &NativeLogLibraryAnnealingLogger {logger}
-	return newAnnealingLogger
+func (this *JsonMessageAnnealingLogger) WithLogHandler(handler LogHandler) *JsonMessageAnnealingLogger {
+	this.logHandler = handler
+	return this
 }
 
-func (this *NativeLogLibraryAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+func (this *JsonMessageAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 
 	annealer := wrap(event.Annealer)
 
 	var builder strings.FluentBuilder
-	builder.Add("INFO {\"AnnealingEvent\": \"", event.EventType.String(), "\", ")
+	builder.Add("{\"AnnealingEvent\": \"", event.EventType.String(), "\", ")
 
 	switch event.EventType {
 	case STARTED_ANNEALING:
@@ -36,12 +34,12 @@ func (this *NativeLogLibraryAnnealingLogger) ObserveAnnealingEvent(event Anneali
 			Add("\"CurrentIteration\": ", annealer.CurrentIteration(), ", ").
 			Add("\"Temperature\": ", annealer.Temperature())
 	case NOTE:
-		builder.Add("\"Message\": \"", event.Note, "\"")
+		builder.Add("\"Note\": \"", event.Note, "\"")
 	default:
 		// deliberately does nothing extra
 	}
 
 	builder.Add("}")
 
-	this.logger.Println(builder.String())
+	this.logHandler.Info(builder.String())
 }
