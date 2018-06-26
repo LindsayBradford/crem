@@ -1,7 +1,10 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package annealing
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 type annealerBase struct {
 	temperature      float64
@@ -9,6 +12,9 @@ type annealerBase struct {
 	maxIterations    uint
 	currentIteration uint
 	observers        []AnnealingObserver
+
+	startTime time.Time
+	finishTime time.Time
 }
 
 func (this *annealerBase) Initialise() {
@@ -83,11 +89,10 @@ func (this *annealerBase) notifyObserversWithEvent(event AnnealingEvent) {
 }
 
 func (this *annealerBase) Anneal() {
-	this.notifyObservers(STARTED_ANNEALING)
+	this.annealingStarted()
 
 	for done := this.initialDoneValue(); !done; {
-		this.currentIteration++
-		this.notifyObservers(STARTED_ITERATION)
+		this.iterationStarted()
 
 		// do the actual objective function work here.
 
@@ -97,7 +102,26 @@ func (this *annealerBase) Anneal() {
 		}
 	}
 
+	this.annealingFinished()
+}
+
+func (this *annealerBase) annealingStarted() {
+	this.notifyObservers(STARTED_ANNEALING)
+	this.startTime = time.Now()
+}
+
+func (this *annealerBase) iterationStarted() {
+	this.currentIteration++
+	this.notifyObservers(STARTED_ITERATION)
+}
+
+func (this *annealerBase) annealingFinished() {
 	this.notifyObservers(FINISHED_ANNEALING)
+	this.finishTime = time.Now()
+}
+
+func (this *annealerBase) ElapsedTime() time.Duration {
+	return this.startTime.Sub(this.finishTime)
 }
 
 func (this *annealerBase) initialDoneValue() bool {
