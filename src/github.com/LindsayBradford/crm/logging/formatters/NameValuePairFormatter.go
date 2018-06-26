@@ -5,7 +5,6 @@ import (
 	"github.com/LindsayBradford/crm/strings"
 )
 
-
 // NameValuePairFormatter formats a LogAttributes array into a string of comma-separated name-value pairs.
 // TODO: Supply example encoding.
 type NameValuePairFormatter struct {}

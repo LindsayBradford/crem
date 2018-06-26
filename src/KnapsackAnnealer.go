@@ -26,7 +26,7 @@ func init() {
 
 func buildLogger() {
 	logBuilder := new(LogHandlerBuilder)
-	logFormatter := new(NameValuePairFormatter)
+	logFormatter := new(JsonFormatter)
 	newLogger, err := logBuilder.
 		// ForNativeLibraryLogHandler().
 		ForBareBonesLogHandler().
