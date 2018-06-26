@@ -26,9 +26,10 @@ func init() {
 
 func buildLogger() {
 	logBuilder := new(LogHandlerBuilder)
-	logFormatter := new(RawMessageFormatter)
+	logFormatter := new(NameValuePairFormatter)
 	newLogger, err := logBuilder.
-		ForNativeLibraryLogHandler().
+		// ForNativeLibraryLogHandler().
+		ForBareBonesLogHandler().
 		WithFormatter(logFormatter).
 		WithLogLevelDestination(DEBUG, STDOUT).
 		// WithLogLevelDestination(ERROR, STDOUT).

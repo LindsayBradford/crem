@@ -31,6 +31,22 @@ func (this *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
 	return this
 }
 
+// ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
+// LogHandler
+func (this *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
+	this.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
+
+	newHandler := new(BareBonesLogHandler)
+
+	defaultDestinations := new(LogLevelDestinations).Initialise()
+	newHandler.SetDestinations(defaultDestinations)
+	newHandler.SetFormatter(new (NullFormatter))
+	newHandler.Initialise()
+
+	this.logHandler = newHandler
+	return this
+}
+
 // WithFormatter instructs LogHandlerBuilder to ensure that the LogHandler constructed will use formatter for its log
 // entry formatting. If not called, the default NullFormatter will be used.
 func (this *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandlerBuilder {

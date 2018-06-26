@@ -31,7 +31,7 @@ func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *Nati
 }
 
 func (this *NativeLibraryLogHandler) Debug(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ "message", message }}
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
 	this.debug.Println("DEBUG " + this.formatter.Format(logAttributes))
 }
 
@@ -40,7 +40,7 @@ func (this *NativeLibraryLogHandler) DebugWithAttributes(logAttributes LogAttrib
 }
 
 func (this *NativeLibraryLogHandler) Info(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ "message", message }}
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
 	this.info.Println("INFO " + this.formatter.Format(logAttributes))
 }
 
@@ -49,7 +49,7 @@ func (this *NativeLibraryLogHandler) InfoWithAttributes(logAttributes LogAttribu
 }
 
 func (this *NativeLibraryLogHandler) Warn(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ "message", message }}
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
 	this.warn.Println("WARN " + this.formatter.Format(logAttributes))
 }
 
@@ -58,7 +58,7 @@ func (this *NativeLibraryLogHandler) WarnWithAttributes(logAttributes LogAttribu
 }
 
 func (this *NativeLibraryLogHandler) Error(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ "message", message }}
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
 	this.error.Println("ERROR " + this.formatter.Format(logAttributes))
 }
 
