@@ -2,17 +2,30 @@ package formatters
 
 import (
 	. "github.com/LindsayBradford/crm/logging/shared"
-	"encoding/json"
-
+	"github.com/LindsayBradford/crm/strings"
 )
 
-// NameValuePairFormatter formats a LogAttributes array into a string of comma-separated name-value pairs.
+// JsonFormatter formats a LogAttributes array into an equivalent JSON encoding.
 // TODO: Supply example encoding.
 type JsonFormatter struct {}
 
 func (this *JsonFormatter) Initialise() {}
 
 func (this *JsonFormatter) Format(attributes LogAttributes) string {
-	atttributesAsJson, _:= json.Marshal(attributes)
-	return string(atttributesAsJson)
+	var builder strings.FluentBuilder
+
+	builder.Add("{")
+	needsComma := false
+
+	for _, attribute := range attributes {
+		if (!needsComma) {
+			needsComma = true
+		} else {
+			builder.Add(", ")
+		}
+		builder.Add("\"", attribute.Name, "\": \"", attribute.Value.(string), "\"")
+	}
+
+	builder.Add("}")
+	return builder.String()
 }
