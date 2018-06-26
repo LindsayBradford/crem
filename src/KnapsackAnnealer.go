@@ -6,6 +6,10 @@ import (
 
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/logging"
+	. "github.com/LindsayBradford/crm/logging/formatters"
+	. "github.com/LindsayBradford/crm/logging/handlers"
+. "github.com/LindsayBradford/crm/logging/shared"
+
 )
 
 const ERROR_STATUS = 1
@@ -22,7 +26,7 @@ func init() {
 
 func buildLogger() {
 	logBuilder := new(LogHandlerBuilder)
-	logFormatter := new(MessageFormatter)
+	logFormatter := new(RawMessageFormatter)
 	newLogger, err := logBuilder.
 		ForNativeLibraryLogHandler().
 		WithFormatter(logFormatter).
@@ -39,7 +43,8 @@ func buildLogger() {
 
 func buildAnnealer() {
 	builder := new(AnnealerBuilder)
-	annealerLogger := new(JsonMessageAnnealingLogger).WithLogHandler(log)
+	// annealerLogger := new(JsonMessageAnnealingLogger).WithLogHandler(log)
+	annealerLogger := new(FreeformAnnealingLogger).WithLogHandler(log)
 
 	log.Debug("About to call AnnealerBuilder.Build() ")
 

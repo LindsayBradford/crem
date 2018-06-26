@@ -1,10 +1,12 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package logging
+package handlers
 
 import (
 	"fmt"
 	"log"
+	. "github.com/LindsayBradford/crm/logging/shared"
+	. "github.com/LindsayBradford/crm/logging/formatters"
 )
 
 type NativeLibraryLogHandler struct {
@@ -16,13 +18,13 @@ type NativeLibraryLogHandler struct {
 }
 
 func (this *NativeLibraryLogHandler) Initialise() {
-	this.debug = log.New(this.destinations.destinations[DEBUG], "", log.Lshortfile|log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.info = log.New(this.destinations.destinations[INFO], "", log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.warn = log.New(this.destinations.destinations[WARN], "", log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.error = log.New(this.destinations.destinations[ERROR], "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.debug = log.New(this.destinations.Destinations[DEBUG], "", log.Lshortfile|log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.info = log.New(this.destinations.Destinations[INFO], "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.warn = log.New(this.destinations.Destinations[WARN], "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	this.error = log.New(this.destinations.Destinations[ERROR], "", log.Ldate|log.Ltime|log.Lmicroseconds)
 }
 
-func (this *NativeLibraryLogHandler) WithFormatter(formatter LogAttributeFormatter) *NativeLibraryLogHandler {
+func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *NativeLibraryLogHandler {
 	formatter.Initialise()
 	this.formatter = formatter
 	return this

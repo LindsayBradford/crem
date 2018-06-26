@@ -1,0 +1,62 @@
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
+// handlers package defines handlers responsible for formatting log entries (delegated to LogFormatter) and delivering
+// the formatted entries to whatever log destinations are needed.
+package handlers
+
+import (
+	. "github.com/LindsayBradford/crm/logging/formatters"
+	. "github.com/LindsayBradford/crm/logging/shared"
+)
+
+// LogHandler defines an interface for the handling of logging. It sets out methods for logging at the various supported
+// LogLevels of either a free-form string (traditional), or LogAttributes (for machine-friendly logging). It delegates
+// formatting to a LogFormatter, and resolution of log destination streams to LogLevelDestinations.
+type LogHandler interface {
+	Debug(message string)
+	DebugWithAttributes(logAttributes LogAttributes)
+
+	Info(message string)
+	InfoWithAttributes(logAttributes LogAttributes)
+
+	Warn(message string)
+	WarnWithAttributes(logAttributes LogAttributes)
+
+	Error(message string)
+	ErrorWithAttributes(logAttributes LogAttributes)
+	ErrorWithError(err error)
+
+	Initialise()
+
+	SetDestinations(*LogLevelDestinations)
+	Destinations() *LogLevelDestinations
+
+	SetFormatter(formatter LogFormatter)
+	Formatter() LogFormatter
+}
+
+// LogHandlerBase is a base struct that implements default behaviour that matches the LogHandler interface
+type LogHandlerBase struct {
+	destinations *LogLevelDestinations
+	formatter LogFormatter
+}
+
+// SetDestinations allows a pre-defined LogLevelDestinations instance to be assigned, and subsequently used for
+// log destination stream resolution.
+func (this *LogHandlerBase) SetDestinations(destinations *LogLevelDestinations) {
+	this.destinations = destinations
+}
+
+func (this *LogHandlerBase) Destinations() *LogLevelDestinations {
+	return this.destinations
+}
+
+// SetFormatter tells the LogHandlerBase to use the supplied formatter for preparing a given log entry for writing
+// to its final LogLevelDestination
+func (this *LogHandlerBase) SetFormatter(formatter LogFormatter) {
+	this.formatter = formatter
+}
+
+func (this *LogHandlerBase) Formatter() LogFormatter {
+	return this.formatter
+}

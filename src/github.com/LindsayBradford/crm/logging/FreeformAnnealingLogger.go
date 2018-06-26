@@ -1,11 +1,15 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
 package logging
 
 import (
 	. "github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/strings"
+	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
+// FreeformAnnealingLogger produces a stream of human-friendly, free-form text log entries from any observed
+// AnnealingEvent instances received.
 type FreeformAnnealingLogger struct {
 	AnnealingLogger
 }
@@ -15,6 +19,8 @@ func (this *FreeformAnnealingLogger) WithLogHandler(handler LogHandler) *Freefor
 	return this
 }
 
+// ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
+// then passes onto its relevant LogHandler as an Info call.
 func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 	annealer := wrap(event.Annealer)
 
@@ -30,7 +36,7 @@ func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent)
 	case STARTED_ITERATION, FINISHED_ANNEALING:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
-			Add("Temperature [", annealer.Temperature(), "], ")
+			Add("Temperature [", annealer.Temperature(), "]")
 	case NOTE:
 		builder.Add("[", event.Note, "]")
 	default:
