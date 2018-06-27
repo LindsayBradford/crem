@@ -5,9 +5,10 @@ import (
 	"os"
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/shared"
 	. "github.com/LindsayBradford/crm/logging"
+	. "github.com/LindsayBradford/crm/logging/modulators"
+	. "github.com/LindsayBradford/crm/logging/formatters"
 )
 
 const ERROR_STATUS = 1
@@ -48,6 +49,7 @@ func buildMachineLogger() {
 		ForBareBonesLogHandler().
 		WithFormatter(new(JsonFormatter)).
 		// WithLogLevelDestination(INFO, DISCARD).
+		WithLogLevelDestination(INFO, STDOUT).
 		Build()
 
 	if (err != nil) {
@@ -59,8 +61,14 @@ func buildMachineLogger() {
 
 func buildAnnealer() {
 	builder := new(AnnealerBuilder)
-	machineAudienceLogger := new(AnnealingAttributeLogger).WithLogHandler(machineLogHandler)
-	humanAudienceLogger := new(FreeformAnnealingLogger).WithLogHandler(humanLogHandler)
+	machineAudienceLogger := new(AnnealingAttributeLogger).
+		WithLogHandler(machineLogHandler).
+		WithModulator(new(NullModulator))
+	humanAudienceLogger := new(FreeformAnnealingLogger).
+		WithLogHandler(humanLogHandler).
+		WithModulator(new(NullModulator))
+		// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
+		// WithModulator(new(IterationModuloLoggingModulator).WithModulo(5))
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 

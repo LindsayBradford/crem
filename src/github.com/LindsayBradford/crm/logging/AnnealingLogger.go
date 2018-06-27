@@ -7,12 +7,14 @@ package logging
 import (
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
 // AnnealingLogger is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
 // drops any AnnealingEvents received.
 type AnnealingLogger struct {
 	logHandler LogHandler
+	modulator LoggingModulator
 }
 
 // Allows for the receipt of AnnelingEvent instances, but deliberately takes no action in logging those events.

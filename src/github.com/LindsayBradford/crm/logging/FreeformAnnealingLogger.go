@@ -6,6 +6,7 @@ import (
 	. "github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/strings"
 	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
 // FreeformAnnealingLogger produces a stream of human-friendly, free-form text log entries from any observed
@@ -19,9 +20,18 @@ func (this *FreeformAnnealingLogger) WithLogHandler(handler LogHandler) *Freefor
 	return this
 }
 
+func (this *FreeformAnnealingLogger) WithModulator(modulator  LoggingModulator) *FreeformAnnealingLogger {
+	this.modulator = modulator
+	return this
+}
+
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
 func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+	if this.modulator.ShouldModulate(event) {
+		return
+	}
+
 	annealer := wrap(event.Annealer)
 
 	var builder strings.FluentBuilder

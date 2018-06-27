@@ -6,7 +6,8 @@ import (
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/shared"
-	)
+	. "github.com/LindsayBradford/crm/logging/modulators"
+)
 
 // AnnealingAttributeLogger produces a relevant set of LogAttributes to match any AnnealingEvents received
 // and passes those events to its LogHandler for whatever logging is appropriate.
@@ -19,9 +20,18 @@ func (this *AnnealingAttributeLogger) WithLogHandler(handler LogHandler) *Anneal
 	return this
 }
 
+func (this *AnnealingAttributeLogger) WithModulator(modulator  LoggingModulator) *AnnealingAttributeLogger {
+	this.modulator = modulator
+	return this
+}
+
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
 func (this *AnnealingAttributeLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+	if this.modulator.ShouldModulate(event) {
+		return
+	}
+
 	annealer := wrap(event.Annealer)
 
 	logAttributes := make(LogAttributes, 0)
