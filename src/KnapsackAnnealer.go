@@ -3,65 +3,80 @@ package main
 
 import (
 	"os"
-
 	. "github.com/LindsayBradford/crm/annealing"
-	. "github.com/LindsayBradford/crm/logging"
-	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-. "github.com/LindsayBradford/crm/logging/shared"
-
+	. "github.com/LindsayBradford/crm/logging/formatters"
+	. "github.com/LindsayBradford/crm/logging/shared"
+	. "github.com/LindsayBradford/crm/logging"
 )
 
 const ERROR_STATUS = 1
 
 var (
-	log LogHandler
-	annealer Annealer
+	humanLogHandler   LogHandler
+	machineLogHandler LogHandler
+	annealer          Annealer
 )
 
 func init() {
-	buildLogger()
+	buildHumanLogger()
+	buildMachineLogger()
 	buildAnnealer()
 }
 
-func buildLogger() {
+func buildHumanLogger() {
 	logBuilder := new(LogHandlerBuilder)
-	logFormatter := new(JsonFormatter)
+
 	newLogger, err := logBuilder.
-		// ForNativeLibraryLogHandler().
-		ForBareBonesLogHandler().
-		WithFormatter(logFormatter).
+		ForNativeLibraryLogHandler().
+		WithFormatter(new(RawMessageFormatter)).
 		WithLogLevelDestination(DEBUG, STDOUT).
-		// WithLogLevelDestination(ERROR, STDOUT).
+		// WithLogLevelDestination(DEBUG, DISCARD).
+		// WithLogLevelDestination(INFO, DISCARD).
 		Build()
 
 	if (err != nil) {
-		log.ErrorWithError(err)
+		humanLogHandler.ErrorWithError(err)
 		os.Exit(ERROR_STATUS)
 	}
-	log = newLogger
+	humanLogHandler = newLogger
+}
+
+func buildMachineLogger() {
+	logBuilder := new(LogHandlerBuilder)
+	newLogger, err := logBuilder.
+		ForBareBonesLogHandler().
+		WithFormatter(new(JsonFormatter)).
+		// WithLogLevelDestination(INFO, DISCARD).
+		Build()
+
+	if (err != nil) {
+		machineLogHandler.ErrorWithError(err)
+		os.Exit(ERROR_STATUS)
+	}
+	machineLogHandler = newLogger
 }
 
 func buildAnnealer() {
 	builder := new(AnnealerBuilder)
-	// annealerLogger := new(JsonMessageAnnealingLogger).WithLogHandler(log)
-	annealerLogger := new(FreeformAnnealingLogger).WithLogHandler(log)
+	machineAudienceLogger := new(JsonMessageAnnealingLogger).WithLogHandler(machineLogHandler)
+	humanAudienceLogger := new(FreeformAnnealingLogger).WithLogHandler(humanLogHandler)
 
-	log.Debug("About to call AnnealerBuilder.Build() ")
+	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 
 	newAnnealer, err := builder.
 		SingleObjectiveAnnealer().
 		WithStartingTemperature(1000).
 		WithCoolingFactor(0.995).
 		WithMaxIterations(5).
-		WithObservers(annealerLogger).
+		WithObservers(machineAudienceLogger, humanAudienceLogger).
 		Build()
 
-	log.Debug("Call to AnnealerBuilder.Build() finished")
+	humanLogHandler.Debug("Call to AnnealerBuilder.Build() finished")
 
 	if (err != nil) {
-		log.ErrorWithError(err)
-		log.Error("Exiting program due to failed Annealer build")
+		humanLogHandler.ErrorWithError(err)
+		humanLogHandler.Error("Exiting program due to failed Annealer build")
 		os.Exit(ERROR_STATUS)
 	}
 
@@ -69,7 +84,7 @@ func buildAnnealer() {
 }
 
 func main() {
-	log.Debug("About to call annealer.Anneal()")
+	humanLogHandler.Debug("About to call annealer.Anneal()")
 	annealer.Anneal()
-	log.Debug("Call to annealer.Anneal() finished. Exiting Program")
+	humanLogHandler.Debug("Call to annealer.Anneal() finished. Exiting Program")
 }
