@@ -8,20 +8,20 @@ import (
 	. "github.com/LindsayBradford/crm/logging/shared"
 	)
 
-// JsonMessageAnnealingLogger produces a stream of text log entries from any observed
-// AnnealingEvent, logging the event as a JSON encoding of the event's content.
-type JsonMessageAnnealingLogger struct{
+// AnnealingAttributeLogger produces a relevant set of LogAttributes to match any AnnealingEvents received
+// and passes those events to its LogHandler for whatever logging is appropriate.
+type AnnealingAttributeLogger struct{
 	AnnealingLogger
 }
 
-func (this *JsonMessageAnnealingLogger) WithLogHandler(handler LogHandler) *JsonMessageAnnealingLogger {
+func (this *AnnealingAttributeLogger) WithLogHandler(handler LogHandler) *AnnealingAttributeLogger {
 	this.logHandler = handler
 	return this
 }
 
-// ObserveAnnealingEvent captures and converts AnnealingEvent instances into a JSON encoding of the event that it
-// then passes onto its relevant LogHandler as an Info call.
-func (this *JsonMessageAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+// ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
+// captures key attributes associated with the event, and passes them to the LogHandler for processing.
+func (this *AnnealingAttributeLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 	annealer := wrap(event.Annealer)
 
 	logAttributes := make(LogAttributes, 0)

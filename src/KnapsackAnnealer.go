@@ -59,7 +59,7 @@ func buildMachineLogger() {
 
 func buildAnnealer() {
 	builder := new(AnnealerBuilder)
-	machineAudienceLogger := new(JsonMessageAnnealingLogger).WithLogHandler(machineLogHandler)
+	machineAudienceLogger := new(AnnealingAttributeLogger).WithLogHandler(machineLogHandler)
 	humanAudienceLogger := new(FreeformAnnealingLogger).WithLogHandler(humanLogHandler)
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
