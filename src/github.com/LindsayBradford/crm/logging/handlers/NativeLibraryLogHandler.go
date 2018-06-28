@@ -18,10 +18,11 @@ type NativeLibraryLogHandler struct {
 }
 
 func (this *NativeLibraryLogHandler) Initialise() {
-	this.debug = log.New(this.destinations.Destinations[DEBUG], "", log.Lshortfile|log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.info = log.New(this.destinations.Destinations[INFO], "", log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.warn = log.New(this.destinations.Destinations[WARN], "", log.Ldate|log.Ltime|log.Lmicroseconds)
-	this.error = log.New(this.destinations.Destinations[ERROR], "", log.Ldate|log.Ltime|log.Lmicroseconds)
+	const metadataMask = log.Ldate|log.Ltime|log.Lmicroseconds
+	this.debug = log.New(this.destinations.Destinations[DEBUG], "", metadataMask)
+	this.info = log.New(this.destinations.Destinations[INFO], "", metadataMask)
+	this.warn = log.New(this.destinations.Destinations[WARN], "", metadataMask)
+	this.error = log.New(this.destinations.Destinations[ERROR], "", metadataMask)
 }
 
 func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *NativeLibraryLogHandler {

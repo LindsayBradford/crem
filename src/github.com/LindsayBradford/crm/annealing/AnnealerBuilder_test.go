@@ -10,7 +10,7 @@ func TestBuild_usingDefaults(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		Build()
 
 	g.Expect(
@@ -40,7 +40,7 @@ func TestBuild_OverrdingDefaults(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		WithStartingTemperature(expectedTemperature).
 		WithCoolingFactor(expectedCoolingFactor).
 		WithMaxIterations(expectedIterations).

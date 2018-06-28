@@ -12,7 +12,7 @@ func TestAnneal_Defaults(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		Build()
 
 	g.Expect(
@@ -41,7 +41,7 @@ func TestAnneal(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		WithStartingTemperature(startTemperature).
 		WithCoolingFactor(coolingFactor).
 		WithMaxIterations(iterations).

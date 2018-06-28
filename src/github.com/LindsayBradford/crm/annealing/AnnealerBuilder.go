@@ -4,6 +4,7 @@ package annealing
 import (
 	"errors"
 	crmerrors "github.com/LindsayBradford/crm/errors"
+	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type AnnealerBuilder struct {
@@ -11,10 +12,18 @@ type AnnealerBuilder struct {
 	buildErrors *crmerrors.CompositeError
 }
 
-func (this *AnnealerBuilder) SingleObjectiveAnnealer() *AnnealerBuilder {
-	this.annealer = &singleObjectiveAnnealer{}
+func (this *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
+	this.annealer = &ElapsedTimeTrackingAnnealer{}
 	this.annealer.Initialise()
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid single-objective annealer")
+	this.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	return this
+}
+
+func (this *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
+	annealer := this.annealer
+	if err := annealer.setLogHandler(logHandler); err != nil {
+		this.buildErrors.Add(err)
+	}
 	return this
 }
 

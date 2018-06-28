@@ -35,8 +35,8 @@ func buildHumanLogger() {
 	newLogger, err := logBuilder.
 		ForNativeLibraryLogHandler().
 		WithFormatter(new(RawMessageFormatter)).
-		WithLogLevelDestination(DEBUG, STDOUT).
-		// WithLogLevelDestination(DEBUG, DISCARD).
+		// WithLogLevelDestination(DEBUG, STDOUT).
+		WithLogLevelDestination(DEBUG, DISCARD).
 		// WithLogLevelDestination(INFO, DISCARD).
 		Build()
 
@@ -77,7 +77,8 @@ func buildAnnealer() {
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 
 	newAnnealer, err := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
+		WithLogHandler(humanLogHandler).
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.997).
 		WithMaxIterations(1000).

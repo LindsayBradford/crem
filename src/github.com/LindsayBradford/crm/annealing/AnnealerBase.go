@@ -3,7 +3,8 @@ package annealing
 
 import (
 	"errors"
-	"time"
+
+	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type annealerBase struct {
@@ -13,9 +14,7 @@ type annealerBase struct {
 	currentIteration uint
 	observers        []AnnealingObserver
 	objectiveManager ObjectiveManager
-
-	startTime time.Time
-	finishTime time.Time
+	logger LogHandler
 }
 
 func (this *annealerBase) Initialise() {
@@ -65,6 +64,17 @@ func (this *annealerBase) SetObjectiveManager(manager ObjectiveManager)  error {
 		return errors.New("Invalid attempt to set Objective Manager to nil value")
 	}
 	this.objectiveManager = manager; return nil
+}
+
+func (this *annealerBase) setLogHandler(logger LogHandler)  error {
+	if logger == nil {
+		return errors.New("Invalid attempt to set log handler to nil value")
+	}
+	this.logger = logger; return nil
+}
+
+func (this *annealerBase) LogHandler() LogHandler {
+	return this.logger
 }
 
 func (this *annealerBase) AddObserver(newObserver AnnealingObserver) error {
@@ -124,7 +134,6 @@ func (this *annealerBase) Anneal() {
 
 func (this *annealerBase) annealingStarted() {
 	this.notifyObservers(STARTED_ANNEALING)
-	this.startTime = time.Now()
 }
 
 func (this *annealerBase) iterationStarted() {
@@ -134,11 +143,6 @@ func (this *annealerBase) iterationStarted() {
 
 func (this *annealerBase) annealingFinished() {
 	this.notifyObservers(FINISHED_ANNEALING)
-	this.finishTime = time.Now()
-}
-
-func (this *annealerBase) ElapsedTime() time.Duration {
-	return this.finishTime.Sub(this.startTime)
 }
 
 func (this *annealerBase) initialDoneValue() bool {

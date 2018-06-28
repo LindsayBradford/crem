@@ -18,7 +18,7 @@ func TestAnnealerStateFormatWrapper_Defaults(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		Build()
 
 	wrapperUnderTest := new(AnnealerStateFormatWrapper).Initialise().Wrapping(annealer)
@@ -51,7 +51,7 @@ func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
 	builder := new(AnnealerBuilder)
 
 	annealer, _ := builder.
-		SingleObjectiveAnnealer().
+		ElapsedTimeTrackingAnnealer().
 		Build()
 
 	wrapperUnderTest := &AnnealerStateFormatWrapper{}
