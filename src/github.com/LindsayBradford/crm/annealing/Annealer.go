@@ -8,6 +8,8 @@ type Annealer interface {
 	setCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
+	SetObjectiveManager(manager ObjectiveManager) error
+
 	setMaxIterations(iterations uint)
 	MaxIterations() uint
 

@@ -12,6 +12,7 @@ type annealerBase struct {
 	maxIterations    uint
 	currentIteration uint
 	observers        []AnnealingObserver
+	objectiveManager ObjectiveManager
 
 	startTime time.Time
 	finishTime time.Time
@@ -22,6 +23,7 @@ func (this *annealerBase) Initialise() {
 	this.coolingFactor = 1
 	this.maxIterations = 0
 	this.currentIteration = 0
+	this.objectiveManager = new(DumbObjectiveManager)
 }
 
 func (this *annealerBase) setTemperature(temperature float64) error {
@@ -58,6 +60,13 @@ func (this *annealerBase) CurrentIteration() uint {
 	return this.currentIteration
 }
 
+func (this *annealerBase) SetObjectiveManager(manager ObjectiveManager)  error {
+	if manager == nil {
+		return errors.New("Invalid attempt to set Objective Manager to nil value")
+	}
+	this.objectiveManager = manager; return nil
+}
+
 func (this *annealerBase) AddObserver(newObserver AnnealingObserver) error {
 	if newObserver == nil {
 		return errors.New("Invalid attempt to add non-existant observer to annealer")
@@ -68,6 +77,14 @@ func (this *annealerBase) AddObserver(newObserver AnnealingObserver) error {
 func (this *annealerBase) notifyObserversWith(thisNote string) {
 	event := AnnealingEvent{
 		EventType: NOTE,
+		Annealer:  this,
+		Note:      thisNote}
+	this.notifyObserversWithEvent(event)
+}
+
+func (this *annealerBase) notifyObserversWithObjectiveEvaluation(thisNote string) {
+	event := AnnealingEvent{
+		EventType: OBJECTIVE_EVALUATION,
 		Annealer:  this,
 		Note:      thisNote}
 	this.notifyObserversWithEvent(event)
@@ -91,15 +108,15 @@ func (this *annealerBase) notifyObserversWithEvent(event AnnealingEvent) {
 func (this *annealerBase) Anneal() {
 	this.annealingStarted()
 
+	this.objectiveManager.Initialise(this)
+
 	for done := this.initialDoneValue(); !done; {
 		this.iterationStarted()
 
-		// do the actual objective function work here.
+		this.objectiveManager.TryRandomChange()
 
 		this.cooldown()
-		if this.shouldFinish() {
-			done = true
-		}
+		done = this.checkIfDone()
 	}
 
 	this.annealingFinished()
@@ -121,14 +138,14 @@ func (this *annealerBase) annealingFinished() {
 }
 
 func (this *annealerBase) ElapsedTime() time.Duration {
-	return this.startTime.Sub(this.finishTime)
+	return this.finishTime.Sub(this.startTime)
 }
 
 func (this *annealerBase) initialDoneValue() bool {
 	return this.maxIterations == 0
 }
 
-func (this *annealerBase) shouldFinish() bool {
+func (this *annealerBase) checkIfDone() bool {
 	return this.currentIteration >= this.maxIterations
 }
 

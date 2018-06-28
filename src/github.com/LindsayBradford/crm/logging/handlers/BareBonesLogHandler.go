@@ -92,7 +92,7 @@ func (this *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
 	var builder strings.FluentBuilder
 	builder.Add(text, "\n")
 
-	// TODO:  THis probably needs a semaphore once we go concurrent.
+	// TODO:  sync.Mutex per destination for when we are concurrent?
 	io.WriteString(this.destinations.Destinations[logLevel], builder.String())
 }
 

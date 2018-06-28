@@ -9,25 +9,25 @@ import (
 	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
-// FreeformAnnealingLogger produces a stream of human-friendly, free-form text log entries from any observed
+// AnnealingMessageLogger produces a stream of human-friendly, free-form text log entries from any observed
 // AnnealingEvent instances received.
-type FreeformAnnealingLogger struct {
+type AnnealingMessageLogger struct {
 	AnnealingLogger
 }
 
-func (this *FreeformAnnealingLogger) WithLogHandler(handler LogHandler) *FreeformAnnealingLogger {
+func (this *AnnealingMessageLogger) WithLogHandler(handler LogHandler) *AnnealingMessageLogger {
 	this.logHandler = handler
 	return this
 }
 
-func (this *FreeformAnnealingLogger) WithModulator(modulator  LoggingModulator) *FreeformAnnealingLogger {
+func (this *AnnealingMessageLogger) WithModulator(modulator  LoggingModulator) *AnnealingMessageLogger {
 	this.modulator = modulator
 	return this
 }
 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
-func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {
+func (this *AnnealingMessageLogger) ObserveAnnealingEvent(event AnnealingEvent) {
 	if this.modulator.ShouldModulate(event) {
 		return
 	}
@@ -47,7 +47,7 @@ func (this *FreeformAnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent)
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Temperature [", annealer.Temperature(), "]")
-	case NOTE:
+	case NOTE, OBJECTIVE_EVALUATION:
 		builder.Add("[", event.Note, "]")
 	default:
 		// deliberately does nothing extra

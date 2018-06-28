@@ -20,7 +20,7 @@ func (this *IterationModuloLoggingModulator) WithModulo(modulo uint) *IterationM
 // received, one is allowed through to the LogHandler. The very first very last STARTED_ITERATION events are
 // exceptions, and are also not modulated.
 func (this *IterationModuloLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
-	if event.EventType != STARTED_ITERATION {
+	if event.EventType != STARTED_ITERATION && event.EventType != OBJECTIVE_EVALUATION {
 		return false
 	}
 

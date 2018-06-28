@@ -17,8 +17,10 @@ const (
 	INVALID_EVENT AnnealingEventType = iota
 	STARTED_ANNEALING
 	STARTED_ITERATION
+	OBJECTIVE_EVALUATION
 	FINISHED_ANNEALING
 	NOTE
+	DEBUG_NOTE
 )
 
 func (eventType AnnealingEventType) String() string {
@@ -26,8 +28,10 @@ func (eventType AnnealingEventType) String() string {
 		"INVALID_EVENT",
 		"STARTED_ANNEALING",
 		"STARTED_ITERATION",
+		"OBJECTIVE_EVALUATION",
 		"FINISHED_ANNEALING",
-		"NOTE"}
+		"NOTE",
+	}
 
 	if eventType < STARTED_ANNEALING || eventType > NOTE {
 		return labels[INVALID_EVENT]

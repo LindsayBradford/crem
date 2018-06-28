@@ -25,7 +25,7 @@ func (this *IterationElapsedTimeLoggingModulator) WithWait(wait time.Duration) *
 // are either 1) the very first or very last STARTED_ITERATION event, or 2) the closest STARTED_ITERATION event to have
 // occurred after the wait duration has passed after the previous was allowed through.
 func (this *IterationElapsedTimeLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
-	if event.EventType != STARTED_ITERATION {
+	if event.EventType != STARTED_ITERATION && event.EventType != OBJECTIVE_EVALUATION {
 		return false
 	}
 

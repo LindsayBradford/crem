@@ -2,13 +2,17 @@
 package main
 
 import (
-	"os"
-	. "github.com/LindsayBradford/crm/annealing"
-	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/shared"
-	. "github.com/LindsayBradford/crm/logging"
-	. "github.com/LindsayBradford/crm/logging/modulators"
-	. "github.com/LindsayBradford/crm/logging/formatters"
+"os"
+
+
+. "github.com/LindsayBradford/crm/annealing"
+. "github.com/LindsayBradford/crm/logging"
+. "github.com/LindsayBradford/crm/logging/formatters"
+. "github.com/LindsayBradford/crm/logging/handlers"
+. "github.com/LindsayBradford/crm/logging/modulators"
+. "github.com/LindsayBradford/crm/logging/shared"
+
+
 )
 
 const ERROR_STATUS = 1
@@ -48,8 +52,8 @@ func buildMachineLogger() {
 	newLogger, err := logBuilder.
 		ForBareBonesLogHandler().
 		WithFormatter(new(JsonFormatter)).
-		// WithLogLevelDestination(INFO, DISCARD).
-		WithLogLevelDestination(INFO, STDOUT).
+		WithLogLevelDestination(INFO, DISCARD).
+		// WithLogLevelDestination(INFO, STDOUT).
 		Build()
 
 	if (err != nil) {
@@ -64,7 +68,7 @@ func buildAnnealer() {
 	machineAudienceLogger := new(AnnealingAttributeLogger).
 		WithLogHandler(machineLogHandler).
 		WithModulator(new(NullModulator))
-	humanAudienceLogger := new(FreeformAnnealingLogger).
+	humanAudienceLogger := new(AnnealingMessageLogger).
 		WithLogHandler(humanLogHandler).
 		WithModulator(new(NullModulator))
 		// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
@@ -74,9 +78,9 @@ func buildAnnealer() {
 
 	newAnnealer, err := builder.
 		SingleObjectiveAnnealer().
-		WithStartingTemperature(1000).
-		WithCoolingFactor(0.995).
-		WithMaxIterations(5).
+		WithStartingTemperature(10).
+		WithCoolingFactor(0.997).
+		WithMaxIterations(1000).
 		WithObservers(machineAudienceLogger, humanAudienceLogger).
 		Build()
 

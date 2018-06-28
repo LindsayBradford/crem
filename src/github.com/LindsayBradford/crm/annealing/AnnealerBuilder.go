@@ -34,6 +34,14 @@ func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerB
 	return this
 }
 
+func (this *AnnealerBuilder) WithObjectiveManager(manager ObjectiveManager) *AnnealerBuilder {
+	annealer := this.annealer
+	if err := annealer.SetObjectiveManager(manager); err != nil {
+		this.buildErrors.Add(err)
+	}
+	return this
+}
+
 func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
 	annealer := this.annealer
 	annealer.setMaxIterations(iterations)
