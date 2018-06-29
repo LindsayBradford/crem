@@ -1,8 +1,6 @@
-/*
- * Copyright (c) 2018 Australian Rivers Institure. Author: Lindsay Bradford
- */
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package annealing
+package shared
 
 import . "github.com/onsi/gomega"
 import "testing"
@@ -15,11 +13,8 @@ func TestAnnealerStateFormatWrapper_Defaults(t *testing.T) {
 	const expectedMaxIterations = "0"
 	const expectedCurrentIteration = "0"
 
-	builder := new(AnnealerBuilder)
-
-	annealer, _ := builder.
-		ElapsedTimeTrackingAnnealer().
-		Build()
+	annealer := new(AnnealerBase)
+	annealer.Initialise()
 
 	wrapperUnderTest := new(AnnealerStateFormatWrapper).Initialise().Wrapping(annealer)
 
@@ -48,11 +43,8 @@ func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
 	const expectedMaxIterations = "000"
 	const expectedCurrentIteration = "00"
 
-	builder := new(AnnealerBuilder)
-
-	annealer, _ := builder.
-		ElapsedTimeTrackingAnnealer().
-		Build()
+	annealer := new(AnnealerBase)
+	annealer.Initialise()
 
 	wrapperUnderTest := &AnnealerStateFormatWrapper{}
 	wrapperUnderTest.Initialise().Wrapping(annealer)

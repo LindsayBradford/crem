@@ -7,7 +7,7 @@ import (
 
 // NameValuePairFormatter formats a LogAttributes array into a string of comma-separated name-value pairs.
 // TODO: Supply example encoding.
-type NameValuePairFormatter struct {}
+type NameValuePairFormatter struct{}
 
 func (this *NameValuePairFormatter) Initialise() {}
 
@@ -17,7 +17,7 @@ func (this *NameValuePairFormatter) Format(attributes LogAttributes) string {
 	needsComma := false
 
 	for _, attribute := range attributes {
-		if (!needsComma) {
+		if !needsComma {
 			needsComma = true
 		} else {
 			builder.Add(", ")

@@ -1,25 +1,27 @@
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package annealing
+package shared
 
 import (
+	. "github.com/LindsayBradford/crm/annealing/objectives"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type Annealer interface {
-	setTemperature(temperature float64) error
+	SetTemperature(temperature float64) error
 	Temperature() float64
 
-	setCoolingFactor(coolingFactor float64) error
+	SetCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
+	ObjectiveManager() ObjectiveManager
 	SetObjectiveManager(manager ObjectiveManager) error
 
-	setMaxIterations(iterations uint)
+	SetMaxIterations(iterations uint)
 	MaxIterations() uint
 
 	AddObserver(observer AnnealingObserver) error
 
-	setLogHandler(logger LogHandler) error
+	SetLogHandler(logger LogHandler) error
 	LogHandler() LogHandler
 
 	Initialise()

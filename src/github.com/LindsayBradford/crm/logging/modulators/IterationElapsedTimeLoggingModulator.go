@@ -3,7 +3,7 @@
 package modulators
 
 import (
-	. "github.com/LindsayBradford/crm/annealing"
+	. "github.com/LindsayBradford/crm/annealing/shared"
 	"time"
 )
 
@@ -11,7 +11,7 @@ import (
 // except STARTED_ITERATION. This Modulator will modulate STARTED_ITERATION events at a rate of one event per every
 // elapsed wait duration specified. The very first very last events are exceptions, and are also not modulated.
 type IterationElapsedTimeLoggingModulator struct {
-	waitDuration time.Duration
+	waitDuration    time.Duration
 	lastTimeAllowed time.Time
 }
 
@@ -25,17 +25,17 @@ func (this *IterationElapsedTimeLoggingModulator) WithWait(wait time.Duration) *
 // are either 1) the very first or very last STARTED_ITERATION event, or 2) the closest STARTED_ITERATION event to have
 // occurred after the wait duration has passed after the previous was allowed through.
 func (this *IterationElapsedTimeLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
-	if event.EventType != STARTED_ITERATION && event.EventType != OBJECTIVE_EVALUATION {
+	if event.EventType != STARTED_ITERATION && event.EventType != FINISHED_ITERATION {
 		return false
 	}
 
 	annealer := event.Annealer
-	if annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations() {
+	if event.EventType == FINISHED_ITERATION && (annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations()) {
 		this.lastTimeAllowed = time.Now()
 		return false
 	}
 
-	if time.Now().Sub(this.lastTimeAllowed) >= this.waitDuration {
+	if event.EventType == FINISHED_ITERATION && time.Now().Sub(this.lastTimeAllowed) >= this.waitDuration {
 		this.lastTimeAllowed = this.lastTimeAllowed.Add(this.waitDuration)
 		return false
 	}

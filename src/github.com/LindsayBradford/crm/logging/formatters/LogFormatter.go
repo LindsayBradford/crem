@@ -21,7 +21,7 @@ const NULL_FORMAT_MESSAGE = "No formatter specified. Using the NullFormatter."
 // NullFormatter implements a 'null object' placeholder formatter that is supplied by default if one is not specified.
 // It returns a static message as per NULL_FORMAT_MESSAGE as a reminder that a proper formatter must be supplied
 // for the logging to do anything meaningful.
-type NullFormatter struct {}
+type NullFormatter struct{}
 
 func (this *NullFormatter) Initialise() {}
 
@@ -45,7 +45,7 @@ func (this *RawMessageFormatter) Initialise() {
 
 func (this *RawMessageFormatter) Format(attributes LogAttributes) string {
 	for _, attribute := range attributes {
-		if (attribute.Name == this.messageLabel) {
+		if attribute.Name == this.messageLabel {
 			return attribute.Value.(string)
 		}
 	}

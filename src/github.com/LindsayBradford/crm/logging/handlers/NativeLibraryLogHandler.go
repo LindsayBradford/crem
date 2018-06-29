@@ -4,21 +4,21 @@ package handlers
 
 import (
 	"fmt"
-	"log"
-	. "github.com/LindsayBradford/crm/logging/shared"
 	. "github.com/LindsayBradford/crm/logging/formatters"
+	. "github.com/LindsayBradford/crm/logging/shared"
+	"log"
 )
 
 type NativeLibraryLogHandler struct {
 	LogHandlerBase
 
-	loggerMap map[LogLevel] *log.Logger
+	loggerMap map[LogLevel]*log.Logger
 }
 
-const metadataMask = log.Ldate|log.Ltime|log.Lmicroseconds
+const metadataMask = log.Ldate | log.Ltime | log.Lmicroseconds
 
 func (this *NativeLibraryLogHandler) Initialise() {
-	this.loggerMap = make(map[LogLevel] *log.Logger)
+	this.loggerMap = make(map[LogLevel]*log.Logger)
 	this.AddLogLevel(DEBUG).AddLogLevel(INFO).AddLogLevel(WARN).AddLogLevel(ERROR)
 }
 
@@ -70,10 +70,10 @@ func (this *NativeLibraryLogHandler) ErrorWithError(err error) {
 }
 
 func (this *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	this.loggerMap[logLevel].Println(string(logLevel) + " " + this.formatter.Format(logAttributes))
+	logAttributes := LogAttributes{NameValuePair{MESSAGE_LABEL, message}}
+	this.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + this.formatter.Format(logAttributes))
 }
 
 func (this *NativeLibraryLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
-	this.loggerMap[logLevel].Println(string(logLevel) + " " + this.formatter.Format(logAttributes))
+	this.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + this.formatter.Format(logAttributes))
 }

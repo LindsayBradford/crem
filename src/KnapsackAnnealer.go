@@ -2,17 +2,15 @@
 package main
 
 import (
-"os"
+	"os"
 
-
-. "github.com/LindsayBradford/crm/annealing"
-. "github.com/LindsayBradford/crm/logging"
-. "github.com/LindsayBradford/crm/logging/formatters"
-. "github.com/LindsayBradford/crm/logging/handlers"
-. "github.com/LindsayBradford/crm/logging/modulators"
-. "github.com/LindsayBradford/crm/logging/shared"
-
-
+	. "github.com/LindsayBradford/crm/annealing"
+	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crm/logging"
+	. "github.com/LindsayBradford/crm/logging/formatters"
+	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crm/logging/shared"
+	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
 const ERROR_STATUS = 1
@@ -42,7 +40,7 @@ func buildHumanLogger() {
 		// WithLogLevelDestination(ANNEALER, DISCARD).
 		Build()
 
-	if (err != nil) {
+	if err != nil {
 		humanLogHandler.ErrorWithError(err)
 		os.Exit(ERROR_STATUS)
 	}
@@ -58,7 +56,7 @@ func buildMachineLogger() {
 		// WithLogLevelDestination(ANNEALER, STDOUT).
 		Build()
 
-	if (err != nil) {
+	if err != nil {
 		machineLogHandler.ErrorWithError(err)
 		os.Exit(ERROR_STATUS)
 	}
@@ -67,14 +65,14 @@ func buildMachineLogger() {
 
 func buildAnnealer() {
 	builder := new(AnnealerBuilder)
-	machineAudienceLogger := new(AnnealingAttributeLogger).
+	machineAudienceObserver := new(AnnealingAttributeObserver).
 		WithLogHandler(machineLogHandler).
 		WithModulator(new(NullModulator))
-	humanAudienceLogger := new(AnnealingMessageLogger).
+	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(humanLogHandler).
-		WithModulator(new(NullModulator))
+		// WithModulator(new(NullModulator))
 		// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
-		// WithModulator(new(IterationModuloLoggingModulator).WithModulo(5))
+		WithModulator(new(IterationModuloLoggingModulator).WithModulo(200))
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 
@@ -83,13 +81,13 @@ func buildAnnealer() {
 		WithLogHandler(humanLogHandler).
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.997).
-		WithMaxIterations(1000).
-		WithObservers(machineAudienceLogger, humanAudienceLogger).
+		WithMaxIterations(2000).
+		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
 
 	humanLogHandler.Debug("Call to AnnealerBuilder.Build() finished")
 
-	if (err != nil) {
+	if err != nil {
 		humanLogHandler.ErrorWithError(err)
 		humanLogHandler.Error("Exiting program due to failed Annealer build")
 		os.Exit(ERROR_STATUS)

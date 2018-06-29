@@ -10,7 +10,7 @@ import (
 
 // LogHandlerBuilder is a fluent constructor of a LogHandler, allowing the caller to specify various formatters and
 // log-level destinations to best suit their needs.
-type LogHandlerBuilder struct{
+type LogHandlerBuilder struct {
 	logHandler  LogHandler
 	buildErrors *crmerrors.CompositeError
 }
@@ -24,7 +24,7 @@ func (this *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
 
 	defaultDestinations := new(LogLevelDestinations).Initialise()
 	newHandler.SetDestinations(defaultDestinations)
-	newHandler.SetFormatter(new (NullFormatter))
+	newHandler.SetFormatter(new(NullFormatter))
 	newHandler.Initialise()
 
 	this.logHandler = newHandler
@@ -40,7 +40,7 @@ func (this *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
 
 	defaultDestinations := new(LogLevelDestinations).Initialise()
 	newHandler.SetDestinations(defaultDestinations)
-	newHandler.SetFormatter(new (NullFormatter))
+	newHandler.SetFormatter(new(NullFormatter))
 	newHandler.Initialise()
 
 	this.logHandler = newHandler

@@ -1,5 +1,6 @@
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package annealing
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
+package shared
 
 type AnnealingObserver interface {
 	ObserveAnnealingEvent(event AnnealingEvent)
@@ -17,10 +18,9 @@ const (
 	INVALID_EVENT AnnealingEventType = iota
 	STARTED_ANNEALING
 	STARTED_ITERATION
-	OBJECTIVE_EVALUATION
+	FINISHED_ITERATION
 	FINISHED_ANNEALING
 	NOTE
-	DEBUG_NOTE
 )
 
 func (eventType AnnealingEventType) String() string {
@@ -28,7 +28,7 @@ func (eventType AnnealingEventType) String() string {
 		"INVALID_EVENT",
 		"STARTED_ANNEALING",
 		"STARTED_ITERATION",
-		"OBJECTIVE_EVALUATION",
+		"FINISHED_ITERATION",
 		"FINISHED_ANNEALING",
 		"NOTE",
 	}

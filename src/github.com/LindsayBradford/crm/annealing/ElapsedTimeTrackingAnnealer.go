@@ -4,23 +4,24 @@ package annealing
 import (
 	. "fmt"
 	. "time"
+	. "github.com/LindsayBradford/crm/annealing/shared"
 )
 
 type ElapsedTimeTrackingAnnealer struct {
-	annealerBase
+	AnnealerBase
 
-	startTime Time
+	startTime  Time
 	finishTime Time
 }
 
 func (this *ElapsedTimeTrackingAnnealer) Anneal() {
-	this.logger.Info("Elapsed-time tracking annealer")
+	this.LogHandler().Info("Elapsed-time tracking annealer")
 
 	this.startTime = Now()
-	this.annealerBase.Anneal()
+	this.AnnealerBase.Anneal()
 	this.finishTime = Now()
 
-	this.logger.Info(this.generateElapsedTimeString())
+	this.LogHandler().Info(this.generateElapsedTimeString())
 }
 
 func (this *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {

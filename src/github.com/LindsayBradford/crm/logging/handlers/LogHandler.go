@@ -41,7 +41,7 @@ type LogHandler interface {
 // LogHandlerBase is a base struct that implements default behaviour that matches the LogHandler interface
 type LogHandlerBase struct {
 	destinations *LogLevelDestinations
-	formatter LogFormatter
+	formatter    LogFormatter
 }
 
 // SetDestinations allows a pre-defined LogLevelDestinations instance to be assigned, and subsequently used for
@@ -63,3 +63,23 @@ func (this *LogHandlerBase) SetFormatter(formatter LogFormatter) {
 func (this *LogHandlerBase) Formatter() LogFormatter {
 	return this.formatter
 }
+
+
+type NullLogHandler struct {}
+
+func (this *NullLogHandler) Debug(message string) {}
+func (this *NullLogHandler) DebugWithAttributes(logAttributes LogAttributes) {}
+func (this *NullLogHandler) Info(message string) {}
+func (this *NullLogHandler) InfoWithAttributes(logAttributes LogAttributes) {}
+func (this *NullLogHandler) Warn(message string) {}
+func (this *NullLogHandler) WarnWithAttributes(logAttributes LogAttributes) {}
+func (this *NullLogHandler) Error(message string) {}
+func (this *NullLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {}
+func (this *NullLogHandler) ErrorWithError(err error) {}
+func (this *NullLogHandler) LogAtLevel(logLevel LogLevel, message string) {}
+func (this *NullLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {}
+func (this *NullLogHandler) Initialise() {}
+func (this *NullLogHandler) SetDestinations(*LogLevelDestinations) {}
+func (this *NullLogHandler) Destinations() *LogLevelDestinations {return nil}
+func (this *NullLogHandler) SetFormatter(formatter LogFormatter) {}
+func (this *NullLogHandler) Formatter() LogFormatter{return &NullFormatter{}}

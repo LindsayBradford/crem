@@ -3,7 +3,7 @@
 // modulators package supplies a number of logging modulators for managing the chattiness of loggers.
 package modulators
 
-import . "github.com/LindsayBradford/crm/annealing"
+import . "github.com/LindsayBradford/crm/annealing/shared"
 
 // LoggingModulator describes an interface to object that decides on how logging should be modulated
 // (reduced in volume of entries logged).
@@ -15,7 +15,7 @@ type LoggingModulator interface {
 }
 
 // NullModulator is a default LoggingModulator that doesn't actually modulate logging.
-type NullModulator struct {}
+type NullModulator struct{}
 
 // ShouldModulate always returns false (do not modulate the log for event)
 func (this *NullModulator) ShouldModulate(event AnnealingEvent) bool {

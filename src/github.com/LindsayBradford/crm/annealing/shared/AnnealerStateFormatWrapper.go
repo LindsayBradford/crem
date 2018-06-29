@@ -1,8 +1,8 @@
-/*
- * Copyright (c) 2017 Australian Rivers Institute. Author: Lindsay Bradford
- */
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package annealing
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
+package shared
 
 import (
 	"fmt"
@@ -14,16 +14,16 @@ type AnnealerStateFormatWrapper struct {
 	MethodFormats map[string]string
 }
 
-const DEFAULT_FLOAT64_FORMAT = "%f"
-const DEFAULT_UINT_FORMAT = "%d"
+const default_float64_format = "%f"
+const default_uint_format = "%d"
 
 func (this *AnnealerStateFormatWrapper) Initialise() *AnnealerStateFormatWrapper {
 	this.MethodFormats = map[string]string{
-			"Temperature":      DEFAULT_FLOAT64_FORMAT,
-			"CoolingFactor":    DEFAULT_FLOAT64_FORMAT,
-			"MaxIterations":    DEFAULT_UINT_FORMAT,
-			"CurrentIteration": DEFAULT_UINT_FORMAT,
-		}
+		"Temperature":      default_float64_format,
+		"CoolingFactor":    default_float64_format,
+		"MaxIterations":    default_uint_format,
+		"CurrentIteration": default_uint_format,
+	}
 	return this
 }
 
@@ -33,7 +33,7 @@ func (this *AnnealerStateFormatWrapper) Wrapping(annealer Annealer) *AnnealerSta
 }
 
 func (this *AnnealerStateFormatWrapper) Wrap(annealer Annealer) {
-	this.AnnealerToFormat = annealer;
+	this.AnnealerToFormat = annealer
 }
 
 func (this *AnnealerStateFormatWrapper) Temperature() string {

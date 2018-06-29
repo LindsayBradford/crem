@@ -4,13 +4,12 @@ package handlers
 
 import (
 	"fmt"
-	. "github.com/LindsayBradford/crm/logging/shared"
 	. "github.com/LindsayBradford/crm/logging/formatters"
-	"io"
+	. "github.com/LindsayBradford/crm/logging/shared"
 	"github.com/LindsayBradford/crm/strings"
+	"io"
 	"time"
 )
-
 
 // Type is here for the purposes of documentation only. It is a stand-in
 // for any Go type, but represents the same type for any given function
@@ -62,14 +61,14 @@ func (this *BareBonesLogHandler) ErrorWithAttributes(logAttributes LogAttributes
 }
 
 func (this *BareBonesLogHandler) ErrorWithError(err error) {
-	logAttributes := LogAttributes{ NameValuePair{ "Error", fmt.Sprintf(err.Error())}}
+	logAttributes := LogAttributes{NameValuePair{"Error", fmt.Sprintf(err.Error())}}
 	logAttributes = prependLogLevel(ERROR, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
 	this.writeString(ERROR, this.formatter.Format(logAttributes))
 }
 
 func (this *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
+	logAttributes := LogAttributes{NameValuePair{MESSAGE_LABEL, message}}
 	logAttributes = prependLogLevel(logLevel, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
 	this.writeString(logLevel, this.formatter.Format(logAttributes))
@@ -98,6 +97,6 @@ func prependLogLevel(logLevel LogLevel, oldSlice []NameValuePair) []NameValuePai
 	return append([]NameValuePair{{"LogLevel", string(logLevel)}}, oldSlice...)
 }
 
-func prepend (newValue NameValuePair, oldSlice []NameValuePair) []NameValuePair {
+func prepend(newValue NameValuePair, oldSlice []NameValuePair) []NameValuePair {
 	return append([]NameValuePair{newValue}, oldSlice...)
 }

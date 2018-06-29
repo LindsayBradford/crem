@@ -7,7 +7,7 @@ import (
 
 // JsonFormatter formats a LogAttributes array into an equivalent JSON encoding.
 // TODO: Supply example encoding.
-type JsonFormatter struct {}
+type JsonFormatter struct{}
 
 func (this *JsonFormatter) Initialise() {}
 
@@ -18,7 +18,7 @@ func (this *JsonFormatter) Format(attributes LogAttributes) string {
 	needsComma := false
 
 	for _, attribute := range attributes {
-		if (!needsComma) {
+		if !needsComma {
 			needsComma = true
 		} else {
 			builder.Add(", ")

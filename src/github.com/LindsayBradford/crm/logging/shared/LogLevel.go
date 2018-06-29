@@ -8,7 +8,7 @@ type LogLevel string
 
 const (
 	DEBUG LogLevel = "Debug"
-	INFO LogLevel = "Info"
-	WARN LogLevel = "Warn"
+	INFO  LogLevel = "Info"
+	WARN  LogLevel = "Warn"
 	ERROR LogLevel = "Error"
 )

@@ -5,7 +5,8 @@
 package logging
 
 import (
-	. "github.com/LindsayBradford/crm/annealing"
+	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crm/annealing/objectives"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/modulators"
 	. "github.com/LindsayBradford/crm/logging/shared"
@@ -17,8 +18,39 @@ const ANNEALER LogLevel = "Annealer"
 // drops any AnnealingEvents received.
 type AnnealingLogger struct {
 	logHandler LogHandler
-	modulator LoggingModulator
+	modulator  LoggingModulator
 }
 
 // Allows for the receipt of AnnealingEvent instances, but deliberately takes no action in logging those events.
 func (this *AnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {}
+
+var (
+	annealingWrapper = AnnealerStateFormatWrapper{
+		MethodFormats: map[string]string{
+			"Temperature":      "%0.4f",
+			"CoolingFactor":    "%0.3f",
+			"MaxIterations":    "%03d",
+			"CurrentIteration": "%03d",
+		},
+	}
+
+	objectiveManagerWrapper = ObjectiveManagerStateFormatWrapper{
+		MethodFormats: map[string]string{
+			"ObjectiveValue":         "%0.4f",
+			"ChangeInObjectiveValue": "%0.4f",
+			"ChangeIsDesirable":      "%t",
+			"AcceptanceProbability":  "%0.6f",
+			"ChangeAccepted":         "%t",
+		},
+	}
+)
+
+func wrapAnnealer(eventAnnealer Annealer) *AnnealerStateFormatWrapper {
+	annealingWrapper.Wrap(eventAnnealer)
+	return &annealingWrapper
+}
+
+func wrapObjectiveManager(eventObjectiveManager ObjectiveManager) *ObjectiveManagerStateFormatWrapper {
+	objectiveManagerWrapper.Wrap(eventObjectiveManager)
+	return &objectiveManagerWrapper
+}

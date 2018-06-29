@@ -5,10 +5,12 @@ import (
 	"errors"
 	crmerrors "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/shared"
 )
 
 type AnnealerBuilder struct {
-	annealer Annealer
+	annealer    Annealer
 	buildErrors *crmerrors.CompositeError
 }
 
@@ -21,7 +23,7 @@ func (this *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
 
 func (this *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
 	annealer := this.annealer
-	if err := annealer.setLogHandler(logHandler); err != nil {
+	if err := annealer.SetLogHandler(logHandler); err != nil {
 		this.buildErrors.Add(err)
 	}
 	return this
@@ -29,7 +31,7 @@ func (this *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuil
 
 func (this *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
 	annealer := this.annealer
-	if err := annealer.setTemperature(temperature); err != nil {
+	if err := annealer.SetTemperature(temperature); err != nil {
 		this.buildErrors.Add(err)
 	}
 	return this
@@ -37,7 +39,7 @@ func (this *AnnealerBuilder) WithStartingTemperature(temperature float64) *Annea
 
 func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
 	annealer := this.annealer
-	if err := annealer.setCoolingFactor(coolingFactor); err != nil {
+	if err := annealer.SetCoolingFactor(coolingFactor); err != nil {
 		this.buildErrors.Add(err)
 	}
 	return this
@@ -53,12 +55,12 @@ func (this *AnnealerBuilder) WithObjectiveManager(manager ObjectiveManager) *Ann
 
 func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
 	annealer := this.annealer
-	annealer.setMaxIterations(iterations)
+	annealer.SetMaxIterations(iterations)
 	return this
 }
 
 func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
-	if (observers == nil) {
+	if observers == nil {
 		this.buildErrors.Add(errors.New("Invalid attempt to supply a non-existant observers list to annealer"))
 	}
 
@@ -80,5 +82,3 @@ func (this *AnnealerBuilder) Build() (Annealer, error) {
 		return this.annealer, this.buildErrors
 	}
 }
-
-

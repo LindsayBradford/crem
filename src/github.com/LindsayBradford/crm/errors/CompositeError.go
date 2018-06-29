@@ -10,7 +10,7 @@ import "github.com/LindsayBradford/crm/strings"
 // ability to learn more about individual errors if needed.
 type CompositeError struct {
 	compositeText    string
-	individualErrors [] error
+	individualErrors []error
 }
 
 // NewComposite returns a CompositeError that formats as the given text prefixing a list of error texts for those
@@ -22,7 +22,7 @@ func NewComposite(text string) *CompositeError {
 }
 
 func (this *CompositeError) Error() string {
-	if (len(this.individualErrors) == 1) {
+	if len(this.individualErrors) == 1 {
 		return this.individualErrors[0].Error()
 	}
 	return this.buildCompositeErrorString()
@@ -43,7 +43,7 @@ func (this *CompositeError) buildCompositeErrorString() string {
 }
 
 // Size returns the number of sub-errors that have been composed together to form the given CompositeError
-func (this* CompositeError) Size() int {
+func (this *CompositeError) Size() int {
 	return len(this.individualErrors)
 }
 
