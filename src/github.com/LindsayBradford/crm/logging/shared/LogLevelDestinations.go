@@ -19,7 +19,7 @@ var (
 	STDERR LogDestination = os.Stderr
 )
 
-// LogLevelDestinations is a mapping of LogLevel values to LogDestination values.
+// LogLevelDestinations is a mapping of LogAtLevel values to LogDestination values.
 type LogLevelDestinations struct {
 	Destinations map[LogLevel] LogDestination
 }

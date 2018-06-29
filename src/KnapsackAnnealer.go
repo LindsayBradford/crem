@@ -38,6 +38,8 @@ func buildHumanLogger() {
 		// WithLogLevelDestination(DEBUG, STDOUT).
 		WithLogLevelDestination(DEBUG, DISCARD).
 		// WithLogLevelDestination(INFO, DISCARD).
+		WithLogLevelDestination(ANNEALER, STDOUT).
+		// WithLogLevelDestination(ANNEALER, DISCARD).
 		Build()
 
 	if (err != nil) {
@@ -52,8 +54,8 @@ func buildMachineLogger() {
 	newLogger, err := logBuilder.
 		ForBareBonesLogHandler().
 		WithFormatter(new(JsonFormatter)).
-		WithLogLevelDestination(INFO, DISCARD).
-		// WithLogLevelDestination(INFO, STDOUT).
+		WithLogLevelDestination(ANNEALER, DISCARD).
+		// WithLogLevelDestination(ANNEALER, STDOUT).
 		Build()
 
 	if (err != nil) {

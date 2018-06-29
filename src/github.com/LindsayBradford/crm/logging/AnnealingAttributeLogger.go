@@ -35,7 +35,7 @@ func (this *AnnealingAttributeLogger) ObserveAnnealingEvent(event AnnealingEvent
 	annealer := wrap(event.Annealer)
 
 	logAttributes := make(LogAttributes, 0)
-	logAttributes = append(logAttributes, NameValuePair{"AnnealingEvent", event.EventType.String()})
+	logAttributes = append(logAttributes, NameValuePair{"Event", event.EventType.String()})
 
 	switch event.EventType {
 	case STARTED_ANNEALING:
@@ -54,5 +54,5 @@ func (this *AnnealingAttributeLogger) ObserveAnnealingEvent(event AnnealingEvent
 	default:
 		// deliberately does nothing extra
 	}
-	this.logHandler.InfoWithAttributes(logAttributes)
+	this.logHandler.LogAtLevelWithAttributes(ANNEALER, logAttributes)
 }

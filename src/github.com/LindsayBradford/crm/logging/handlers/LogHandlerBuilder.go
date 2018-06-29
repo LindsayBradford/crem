@@ -59,7 +59,10 @@ func (this *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandler
 // destination for the given logLevel.
 func (this *LogHandlerBuilder) WithLogLevelDestination(logLevel LogLevel, destination LogDestination) *LogHandlerBuilder {
 	this.logHandler.Destinations().Override(logLevel, destination)
-	this.logHandler.Initialise()
+	if nativeLibraryHandler, ok := this.logHandler.(*NativeLibraryLogHandler); ok {
+		nativeLibraryHandler.AddLogLevel(logLevel)
+	}
+
 	return this
 }
 

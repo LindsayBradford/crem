@@ -35,7 +35,7 @@ func (this *AnnealingMessageLogger) ObserveAnnealingEvent(event AnnealingEvent) 
 	annealer := wrap(event.Annealer)
 
 	var builder strings.FluentBuilder
-	builder.Add("Annealing Event [", event.EventType.String(), "]: ")
+	builder.Add("Event [", event.EventType.String(), "]: ")
 
 	switch event.EventType {
 	case STARTED_ANNEALING:
@@ -53,7 +53,7 @@ func (this *AnnealingMessageLogger) ObserveAnnealingEvent(event AnnealingEvent) 
 		// deliberately does nothing extra
 	}
 
-	this.logHandler.Info(builder.String())
+	this.logHandler.LogAtLevel(ANNEALER, builder.String())
 }
 
 func wrap(eventAnnealer Annealer) *AnnealerStateFormatWrapper {

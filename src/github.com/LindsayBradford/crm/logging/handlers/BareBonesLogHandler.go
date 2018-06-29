@@ -30,62 +30,55 @@ func (this *BareBonesLogHandler) WithFormatter(formatter LogFormatter) *BareBone
 }
 
 func (this *BareBonesLogHandler) Debug(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	logAttributes = prependLogLevel(DEBUG, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(DEBUG, this.formatter.Format(logAttributes))
+	this.LogAtLevel(DEBUG, message)
 }
 
 func (this *BareBonesLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	logAttributes = prependLogLevel(DEBUG, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(DEBUG, this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(DEBUG, logAttributes)
 }
 
 func (this *BareBonesLogHandler) Info(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	logAttributes = prependLogLevel(INFO, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(INFO, this.formatter.Format(logAttributes))
+	this.LogAtLevel(INFO, message)
 }
 
 func (this *BareBonesLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	logAttributes = prependLogLevel(INFO, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(INFO, this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(INFO, logAttributes)
 }
 
 func (this *BareBonesLogHandler) Warn(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	logAttributes = prependLogLevel(WARN, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(WARN, this.formatter.Format(logAttributes))
+	this.LogAtLevel(WARN, message)
 }
 
 func (this *BareBonesLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	logAttributes = prependLogLevel(WARN, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(WARN, this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(WARN, logAttributes)
 }
 
 func (this *BareBonesLogHandler) Error(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	logAttributes = prependLogLevel(ERROR, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(ERROR, this.formatter.Format(logAttributes))
+	this.LogAtLevel(ERROR, message)
 }
 
 func (this *BareBonesLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	logAttributes = prependLogLevel(ERROR, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(ERROR, this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(ERROR, logAttributes)
 }
 
 func (this *BareBonesLogHandler) ErrorWithError(err error) {
 	logAttributes := LogAttributes{ NameValuePair{ "Error", fmt.Sprintf(err.Error())}}
-	logAttributes = prependLogLevel(WARN, logAttributes)
+	logAttributes = prependLogLevel(ERROR, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
 	this.writeString(ERROR, this.formatter.Format(logAttributes))
+}
+
+func (this *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message string) {
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
+	logAttributes = prependLogLevel(logLevel, logAttributes)
+	logAttributes = prependTimestamp(logAttributes)
+	this.writeString(logLevel, this.formatter.Format(logAttributes))
+}
+
+func (this *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
+	logAttributes = prependLogLevel(logLevel, logAttributes)
+	logAttributes = prependTimestamp(logAttributes)
+	this.writeString(logLevel, this.formatter.Format(logAttributes))
 }
 
 func (this *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {

@@ -11,18 +11,20 @@ import (
 
 type NativeLibraryLogHandler struct {
 	LogHandlerBase
-	debug    *log.Logger
-	info    *log.Logger
-	warn    *log.Logger
-	error    *log.Logger
+
+	loggerMap map[LogLevel] *log.Logger
 }
 
+const metadataMask = log.Ldate|log.Ltime|log.Lmicroseconds
+
 func (this *NativeLibraryLogHandler) Initialise() {
-	const metadataMask = log.Ldate|log.Ltime|log.Lmicroseconds
-	this.debug = log.New(this.destinations.Destinations[DEBUG], "", metadataMask)
-	this.info = log.New(this.destinations.Destinations[INFO], "", metadataMask)
-	this.warn = log.New(this.destinations.Destinations[WARN], "", metadataMask)
-	this.error = log.New(this.destinations.Destinations[ERROR], "", metadataMask)
+	this.loggerMap = make(map[LogLevel] *log.Logger)
+	this.AddLogLevel(DEBUG).AddLogLevel(INFO).AddLogLevel(WARN).AddLogLevel(ERROR)
+}
+
+func (this *NativeLibraryLogHandler) AddLogLevel(logLevel LogLevel) *NativeLibraryLogHandler {
+	this.loggerMap[logLevel] = log.New(this.destinations.Destinations[logLevel], "", metadataMask)
+	return this
 }
 
 func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *NativeLibraryLogHandler {
@@ -32,41 +34,46 @@ func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *Nati
 }
 
 func (this *NativeLibraryLogHandler) Debug(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	this.debug.Println("DEBUG " + this.formatter.Format(logAttributes))
+	this.LogAtLevel(DEBUG, message)
 }
 
 func (this *NativeLibraryLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	this.debug.Println("DEBUG " + this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(DEBUG, logAttributes)
 }
 
 func (this *NativeLibraryLogHandler) Info(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	this.info.Println("INFO " + this.formatter.Format(logAttributes))
+	this.LogAtLevel(INFO, message)
 }
 
 func (this *NativeLibraryLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	this.info.Println("INFO " + this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(INFO, logAttributes)
 }
 
 func (this *NativeLibraryLogHandler) Warn(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	this.warn.Println("WARN " + this.formatter.Format(logAttributes))
+	this.LogAtLevel(WARN, message)
 }
 
 func (this *NativeLibraryLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	this.warn.Println("WARN " + this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(WARN, logAttributes)
 }
 
 func (this *NativeLibraryLogHandler) Error(message string) {
-	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
-	this.error.Println("ERROR " + this.formatter.Format(logAttributes))
+	this.LogAtLevel(ERROR, message)
 }
 
 func (this *NativeLibraryLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	this.error.Println("ERROR " + this.formatter.Format(logAttributes))
+	this.LogAtLevelWithAttributes(ERROR, logAttributes)
 }
 
 func (this *NativeLibraryLogHandler) ErrorWithError(err error) {
-	this.error.Println("ERROR " + fmt.Sprintf(err.Error()))
+	this.LogAtLevel(ERROR, fmt.Sprintf(err.Error()))
+}
+
+func (this *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message string) {
+	logAttributes := LogAttributes{ NameValuePair{ MESSAGE_LABEL, message }}
+	this.loggerMap[logLevel].Println(string(logLevel) + " " + this.formatter.Format(logAttributes))
+}
+
+func (this *NativeLibraryLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
+	this.loggerMap[logLevel].Println(string(logLevel) + " " + this.formatter.Format(logAttributes))
 }
