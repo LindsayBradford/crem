@@ -9,25 +9,35 @@ import (
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
-type NoParameterFunction func()
+type NoParameterFunction func() error
 
 // ProfileIfRequired establishes profiling based on what is passed as the cpuProfile
 // parameter. If an empty string, it's assumed profiling is not needed.  A non-empty
 // string is asssumed to contain a path to a file in which profiling data is to be collated.
 
-func ProfileIfRequired(cpuProfilePath string, humanLogHandler handlers.LogHandler, functionToProfile NoParameterFunction) {
+func ProfileIfRequired(cpuProfilePath string, humanLogHandler handlers.LogHandler, functionToProfile NoParameterFunction) error {
 	if cpuProfilePath != "" {
 		f, err := os.Create(cpuProfilePath)
 		if err != nil {
-			humanLogHandler.ErrorWithError(err)
-			os.Exit(1)
+			return err
 		}
-		humanLogHandler.Info("About to profile cpu data to [" + cpuProfilePath + "]")
 
 		pprof.StartCPUProfile(f)
-		functionToProfile()
+
+		err = functionToProfile()
+
 		defer pprof.StopCPUProfile()
+
+		if err != nil {
+			return err
+		}
+
 	} else {
-		functionToProfile()
+		err := functionToProfile()
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

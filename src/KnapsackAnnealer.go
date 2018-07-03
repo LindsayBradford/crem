@@ -102,12 +102,16 @@ func buildAnnealer() {
 
 func main() {
 	args := CommandLine.ParseArguments()
+	if args.CpuProfile != "" {
+		humanLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+	}
 	profiling.ProfileIfRequired(args.CpuProfile, humanLogHandler, runAnnealer)
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
 }
 
-func runAnnealer() {
+func runAnnealer() error {
 	humanLogHandler.Debug("About to call annealer.Anneal()")
 	annealer.Anneal()
 	humanLogHandler.Debug("Call to annealer.Anneal() finished. Exiting Program")
+	return nil
 }
