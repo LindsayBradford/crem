@@ -31,6 +31,8 @@ type LogHandler interface {
 
 	Initialise()
 
+	BeingDiscarded(logLevel LogLevel) bool
+
 	SetDestinations(*LogLevelDestinations)
 	Destinations() *LogLevelDestinations
 
@@ -64,6 +66,9 @@ func (this *LogHandlerBase) Formatter() LogFormatter {
 	return this.formatter
 }
 
+func (this *LogHandlerBase)  BeingDiscarded(logLevel LogLevel) bool {
+	return this.destinations.Destinations[logLevel] == DISCARD
+}
 
 type NullLogHandler struct {}
 
@@ -83,3 +88,4 @@ func (this *NullLogHandler) SetDestinations(*LogLevelDestinations) {}
 func (this *NullLogHandler) Destinations() *LogLevelDestinations {return nil}
 func (this *NullLogHandler) SetFormatter(formatter LogFormatter) {}
 func (this *NullLogHandler) Formatter() LogFormatter{return &NullFormatter{}}
+func (this *NullLogHandler) BeingDiscarded(logLevel LogLevel) bool { return true }

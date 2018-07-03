@@ -2,15 +2,19 @@
 package main
 
 import (
-	"os"
+"os"
 
-	. "github.com/LindsayBradford/crm/annealing"
-	. "github.com/LindsayBradford/crm/annealing/shared"
-	. "github.com/LindsayBradford/crm/logging"
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/shared"
-	. "github.com/LindsayBradford/crm/logging/modulators"
+
+. "github.com/LindsayBradford/crm/annealing"
+. "github.com/LindsayBradford/crm/annealing/shared"
+"github.com/LindsayBradford/crm/commandline"
+. "github.com/LindsayBradford/crm/logging"
+. "github.com/LindsayBradford/crm/logging/formatters"
+. "github.com/LindsayBradford/crm/logging/handlers"
+. "github.com/LindsayBradford/crm/logging/modulators"
+. "github.com/LindsayBradford/crm/logging/shared"
+"github.com/LindsayBradford/crm/profiling"
+
 )
 
 const ERROR_STATUS = 1
@@ -81,7 +85,7 @@ func buildAnnealer() {
 		WithLogHandler(humanLogHandler).
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.997).
-		WithMaxIterations(2000).
+		WithMaxIterations(2000000).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
 
@@ -97,6 +101,12 @@ func buildAnnealer() {
 }
 
 func main() {
+	args := CommandLine.ParseArguments()
+	profiling.ProfileIfRequired(args.CpuProfile, humanLogHandler, runAnnealer)
+	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
+}
+
+func runAnnealer() {
 	humanLogHandler.Debug("About to call annealer.Anneal()")
 	annealer.Anneal()
 	humanLogHandler.Debug("Call to annealer.Anneal() finished. Exiting Program")

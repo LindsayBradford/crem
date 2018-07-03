@@ -100,3 +100,4 @@ func prependLogLevel(logLevel LogLevel, oldSlice []NameValuePair) []NameValuePai
 func prepend(newValue NameValuePair, oldSlice []NameValuePair) []NameValuePair {
 	return append([]NameValuePair{newValue}, oldSlice...)
 }
+

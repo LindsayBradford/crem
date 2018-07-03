@@ -28,7 +28,7 @@ func (this *AnnealingMessageObserver) WithModulator(modulator LoggingModulator) 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
 func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event) {
 		return
 	}
 

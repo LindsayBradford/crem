@@ -28,7 +28,7 @@ func (this *AnnealingAttributeObserver) WithModulator(modulator LoggingModulator
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
 func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event)  {
 		return
 	}
 
