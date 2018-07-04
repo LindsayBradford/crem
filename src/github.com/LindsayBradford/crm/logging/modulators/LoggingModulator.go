@@ -14,7 +14,7 @@ type LoggingModulator interface {
 	ShouldModulate(event AnnealingEvent) bool
 }
 
-// NullModulator is a default LoggingModulator that doesn't actually modulate logging.
+// NullModulator is a default LoggingModulator that doesn't actually modulate logging (lets all events through).
 type NullModulator struct{}
 
 // ShouldModulate always returns false (do not modulate the log for event)
