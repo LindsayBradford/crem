@@ -2,6 +2,8 @@
 
 package objectives
 
+var NULL_OBJECTIVE_MANAGER = new(NullObjectiveManager)
+
 type NullObjectiveManager struct {
 	BaseObjectiveManager
 }
@@ -11,6 +13,6 @@ func (this *NullObjectiveManager) Initialise() {
 }
 
 func (this *NullObjectiveManager) TryRandomChange(temperature float64) {}
-func (this *NullObjectiveManager) AcceptLastChange()  {}
-func (this *NullObjectiveManager) RevertLastChange()  {}
+func (this *NullObjectiveManager) AcceptLastChange()                   {}
+func (this *NullObjectiveManager) RevertLastChange()                   {}
 

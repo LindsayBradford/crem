@@ -8,7 +8,7 @@ import (
 )
 
 type ElapsedTimeTrackingAnnealer struct {
-	AnnealerBase
+	SimpleAnnealer
 
 	startTime  Time
 	finishTime Time
@@ -18,7 +18,7 @@ func (this *ElapsedTimeTrackingAnnealer) Anneal() {
 	this.LogHandler().Info("Elapsed-time tracking annealer")
 
 	this.startTime = Now()
-	this.AnnealerBase.Anneal()
+	this.SimpleAnnealer.Anneal()
 	this.finishTime = Now()
 
 	this.LogHandler().Info(this.generateElapsedTimeString())

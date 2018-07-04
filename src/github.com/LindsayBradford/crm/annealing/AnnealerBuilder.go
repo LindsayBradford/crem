@@ -2,11 +2,12 @@
 package annealing
 
 import (
-	"errors"
-	crmerrors "github.com/LindsayBradford/crm/errors"
-	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/annealing/objectives"
-	. "github.com/LindsayBradford/crm/annealing/shared"
+
+. "github.com/LindsayBradford/crm/annealing/objectives"
+. "github.com/LindsayBradford/crm/annealing/shared"
+crmerrors "github.com/LindsayBradford/crm/errors"
+. "github.com/LindsayBradford/crm/logging/handlers"
+
 )
 
 type AnnealerBuilder struct {
@@ -16,6 +17,13 @@ type AnnealerBuilder struct {
 
 func (this *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
 	this.annealer = &ElapsedTimeTrackingAnnealer{}
+	this.annealer.Initialise()
+	this.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	return this
+}
+
+func (this *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
+	this.annealer = &SimpleAnnealer{}
 	this.annealer.Initialise()
 	this.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
 	return this
@@ -57,9 +65,7 @@ func (this *AnnealerBuilder) WithDumbObjectiveManager(initialObjectiveValue floa
 	annealer := this.annealer
 	objectiveManager := new(DumbObjectiveManager)
 	objectiveManager.SetObjectiveValue(initialObjectiveValue)
-	if err := annealer.SetObjectiveManager(objectiveManager); err != nil {
-		this.buildErrors.Add(err)
-	}
+	annealer.SetObjectiveManager(objectiveManager)
 	return this
 }
 
@@ -70,10 +76,6 @@ func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder
 }
 
 func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
-	if observers == nil {
-		this.buildErrors.Add(errors.New("Invalid attempt to supply a non-existant observers list to annealer"))
-	}
-
 	annealer := this.annealer
 
 	for _, currObserver := range observers {
@@ -85,7 +87,7 @@ func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *Anne
 	return this
 }
 
-func (this *AnnealerBuilder) Build() (Annealer, error) {
+func (this *AnnealerBuilder) Build() (Annealer, *crmerrors.CompositeError) {
 	if this.buildErrors.Size() == 0 {
 		return this.annealer, nil
 	} else {

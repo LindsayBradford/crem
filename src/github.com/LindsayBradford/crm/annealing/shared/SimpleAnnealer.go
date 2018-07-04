@@ -1,3 +1,7 @@
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package shared
 
@@ -8,7 +12,7 @@ import (
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
-type AnnealerBase struct {
+type SimpleAnnealer struct {
 	temperature      float64
 	coolingFactor    float64
 	maxIterations    uint
@@ -18,16 +22,16 @@ type AnnealerBase struct {
 	logger           LogHandler
 }
 
-func (this *AnnealerBase) Initialise() {
+func (this *SimpleAnnealer) Initialise() {
 	this.temperature = 1
 	this.coolingFactor = 1
 	this.maxIterations = 0
 	this.currentIteration = 0
-	this.objectiveManager = new(NullObjectiveManager)
-	this.logger = new(NullLogHandler)
+	this.objectiveManager = NULL_OBJECTIVE_MANAGER
+	this.logger = NULL_LOG_HANDLER
 }
 
-func (this *AnnealerBase) SetTemperature(temperature float64) error {
+func (this *SimpleAnnealer) SetTemperature(temperature float64) error {
 	if temperature <= 0 {
 		return errors.New("Invalid attempt to set annealer temperature to value <= 0")
 	}
@@ -35,11 +39,11 @@ func (this *AnnealerBase) SetTemperature(temperature float64) error {
 	return nil
 }
 
-func (this *AnnealerBase) Temperature() float64 {
+func (this *SimpleAnnealer) Temperature() float64 {
 	return this.temperature
 }
 
-func (this *AnnealerBase) SetCoolingFactor(coolingFactor float64) error {
+func (this *SimpleAnnealer) SetCoolingFactor(coolingFactor float64) error {
 	if coolingFactor <= 0 || coolingFactor > 1 {
 		return errors.New("Invalid attempt to set annealer cooling factor to value <= 0 or > 1")
 	}
@@ -47,27 +51,27 @@ func (this *AnnealerBase) SetCoolingFactor(coolingFactor float64) error {
 	return nil
 }
 
-func (this *AnnealerBase) CoolingFactor() float64 {
+func (this *SimpleAnnealer) CoolingFactor() float64 {
 	return this.coolingFactor
 }
 
-func (this *AnnealerBase) SetMaxIterations(iterations uint) {
+func (this *SimpleAnnealer) SetMaxIterations(iterations uint) {
 	this.maxIterations = iterations
 }
 
-func (this *AnnealerBase) MaxIterations() uint {
+func (this *SimpleAnnealer) MaxIterations() uint {
 	return this.maxIterations
 }
 
-func (this *AnnealerBase) CurrentIteration() uint {
+func (this *SimpleAnnealer) CurrentIteration() uint {
 	return this.currentIteration
 }
 
-func (this *AnnealerBase) ObjectiveManager() ObjectiveManager {
+func (this *SimpleAnnealer) ObjectiveManager() ObjectiveManager {
 	return this.objectiveManager
 }
 
-func (this *AnnealerBase) SetObjectiveManager(manager ObjectiveManager) error {
+func (this *SimpleAnnealer) SetObjectiveManager(manager ObjectiveManager) error {
 	if manager == nil {
 		return errors.New("Invalid attempt to set Objective Manager to nil value")
 	}
@@ -75,7 +79,7 @@ func (this *AnnealerBase) SetObjectiveManager(manager ObjectiveManager) error {
 	return nil
 }
 
-func (this *AnnealerBase) SetLogHandler(logger LogHandler) error {
+func (this *SimpleAnnealer) SetLogHandler(logger LogHandler) error {
 	if logger == nil {
 		return errors.New("Invalid attempt to set log handler to nil value")
 	}
@@ -83,11 +87,11 @@ func (this *AnnealerBase) SetLogHandler(logger LogHandler) error {
 	return nil
 }
 
-func (this *AnnealerBase) LogHandler() LogHandler {
+func (this *SimpleAnnealer) LogHandler() LogHandler {
 	return this.logger
 }
 
-func (this *AnnealerBase) AddObserver(newObserver AnnealingObserver) error {
+func (this *SimpleAnnealer) AddObserver(newObserver AnnealingObserver) error {
 	if newObserver == nil {
 		return errors.New("Invalid attempt to add non-existant observer to annealer")
 	}
@@ -95,22 +99,18 @@ func (this *AnnealerBase) AddObserver(newObserver AnnealingObserver) error {
 	return nil
 }
 
-func (this *AnnealerBase) notifyObserversWith(thisNote string) {
-	event := AnnealingEvent{
-		EventType: NOTE,
-		Annealer:  this,
-		Note:      thisNote}
-	this.notifyObserversWithEvent(event)
+func (this *SimpleAnnealer) Observers() []AnnealingObserver {
+	return this.observers
 }
 
-func (this *AnnealerBase) notifyObservers(thisEventType AnnealingEventType) {
+func (this *SimpleAnnealer) notifyObservers(thisEventType AnnealingEventType) {
 	event := AnnealingEvent{
 		EventType: thisEventType,
 		Annealer:  this}
 	this.notifyObserversWithEvent(event)
 }
 
-func (this *AnnealerBase) notifyObserversWithEvent(event AnnealingEvent) {
+func (this *SimpleAnnealer) notifyObserversWithEvent(event AnnealingEvent) {
 	for _, currObserver := range this.observers {
 		if currObserver != nil {
 			currObserver.ObserveAnnealingEvent(event)
@@ -118,49 +118,49 @@ func (this *AnnealerBase) notifyObserversWithEvent(event AnnealingEvent) {
 	}
 }
 
-func (this *AnnealerBase) Anneal() {
+func (this *SimpleAnnealer) Anneal() {
 	this.objectiveManager.Initialise()
 
 	this.annealingStarted()
 
-for done := this.initialDoneValue(); !done; {
-		this.iterationStarted()
+	for done := this.initialDoneValue(); !done; {
+			this.iterationStarted()
 
-		this.objectiveManager.TryRandomChange(this.temperature)
+			this.objectiveManager.TryRandomChange(this.temperature)
 
-		this.iterationFinished()
-		this.cooldown()
-		done = this.checkIfDone()
+			this.iterationFinished()
+			this.cooldown()
+			done = this.checkIfDone()
 	}
 
 	this.annealingFinished()
 }
 
-func (this *AnnealerBase) annealingStarted() {
+func (this *SimpleAnnealer) annealingStarted() {
 	this.notifyObservers(STARTED_ANNEALING)
 }
 
-func (this *AnnealerBase) iterationStarted() {
+func (this *SimpleAnnealer) iterationStarted() {
 	this.currentIteration++
 	this.notifyObservers(STARTED_ITERATION)
 }
 
-func (this *AnnealerBase) iterationFinished() {
+func (this *SimpleAnnealer) iterationFinished() {
 	this.notifyObservers(FINISHED_ITERATION)
 }
 
-func (this *AnnealerBase) annealingFinished() {
+func (this *SimpleAnnealer) annealingFinished() {
 	this.notifyObservers(FINISHED_ANNEALING)
 }
 
-func (this *AnnealerBase) initialDoneValue() bool {
+func (this *SimpleAnnealer) initialDoneValue() bool {
 	return this.maxIterations == 0
 }
 
-func (this *AnnealerBase) checkIfDone() bool {
+func (this *SimpleAnnealer) checkIfDone() bool {
 	return this.currentIteration >= this.maxIterations
 }
 
-func (this *AnnealerBase) cooldown() {
+func (this *SimpleAnnealer) cooldown() {
 	this.temperature *= this.coolingFactor
 }

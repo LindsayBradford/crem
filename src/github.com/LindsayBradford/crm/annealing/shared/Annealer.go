@@ -20,6 +20,7 @@ type Annealer interface {
 	MaxIterations() uint
 
 	AddObserver(observer AnnealingObserver) error
+	Observers() []AnnealingObserver
 
 	SetLogHandler(logger LogHandler) error
 	LogHandler() LogHandler

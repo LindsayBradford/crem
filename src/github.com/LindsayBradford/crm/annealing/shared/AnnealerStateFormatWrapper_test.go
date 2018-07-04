@@ -13,7 +13,7 @@ func TestAnnealerStateFormatWrapper_Defaults(t *testing.T) {
 	const expectedMaxIterations = "0"
 	const expectedCurrentIteration = "0"
 
-	annealer := new(AnnealerBase)
+	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
 	wrapperUnderTest := new(AnnealerStateFormatWrapper).Initialise().Wrapping(annealer)
@@ -43,7 +43,7 @@ func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
 	const expectedMaxIterations = "000"
 	const expectedCurrentIteration = "00"
 
-	annealer := new(AnnealerBase)
+	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
 	wrapperUnderTest := &AnnealerStateFormatWrapper{}
