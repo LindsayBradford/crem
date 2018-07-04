@@ -23,7 +23,7 @@ func (this *AnnealerBase) Initialise() {
 	this.coolingFactor = 1
 	this.maxIterations = 0
 	this.currentIteration = 0
-	this.objectiveManager = new(DumbObjectiveManager)
+	this.objectiveManager = new(NullObjectiveManager)
 	this.logger = new(NullLogHandler)
 }
 
