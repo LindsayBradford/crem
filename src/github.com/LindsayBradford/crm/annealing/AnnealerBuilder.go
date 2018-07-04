@@ -53,6 +53,16 @@ func (this *AnnealerBuilder) WithObjectiveManager(manager ObjectiveManager) *Ann
 	return this
 }
 
+func (this *AnnealerBuilder) WithDumbObjectiveManager(initialObjectiveValue float64) *AnnealerBuilder {
+	annealer := this.annealer
+	objectiveManager := new(DumbObjectiveManager)
+	objectiveManager.SetObjectiveValue(initialObjectiveValue)
+	if err := annealer.SetObjectiveManager(objectiveManager); err != nil {
+		this.buildErrors.Add(err)
+	}
+	return this
+}
+
 func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
 	annealer := this.annealer
 	annealer.SetMaxIterations(iterations)

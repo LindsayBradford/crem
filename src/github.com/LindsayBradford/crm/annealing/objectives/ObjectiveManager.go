@@ -93,7 +93,7 @@ func newRandomValue() float64 {
 }
 
 func (this *BaseObjectiveManager) ChangeIsDesirable() bool {
-	if this.changeInObjectiveValue < 0  {
+	if this.changeInObjectiveValue <= 0  {
 		return true
 	}
 	return false

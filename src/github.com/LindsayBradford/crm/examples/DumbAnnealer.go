@@ -6,16 +6,17 @@ package main
 import (
 	"os"
 
-	. "github.com/LindsayBradford/crm/annealing"
-	. "github.com/LindsayBradford/crm/annealing/objectives"
-	. "github.com/LindsayBradford/crm/annealing/shared"
-	. "github.com/LindsayBradford/crm/annealing/logging"
-	"github.com/LindsayBradford/crm/commandline"
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/modulators"
-	. "github.com/LindsayBradford/crm/logging/shared"
-	"github.com/LindsayBradford/crm/profiling"
+
+. "github.com/LindsayBradford/crm/annealing"
+. "github.com/LindsayBradford/crm/annealing/logging"
+. "github.com/LindsayBradford/crm/annealing/shared"
+"github.com/LindsayBradford/crm/commandline"
+. "github.com/LindsayBradford/crm/logging/formatters"
+. "github.com/LindsayBradford/crm/logging/handlers"
+. "github.com/LindsayBradford/crm/logging/modulators"
+. "github.com/LindsayBradford/crm/logging/shared"
+"github.com/LindsayBradford/crm/profiling"
+
 )
 
 const ERROR_STATUS = 1
@@ -58,11 +59,11 @@ func buildDumbAnnealer() {
 
 	newAnnealer, err := builder.
 		ElapsedTimeTrackingAnnealer().
-		WithObjectiveManager(new(DumbObjectiveManager)).
+		WithDumbObjectiveManager(100).
 		WithLogHandler(humanLogHandler).
 		WithStartingTemperature(10).
-		WithCoolingFactor(0.997).
-		WithMaxIterations(1800).
+		WithCoolingFactor(0.99).
+		WithMaxIterations(500).
 		WithObservers(humanAudienceObserver).
 		Build()
 

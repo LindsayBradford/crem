@@ -6,9 +6,11 @@ type DumbObjectiveManager struct {
 	BaseObjectiveManager
 }
 
-func (this *DumbObjectiveManager) Initialise() {
-	this.objectiveValue = float64(500)
+func (this *DumbObjectiveManager) SetObjectiveValue(initialObjectiveValue float64) {
+	this.objectiveValue = initialObjectiveValue
 }
+
+func (this *DumbObjectiveManager) Initialise() {}
 
 func (this *DumbObjectiveManager) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
