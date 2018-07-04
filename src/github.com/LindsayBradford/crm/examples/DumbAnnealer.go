@@ -82,7 +82,7 @@ func main() {
 	if args.CpuProfile != "" {
 		humanLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 	}
-	profiling.ProfileIfRequired(args.CpuProfile, humanLogHandler, runAnnealer)
+	profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
 }
 
