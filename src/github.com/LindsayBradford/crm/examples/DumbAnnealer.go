@@ -6,7 +6,6 @@ package main
 import (
 	"os"
 
-
 . "github.com/LindsayBradford/crm/annealing"
 . "github.com/LindsayBradford/crm/annealing/logging"
 . "github.com/LindsayBradford/crm/annealing/shared"
@@ -16,22 +15,9 @@ import (
 . "github.com/LindsayBradford/crm/logging/modulators"
 . "github.com/LindsayBradford/crm/logging/shared"
 "github.com/LindsayBradford/crm/profiling"
-
 )
 
-const ERROR_STATUS = 1
-
-var (
-	humanLogHandler   LogHandler
-	annealer          Annealer
-)
-
-func init() {
-	buildHumanLogger()
-	buildDumbAnnealer()
-}
-
-func buildHumanLogger() {
+func buildDumbAnnealerLogger() LogHandler {
 	logBuilder := new(LogHandlerBuilder)
 
 	newLogger, err := logBuilder.
@@ -42,54 +28,59 @@ func buildHumanLogger() {
 		Build()
 
 	if err != nil {
-		humanLogHandler.ErrorWithError(err)
-		os.Exit(ERROR_STATUS)
+		newLogger.ErrorWithError(err)
+		os.Exit(1)
 	}
-	humanLogHandler = newLogger
+	return newLogger
 }
 
-func buildDumbAnnealer() {
+func buildDumbAnnealer(logHandler LogHandler) Annealer {
 	builder := new(AnnealerBuilder)
 	humanAudienceObserver := new(AnnealingMessageObserver).
-		WithLogHandler(humanLogHandler).
+		WithLogHandler(logHandler).
 		WithModulator(
 			new(IterationModuloLoggingModulator).WithModulo(1))  // No STARTED_ITERATION events, all FINISHED_ITERATION events
 
-	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
+	logHandler.Debug("About to call AnnealerBuilder.Build() ")
 
 	newAnnealer, err := builder.
 		ElapsedTimeTrackingAnnealer().
 		WithDumbObjectiveManager(100).
-		WithLogHandler(humanLogHandler).
+		WithLogHandler(logHandler).
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.99).
 		WithMaxIterations(500).
 		WithObservers(humanAudienceObserver).
 		Build()
 
-	humanLogHandler.Debug("Call to AnnealerBuilder.Build() finished")
+	logHandler.Debug("Call to AnnealerBuilder.Build() finished")
 
 	if err != nil {
-		humanLogHandler.ErrorWithError(err)
-		humanLogHandler.Error("Exiting program due to failed Annealer build")
-		os.Exit(ERROR_STATUS)
+		logHandler.ErrorWithError(err)
+		logHandler.Error("Exiting program due to failed Annealer build")
+		os.Exit(1)
 	}
 
-	annealer = newAnnealer
+	return newAnnealer
 }
 
 func main() {
+	logger := buildDumbAnnealerLogger()
+
+	runAnnealer := func() error {
+		annealer := buildDumbAnnealer(logger)
+		logger.Debug("About to call annealer.Anneal()")
+		annealer.Anneal()
+		logger.Debug("Call to annealer.Anneal() finished. Exiting Program")
+		return nil
+	}
+
 	args := CommandLine.ParseArguments()
 	if args.CpuProfile != "" {
-		humanLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+		logger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 	}
+
 	profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
 }
 
-func runAnnealer() error {
-	humanLogHandler.Debug("About to call annealer.Anneal()")
-	annealer.Anneal()
-	humanLogHandler.Debug("Call to annealer.Anneal() finished. Exiting Program")
-	return nil
-}

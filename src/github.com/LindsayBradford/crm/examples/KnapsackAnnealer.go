@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package main
 
@@ -17,21 +19,7 @@ import (
 
 )
 
-const ERROR_STATUS = 1
-
-var (
-	humanLogHandler   LogHandler
-	machineLogHandler LogHandler
-	annealer          Annealer
-)
-
-func init() {
-	buildHumanLogger()
-	buildMachineLogger()
-	buildAnnealer()
-}
-
-func buildHumanLogger() {
+func buildHumanLogger() LogHandler {
 	logBuilder := new(LogHandlerBuilder)
 
 	newLogger, err := logBuilder.
@@ -45,13 +33,13 @@ func buildHumanLogger() {
 		Build()
 
 	if err != nil {
-		humanLogHandler.ErrorWithError(err)
-		os.Exit(ERROR_STATUS)
+		newLogger.ErrorWithError(err)
+		os.Exit(1)
 	}
-	humanLogHandler = newLogger
+	return newLogger
 }
 
-func buildMachineLogger() {
+func buildMachineLogger() LogHandler {
 	logBuilder := new(LogHandlerBuilder)
 	newLogger, err := logBuilder.
 		ForBareBonesLogHandler().
@@ -61,13 +49,13 @@ func buildMachineLogger() {
 		Build()
 
 	if err != nil {
-		machineLogHandler.ErrorWithError(err)
-		os.Exit(ERROR_STATUS)
+		newLogger.ErrorWithError(err)
+		os.Exit(1)
 	}
-	machineLogHandler = newLogger
+	return newLogger
 }
 
-func buildAnnealer() {
+func buildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Annealer {
 	builder := new(AnnealerBuilder)
 	machineAudienceObserver := new(AnnealingAttributeObserver).
 		WithLogHandler(machineLogHandler).
@@ -95,24 +83,30 @@ func buildAnnealer() {
 	if err != nil {
 		humanLogHandler.ErrorWithError(err)
 		humanLogHandler.Error("Exiting program due to failed Annealer build")
-		os.Exit(ERROR_STATUS)
+		os.Exit(1)
 	}
 
-	annealer = newAnnealer
+	return newAnnealer
 }
 
 func main() {
+	humanAudienceLogger := buildHumanLogger()
+
 	args := CommandLine.ParseArguments()
 	if args.CpuProfile != "" {
-		humanLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 	}
+
+	machineAudienceLogger := buildMachineLogger()
+	annealer := buildAnnealer(humanAudienceLogger, machineAudienceLogger)
+
+	runAnnealer := func() error {
+		humanAudienceLogger.Debug("About to call annealer.Anneal()")
+		annealer.Anneal()
+		humanAudienceLogger.Debug("Call to annealer.Anneal() finished. Exiting Program")
+		return nil
+	}
+
 	profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
-}
-
-func runAnnealer() error {
-	humanLogHandler.Debug("About to call annealer.Anneal()")
-	annealer.Anneal()
-	humanLogHandler.Debug("Call to annealer.Anneal() finished. Exiting Program")
-	return nil
 }
