@@ -1,6 +1,7 @@
 # Catchment Resilience Modeller
 
 [![Build Status](https://travis-ci.com/LindsayBradford/crm.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crm)
+[![GoDoc](https://godoc.org/github.com/LindsayBradford/crm?status.svg)](https://godoc.org/github.com/LindsayBradford/crm)
 
 ## Release 0.1 - 04/06/2018
 
