@@ -1,6 +1,6 @@
 # Catchment Resilience Modeller
 
-TBD: <Add Travis CI support>
+[![Build Status](https://travis-ci.org/LindsayBradford/crm.svg?branch=master)](https://travis-ci.org/LindsayBradford/crm)
 
 ## Release 0.1 - 04/06/2018
 
