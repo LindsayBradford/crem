@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-// formatters package defines Logging formatters that take LogAttributes and convert them into logging-ready strings.
+// Package formatters defines logging formatters that take LogAttributes and convert them into logging-ready strings.
 package formatters
 
 import . "github.com/LindsayBradford/crm/logging/shared"

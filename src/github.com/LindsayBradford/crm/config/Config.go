@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-// Global Configuration file (only constants) for the Catchment Resilience Modelling tool.
+// Package config contains configuration global to the Catchment Resilience Modelling tool.
 package config
 
 // Version number of the Catchment Resilience Modelling tool

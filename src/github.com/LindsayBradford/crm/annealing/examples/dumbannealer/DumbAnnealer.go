@@ -1,5 +1,3 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package main
 
@@ -75,7 +73,7 @@ func main() {
 		return nil
 	}
 
-	args := CommandLine.ParseArguments()
+	args := commandline.ParseArguments()
 	if args.CpuProfile != "" {
 		logger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 	}

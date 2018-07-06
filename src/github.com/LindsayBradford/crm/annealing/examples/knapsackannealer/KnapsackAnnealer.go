@@ -1,5 +1,3 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 package main
 
@@ -25,8 +23,8 @@ func buildHumanLogger() LogHandler {
 	newLogger, err := logBuilder.
 		ForNativeLibraryLogHandler().
 		WithFormatter(new(RawMessageFormatter)).
-		// WithLogLevelDestination(DEBUG, STDOUT).
-		WithLogLevelDestination(DEBUG, DISCARD).
+		WithLogLevelDestination(DEBUG, STDOUT).
+		// WithLogLevelDestination(DEBUG, DISCARD).
 		// WithLogLevelDestination(INFO, DISCARD).
 		WithLogLevelDestination(ANNEALER, STDOUT).
 		// WithLogLevelDestination(ANNEALER, DISCARD).
@@ -92,7 +90,7 @@ func buildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 func main() {
 	humanAudienceLogger := buildHumanLogger()
 
-	args := CommandLine.ParseArguments()
+	args := commandline.ParseArguments()
 	if args.CpuProfile != "" {
 		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 	}

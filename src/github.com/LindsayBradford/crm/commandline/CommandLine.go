@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package CommandLine
+package commandline
 
 import (
 	"github.com/LindsayBradford/crm/config"
