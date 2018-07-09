@@ -74,11 +74,18 @@ func main() {
 	}
 
 	args := commandline.ParseArguments()
-	if args.CpuProfile != "" {
+
+	runAnnealerProfiling := func() error {
 		logger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+		return profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
 	}
 
-	profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
+	if args.CpuProfile != "" {
+		runAnnealerProfiling()
+	} else {
+		runAnnealer()
+	}
+
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
 }
 

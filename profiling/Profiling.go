@@ -3,6 +3,7 @@
 package profiling
 
 import (
+	"errors"
 	"os"
 	"runtime/pprof"
 
@@ -15,28 +16,20 @@ type NoParameterFunction func() error
 // string is assumed to contain a path to a file in which profiling data is to be collated.
 
 func CpuProfileOfFunctionToFile(functionToProfile NoParameterFunction, cpuProfilePath string) error {
-	if cpuProfilePath != "" {
-		f, err := os.Create(cpuProfilePath)
-		if err != nil {
-			return err
-		}
-
-		pprof.StartCPUProfile(f)
-
-		err = functionToProfile()
-
-		defer pprof.StopCPUProfile()
-
-		if err != nil {
-			return err
-		}
-
-	} else {
-		err := functionToProfile()
-		if err != nil {
-			return err
-		}
+	if cpuProfilePath == "" {
+		return errors.New("empty cpuProfilePath supplied")
 	}
 
-	return nil
+	f, err := os.Create(cpuProfilePath)
+	if err != nil {
+		return err
+	}
+
+	pprof.StartCPUProfile(f)
+
+	err = functionToProfile()
+
+	defer pprof.StopCPUProfile()
+
+	return err
 }

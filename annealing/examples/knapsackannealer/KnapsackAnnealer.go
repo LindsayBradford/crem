@@ -89,13 +89,8 @@ func buildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 
 func main() {
 	humanAudienceLogger := buildHumanLogger()
-
-	args := commandline.ParseArguments()
-	if args.CpuProfile != "" {
-		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
-	}
-
 	machineAudienceLogger := buildMachineLogger()
+
 	annealer := buildAnnealer(humanAudienceLogger, machineAudienceLogger)
 
 	runAnnealer := func() error {
@@ -105,6 +100,18 @@ func main() {
 		return nil
 	}
 
-	profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
+	args := commandline.ParseArguments()
+
+	runAnnealerProfiled := func() error {
+		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+		return profiling.CpuProfileOfFunctionToFile(runAnnealer, args.CpuProfile)
+	}
+
+	if args.CpuProfile != "" {
+		runAnnealerProfiled()
+	} else {
+		runAnnealer()
+	}
+
 	os.Stdout.Sync(); os.Stderr.Sync()  // flush STDOUT & STDERROR streams
 }
