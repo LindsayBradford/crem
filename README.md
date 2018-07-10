@@ -32,3 +32,4 @@ detailed in [LICENCE.md](LICENCE.md).
 #### Dependencies:
 
 - [Gomega](https://github.com/onsi/gomega)  For a Fluent-API based approach to test assertions, MIT licence
+- [go-ole](https://github.com/go-ole/go-ole) For i/o via Excel files. MIT licence
