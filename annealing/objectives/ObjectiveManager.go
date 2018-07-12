@@ -8,12 +8,15 @@ import (
 	"time"
 )
 
+var (
+	randomNumberGenerator *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+)
+
 type ObjectiveManager interface {
 	Initialise()
 	TryRandomChange(temperature float64)
 
 	ObjectiveValue() float64
-	SetObjectiveValue(objectiveValue float64)
 
 	ChangeInObjectiveValue() float64
 	SetChangeInObjectiveValue(change float64)
@@ -25,9 +28,6 @@ type ObjectiveManager interface {
 	AcceptLastChange()
 	ChangeAccepted() bool
 	RevertLastChange()
-
-	SetRandomNumberGenerator(*rand.Rand)
-	RandomNumberGenerator() *rand.Rand
 }
 
 type BaseObjectiveManager struct {
@@ -36,28 +36,13 @@ type BaseObjectiveManager struct {
 	changeIsDesirable      bool
 	changeAccepted         bool
 	acceptanceProbability  float64
-	randomNumberGenerator  *rand.Rand
 }
 
-func (this *BaseObjectiveManager) Initialise() {
-	this.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
-}
-
-func (this *BaseObjectiveManager) RandomNumberGenerator() *rand.Rand {
-	return this.randomNumberGenerator
-}
-
-func (this *BaseObjectiveManager) SetRandomNumberGenerator(generator *rand.Rand) {
-	this.randomNumberGenerator = generator
-}
+func (this *BaseObjectiveManager) Initialise() {}
 
 func (this *BaseObjectiveManager) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
 	DecideOnWhetherToAcceptChange(this, temperature)
-}
-
-func (this *BaseObjectiveManager) SetObjectiveValue(objectiveValue float64) {
-	this.objectiveValue = objectiveValue
 }
 
 func (this *BaseObjectiveManager) ObjectiveValue() float64 {
@@ -90,7 +75,7 @@ func DecideOnWhetherToAcceptChange(manager ObjectiveManager,  annealingTemperatu
 		probabilityToAcceptBadChange := math.Exp(-manager.ChangeInObjectiveValue() / annealingTemperature)
 		manager.SetAcceptanceProbability(probabilityToAcceptBadChange)
 
-		randomValue  := newRandomValue(manager.RandomNumberGenerator())
+		randomValue  := newRandomValue()
 		if probabilityToAcceptBadChange > randomValue {
 			manager.AcceptLastChange()
 		} else {
@@ -99,10 +84,10 @@ func DecideOnWhetherToAcceptChange(manager ObjectiveManager,  annealingTemperatu
 	}
 }
 
-// newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
+// newRandomValue returns the next random number in the range [0,1] from the embedded randomNumberGenerator.
 // (which by default returns a random number in the range [0,1).
 // See: http://mumble.net/~campbell/2014/04/28/uniform-random-float
-func newRandomValue(randomNumberGenerator *rand.Rand) float64 {
+func newRandomValue() float64 {
 	distributionRange := int64(math.Pow(2,53))
 	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange - 1)
 }
@@ -125,3 +110,4 @@ func (this *BaseObjectiveManager) RevertLastChange()  {
 func (this *BaseObjectiveManager) ChangeAccepted() bool {
 	return this.changeAccepted
 }
+

@@ -10,9 +10,7 @@ func (this *DumbObjectiveManager) SetObjectiveValue(initialObjectiveValue float6
 	this.objectiveValue = initialObjectiveValue
 }
 
-func (this *DumbObjectiveManager) Initialise() {
-	this.BaseObjectiveManager.Initialise()
-}
+func (this *DumbObjectiveManager) Initialise() {}
 
 func (this *DumbObjectiveManager) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
@@ -20,7 +18,7 @@ func (this *DumbObjectiveManager) TryRandomChange(temperature float64) {
 }
 
 func (this *DumbObjectiveManager) makeRandomChange() {
-	randomValue := this.RandomNumberGenerator().Intn(2)
+	randomValue := randomNumberGenerator.Intn(2)
 
 	var changeInObjectiveValue float64
 	switch randomValue {
