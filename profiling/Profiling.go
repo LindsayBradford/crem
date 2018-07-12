@@ -6,10 +6,14 @@ import (
 	"errors"
 	"os"
 	"runtime/pprof"
-
 )
 
 type NoParameterFunction func() error
+
+type ProfiledAndUnProfiledFunctionPair struct {
+	UnProfiledFunction NoParameterFunction
+	ProfiledFunction   NoParameterFunction
+}
 
 // CpuProfileOfFunctionToFile establishes profiling based on what is passed as the cpuProfile
 // parameter. If an empty string, it's assumed profiling is not needed.  A non-empty
