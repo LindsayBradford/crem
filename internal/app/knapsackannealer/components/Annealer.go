@@ -19,8 +19,8 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 		WithModulator(new(NullModulator))
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(humanLogHandler).
-	// WithModulator(new(NullModulator))
-	// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
+		// WithModulator(new(NullModulator))
+		// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
 		WithModulator(new(IterationModuloLoggingModulator).WithModulo(200))
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
@@ -45,4 +45,3 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 
 	return newAnnealer
 }
-

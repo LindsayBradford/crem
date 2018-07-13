@@ -18,10 +18,7 @@ func BuildHumanLogger() LogHandler {
 		ForNativeLibraryLogHandler().
 		WithFormatter(new(RawMessageFormatter)).
 		WithLogLevelDestination(DEBUG, STDOUT).
-	// WithLogLevelDestination(DEBUG, DISCARD).
-	// WithLogLevelDestination(INFO, DISCARD).
 		WithLogLevelDestination(ANNEALER, STDOUT).
-	// WithLogLevelDestination(ANNEALER, DISCARD).
 		Build()
 
 	if err != nil {
@@ -37,7 +34,6 @@ func BuildMachineLogger() LogHandler {
 		ForBareBonesLogHandler().
 		WithFormatter(new(JsonFormatter)).
 		WithLogLevelDestination(ANNEALER, DISCARD).
-	// WithLogLevelDestination(ANNEALER, STDOUT).
 		Build()
 
 	if err != nil {
