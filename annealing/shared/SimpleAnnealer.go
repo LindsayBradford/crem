@@ -116,6 +116,7 @@ func (this *SimpleAnnealer) notifyObserversWithEvent(event AnnealingEvent) {
 }
 
 func (this *SimpleAnnealer) Anneal() {
+	this.objectiveManager.SetLogHandler(this.LogHandler())
 	this.objectiveManager.Initialise()
 
 	this.annealingStarted()
@@ -130,6 +131,7 @@ func (this *SimpleAnnealer) Anneal() {
 			done = this.checkIfDone()
 	}
 
+	this.objectiveManager.TearDown()
 	this.annealingFinished()
 }
 

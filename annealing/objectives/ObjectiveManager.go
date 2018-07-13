@@ -3,9 +3,11 @@
 package objectives
 
 import (
+	"errors"
 	"math"
 	"math/rand"
 	"time"
+	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type ObjectiveManager interface {
@@ -28,6 +30,11 @@ type ObjectiveManager interface {
 
 	SetRandomNumberGenerator(*rand.Rand)
 	RandomNumberGenerator() *rand.Rand
+
+	SetLogHandler(logger LogHandler) error
+	LogHandler() LogHandler
+
+	TearDown()
 }
 
 type BaseObjectiveManager struct {
@@ -37,10 +44,16 @@ type BaseObjectiveManager struct {
 	changeAccepted         bool
 	acceptanceProbability  float64
 	randomNumberGenerator  *rand.Rand
+	logHandler             LogHandler
 }
 
 func (this *BaseObjectiveManager) Initialise() {
+	this.logHandler.Debug("Initialising Objective Manager")
 	this.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
+}
+
+func (this *BaseObjectiveManager) TearDown() {
+	this.logHandler.Debug("Triggering tear-down of Objective Manager")
 }
 
 func (this *BaseObjectiveManager) RandomNumberGenerator() *rand.Rand {
@@ -49,6 +62,18 @@ func (this *BaseObjectiveManager) RandomNumberGenerator() *rand.Rand {
 
 func (this *BaseObjectiveManager) SetRandomNumberGenerator(generator *rand.Rand) {
 	this.randomNumberGenerator = generator
+}
+
+func (this *BaseObjectiveManager) LogHandler() LogHandler {
+	return this.logHandler
+}
+
+func (this *BaseObjectiveManager) SetLogHandler(logHandler LogHandler) error {
+	if logHandler == nil {
+		return errors.New("Invalid attempt to set log handler to nil value")
+	}
+	this.logHandler = logHandler
+	return nil
 }
 
 func (this *BaseObjectiveManager) TryRandomChange(temperature float64) {
