@@ -40,3 +40,7 @@ func (this *Worksheet) getProperty(propertyName string, parameters... interface{
 func (this *Worksheet) getPropertyString(propertyName string, parameters... interface{}) string {
 	return getPropertyString(this.dispatch, propertyName, parameters...)
 }
+
+func (this *Worksheet) call(methodName string, parameters... interface{}) *ole.IDispatch {
+	return callMethod(this.dispatch, methodName, parameters...)
+}

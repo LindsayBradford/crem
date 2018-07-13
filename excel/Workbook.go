@@ -30,17 +30,32 @@ func (this *Workbook) getProperty(propertyName string, parameters ... interface{
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Workbook) Worksheet(index uint) (worksheet *Worksheet, err error) {
+func (this *Workbook) Worksheet(index uint) (worksheet *Worksheet) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cannot open worksheet at index [" + fmt.Sprintf("%d", index) + "]")
-			worksheet = nil
+			panic("Cannot open worksheet at index [" + fmt.Sprintf("%d", index) + "]")
 		}
 	}()
 
 	worksheet = new(Worksheet)
 	worksheet.dispatch = this.getProperty("Worksheets", index)
-	return worksheet, nil
+	return worksheet
+}
+
+func (this *Workbook) WorksheetNamed(name string) (worksheet *Worksheet) {
+	defer func() {
+		if r := recover(); r != nil {
+			panic("Cannot open worksheet [" + name + "]")
+		}
+	}()
+
+	worksheet = new(Worksheet)
+	worksheet.dispatch = this.getProperty("Worksheets", name)
+	return worksheet
+}
+
+func (this *Workbook) Save() {
+	this.call("Save")
 }
 
 func (this *Workbook) Close() {

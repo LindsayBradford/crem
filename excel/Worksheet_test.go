@@ -19,7 +19,7 @@ func TestWorksheet_Cells(t *testing.T) {
 
 	workbookUnderTest, _ := workbooksUnderTest.Open(testFixtureAbsolutePath)
 
-	worksheetOne, _ := workbookUnderTest.Worksheet(1)
+	worksheetOne := workbookUnderTest.Worksheet(1)
 	worksheetOneActualColumns := worksheetOne.UsedRange().Columns().Count()
 	g.Expect(worksheetOneActualColumns).To(BeIdenticalTo(uint(3)), "Columns used should be 3")
 
