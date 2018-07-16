@@ -80,6 +80,7 @@ func storeAnnealingTableToWorkbook(table *annealingTable) {
 	for index := 0; index < len(table.rows); index++ {
 		worksheet.Cells(2+uint(index), 5).SetValue(table.rows[index].InOut)
 	}
+	worksheet.UsedRange().Columns().AutoFit()
 }
 
 func clearTrackingDataFromWorkbook() (table *trackingTable) {
@@ -92,6 +93,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	worksheet := workbook.WorksheetNamed("Tracker")
 	setTrackingDataColumnHeaders(worksheet)
 	storeTrackingTableToWorksheet(table, worksheet)
+	worksheet.UsedRange().Columns().AutoFit()
 }
 
 func setTrackingDataColumnHeaders(worksheet *excel.Worksheet) {

@@ -30,6 +30,10 @@ func (this *Range) Clear() {
 	this.call("Clear")
 }
 
+func (this *Range) AutoFit() {
+	this.call("AutoFit")
+}
+
 func (this *Range) getProperty(propertyName string, parameters... interface{})  *ole.IDispatch {
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
