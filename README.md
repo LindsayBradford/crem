@@ -25,10 +25,10 @@ TBD
 
 #### Copyright:
 
-This software has been released under the
-[BSD-3-Clause](https://tldrlegal.com/license/bsd-3-clause-license-%28revised%29) copyright licence,
+The Catchment Resilience Modeller (CRM) software is licensed under a BSD 3-clause "New" or "Revised" licence,
 detailed in [LICENCE.md](LICENCE.md).
 
 #### Dependencies:
 
-- [Gomega](https://github.com/onsi/gomega)  For a Fluent-API based approach to test assertions, MIT licence
+- [Gomega](https://github.com/onsi/gomega)  For a Fluent-API based approach to test assertions
+- [go-ole](https://github.com/go-ole/go-ole) For I/O via Excel files
