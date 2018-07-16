@@ -9,7 +9,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 
-In addition, the Catchment Resilience Model (CRM) software contains underlying openly licensed software listed below:
+In addition, the Catchment Resilience Modeller (CRM) software contains underlying openly licensed software listed below:
 
 A.  The following software licensed under an MIT licence (the MIT licence is pasted below this list):
 
