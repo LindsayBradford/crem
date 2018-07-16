@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 var excelHandlerUnderTest *ExcelHandler
 
 func setup() {
-	excelHandlerUnderTest, _ = InitialiseHandler()
+	excelHandlerUnderTest = InitialiseHandler()
 }
 
 func teardown() {

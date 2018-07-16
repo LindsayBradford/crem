@@ -47,21 +47,21 @@ func (this *ExcelHandler) Initialise() error {
 	return nil
 }
 
-func InitialiseHandler() (*ExcelHandler, error) {
+func InitialiseHandler() (*ExcelHandler) {
 	ole.CoInitialize(0)
 
 	newHandler := new(ExcelHandler)
 
 	initialiseError := newHandler.Initialise()
 	if initialiseError != nil {
-		return nil, initialiseError
+		panic(initialiseError)
 	}
 
 	newHandler.setProperty("Visible", false)
 	newHandler.setProperty("DisplayAlerts", false)
 	newHandler.setProperty("ScreenUpdating", false)
 
-	return newHandler, nil
+	return newHandler
 }
 
 func (this *ExcelHandler) Destroy() {
