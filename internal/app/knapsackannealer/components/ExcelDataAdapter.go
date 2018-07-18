@@ -53,11 +53,9 @@ func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 
 	for index := 0; index < len(table.rows); index++ {
 		rowOffset := uint(2+index)
-		table.rows[index].Cost = worksheet.Cells(rowOffset, 1).Value().(float64)
-		table.rows[index].Feature = worksheet.Cells(rowOffset, 2).Value().(float64)
-		table.rows[index].X = (uint64)(worksheet.Cells(rowOffset, 3).Value().(float64))
-		table.rows[index].Y = (uint64)(worksheet.Cells(rowOffset, 4).Value().(float64))
-		table.rows[index].InOut = (uint64)(worksheet.Cells(rowOffset, 5).Value().(float64))
+		table.rows[index].Cost = worksheet.Cells(rowOffset, 2).Value().(float64)
+		table.rows[index].Feature = worksheet.Cells(rowOffset, 3).Value().(float64)
+		table.rows[index].PUStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
 	}
 
 	randomiseInitialSolutionSet(table)
@@ -67,18 +65,18 @@ func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 func randomiseInitialSolutionSet(table *annealingTable) {
 	for index := 0; index < len(table.rows); index++ {
 		randomInOutValue := generateRandomInOutValue()
-		table.setInOutValueAtIndex(randomInOutValue, uint64(index))
+		table.setPUStatusAtIndex(randomInOutValue, uint64(index))
 	}
 }
 
-func generateRandomInOutValue() uint64 {
-	return (uint64)(randomNumberGenerator.Intn(2))
+func generateRandomInOutValue() InclusionStatus {
+	return (InclusionStatus)(randomNumberGenerator.Intn(2))
 }
 
 func storeAnnealingTableToWorkbook(table *annealingTable) {
 	worksheet := workbook.WorksheetNamed("Data")
 	for index := 0; index < len(table.rows); index++ {
-		worksheet.Cells(2+uint(index), 5).SetValue(table.rows[index].InOut)
+		worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PUStatus))
 	}
 	worksheet.UsedRange().Columns().AutoFit()
 }
@@ -98,7 +96,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 
 func setTrackingDataColumnHeaders(worksheet *excel.Worksheet) {
 	columnNames := [...]string{
-		"ObjFuncValue",
+		"ObjFuncChange",
 		"Temperature",
 		"ChangeIsDesirable",
 		"AcceptanceProbability",
@@ -119,7 +117,7 @@ func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksh
 	const rowOffset = 2
 	for index := 0; index < len(table.rows); index++ {
 		rowNumber := uint(index + rowOffset)
-		worksheet.Cells(rowNumber, 1).SetValue(table.rows[index].ObjectiveFunctionValue)
+		worksheet.Cells(rowNumber, 1).SetValue(table.rows[index].ObjectiveFunctionChange)
 		worksheet.Cells(rowNumber, 2).SetValue(table.rows[index].Temperature)
 		worksheet.Cells(rowNumber, 3).SetValue(table.rows[index].ChangeIsDesirable)
 		worksheet.Cells(rowNumber, 4).SetValue(table.rows[index].AcceptanceProbability)

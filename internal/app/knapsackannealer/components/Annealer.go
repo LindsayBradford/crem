@@ -29,8 +29,8 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 		ElapsedTimeTrackingAnnealer().
 		WithLogHandler(humanLogHandler).
 		WithObjectiveManager(new(KnapsackObjectiveManager)).
-		WithStartingTemperature(10).
-		WithCoolingFactor(0.997).
+		WithStartingTemperature(50).
+		WithCoolingFactor(0.995).
 		WithMaxIterations(2000).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
