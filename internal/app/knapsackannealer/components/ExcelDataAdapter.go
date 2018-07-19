@@ -15,6 +15,7 @@ const data = "Data"
 var (
 	excelHandler *excel.ExcelHandler
 	workbook *excel.Workbook
+	testFixtureAbsolutePath string
 )
 
 func init() {
@@ -30,7 +31,7 @@ func init() {
 
 func initialiseDataSource() (filePath string) {
 	workingDirectory, _ := os.Getwd()
-	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "KnapsackAnnealerTestFixture.xls")
+	testFixtureAbsolutePath = filepath.Join(workingDirectory, "testdata", "KnapsackAnnealerTestFixture.xls")
 
 	var dataSourceErr error
 	workbook, dataSourceErr = excelHandler.Workbooks().Open(testFixtureAbsolutePath)
@@ -84,9 +85,12 @@ func storeAnnealingTableToWorkbook(table *annealingTable) {
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
-func clearTrackingDataFromWorkbook() (table *trackingTable) {
-	worksheet := workbook.WorksheetNamed(tracker)
-	worksheet.UsedRange().Clear()
+func initialiseTrackingTable() *trackingTable {
+	clearTrackingDataFromWorkbook()
+	return createNewTrackingTable()
+}
+
+func createNewTrackingTable() *trackingTable {
 	newTrackingTable := new(trackingTable)
 	newTrackingTable.headings = []trackingTableHeadings{
 		ObjFuncChange,
@@ -102,7 +106,19 @@ func clearTrackingDataFromWorkbook() (table *trackingTable) {
 	return newTrackingTable
 }
 
+func clearTrackingDataFromWorkbook() () {
+	worksheet := workbook.WorksheetNamed(tracker)
+	worksheet.UsedRange().Clear()
+}
+
 func storeTrackingTableToWorkbook(table *trackingTable) {
+	defer func() {
+		if r := recover(); r != nil {
+			excelHandler.Destroy()
+			panic("Failed storing data to Excel data-source [" + testFixtureAbsolutePath + "]")
+		}
+	}()
+
 	worksheet := workbook.WorksheetNamed(tracker)
 	setTrackingDataColumnHeaders(table, worksheet)
 	storeTrackingTableToWorksheet(table, worksheet)
@@ -132,6 +148,13 @@ func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksh
 }
 
 func saveAndCloseWorkbook() {
+	defer func() {
+		if r := recover(); r != nil {
+			excelHandler.Destroy()
+			panic("Failed saving data to Excel data-source [" + testFixtureAbsolutePath + "]")
+		}
+	}()
+
 	workbook.Save()
 	workbook.Close()
 }

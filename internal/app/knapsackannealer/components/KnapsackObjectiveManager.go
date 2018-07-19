@@ -135,7 +135,7 @@ func (this *KnapsackObjectiveManager) Initialise() {
 	this.SetObjectiveValue(currentCost*0.8 + currentPenalty)
 
 	this.LogHandler().Debug("Clearing tracking data from workbook")
-	this.trackingData = clearTrackingDataFromWorkbook()
+	this.trackingData = initialiseTrackingTable()
 
 	this.LogHandler().Info("Data retrieved from workbook [" + this.dataSourcePath + "]")
 }
