@@ -9,6 +9,9 @@ import (
 	"github.com/LindsayBradford/crm/excel"
 )
 
+const tracker = "Tracker"
+const data = "Data"
+
 var (
 	excelHandler *excel.ExcelHandler
 	workbook *excel.Workbook
@@ -45,7 +48,7 @@ func destroyExcelHandler() {
 
 func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 	table = new(annealingTable)
-	worksheet := workbook.WorksheetNamed("Data")
+	worksheet := workbook.WorksheetNamed(data)
 
 	const headerRowCount = uint(1)
 	worksheetRowCount := worksheet.UsedRange().Rows().Count()
@@ -55,7 +58,7 @@ func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 		rowOffset := uint(2+index)
 		table.rows[index].Cost = worksheet.Cells(rowOffset, 2).Value().(float64)
 		table.rows[index].Feature = worksheet.Cells(rowOffset, 3).Value().(float64)
-		table.rows[index].PUStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
+		table.rows[index].PlanningUnitStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
 	}
 
 	randomiseInitialSolutionSet(table)
@@ -65,7 +68,7 @@ func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 func randomiseInitialSolutionSet(table *annealingTable) {
 	for index := 0; index < len(table.rows); index++ {
 		randomInOutValue := generateRandomInOutValue()
-		table.setPUStatusAtIndex(randomInOutValue, uint64(index))
+		table.setPlanningUnitStatusAtIndex(randomInOutValue, uint64(index))
 	}
 }
 
@@ -74,42 +77,42 @@ func generateRandomInOutValue() InclusionStatus {
 }
 
 func storeAnnealingTableToWorkbook(table *annealingTable) {
-	worksheet := workbook.WorksheetNamed("Data")
+	worksheet := workbook.WorksheetNamed(data)
 	for index := 0; index < len(table.rows); index++ {
-		worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PUStatus))
+		worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PlanningUnitStatus))
 	}
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
 func clearTrackingDataFromWorkbook() (table *trackingTable) {
-	worksheet := workbook.WorksheetNamed("Tracker")
+	worksheet := workbook.WorksheetNamed(tracker)
 	worksheet.UsedRange().Clear()
-	return new(trackingTable)
+	newTrackingTable := new(trackingTable)
+	newTrackingTable.headings = []trackingTableHeadings{
+		ObjFuncChange,
+		Temperature,
+		ChangeIsDesirable,
+		AcceptanceProbability,
+		ChangeAccepted,
+		InFirst50,
+		InSecond50,
+		TotalCost,
+	}
+
+	return newTrackingTable
 }
 
 func storeTrackingTableToWorkbook(table *trackingTable) {
-	worksheet := workbook.WorksheetNamed("Tracker")
-	setTrackingDataColumnHeaders(worksheet)
+	worksheet := workbook.WorksheetNamed(tracker)
+	setTrackingDataColumnHeaders(table, worksheet)
 	storeTrackingTableToWorksheet(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
-func setTrackingDataColumnHeaders(worksheet *excel.Worksheet) {
-	columnNames := [...]string{
-		"ObjFuncChange",
-		"Temperature",
-		"ChangeIsDesirable",
-		"AcceptanceProbability",
-		"ChangeAccepted",
-		"InFirst50",
-		"InSecond50",
-		"TotalCost",
-	}
-
-	const headerRowIndex = 1
-
-	for columnIndex := uint(1); columnIndex <= uint(len(columnNames)); columnIndex++ {
-		worksheet.Cells(headerRowIndex, columnIndex).SetValue(columnNames[columnIndex-1])
+func setTrackingDataColumnHeaders(table *trackingTable, worksheet *excel.Worksheet) {
+	const headerRowIndex = uint(1)
+	for _, heading := range table.headings {
+		worksheet.Cells(headerRowIndex, uint(heading)).SetValue(heading.String())
 	}
 }
 
@@ -117,14 +120,14 @@ func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksh
 	const rowOffset = 2
 	for index := 0; index < len(table.rows); index++ {
 		rowNumber := uint(index + rowOffset)
-		worksheet.Cells(rowNumber, 1).SetValue(table.rows[index].ObjectiveFunctionChange)
-		worksheet.Cells(rowNumber, 2).SetValue(table.rows[index].Temperature)
-		worksheet.Cells(rowNumber, 3).SetValue(table.rows[index].ChangeIsDesirable)
-		worksheet.Cells(rowNumber, 4).SetValue(table.rows[index].AcceptanceProbability)
-		worksheet.Cells(rowNumber, 5).SetValue(table.rows[index].ChangeAccepted)
-		worksheet.Cells(rowNumber, 6).SetValue(table.rows[index].InFirst50)
-		worksheet.Cells(rowNumber, 7).SetValue(table.rows[index].InSecond50)
-		worksheet.Cells(rowNumber, 8).SetValue(table.rows[index].TotalCost)
+		worksheet.Cells(rowNumber, ObjFuncChange.Index()).SetValue(table.rows[index].ObjectiveFunctionChange)
+		worksheet.Cells(rowNumber, Temperature.Index()).SetValue(table.rows[index].Temperature)
+		worksheet.Cells(rowNumber, ChangeIsDesirable.Index()).SetValue(table.rows[index].ChangeIsDesirable)
+		worksheet.Cells(rowNumber, AcceptanceProbability.Index()).SetValue(table.rows[index].AcceptanceProbability)
+		worksheet.Cells(rowNumber, ChangeAccepted.Index()).SetValue(table.rows[index].ChangeAccepted)
+		worksheet.Cells(rowNumber, InFirst50.Index()).SetValue(table.rows[index].InFirst50)
+		worksheet.Cells(rowNumber, InSecond50.Index()).SetValue(table.rows[index].InSecond50)
+		worksheet.Cells(rowNumber, TotalCost.Index()).SetValue(table.rows[index].TotalCost)
 	}
 }
 

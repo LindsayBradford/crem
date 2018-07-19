@@ -35,9 +35,9 @@ type annealingTable struct {
 }
 
 type annealingData struct {
-	Cost     float64
-	Feature  float64
-	PUStatus InclusionStatus
+	Cost               float64
+	Feature            float64
+	PlanningUnitStatus InclusionStatus
 }
 
 type InclusionStatus uint64
@@ -48,27 +48,65 @@ const (
 )
 
 func (this *annealingTable) ToggleRandomPlanningUnit() (rowIndexToggled uint64) {
-	rowIndexToggled = this.GenerateRandomInOutIndex()
-	this.TogglePUStatusAtIndex(rowIndexToggled)
+	rowIndexToggled = this.SelectRandomPlanningUnit()
+	this.TogglePlanningUnitStatusAtIndex(rowIndexToggled)
 	return
 }
 
-func (this *annealingTable) GenerateRandomInOutIndex() uint64 {
+func (this *annealingTable) SelectRandomPlanningUnit() uint64 {
 	tableSize := len(this.rows)
 	return (uint64)(randomNumberGenerator.Intn(tableSize))
 }
 
-func (this *annealingTable) TogglePUStatusAtIndex(index uint64) {
-	newInOutValue := (InclusionStatus)((this.rows[index].PUStatus + 1) % 2)
-	this.setPUStatusAtIndex(newInOutValue, index)
+func (this *annealingTable) TogglePlanningUnitStatusAtIndex(index uint64) {
+	newStatusValue := (InclusionStatus)((this.rows[index].PlanningUnitStatus + 1) % 2)
+	this.setPlanningUnitStatusAtIndex(newStatusValue, index)
 }
 
-func (this *annealingTable) setPUStatusAtIndex(inOutValue InclusionStatus, index uint64) {
-	this.rows[index].PUStatus = inOutValue
+func (this *annealingTable) setPlanningUnitStatusAtIndex(status InclusionStatus, index uint64) {
+	this.rows[index].PlanningUnitStatus = status
 }
 
 type trackingTable struct {
+	headings []trackingTableHeadings
 	rows []trackingData
+}
+
+type trackingTableHeadings int
+
+const (
+	UNKNOWN trackingTableHeadings = iota
+	ObjFuncChange
+	Temperature
+	ChangeIsDesirable
+	AcceptanceProbability
+	ChangeAccepted
+	InFirst50
+	InSecond50
+	TotalCost
+)
+
+func (heading trackingTableHeadings) String() string {
+	columnNames := [...]string{
+		"<UnknownHeader>",
+		"ObjFuncChange",
+		"Temperature",
+		"ChangeIsDesirable",
+		"AcceptanceProbability",
+		"ChangeAccepted",
+		"InFirst50",
+		"InSecond50",
+		"TotalCost",
+	}
+	if heading < ObjFuncChange || heading> TotalCost {
+		return columnNames[UNKNOWN]
+	}
+
+	return columnNames[heading]
+}
+
+func (heading trackingTableHeadings) Index() uint {
+	return uint(heading)
 }
 
 type trackingData struct {
@@ -84,7 +122,6 @@ type trackingData struct {
 
 func (this *KnapsackObjectiveManager) Initialise() {
 	this.BaseObjectiveManager.Initialise()
-	this.penalty = 100 // TODO: make configurable
 
 	this.dataSourcePath = initialiseDataSource()
 	this.LogHandler().Info("Opening Excel workbook [" + this.dataSourcePath + "] as data source")
@@ -101,6 +138,11 @@ func (this *KnapsackObjectiveManager) Initialise() {
 	this.trackingData = clearTrackingDataFromWorkbook()
 
 	this.LogHandler().Info("Data retrieved from workbook [" + this.dataSourcePath + "]")
+}
+
+func (this *KnapsackObjectiveManager) WithPenalty(penalty float64) *KnapsackObjectiveManager {
+	this.penalty = penalty
+	return this
 }
 
 func (this *KnapsackObjectiveManager) TearDown() {
@@ -144,7 +186,7 @@ func (this *KnapsackObjectiveManager) makeRandomChange(temperature float64) {
 func (this *KnapsackObjectiveManager) deriveTotalPenalty() float64 {
 	totalPenalty := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
-		totalPenalty += float64(this.annealingData.rows[index].PUStatus) * this.annealingData.rows[index].Cost
+		totalPenalty += float64(this.annealingData.rows[index].PlanningUnitStatus) * this.annealingData.rows[index].Cost
 	}
 	return math.Max(0, this.penalty-totalPenalty)
 }
@@ -153,7 +195,7 @@ func (this *KnapsackObjectiveManager) deriveFeatureCost() float64 {
 	totalFeatureCost := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
 		totalFeatureCost +=
-			float64(this.annealingData.rows[index].PUStatus) * this.annealingData.rows[index].Feature
+			float64(this.annealingData.rows[index].PlanningUnitStatus) * this.annealingData.rows[index].Feature
 	}
 	return totalFeatureCost
 }
@@ -180,7 +222,7 @@ func (this *KnapsackObjectiveManager) deriveSmallPUs() uint64 {
 	totalSmallPUs := uint64(0)
 	var index = 0
 	for index = 0; index < len(this.annealingData.rows) / 2; index++ {
-		totalSmallPUs += uint64(this.annealingData.rows[index].PUStatus)
+		totalSmallPUs += uint64(this.annealingData.rows[index].PlanningUnitStatus)
 	}
 	return totalSmallPUs
 }
@@ -189,13 +231,13 @@ func (this *KnapsackObjectiveManager) deriveLargePUs() uint64 {
 	totalLargePUs := uint64(0)
 	var index = 0
 	for index = len(this.annealingData.rows) / 2; index < len(this.annealingData.rows); index++ {
-		totalLargePUs += uint64(this.annealingData.rows[index].PUStatus)
+		totalLargePUs += uint64(this.annealingData.rows[index].PlanningUnitStatus)
 	}
 	return totalLargePUs
 }
 
 func (this *KnapsackObjectiveManager) RevertLastChange() {
-	this.annealingData.TogglePUStatusAtIndex(this.previousPlanningUnitChanged)
+	this.annealingData.TogglePlanningUnitStatusAtIndex(this.previousPlanningUnitChanged)
 	this.SetObjectiveValue(this.ObjectiveValue() - this.ChangeInObjectiveValue())
 	this.SetChangeInObjectiveValue(0)
 	this.addTrackerData()
