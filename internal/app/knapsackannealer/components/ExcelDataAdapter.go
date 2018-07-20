@@ -120,9 +120,13 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	}()
 
 	worksheet := workbook.WorksheetNamed(tracker)
-	setTrackingDataColumnHeaders(table, worksheet)
 	storeTrackingTableToWorksheet(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
+}
+
+func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
+	setTrackingDataColumnHeaders(table, worksheet)
+	storeTrackingTableRowsToWorksheet(table, worksheet)
 }
 
 func setTrackingDataColumnHeaders(table *trackingTable, worksheet *excel.Worksheet) {
@@ -132,7 +136,7 @@ func setTrackingDataColumnHeaders(table *trackingTable, worksheet *excel.Workshe
 	}
 }
 
-func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
+func storeTrackingTableRowsToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
 	const rowOffset = 2
 	for index := 0; index < len(table.rows); index++ {
 		rowNumber := uint(index + rowOffset)
