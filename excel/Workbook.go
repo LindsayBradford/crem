@@ -58,6 +58,10 @@ func (this *Workbook) Save() {
 	this.call("Save")
 }
 
+func (this *Workbook) SaveAs(newFileName string) {
+	this.call("SaveAs", newFileName)
+}
+
 func (this *Workbook) Close() {
 	this.call("Close")
 }

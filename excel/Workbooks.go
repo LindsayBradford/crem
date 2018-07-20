@@ -34,7 +34,7 @@ func (this *Workbooks) Open(filePath string) (workbook *Workbook, err error) {
 	}()
 
 	workbook = new(Workbook)
-	workbook.dispatch = this.call("Open", filePath)
+	workbook.dispatch = this.call("Open", filePath, true)
 	return workbook, nil
 }
 

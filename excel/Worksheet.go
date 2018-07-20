@@ -15,6 +15,10 @@ func (this *Worksheet) Name() string {
 	return this.getPropertyString("Name")
 }
 
+func (this *Worksheet) SetName(name string) {
+	this.setProperty("Name", name)
+}
+
 func (this *Worksheet) UsedRange() (usedRange *Range) {
 	usedRange = new(Range)
 	usedRange.dispatch = this.getProperty("UsedRange")
@@ -39,6 +43,10 @@ func (this *Worksheet) getProperty(propertyName string, parameters... interface{
 
 func (this *Worksheet) getPropertyString(propertyName string, parameters... interface{}) string {
 	return getPropertyString(this.dispatch, propertyName, parameters...)
+}
+
+func (this *Worksheet) setProperty(propertyName string, propertyValue interface{}) {
+	setProperty(this.dispatch, propertyName, propertyValue)
 }
 
 func (this *Worksheet) call(methodName string, parameters... interface{}) *ole.IDispatch {

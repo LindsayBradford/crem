@@ -52,5 +52,4 @@ func TestWorksheet_Cells(t *testing.T) {
 	actualCell5_5Value := worksheetOne.Cells(5,5).Value()
 
 	g.Expect(actualCell5_5Value).To(Equal(expectedCell5_5Value), "Cells(5,5) actual value match expected value")
-
 }
