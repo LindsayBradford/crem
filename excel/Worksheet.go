@@ -18,6 +18,10 @@ func (this *Worksheet) SetName(name string) {
 	this.setProperty("Name", name)
 }
 
+func (this *Worksheet) Delete() {
+	this.call("Delete")
+}
+
 func (this *Worksheet) UsedRange() (usedRange *Range) {
 	usedRange = new(Range)
 	usedRange.dispatch = this.getProperty("UsedRange")

@@ -3,10 +3,15 @@
 package components
 
 import (
+	"encoding/csv"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/LindsayBradford/crm/excel"
+	"github.com/onsi/gomega/gstruct/errors"
 )
 
 const tracker = "Tracker"
@@ -121,35 +126,81 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	}()
 
 	worksheet := workbook.WorksheetNamed(tracker)
-	storeTrackingTableToWorksheet(table, worksheet)
+	storeTrackingTableToWorksheet_fast(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
-func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
-	setTrackingDataColumnHeaders(table, worksheet)
-	storeTrackingTableRowsToWorksheet(table, worksheet)
+
+func storeTrackingTableToWorksheet_fast(table *trackingTable, worksheet *excel.Worksheet) {
+	tempFile := writeTableToTempCsvFile(table)
+	loadTempCsvFileIntoWorksheet(tempFile, worksheet)
+	deleteTempCsvFile(tempFile)
 }
 
-func setTrackingDataColumnHeaders(table *trackingTable, worksheet *excel.Worksheet) {
-	const headerRowIndex = uint(1)
+func writeTableToTempCsvFile(table *trackingTable) string {
+	tmpFileHandle, err := ioutil.TempFile("", "trackingTableCsv")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w := csv.NewWriter(tmpFileHandle)
+	w.UseCRLF = true
+
+	headingsAsStringArray := make([]string, len(table.headings))
 	for _, heading := range table.headings {
-		worksheet.Cells(headerRowIndex, uint(heading)).SetValue(heading.String())
+		headingsAsStringArray[heading.Index() - 1] = heading.String()
 	}
+	if err := w.Write(headingsAsStringArray); err != nil {
+		panic(errors.Nest("error writing header to csv:", err))
+	}
+
+  for _, row := range table.rows {
+  	rowArray := make([]string, len(table.headings))
+
+  	objectivesFunctionValueAsString := fmt.Sprintf("%f",row.ObjectiveFunctionChange)
+	  rowArray[ObjFuncChange.Index() - 1] = objectivesFunctionValueAsString
+
+	  TemperatureAsString := fmt.Sprintf("%f",row.Temperature)
+	  rowArray[Temperature.Index() - 1] = TemperatureAsString
+
+	  ChangeIsDesirableAsString := fmt.Sprintf("%t",row.ChangeIsDesirable)
+	  rowArray[ChangeIsDesirable.Index() - 1] = ChangeIsDesirableAsString
+
+	  AcceptanceProbabilityAsString := fmt.Sprintf("%f",row.AcceptanceProbability)
+	  rowArray[AcceptanceProbability.Index() - 1] = AcceptanceProbabilityAsString
+
+	  ChangeAcceptedAsString := fmt.Sprintf("%t",row.ChangeAccepted)
+	  rowArray[ChangeAccepted.Index() - 1] = ChangeAcceptedAsString
+
+	  InFirst50AsString := fmt.Sprintf("%d",row.InFirst50)
+	  rowArray[InFirst50.Index() - 1] = InFirst50AsString
+
+	  InSecond50AsString := fmt.Sprintf("%d",row.InSecond50)
+	  rowArray[InSecond50.Index() - 1] = InSecond50AsString
+
+	  TotalCostAsString := fmt.Sprintf("%f",row.TotalCost)
+	  rowArray[TotalCost.Index() - 1] = TotalCostAsString
+
+		if err := w.Write(rowArray); err != nil {
+			panic(errors.Nest("error writing record to csv:", err))
+		}
+	}
+
+	w.Flush()
+
+	if err := tmpFileHandle.Close(); err != nil {
+		panic(errors.Nest("error closing csv:", err))
+	}
+
+	return tmpFileHandle.Name()
 }
 
-func storeTrackingTableRowsToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
-	const rowOffset = 2
-	for index := 0; index < len(table.rows); index++ {
-		rowNumber := uint(index + rowOffset)
-		worksheet.Cells(rowNumber, ObjFuncChange.Index()).SetValue(table.rows[index].ObjectiveFunctionChange)
-		worksheet.Cells(rowNumber, Temperature.Index()).SetValue(table.rows[index].Temperature)
-		worksheet.Cells(rowNumber, ChangeIsDesirable.Index()).SetValue(table.rows[index].ChangeIsDesirable)
-		worksheet.Cells(rowNumber, AcceptanceProbability.Index()).SetValue(table.rows[index].AcceptanceProbability)
-		worksheet.Cells(rowNumber, ChangeAccepted.Index()).SetValue(table.rows[index].ChangeAccepted)
-		worksheet.Cells(rowNumber, InFirst50.Index()).SetValue(table.rows[index].InFirst50)
-		worksheet.Cells(rowNumber, InSecond50.Index()).SetValue(table.rows[index].InSecond50)
-		worksheet.Cells(rowNumber, TotalCost.Index()).SetValue(table.rows[index].TotalCost)
-	}
+func loadTempCsvFileIntoWorksheet(tempFileName string, worksheet *excel.Worksheet) {
+	excel.AddCsvFileContentToWorksheet(tempFileName, worksheet)
+}
+
+func deleteTempCsvFile(tempFileName string) {
+	defer os.Remove(tempFileName)
 }
 
 func saveAndCloseWorkbook() {

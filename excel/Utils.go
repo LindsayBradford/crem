@@ -34,23 +34,28 @@ func callMethod(dispatch *ole.IDispatch, methodName string, parameters... interf
 	return oleutil.MustCallMethod(dispatch, methodName, parameters...).ToIDispatch()
 }
 
-
-func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook *Workbook) (worksheet *Worksheet) {
+func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook *Workbook) *Worksheet {
 	worksheets := workbook.Worksheets()
 	newWorksheet :=  worksheets.Add()
-	topLeftOfWorksheet := newWorksheet.Cells(1,1)
 
-	queryTableDispatch := newWorksheet.getProperty("QueryTables" )
-	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;" + csvFilePath, topLeftOfWorksheet.dispatch)
-	setProperty(newQueryTable, "TextFileParseType", 1)  // xlDelimited
-	setProperty(newQueryTable, "TextFileCommaDelimiter", true)
-	setProperty(newQueryTable, "TextFileSpaceDelimiter", false)
-	setProperty(newQueryTable, "Refresh", false)
+	AddCsvFileContentToWorksheet(csvFilePath, newWorksheet)
 
 	newWorksheet.SetName(worksheetName)
 	MoveWorksheetToLastInWorksheets(newWorksheet, worksheets)
 
 	return newWorksheet
+}
+
+func AddCsvFileContentToWorksheet(csvFilePath string, worksheet *Worksheet) {
+	worksheet.UsedRange().Clear()
+	topLeftOfWorksheet := worksheet.Cells(1,1)
+
+	queryTableDispatch := worksheet.getProperty("QueryTables" )
+	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;" + csvFilePath, topLeftOfWorksheet.dispatch)
+	setProperty(newQueryTable, "TextFileParseType", 1)  // xlDelimited
+	setProperty(newQueryTable, "TextFileCommaDelimiter", true)
+	setProperty(newQueryTable, "TextFileSpaceDelimiter", false)
+	setProperty(newQueryTable, "Refresh", false)
 }
 
 func LastOfWorksheets(worksheets *Worksheets) (worksheet *Worksheet) {
