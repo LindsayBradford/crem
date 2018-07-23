@@ -33,12 +33,13 @@ func initialiseDataSource() (filePath string) {
 	workingDirectory, _ := os.Getwd()
 	testFixtureAbsolutePath = filepath.Join(workingDirectory, "testdata", "KnapsackAnnealerTestFixture.xls")
 
-	var dataSourceErr error
-	workbook, dataSourceErr = excelHandler.Workbooks().Open(testFixtureAbsolutePath)
+	defer func() {
+		if r := recover(); r != nil {
+			panic("Workbook [" + testFixtureAbsolutePath + "] could not be opened. Data source initialisation failed.")
+		}
+	}()
 
-	if dataSourceErr != nil {
-		panic("Workbook [" + testFixtureAbsolutePath + "] could not be opened.")
-	}
+	workbook = excelHandler.Workbooks().Open(testFixtureAbsolutePath)
 
 	return testFixtureAbsolutePath
 }

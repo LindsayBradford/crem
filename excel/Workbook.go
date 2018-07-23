@@ -13,17 +13,17 @@ type Workbook         struct {
 	dispatch *ole.IDispatch
 }
 
-func (this *Workbook) Worksheets() (worksheets *Worksheets, err error) {
+func (this *Workbook) Worksheets() (worksheets *Worksheets) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cannot retrieve worksheets")
+			panic(errors.New("Cannot retrieve worksheets"))
 			worksheets = nil
 		}
 	}()
 
 	worksheets = new(Worksheets)
 	worksheets.dispatch = this.getProperty("Worksheets")
-	return worksheets, nil
+	return worksheets
 }
 
 func (this *Workbook) getProperty(propertyName string, parameters ... interface{}) *ole.IDispatch {

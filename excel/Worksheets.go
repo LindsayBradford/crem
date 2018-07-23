@@ -24,41 +24,7 @@ func (this *Worksheets) Add() (worksheet *Worksheet) {
 
 	worksheet = new(Worksheet)
 	worksheet.dispatch = this.call("Add")
-	this.moveToLast(worksheet)
 	return worksheet
-}
-
-func (this *Worksheets) moveToLast(worksheet *Worksheet) {
-	defer func() {
-		if r := recover(); r != nil {
-			msg := fmt.Sprintf("Cannot excel worksheet [%s] to last position", r)
-			panic(errors.New(msg))
-		}
-	}()
-
-	worksheet.call("Move", nil, this.last().dispatch)
-}
-
-func (this *Worksheets) last() (worksheet *Worksheet) {
-	worksheetCount := this.Count()
-	lastWorksheet := this.Item(worksheetCount)
-	return lastWorksheet
-}
-
-func (this *Worksheets) AddFromCsvFile(csvFilePath string, worksheetName string) (worksheet *Worksheet) {
-	newWorksheet := this.Add()
-
-	topLeftOfWorksheet := newWorksheet.Cells(1,1)
-
-	queryTableDispatch := newWorksheet.getProperty("QueryTables" )
-	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;" + csvFilePath, topLeftOfWorksheet.dispatch)
-	setProperty(newQueryTable, "TextFileParseType", 1)  // xlDelimited
-	setProperty(newQueryTable, "TextFileCommaDelimiter", true)
-	setProperty(newQueryTable, "TextFileSpaceDelimiter", false)
-	setProperty(newQueryTable, "Refresh", false)
-	newWorksheet.SetName(worksheetName)
-
-	return newWorksheet
 }
 
 func (this *Worksheets) Count() uint {

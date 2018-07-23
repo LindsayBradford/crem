@@ -17,7 +17,7 @@ func TestWorksheet_Cells(t *testing.T) {
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
 
-	workbookUnderTest, _ := workbooksUnderTest.Open(testFixtureAbsolutePath)
+	workbookUnderTest := workbooksUnderTest.Open(testFixtureAbsolutePath)
 
 	worksheetOne := workbookUnderTest.Worksheet(1)
 	worksheetOneActualColumns := worksheetOne.UsedRange().Columns().Count()

@@ -12,30 +12,30 @@ type Workbooks         struct {
 	dispatch *ole.IDispatch
 }
 
-func (this *Workbooks) Add() (workbook *Workbook, err error) {
+func (this *Workbooks) Add() (workbook *Workbook) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cannot create new excel workbook")
+			panic(errors.New("Cannot create new excel workbook"))
 			workbook = nil
 		}
 	}()
 
 	workbook = new(Workbook)
 	workbook.dispatch = this.call("Add")
-	return workbook, nil
+	return workbook
 }
 
-func (this *Workbooks) Open(filePath string) (workbook *Workbook, err error) {
+func (this *Workbooks) Open(filePath string) (workbook *Workbook) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cannot open excel file [" + filePath + "]")
+			panic(errors.New("Cannot open excel file [" + filePath + "]"))
 			workbook = nil
 		}
 	}()
 
 	workbook = new(Workbook)
 	workbook.dispatch = this.call("Open", filePath, true)
-	return workbook, nil
+	return workbook
 }
 
 func (this *Workbooks) Close() {

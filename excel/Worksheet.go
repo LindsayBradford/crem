@@ -10,7 +10,6 @@ type Worksheet         struct {
 	dispatch *ole.IDispatch
 }
 
-
 func (this *Worksheet) Name() string {
 	return this.getPropertyString("Name")
 }

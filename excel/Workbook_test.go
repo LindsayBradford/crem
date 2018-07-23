@@ -17,8 +17,8 @@ func TestWorkbook_Worksheet(t *testing.T) {
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
 
-	workbookUnderTest, _ := workbooksUnderTest.Open(testFixtureAbsolutePath)
-	worksheetsUnderTest, _ := workbookUnderTest.Worksheets()
+	workbookUnderTest := workbooksUnderTest.Open(testFixtureAbsolutePath)
+	worksheetsUnderTest := workbookUnderTest.Worksheets()
 
 	worksheetCount := worksheetsUnderTest.Count()
 	g.Expect(worksheetCount).To(BeIdenticalTo(uint(2)), "Expected worksheets count of 2 for test fixture")
