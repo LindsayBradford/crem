@@ -14,6 +14,10 @@ func (this *DumbObjectiveManager) Initialise() {
 	this.BaseObjectiveManager.Initialise()
 }
 
+func (this *DumbObjectiveManager) TearDown() {
+	this.BaseObjectiveManager.TearDown()
+}
+
 func (this *DumbObjectiveManager) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
 	DecideOnWhetherToAcceptChange(this, temperature)

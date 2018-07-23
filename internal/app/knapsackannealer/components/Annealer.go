@@ -19,8 +19,8 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 		WithModulator(new(NullModulator))
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(humanLogHandler).
-	// WithModulator(new(NullModulator))
-	// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
+		// WithModulator(new(NullModulator))
+		// WithModulator(new(IterationElapsedTimeLoggingModulator).WithWait(1 * time.Second))
 		WithModulator(new(IterationModuloLoggingModulator).WithModulo(200))
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
@@ -28,9 +28,10 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 	newAnnealer, err := builder.
 		ElapsedTimeTrackingAnnealer().
 		WithLogHandler(humanLogHandler).
-		WithObjectiveManager(new(KnapsackObjectiveManager)).
-		WithStartingTemperature(10).
-		WithCoolingFactor(0.997).
+		WithObjectiveManager(
+			new(KnapsackObjectiveManager).WithPenalty(100)).
+		WithStartingTemperature(50).
+		WithCoolingFactor(0.995).
 		WithMaxIterations(2000).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
@@ -45,4 +46,3 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 
 	return newAnnealer
 }
-
