@@ -126,12 +126,12 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	}()
 
 	worksheet := workbook.WorksheetNamed(tracker)
-	storeTrackingTableToWorksheet_fast(table, worksheet)
+	storeTrackingTableToWorksheet(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
 
-func storeTrackingTableToWorksheet_fast(table *trackingTable, worksheet *excel.Worksheet) {
+func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
 	tempFile := writeTableToTempCsvFile(table)
 	loadTempCsvFileIntoWorksheet(tempFile, worksheet)
 	deleteTempCsvFile(tempFile)
