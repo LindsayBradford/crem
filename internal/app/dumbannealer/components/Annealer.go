@@ -23,11 +23,12 @@ func BuildDumbAnnealer(logHandler LogHandler) Annealer {
 
 	newAnnealer, err := builder.
 		ElapsedTimeTrackingAnnealer().
-		WithDumbObjectiveManager(100).
-		WithLogHandler(logHandler).
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.99).
 		WithMaxIterations(500).
+		WithDumbObjectiveManager(100).
+		WithLogHandler(logHandler).
+		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
 		WithObservers(humanAudienceObserver).
 		Build()
 

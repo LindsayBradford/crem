@@ -61,6 +61,14 @@ func (this *AnnealerBuilder) WithObjectiveManager(manager ObjectiveManager) *Ann
 	return this
 }
 
+func (this *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
+	annealer := this.annealer
+	if err := annealer.SetEventNotifier(delegate); err != nil {
+		this.buildErrors.Add(err)
+	}
+	return this
+}
+
 func (this *AnnealerBuilder) WithDumbObjectiveManager(initialObjectiveValue float64) *AnnealerBuilder {
 	annealer := this.annealer
 	objectiveManager := new(DumbObjectiveManager)

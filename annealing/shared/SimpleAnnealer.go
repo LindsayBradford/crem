@@ -14,7 +14,7 @@ type SimpleAnnealer struct {
 	coolingFactor    float64
 	maxIterations    uint
 	currentIteration uint
-	observers        []AnnealingObserver
+	eventNotifier    AnnealingEventNotifier
 	objectiveManager ObjectiveManager
 	logger           LogHandler
 }
@@ -24,6 +24,7 @@ func (this *SimpleAnnealer) Initialise() {
 	this.coolingFactor = 1
 	this.maxIterations = 0
 	this.currentIteration = 0
+	this.eventNotifier = NULL_EVENT_NOTIFIER
 	this.objectiveManager = NULL_OBJECTIVE_MANAGER
 	this.logger = NULL_LOG_HANDLER
 }
@@ -88,31 +89,24 @@ func (this *SimpleAnnealer) LogHandler() LogHandler {
 	return this.logger
 }
 
-func (this *SimpleAnnealer) AddObserver(newObserver AnnealingObserver) error {
-	if newObserver == nil {
-		return errors.New("Invalid attempt to add non-existant observer to annealer")
+func (this *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) error {
+	if delegate == nil {
+		return errors.New("Invalid attempt to set event notifier to nil value")
 	}
-	this.observers = append(this.observers, newObserver)
+	this.eventNotifier = delegate
 	return nil
 }
 
+func (this *SimpleAnnealer) AddObserver(newObserver AnnealingObserver) error {
+	return this.eventNotifier.AddObserver(newObserver)
+}
+
 func (this *SimpleAnnealer) Observers() []AnnealingObserver {
-	return this.observers
+	return this.eventNotifier.Observers()
 }
 
-func (this *SimpleAnnealer) notifyObservers(thisEventType AnnealingEventType) {
-	event := AnnealingEvent{
-		EventType: thisEventType,
-		Annealer:  this}
-	this.notifyObserversWithEvent(event)
-}
-
-func (this *SimpleAnnealer) notifyObserversWithEvent(event AnnealingEvent) {
-	for _, currObserver := range this.observers {
-		if currObserver != nil {
-			currObserver.ObserveAnnealingEvent(event)
-		}
-	}
+func (this *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
+	this.eventNotifier.NotifyObserversOfAnnealingEvent(this, eventType)
 }
 
 func (this *SimpleAnnealer) Anneal() {
@@ -122,13 +116,13 @@ func (this *SimpleAnnealer) Anneal() {
 	this.annealingStarted()
 
 	for done := this.initialDoneValue(); !done; {
-			this.iterationStarted()
+		this.iterationStarted()
 
-			this.objectiveManager.TryRandomChange(this.temperature)
+		this.objectiveManager.TryRandomChange(this.temperature)
 
-			this.iterationFinished()
-			this.cooldown()
-			done = this.checkIfDone()
+		this.iterationFinished()
+		this.cooldown()
+		done = this.checkIfDone()
 	}
 
 	this.objectiveManager.TearDown()

@@ -19,8 +19,8 @@ type Annealer interface {
 	SetMaxIterations(iterations uint)
 	MaxIterations() uint
 
+	SetEventNotifier(notifier AnnealingEventNotifier) error
 	AddObserver(observer AnnealingObserver) error
-	Observers() []AnnealingObserver
 
 	SetLogHandler(logger LogHandler) error
 	LogHandler() LogHandler
