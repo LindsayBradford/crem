@@ -24,8 +24,20 @@ type AnnealingLogger struct {
 // Allows for the receipt of AnnealingEvent instances, but deliberately takes no action in logging those events.
 func (this *AnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {}
 
-var (
-	annealingWrapper = AnnealerStateFormatWrapper{
+func wrapAnnealer(eventAnnealer Annealer) *AnnealerStateFormatWrapper {
+	wrapper := newAnnealingWrapper()
+	wrapper.Wrap(eventAnnealer)
+	return wrapper
+}
+
+func wrapObjectiveManager(eventObjectiveManager ObjectiveManager) *ObjectiveManagerStateFormatWrapper {
+	wrapper := newObjectiveManagerWrapper()
+	wrapper.Wrap(eventObjectiveManager)
+	return wrapper
+}
+
+func newAnnealingWrapper() *AnnealerStateFormatWrapper  {
+	annealingWrapper := AnnealerStateFormatWrapper{
 		MethodFormats: map[string]string{
 			"Temperature":      "%0.4f",
 			"CoolingFactor":    "%0.3f",
@@ -33,8 +45,11 @@ var (
 			"CurrentIteration": "%03d",
 		},
 	}
+	return &annealingWrapper
+}
 
-	objectiveManagerWrapper = ObjectiveManagerStateFormatWrapper{
+func newObjectiveManagerWrapper() *ObjectiveManagerStateFormatWrapper  {
+	objectiveManagerWrapper := ObjectiveManagerStateFormatWrapper{
 		MethodFormats: map[string]string{
 			"ObjectiveValue":         "%0.4f",
 			"ChangeInObjectiveValue": "%0.4f",
@@ -43,14 +58,5 @@ var (
 			"ChangeAccepted":         "%t",
 		},
 	}
-)
-
-func wrapAnnealer(eventAnnealer Annealer) *AnnealerStateFormatWrapper {
-	annealingWrapper.Wrap(eventAnnealer)
-	return &annealingWrapper
-}
-
-func wrapObjectiveManager(eventObjectiveManager ObjectiveManager) *ObjectiveManagerStateFormatWrapper {
-	objectiveManagerWrapper.Wrap(eventObjectiveManager)
 	return &objectiveManagerWrapper
 }

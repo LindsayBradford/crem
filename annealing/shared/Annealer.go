@@ -21,6 +21,7 @@ type Annealer interface {
 
 	SetEventNotifier(notifier AnnealingEventNotifier) error
 	AddObserver(observer AnnealingObserver) error
+	Observers() []AnnealingObserver
 
 	SetLogHandler(logger LogHandler) error
 	LogHandler() LogHandler

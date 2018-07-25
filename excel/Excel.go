@@ -3,12 +3,10 @@
 package excel
 
 import (
-"errors"
+	"errors"
 
-
-"github.com/go-ole/go-ole"
-"github.com/go-ole/go-ole/oleutil"
-
+	"github.com/go-ole/go-ole"
+	"github.com/go-ole/go-ole/oleutil"
 )
 
 type ApplicationObject *ole.IUnknown
@@ -17,7 +15,6 @@ type Excel struct {
 	dispatch *ole.IDispatch
 }
 
-
 type ExcelHandler struct {
 	appObject ApplicationObject
 	excel     *Excel
@@ -25,9 +22,10 @@ type ExcelHandler struct {
 }
 
 func (this *ExcelHandler) Initialise() error {
+	err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED)
 	excelAppObject, err := oleutil.CreateObject("Excel.Application")
 
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 
@@ -35,7 +33,7 @@ func (this *ExcelHandler) Initialise() error {
 
 	newExcelIDispatch, err := excelAppObject.QueryInterface(ole.IID_IDispatch)
 
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 
@@ -47,7 +45,7 @@ func (this *ExcelHandler) Initialise() error {
 	return nil
 }
 
-func InitialiseHandler() (*ExcelHandler) {
+func InitialiseHandler() *ExcelHandler {
 	ole.CoInitialize(0)
 
 	newHandler := new(ExcelHandler)
@@ -99,7 +97,8 @@ func (this *ExcelHandler) Close() (err error) {
 	callMethod(this.excel.dispatch, "Save")
 
 	workbooks := this.Workbooks()
-	workbooks.Close(); workbooks.Release()
+	workbooks.Close()
+	workbooks.Release()
 
 	return nil
 }

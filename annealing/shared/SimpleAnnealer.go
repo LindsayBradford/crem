@@ -24,7 +24,7 @@ func (this *SimpleAnnealer) Initialise() {
 	this.coolingFactor = 1
 	this.maxIterations = 0
 	this.currentIteration = 0
-	this.eventNotifier = NULL_EVENT_NOTIFIER
+	this.eventNotifier = new(SynchronousAnnealingEventNotifier)
 	this.objectiveManager = NULL_OBJECTIVE_MANAGER
 	this.logger = NULL_LOG_HANDLER
 }
@@ -97,8 +97,8 @@ func (this *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) er
 	return nil
 }
 
-func (this *SimpleAnnealer) AddObserver(newObserver AnnealingObserver) error {
-	return this.eventNotifier.AddObserver(newObserver)
+func (this *SimpleAnnealer) AddObserver(observer AnnealingObserver) error {
+	return this.eventNotifier.AddObserver(observer)
 }
 
 func (this *SimpleAnnealer) Observers() []AnnealingObserver {
@@ -106,7 +106,12 @@ func (this *SimpleAnnealer) Observers() []AnnealingObserver {
 }
 
 func (this *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
-	this.eventNotifier.NotifyObserversOfAnnealingEvent(this, eventType)
+	this.eventNotifier.NotifyObserversOfAnnealingEvent(this.cloneState(), eventType)
+}
+
+func (this *SimpleAnnealer) cloneState() *SimpleAnnealer {
+	cloneOfThis := *this
+	return &cloneOfThis
 }
 
 func (this *SimpleAnnealer) Anneal() {

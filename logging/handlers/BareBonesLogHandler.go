@@ -4,11 +4,12 @@ package handlers
 
 import (
 	"fmt"
+	"io"
+	"time"
+
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/shared"
 	"github.com/LindsayBradford/crm/strings"
-	"io"
-	"time"
 )
 
 // Type is here for the purposes of documentation only. It is a stand-in
@@ -83,8 +84,6 @@ func (this *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, log
 func (this *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
 	var builder strings.FluentBuilder
 	builder.Add(text, "\n")
-
-	// TODO:  sync.Mutex per destination for when we are concurrent?
 	io.WriteString(this.destinations.Destinations[logLevel], builder.String())
 }
 
@@ -100,4 +99,3 @@ func prependLogLevel(logLevel LogLevel, oldSlice []NameValuePair) []NameValuePai
 func prepend(newValue NameValuePair, oldSlice []NameValuePair) []NameValuePair {
 	return append([]NameValuePair{newValue}, oldSlice...)
 }
-

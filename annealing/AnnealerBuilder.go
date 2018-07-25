@@ -2,17 +2,22 @@
 package annealing
 
 import (
-
-. "github.com/LindsayBradford/crm/annealing/objectives"
-. "github.com/LindsayBradford/crm/annealing/shared"
-crmerrors "github.com/LindsayBradford/crm/errors"
-. "github.com/LindsayBradford/crm/logging/handlers"
-
+	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/shared"
+	crmerrors "github.com/LindsayBradford/crm/errors"
+	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type AnnealerBuilder struct {
 	annealer    Annealer
 	buildErrors *crmerrors.CompositeError
+}
+
+func (this *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
+	this.annealer = &OSThreadLockedAnnealer{}
+	this.annealer.Initialise()
+	this.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
+	return this
 }
 
 func (this *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {

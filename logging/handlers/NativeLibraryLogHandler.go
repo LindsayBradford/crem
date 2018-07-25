@@ -4,9 +4,10 @@ package handlers
 
 import (
 	"fmt"
+	"log"
+
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/shared"
-	"log"
 )
 
 type NativeLibraryLogHandler struct {
