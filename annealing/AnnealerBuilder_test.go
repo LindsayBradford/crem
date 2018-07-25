@@ -5,7 +5,7 @@ package annealing
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crm/annealing/objectives"
+	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/onsi/gomega"
@@ -22,7 +22,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	const expectedCoolingFactor float64 = 0.5
 	const expectedIterations uint = 5000
 	expectedLogHandler := new(handlers.BareBonesLogHandler)
-	expectedObjectiveManager := new(objectives.DumbObjectiveManager)
+	expectedObjectiveManager := new(solution.DumbSolutionTourer)
 	expectedObservers := []shared.AnnealingObserver{ new(dummyObserver)}
 
 	builder := new(AnnealerBuilder)
@@ -33,7 +33,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 		WithCoolingFactor(expectedCoolingFactor).
 		WithMaxIterations(expectedIterations).
 		WithLogHandler(expectedLogHandler).
-		WithObjectiveManager(expectedObjectiveManager).
+		WithStateTourer(expectedObjectiveManager).
 		WithObservers(expectedObservers...).
 		Build()
 
@@ -58,8 +58,8 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 		"Annealer should have built with supplied LogHandler")
 
 	g.Expect(
-		annealer.ObjectiveManager()).To(BeIdenticalTo(expectedObjectiveManager),
-		"Annealer should have built with supplied ObjectiveManager")
+		annealer.SolutionTourer()).To(BeIdenticalTo(expectedObjectiveManager),
+		"Annealer should have built with supplied SolutionTourer")
 
 	g.Expect(
 		annealer.Observers()).To(Equal(expectedObservers),
@@ -72,7 +72,7 @@ func TestBuild_BadInputs(t *testing.T) {
 	const badTemperature float64 = -1
 	const badCoolingFactor float64 = 1.0000001
 	badLogHandler := handlers.LogHandler(nil)
-	badObjectiveManager := objectives.ObjectiveManager(nil)
+	badObjectiveManager := solution.SolutionTourer(nil)
 	// badObserver := shared.AnnealingObserver(nil)
 
 	expectedErrors := 5
@@ -84,7 +84,7 @@ func TestBuild_BadInputs(t *testing.T) {
 		WithStartingTemperature(badTemperature).
 		WithCoolingFactor(badCoolingFactor).
 		WithLogHandler(badLogHandler).
-		WithObjectiveManager(badObjectiveManager).
+		WithStateTourer(badObjectiveManager).
 		WithObservers(nil).
 		Build()
 
@@ -113,7 +113,7 @@ func TestBuild_BadInputs(t *testing.T) {
 		"Annealer should have built with nullLogHandler")
 
 	g.Expect(
-		annealer.ObjectiveManager()).To(Equal(objectives.NULL_OBJECTIVE_MANAGER),
+		annealer.SolutionTourer()).To(Equal(solution.NULL_SOLUTION_TOURER),
 		"Annealer should have built with nullObjectiveManager")
 
 	g.Expect(
@@ -126,7 +126,7 @@ func TestAnnealerBuilder_WithDumbObjectiveManager(t *testing.T) {
 
 	expectedObjectiveValue := float64(10)
 
-	expectedObjectiveManager := new(objectives.DumbObjectiveManager)
+	expectedObjectiveManager := new(solution.DumbSolutionTourer)
 	expectedObjectiveManager.SetObjectiveValue(expectedObjectiveValue)
 
 	builder := new(AnnealerBuilder)
@@ -139,7 +139,7 @@ func TestAnnealerBuilder_WithDumbObjectiveManager(t *testing.T) {
 	g.Expect(err).To(BeNil(),"Annealer should have built without errors")
 
 	g.Expect(
-		annealer.ObjectiveManager()).To(Equal(expectedObjectiveManager),
-		"Annealer should have built with expected DumbObjectiveManager")
+		annealer.SolutionTourer()).To(Equal(expectedObjectiveManager),
+		"Annealer should have built with expected DumbSolutionTourer")
 
 }

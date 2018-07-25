@@ -2,7 +2,7 @@
 package shared
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
@@ -13,8 +13,8 @@ type Annealer interface {
 	SetCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
-	ObjectiveManager() ObjectiveManager
-	SetObjectiveManager(manager ObjectiveManager) error
+	SolutionTourer() SolutionTourer
+	SetSolutionTourer(tourer SolutionTourer) error
 
 	SetMaxIterations(iterations uint)
 	MaxIterations() uint

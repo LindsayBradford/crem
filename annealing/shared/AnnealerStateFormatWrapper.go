@@ -8,16 +8,15 @@ import (
 	"fmt"
 )
 
-type AnnealerStateFormatWrapper struct {
+type AnnealerFormatWrapper struct {
 	AnnealerToFormat Annealer
-
 	MethodFormats map[string]string
 }
 
 const default_float64_format = "%f"
 const default_uint_format = "%d"
 
-func (this *AnnealerStateFormatWrapper) Initialise() *AnnealerStateFormatWrapper {
+func (this *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
 	this.MethodFormats = map[string]string{
 		"Temperature":      default_float64_format,
 		"CoolingFactor":    default_float64_format,
@@ -27,32 +26,32 @@ func (this *AnnealerStateFormatWrapper) Initialise() *AnnealerStateFormatWrapper
 	return this
 }
 
-func (this *AnnealerStateFormatWrapper) Wrapping(annealer Annealer) *AnnealerStateFormatWrapper {
+func (this *AnnealerFormatWrapper) Wrapping(annealer Annealer) *AnnealerFormatWrapper {
 	this.Wrap(annealer)
 	return this
 }
 
-func (this *AnnealerStateFormatWrapper) Wrap(annealer Annealer) {
+func (this *AnnealerFormatWrapper) Wrap(annealer Annealer) {
 	this.AnnealerToFormat = annealer
 }
 
-func (this *AnnealerStateFormatWrapper) Temperature() string {
+func (this *AnnealerFormatWrapper) Temperature() string {
 	return this.applyFormatting("Temperature", this.AnnealerToFormat.Temperature())
 }
 
-func (this *AnnealerStateFormatWrapper) CoolingFactor() string {
+func (this *AnnealerFormatWrapper) CoolingFactor() string {
 	return this.applyFormatting("CoolingFactor", this.AnnealerToFormat.CoolingFactor())
 }
 
-func (this *AnnealerStateFormatWrapper) MaxIterations() string {
+func (this *AnnealerFormatWrapper) MaxIterations() string {
 	return this.applyFormatting("MaxIterations", this.AnnealerToFormat.MaxIterations())
 }
 
-func (this *AnnealerStateFormatWrapper) CurrentIteration() string {
+func (this *AnnealerFormatWrapper) CurrentIteration() string {
 	return this.applyFormatting("CurrentIteration", this.AnnealerToFormat.CurrentIteration())
 }
 
-func (this *AnnealerStateFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+func (this *AnnealerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
 	formatToApply := this.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

@@ -2,7 +2,7 @@
 package annealing
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	crmerrors "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
@@ -58,9 +58,9 @@ func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerB
 	return this
 }
 
-func (this *AnnealerBuilder) WithObjectiveManager(manager ObjectiveManager) *AnnealerBuilder {
+func (this *AnnealerBuilder) WithStateTourer(tourer SolutionTourer) *AnnealerBuilder {
 	annealer := this.annealer
-	if err := annealer.SetObjectiveManager(manager); err != nil {
+	if err := annealer.SetSolutionTourer(tourer); err != nil {
 		this.buildErrors.Add(err)
 	}
 	return this
@@ -76,9 +76,9 @@ func (this *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) 
 
 func (this *AnnealerBuilder) WithDumbObjectiveManager(initialObjectiveValue float64) *AnnealerBuilder {
 	annealer := this.annealer
-	objectiveManager := new(DumbObjectiveManager)
+	objectiveManager := new(DumbSolutionTourer)
 	objectiveManager.SetObjectiveValue(initialObjectiveValue)
-	annealer.SetObjectiveManager(objectiveManager)
+	annealer.SetSolutionTourer(objectiveManager)
 	return this
 }
 

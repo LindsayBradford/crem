@@ -33,7 +33,7 @@ func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent
 	}
 
 	annealer := wrapAnnealer(event.Annealer)
-	objectiveManager := wrapObjectiveManager(event.Annealer.ObjectiveManager())
+	solutionTourer := wrapSolutionTourer(event.Annealer.SolutionTourer())
 
 	var builder strings.FluentBuilder
 	builder.Add("Event [", event.EventType.String(), "]: ")
@@ -42,28 +42,28 @@ func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent
 	case STARTED_ANNEALING:
 		builder.
 			Add("Maximum Iterations [", annealer.MaxIterations(), "], ").
-			Add("Objective value [", objectiveManager.ObjectiveValue(), "], ").
+			Add("Objective value [", solutionTourer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
 	case STARTED_ITERATION:
-		objectiveManager := wrapObjectiveManager(event.Annealer.ObjectiveManager())
+		solutionTourer := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
-			Add("Objective value [", objectiveManager.ObjectiveValue(), "]")
+			Add("Objective value [", solutionTourer.ObjectiveValue(), "]")
 	case FINISHED_ITERATION:
-		objectiveManager := wrapObjectiveManager(event.Annealer.ObjectiveManager())
+		solutionTourer := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
-			Add("Objective value [", objectiveManager.ObjectiveValue(), "], ").
-			Add("Change [", objectiveManager.ChangeInObjectiveValue(), "], ").
-			Add("Desirable? [", objectiveManager.ChangeIsDesirable(), "], ").
-			Add("Acceptance Probability [", objectiveManager.AcceptanceProbability(), "], ").
-			Add("Accepted? [", objectiveManager.ChangeAccepted(), "]")
+			Add("Objective value [", solutionTourer.ObjectiveValue(), "], ").
+			Add("Change [", solutionTourer.ChangeInObjectiveValue(), "], ").
+			Add("Desirable? [", solutionTourer.ChangeIsDesirable(), "], ").
+			Add("Acceptance Probability [", solutionTourer.AcceptanceProbability(), "], ").
+			Add("Accepted? [", solutionTourer.ChangeAccepted(), "]")
 	case FINISHED_ANNEALING:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
-			Add("Objective value [", objectiveManager.ObjectiveValue(), "], ").
+			Add("Objective value [", solutionTourer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "]")
 	case NOTE:
 		builder.Add("[", event.Note, "]")

@@ -8,7 +8,7 @@ import . "github.com/LindsayBradford/crm/logging/shared"
 // LogFormatter describes an interface for the formatting of LogAttributes into some logging-ready string.
 // Instances of LogHandler are expected to delegate any formatting of the supplied attributes to a LogFormatter.
 type LogFormatter interface {
-	// Initialises any necessary state the formatter requires prior to being used.
+	// Initialises any necessary solution the formatter requires prior to being used.
 	Initialise()
 
 	// Format converts the supplied attributes into a representative 'logging ready' string.

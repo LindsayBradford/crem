@@ -32,9 +32,9 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 		WithCoolingFactor(0.995).
 		WithMaxIterations(2000).
 		WithLogHandler(humanLogHandler).
-		WithObjectiveManager(new(KnapsackObjectiveManager).WithPenalty(100)).
-		// WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
-		WithEventNotifier(new(ChanneledAnnealingEventNotifier)).
+		WithStateTourer(new(KnapsackObjectiveManager).WithPenalty(100)).
+		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
+		// WithEventNotifier(new(ChanneledAnnealingEventNotifier)).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
 

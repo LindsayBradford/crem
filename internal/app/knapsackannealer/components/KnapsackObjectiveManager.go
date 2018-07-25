@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/solution"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 )
 
 type KnapsackObjectiveManager struct {
-	BaseObjectiveManager
+	BaseSolutionTourer
 
 	dataSourcePath string
 	penalty        float64
@@ -119,7 +119,7 @@ type trackingData struct {
 }
 
 func (this *KnapsackObjectiveManager) Initialise() {
-	this.BaseObjectiveManager.Initialise()
+	this.BaseSolutionTourer.Initialise()
 
 	this.dataSourcePath = initialiseDataSource()
 	this.LogHandler().Info("Opening Excel workbook [" + this.dataSourcePath + "] as data source")
@@ -144,7 +144,7 @@ func (this *KnapsackObjectiveManager) WithPenalty(penalty float64) *KnapsackObje
 }
 
 func (this *KnapsackObjectiveManager) TearDown() {
-	this.BaseObjectiveManager.TearDown()
+	this.BaseSolutionTourer.TearDown()
 	this.saveDataToWorkbookAndClose()
 	destroyExcelHandler()
 }
@@ -199,7 +199,7 @@ func (this *KnapsackObjectiveManager) deriveFeatureCost() float64 {
 }
 
 func (this *KnapsackObjectiveManager) AcceptLastChange() {
-	this.BaseObjectiveManager.AcceptLastChange()
+	this.BaseSolutionTourer.AcceptLastChange()
 	this.addTrackerData()
 }
 
@@ -239,5 +239,5 @@ func (this *KnapsackObjectiveManager) RevertLastChange() {
 	this.SetObjectiveValue(this.ObjectiveValue() - this.ChangeInObjectiveValue())
 	this.SetChangeInObjectiveValue(0)
 	this.addTrackerData()
-	this.BaseObjectiveManager.RevertLastChange()
+	this.BaseSolutionTourer.RevertLastChange()
 }

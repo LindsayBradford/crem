@@ -1,29 +1,29 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package objectives
+package solution
 
-type DumbObjectiveManager struct {
-	BaseObjectiveManager
+type DumbSolutionTourer struct {
+	BaseSolutionTourer
 }
 
-func (this *DumbObjectiveManager) SetObjectiveValue(initialObjectiveValue float64) {
+func (this *DumbSolutionTourer) SetObjectiveValue(initialObjectiveValue float64) {
 	this.objectiveValue = initialObjectiveValue
 }
 
-func (this *DumbObjectiveManager) Initialise() {
-	this.BaseObjectiveManager.Initialise()
+func (this *DumbSolutionTourer) Initialise() {
+	this.BaseSolutionTourer.Initialise()
 }
 
-func (this *DumbObjectiveManager) TearDown() {
-	this.BaseObjectiveManager.TearDown()
+func (this *DumbSolutionTourer) TearDown() {
+	this.BaseSolutionTourer.TearDown()
 }
 
-func (this *DumbObjectiveManager) TryRandomChange(temperature float64) {
+func (this *DumbSolutionTourer) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
 	DecideOnWhetherToAcceptChange(this, temperature)
 }
 
-func (this *DumbObjectiveManager) makeRandomChange() {
+func (this *DumbSolutionTourer) makeRandomChange() {
 	randomValue := this.RandomNumberGenerator().Intn(2)
 
 	var changeInObjectiveValue float64
@@ -42,11 +42,11 @@ func (this *DumbObjectiveManager) makeRandomChange() {
 	this.objectiveValue += this.changeInObjectiveValue
 }
 
-func (this *DumbObjectiveManager) AcceptLastChange()  {
-	this.BaseObjectiveManager.AcceptLastChange()
+func (this *DumbSolutionTourer) AcceptLastChange()  {
+	this.BaseSolutionTourer.AcceptLastChange()
 }
 
-func (this *DumbObjectiveManager) RevertLastChange()  {
+func (this *DumbSolutionTourer) RevertLastChange()  {
 	this.objectiveValue -= this.changeInObjectiveValue
-	this.BaseObjectiveManager.RevertLastChange()
+	this.BaseSolutionTourer.RevertLastChange()
 }

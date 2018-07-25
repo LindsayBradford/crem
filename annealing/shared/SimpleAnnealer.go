@@ -5,7 +5,7 @@ package shared
 import (
 	"errors"
 
-	. "github.com/LindsayBradford/crm/annealing/objectives"
+	. "github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
@@ -15,7 +15,7 @@ type SimpleAnnealer struct {
 	maxIterations    uint
 	currentIteration uint
 	eventNotifier    AnnealingEventNotifier
-	objectiveManager ObjectiveManager
+	stateTourer      SolutionTourer
 	logger           LogHandler
 }
 
@@ -25,7 +25,7 @@ func (this *SimpleAnnealer) Initialise() {
 	this.maxIterations = 0
 	this.currentIteration = 0
 	this.eventNotifier = new(SynchronousAnnealingEventNotifier)
-	this.objectiveManager = NULL_OBJECTIVE_MANAGER
+	this.stateTourer = NULL_SOLUTION_TOURER
 	this.logger = NULL_LOG_HANDLER
 }
 
@@ -65,15 +65,15 @@ func (this *SimpleAnnealer) CurrentIteration() uint {
 	return this.currentIteration
 }
 
-func (this *SimpleAnnealer) ObjectiveManager() ObjectiveManager {
-	return this.objectiveManager
+func (this *SimpleAnnealer) SolutionTourer() SolutionTourer {
+	return this.stateTourer
 }
 
-func (this *SimpleAnnealer) SetObjectiveManager(manager ObjectiveManager) error {
-	if manager == nil {
-		return errors.New("Invalid attempt to set Objective Manager to nil value")
+func (this *SimpleAnnealer) SetSolutionTourer(tourer SolutionTourer) error {
+	if tourer == nil {
+		return errors.New("Invalid attempt to set Solution Tourer to nil value")
 	}
-	this.objectiveManager = manager
+	this.stateTourer = tourer
 	return nil
 }
 
@@ -115,22 +115,22 @@ func (this *SimpleAnnealer) cloneState() *SimpleAnnealer {
 }
 
 func (this *SimpleAnnealer) Anneal() {
-	this.objectiveManager.SetLogHandler(this.LogHandler())
-	this.objectiveManager.Initialise()
+	this.stateTourer.SetLogHandler(this.LogHandler())
+	this.stateTourer.Initialise()
 
 	this.annealingStarted()
 
 	for done := this.initialDoneValue(); !done; {
 		this.iterationStarted()
 
-		this.objectiveManager.TryRandomChange(this.temperature)
+		this.stateTourer.TryRandomChange(this.temperature)
 
 		this.iterationFinished()
 		this.cooldown()
 		done = this.checkIfDone()
 	}
 
-	this.objectiveManager.TearDown()
+	this.stateTourer.TearDown()
 	this.annealingFinished()
 }
 

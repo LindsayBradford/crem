@@ -16,23 +16,23 @@ func TestAnnealerStateFormatWrapper_Defaults(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	wrapperUnderTest := new(AnnealerStateFormatWrapper).Initialise().Wrapping(annealer)
+	wrapperUnderTest := new(AnnealerFormatWrapper).Initialise().Wrapping(annealer)
 
 	g.Expect(
 		wrapperUnderTest.Temperature()).To(BeIdenticalTo(expectedTemperature),
-		"AnnealerStateFormatWrapper should not have defaulted to temperature of \"%s\"", expectedTemperature)
+		"AnnealerFormatWrapper should not have defaulted to temperature of \"%s\"", expectedTemperature)
 
 	g.Expect(
 		wrapperUnderTest.CoolingFactor()).To(BeIdenticalTo(expectedCoolingFactor),
-		"AnnealerStateFormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
+		"AnnealerFormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
 
 	g.Expect(
 		wrapperUnderTest.MaxIterations()).To(BeIdenticalTo(expectedMaxIterations),
-		"AnnealerStateFormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
+		"AnnealerFormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
 
 	g.Expect(
 		wrapperUnderTest.CurrentIteration()).To(BeIdenticalTo(expectedCurrentIteration),
-		"AnnealerStateFormatWrapper  should not have defaulted to current iteration of \"%s\"", expectedCurrentIteration)
+		"AnnealerFormatWrapper  should not have defaulted to current iteration of \"%s\"", expectedCurrentIteration)
 }
 
 func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
@@ -46,26 +46,26 @@ func TestAnnealerStateFormatWrapper_FormatOverrides(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	wrapperUnderTest := &AnnealerStateFormatWrapper{}
+	wrapperUnderTest := &AnnealerFormatWrapper{}
 	wrapperUnderTest.Initialise().Wrapping(annealer)
 
 	wrapperUnderTest.MethodFormats["Temperature"] = "%0.2f"
 	g.Expect(
 		wrapperUnderTest.Temperature()).To(BeIdenticalTo(expectedTemperature),
-		"AnnealerStateFormatWrapper should not have defaulted to temperature of \"%s\"", expectedTemperature)
+		"AnnealerFormatWrapper should not have defaulted to temperature of \"%s\"", expectedTemperature)
 
 	wrapperUnderTest.MethodFormats["CoolingFactor"] = "%0.1f"
 	g.Expect(
 		wrapperUnderTest.CoolingFactor()).To(BeIdenticalTo(expectedCoolingFactor),
-		"AnnealerStateFormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
+		"AnnealerFormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
 
 	wrapperUnderTest.MethodFormats["MaxIterations"] = "%03d"
 	g.Expect(
 		wrapperUnderTest.MaxIterations()).To(BeIdenticalTo(expectedMaxIterations),
-		"AnnealerStateFormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
+		"AnnealerFormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
 
 	wrapperUnderTest.MethodFormats["CurrentIteration"] = "%02d"
 	g.Expect(
 		wrapperUnderTest.CurrentIteration()).To(BeIdenticalTo(expectedCurrentIteration),
-		"AnnealerStateFormatWrapper  should not have defaulted to current iteration of \"%s\"", expectedCurrentIteration)
+		"AnnealerFormatWrapper  should not have defaulted to current iteration of \"%s\"", expectedCurrentIteration)
 }

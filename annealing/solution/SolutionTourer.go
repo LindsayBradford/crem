@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package objectives
+package solution
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
-type ObjectiveManager interface {
+type SolutionTourer interface {
 	Initialise()
 	TryRandomChange(temperature float64)
 
@@ -37,7 +37,7 @@ type ObjectiveManager interface {
 	TearDown()
 }
 
-type BaseObjectiveManager struct {
+type BaseSolutionTourer struct {
 	objectiveValue         float64
 	changeInObjectiveValue float64
 	changeIsDesirable      bool
@@ -47,28 +47,28 @@ type BaseObjectiveManager struct {
 	logHandler             LogHandler
 }
 
-func (this *BaseObjectiveManager) Initialise() {
-	this.logHandler.Debug("Initialising Objective Manager")
+func (this *BaseSolutionTourer) Initialise() {
+	this.logHandler.Debug("Initialising Solution Tourer")
 	this.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
 }
 
-func (this *BaseObjectiveManager) TearDown() {
-	this.logHandler.Debug("Triggering tear-down of Objective Manager")
+func (this *BaseSolutionTourer) TearDown() {
+	this.logHandler.Debug("Triggering tear-down of Solution Tourer")
 }
 
-func (this *BaseObjectiveManager) RandomNumberGenerator() *rand.Rand {
+func (this *BaseSolutionTourer) RandomNumberGenerator() *rand.Rand {
 	return this.randomNumberGenerator
 }
 
-func (this *BaseObjectiveManager) SetRandomNumberGenerator(generator *rand.Rand) {
+func (this *BaseSolutionTourer) SetRandomNumberGenerator(generator *rand.Rand) {
 	this.randomNumberGenerator = generator
 }
 
-func (this *BaseObjectiveManager) LogHandler() LogHandler {
+func (this *BaseSolutionTourer) LogHandler() LogHandler {
 	return this.logHandler
 }
 
-func (this *BaseObjectiveManager) SetLogHandler(logHandler LogHandler) error {
+func (this *BaseSolutionTourer) SetLogHandler(logHandler LogHandler) error {
 	if logHandler == nil {
 		return errors.New("Invalid attempt to set log handler to nil value")
 	}
@@ -76,50 +76,50 @@ func (this *BaseObjectiveManager) SetLogHandler(logHandler LogHandler) error {
 	return nil
 }
 
-func (this *BaseObjectiveManager) TryRandomChange(temperature float64) {
+func (this *BaseSolutionTourer) TryRandomChange(temperature float64) {
 	this.makeRandomChange()
 	DecideOnWhetherToAcceptChange(this, temperature)
 }
 
-func (this *BaseObjectiveManager) SetObjectiveValue(objectiveValue float64) {
+func (this *BaseSolutionTourer) SetObjectiveValue(objectiveValue float64) {
 	this.objectiveValue = objectiveValue
 }
 
-func (this *BaseObjectiveManager) ObjectiveValue() float64 {
+func (this *BaseSolutionTourer) ObjectiveValue() float64 {
 	return this.objectiveValue
 }
 
-func (this *BaseObjectiveManager) ChangeInObjectiveValue() float64 {
+func (this *BaseSolutionTourer) ChangeInObjectiveValue() float64 {
 	return this.changeInObjectiveValue
 }
 
-func (this *BaseObjectiveManager) SetChangeInObjectiveValue(change float64) {
+func (this *BaseSolutionTourer) SetChangeInObjectiveValue(change float64) {
 	this.changeInObjectiveValue = change
 }
 
-func (this *BaseObjectiveManager) AcceptanceProbability() float64 {
+func (this *BaseSolutionTourer) AcceptanceProbability() float64 {
 	return this.acceptanceProbability
 }
 
-func (this *BaseObjectiveManager) SetAcceptanceProbability(probability float64) {
+func (this *BaseSolutionTourer) SetAcceptanceProbability(probability float64) {
 	this.acceptanceProbability = probability
 }
 
-func (this *BaseObjectiveManager) makeRandomChange() {}
+func (this *BaseSolutionTourer) makeRandomChange() {}
 
-func DecideOnWhetherToAcceptChange(manager ObjectiveManager,  annealingTemperature float64) {
-	if (manager.ChangeIsDesirable()) {
-		manager.SetAcceptanceProbability(1)
-		manager.AcceptLastChange()
+func DecideOnWhetherToAcceptChange(tourer SolutionTourer,  annealingTemperature float64) {
+	if (tourer.ChangeIsDesirable()) {
+		tourer.SetAcceptanceProbability(1)
+		tourer.AcceptLastChange()
 	} else {
-		probabilityToAcceptBadChange := math.Exp(-manager.ChangeInObjectiveValue() / annealingTemperature)
-		manager.SetAcceptanceProbability(probabilityToAcceptBadChange)
+		probabilityToAcceptBadChange := math.Exp(-tourer.ChangeInObjectiveValue() / annealingTemperature)
+		tourer.SetAcceptanceProbability(probabilityToAcceptBadChange)
 
-		randomValue  := newRandomValue(manager.RandomNumberGenerator())
+		randomValue  := newRandomValue(tourer.RandomNumberGenerator())
 		if probabilityToAcceptBadChange > randomValue {
-			manager.AcceptLastChange()
+			tourer.AcceptLastChange()
 		} else {
-			manager.RevertLastChange()
+			tourer.RevertLastChange()
 		}
 	}
 }
@@ -132,21 +132,21 @@ func newRandomValue(randomNumberGenerator *rand.Rand) float64 {
 	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange - 1)
 }
 
-func (this *BaseObjectiveManager) ChangeIsDesirable() bool {
+func (this *BaseSolutionTourer) ChangeIsDesirable() bool {
 	if this.changeInObjectiveValue <= 0  {
 		return true
 	}
 	return false
 }
 
-func (this *BaseObjectiveManager) AcceptLastChange()  {
+func (this *BaseSolutionTourer) AcceptLastChange()  {
 	this.changeAccepted = true
 }
 
-func (this *BaseObjectiveManager) RevertLastChange()  {
+func (this *BaseSolutionTourer) RevertLastChange()  {
 	this.changeAccepted = false
 }
 
-func (this *BaseObjectiveManager) ChangeAccepted() bool {
+func (this *BaseSolutionTourer) ChangeAccepted() bool {
 	return this.changeAccepted
 }

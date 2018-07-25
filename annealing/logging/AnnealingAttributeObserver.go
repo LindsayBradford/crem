@@ -45,14 +45,14 @@ func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEve
 			NameValuePair{"CoolingFactor", annealer.CoolingFactor()},
 		)
 	case STARTED_ITERATION:
-		objectiveManager := wrapObjectiveManager(event.Annealer.ObjectiveManager())
+		objectiveManager := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"Temperature", annealer.Temperature()},
 			NameValuePair{"ObjectiveValue", objectiveManager.ObjectiveValue()},
 		)
 	case FINISHED_ITERATION:
-		objectiveManager := wrapObjectiveManager(event.Annealer.ObjectiveManager())
+		objectiveManager := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"ObjectiveValue", objectiveManager.ObjectiveValue()},

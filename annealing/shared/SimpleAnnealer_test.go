@@ -5,7 +5,7 @@ package shared
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crm/annealing/objectives"
+	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/onsi/gomega"
 )
@@ -37,7 +37,7 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with nullLogHandler")
 
 	g.Expect(
-		annealer.ObjectiveManager()).To(Equal(objectives.NULL_OBJECTIVE_MANAGER),
+		annealer.SolutionTourer()).To(Equal(solution.NULL_SOLUTION_TOURER),
 		"Annealer should have built with nullObjectiveManager")
 
 	g.Expect(
@@ -70,11 +70,11 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	g.Expect(annealer.LogHandler()).To(Equal(handlers.NULL_LOG_HANDLER),
 		"Annealer should have ignored crap LogHandler set attempt")
 
-	objectiveMgrErr := annealer.SetObjectiveManager(nil)
+	tourerErr := annealer.SetSolutionTourer(nil)
 
-	g.Expect(objectiveMgrErr).To(Not(BeNil()))
-	g.Expect(annealer.ObjectiveManager()).To(Equal(objectives.NULL_OBJECTIVE_MANAGER),
-		"Annealer should have ignored crap Objective Manager set attempt")
+	g.Expect(tourerErr).To(Not(BeNil()))
+	g.Expect(annealer.SolutionTourer()).To(Equal(solution.NULL_SOLUTION_TOURER),
+		"Annealer should have ignored crap Solution Tourer set attempt")
 
 	observersErr := annealer.AddObserver(nil)
 
@@ -163,7 +163,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 }
 
 type TryCountingObjectiveManager struct {
-	objectives.NullObjectiveManager
+	solution.NullSolutionTourer
 	changesTried uint
 }
 
@@ -183,17 +183,17 @@ func TestSimpleAnnealer_SetObjectiveManager(t *testing.T) {
 	annealer.SetCoolingFactor(0.5)
 	annealer.SetMaxIterations(expectedObjectiveManagerTryCount)
 
-	expectedObjectiveManager := new(TryCountingObjectiveManager)
+	expectedSolutionTourer := new(TryCountingObjectiveManager)
 
-	objectiveManagerErr := annealer.SetObjectiveManager(expectedObjectiveManager)
+	tourerErr := annealer.SetSolutionTourer(expectedSolutionTourer)
 
-	g.Expect(objectiveManagerErr).To(BeNil())
-	g.Expect(annealer.objectiveManager).To(BeIdenticalTo(expectedObjectiveManager),
-		"Annealer should have accepted CountingObserver as new ObjectiveManager")
+	g.Expect(tourerErr).To(BeNil())
+	g.Expect(annealer.stateTourer).To(BeIdenticalTo(expectedSolutionTourer),
+		"Annealer should have accepted CountingObserver as new SolutionTourer")
 
 	annealer.Anneal()
 
-	g.Expect(expectedObjectiveManager.changesTried).To(BeIdenticalTo(expectedObjectiveManagerTryCount),
+	g.Expect(expectedSolutionTourer.changesTried).To(BeIdenticalTo(expectedObjectiveManagerTryCount),
 		"Annealer should have tried same number of changes as iterations")
 }
 
