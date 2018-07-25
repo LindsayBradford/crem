@@ -33,7 +33,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 		WithCoolingFactor(expectedCoolingFactor).
 		WithMaxIterations(expectedIterations).
 		WithLogHandler(expectedLogHandler).
-		WithStateTourer(expectedObjectiveManager).
+		WithSolutionTourer(expectedObjectiveManager).
 		WithObservers(expectedObservers...).
 		Build()
 
@@ -84,7 +84,7 @@ func TestBuild_BadInputs(t *testing.T) {
 		WithStartingTemperature(badTemperature).
 		WithCoolingFactor(badCoolingFactor).
 		WithLogHandler(badLogHandler).
-		WithStateTourer(badObjectiveManager).
+		WithSolutionTourer(badObjectiveManager).
 		WithObservers(nil).
 		Build()
 

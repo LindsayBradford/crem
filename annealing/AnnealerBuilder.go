@@ -58,7 +58,7 @@ func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerB
 	return this
 }
 
-func (this *AnnealerBuilder) WithStateTourer(tourer SolutionTourer) *AnnealerBuilder {
+func (this *AnnealerBuilder) WithSolutionTourer(tourer SolutionTourer) *AnnealerBuilder {
 	annealer := this.annealer
 	if err := annealer.SetSolutionTourer(tourer); err != nil {
 		this.buildErrors.Add(err)

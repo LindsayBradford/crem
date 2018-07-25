@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crm/commandline"
-	"github.com/LindsayBradford/crm/internal/app/knapsackannealer/components"
+	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crm/profiling"
 )
 

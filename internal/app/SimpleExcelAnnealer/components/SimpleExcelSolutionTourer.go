@@ -14,7 +14,7 @@ var (
 	randomNumberGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-type KnapsackObjectiveManager struct {
+type SimpleExcelSolutionTourer struct {
 	BaseSolutionTourer
 
 	dataSourcePath string
@@ -118,7 +118,7 @@ type trackingData struct {
 	TotalCost               float64
 }
 
-func (this *KnapsackObjectiveManager) Initialise() {
+func (this *SimpleExcelSolutionTourer) Initialise() {
 	this.BaseSolutionTourer.Initialise()
 
 	this.dataSourcePath = initialiseDataSource()
@@ -138,18 +138,18 @@ func (this *KnapsackObjectiveManager) Initialise() {
 	this.LogHandler().Info("Data retrieved from workbook [" + this.dataSourcePath + "]")
 }
 
-func (this *KnapsackObjectiveManager) WithPenalty(penalty float64) *KnapsackObjectiveManager {
+func (this *SimpleExcelSolutionTourer) WithPenalty(penalty float64) *SimpleExcelSolutionTourer {
 	this.penalty = penalty
 	return this
 }
 
-func (this *KnapsackObjectiveManager) TearDown() {
+func (this *SimpleExcelSolutionTourer) TearDown() {
 	this.BaseSolutionTourer.TearDown()
 	this.saveDataToWorkbookAndClose()
 	destroyExcelHandler()
 }
 
-func (this *KnapsackObjectiveManager) saveDataToWorkbookAndClose() {
+func (this *SimpleExcelSolutionTourer) saveDataToWorkbookAndClose() {
 	this.LogHandler().Info("Storing data to workbook [" + this.dataSourcePath + "]")
 	storeAnnealingTableToWorkbook(this.annealingData)
 	storeTrackingTableToWorkbook(this.trackingData)
@@ -160,13 +160,13 @@ func (this *KnapsackObjectiveManager) saveDataToWorkbookAndClose() {
 	this.LogHandler().Debug("Workbook [" + this.dataSourcePath + "] closed")
 }
 
-func (this *KnapsackObjectiveManager) TryRandomChange(temperature float64) {
+func (this *SimpleExcelSolutionTourer) TryRandomChange(temperature float64) {
 	this.temperature = temperature
 	this.makeRandomChange(temperature)
 	DecideOnWhetherToAcceptChange(this, temperature)
 }
 
-func (this *KnapsackObjectiveManager) makeRandomChange(temperature float64) {
+func (this *SimpleExcelSolutionTourer) makeRandomChange(temperature float64) {
 	previousPenalty := this.deriveTotalPenalty()
 	previousCost := this.deriveFeatureCost()
 
@@ -181,7 +181,7 @@ func (this *KnapsackObjectiveManager) makeRandomChange(temperature float64) {
 	this.SetObjectiveValue(this.ObjectiveValue() + this.ChangeInObjectiveValue())
 }
 
-func (this *KnapsackObjectiveManager) deriveTotalPenalty() float64 {
+func (this *SimpleExcelSolutionTourer) deriveTotalPenalty() float64 {
 	totalPenalty := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
 		totalPenalty += float64(this.annealingData.rows[index].PlanningUnitStatus) * this.annealingData.rows[index].Cost
@@ -189,7 +189,7 @@ func (this *KnapsackObjectiveManager) deriveTotalPenalty() float64 {
 	return math.Max(0, this.penalty-totalPenalty)
 }
 
-func (this *KnapsackObjectiveManager) deriveFeatureCost() float64 {
+func (this *SimpleExcelSolutionTourer) deriveFeatureCost() float64 {
 	totalFeatureCost := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
 		totalFeatureCost +=
@@ -198,12 +198,12 @@ func (this *KnapsackObjectiveManager) deriveFeatureCost() float64 {
 	return totalFeatureCost
 }
 
-func (this *KnapsackObjectiveManager) AcceptLastChange() {
+func (this *SimpleExcelSolutionTourer) AcceptLastChange() {
 	this.BaseSolutionTourer.AcceptLastChange()
 	this.addTrackerData()
 }
 
-func (this *KnapsackObjectiveManager) addTrackerData() {
+func (this *SimpleExcelSolutionTourer) addTrackerData() {
 	newRow := new(trackingData)
 	newRow.ObjectiveFunctionChange = this.ChangeInObjectiveValue()
 	newRow.Temperature = this.temperature
@@ -216,7 +216,7 @@ func (this *KnapsackObjectiveManager) addTrackerData() {
 	this.trackingData.rows = append(this.trackingData.rows, *newRow)
 }
 
-func (this *KnapsackObjectiveManager) deriveSmallPUs() uint64 {
+func (this *SimpleExcelSolutionTourer) deriveSmallPUs() uint64 {
 	totalSmallPUs := uint64(0)
 	var index = 0
 	for index = 0; index < len(this.annealingData.rows) / 2; index++ {
@@ -225,7 +225,7 @@ func (this *KnapsackObjectiveManager) deriveSmallPUs() uint64 {
 	return totalSmallPUs
 }
 
-func (this *KnapsackObjectiveManager) deriveLargePUs() uint64 {
+func (this *SimpleExcelSolutionTourer) deriveLargePUs() uint64 {
 	totalLargePUs := uint64(0)
 	var index = 0
 	for index = len(this.annealingData.rows) / 2; index < len(this.annealingData.rows); index++ {
@@ -234,7 +234,7 @@ func (this *KnapsackObjectiveManager) deriveLargePUs() uint64 {
 	return totalLargePUs
 }
 
-func (this *KnapsackObjectiveManager) RevertLastChange() {
+func (this *SimpleExcelSolutionTourer) RevertLastChange() {
 	this.annealingData.TogglePlanningUnitStatusAtIndex(this.previousPlanningUnitChanged)
 	this.SetObjectiveValue(this.ObjectiveValue() - this.ChangeInObjectiveValue())
 	this.SetChangeInObjectiveValue(0)

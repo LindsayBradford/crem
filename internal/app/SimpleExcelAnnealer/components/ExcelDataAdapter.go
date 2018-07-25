@@ -36,7 +36,7 @@ func init() {
 
 func initialiseDataSource() (filePath string) {
 	workingDirectory, _ := os.Getwd()
-	testFixtureAbsolutePath = filepath.Join(workingDirectory, "testdata", "KnapsackAnnealerTestFixture.xls")
+	testFixtureAbsolutePath = filepath.Join(workingDirectory, "testdata", "SimpleExcelAnnealerTestFixture.xls")
 
 	defer func() {
 		if r := recover(); r != nil {
