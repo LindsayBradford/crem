@@ -9,7 +9,7 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Worksheets         struct {
+type Worksheets struct {
 	dispatch *ole.IDispatch
 }
 
@@ -37,14 +37,14 @@ func (this *Worksheets) Item(index uint) *Worksheet {
 	return worksheet
 }
 
-func (this *Worksheets) getProperty(propertyName string, parameters... interface{}) *ole.IDispatch {
+func (this *Worksheets) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheets) getPropertyValue(propertyName string, parameters... interface{}) int64 {
+func (this *Worksheets) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
 	return getPropertyValue(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheets) call(methodName string, parameters... interface{}) *ole.IDispatch {
+func (this *Worksheets) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(this.dispatch, methodName, parameters...)
 }

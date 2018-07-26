@@ -32,7 +32,7 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 		WithCoolingFactor(0.995).
 		WithMaxIterations(2000).
 		WithLogHandler(humanLogHandler).
-		WithSolutionTourer(new(SimpleExcelSolutionTourer).WithPenalty(100)).
+		WithSolutionExplorer(new(SimpleExcelSolutionExplorer).WithPenalty(100)).
 		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
 		// WithEventNotifier(new(ChanneledAnnealingEventNotifier)).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).

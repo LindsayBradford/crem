@@ -6,7 +6,7 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Worksheet         struct {
+type Worksheet struct {
 	dispatch *ole.IDispatch
 }
 
@@ -28,7 +28,7 @@ func (this *Worksheet) UsedRange() (usedRange *Range) {
 	return usedRange
 }
 
-func (this *Worksheet) Cells(rowIndex uint , columnIndex uint ) (cell *Cell) {
+func (this *Worksheet) Cells(rowIndex uint, columnIndex uint) (cell *Cell) {
 	defer func() {
 		if r := recover(); r != nil {
 			cell = nil
@@ -40,11 +40,11 @@ func (this *Worksheet) Cells(rowIndex uint , columnIndex uint ) (cell *Cell) {
 	return newCell
 }
 
-func (this *Worksheet) getProperty(propertyName string, parameters... interface{})  *ole.IDispatch {
+func (this *Worksheet) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheet) getPropertyString(propertyName string, parameters... interface{}) string {
+func (this *Worksheet) getPropertyString(propertyName string, parameters ...interface{}) string {
 	return getPropertyString(this.dispatch, propertyName, parameters...)
 }
 
@@ -52,6 +52,6 @@ func (this *Worksheet) setProperty(propertyName string, propertyValue interface{
 	setProperty(this.dispatch, propertyName, propertyValue)
 }
 
-func (this *Worksheet) call(methodName string, parameters... interface{}) *ole.IDispatch {
+func (this *Worksheet) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(this.dispatch, methodName, parameters...)
 }

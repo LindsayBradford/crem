@@ -19,15 +19,14 @@ func TestWorksheets_Add(t *testing.T) {
 
 	originalWorksheetCount := worksheets.Count()
 
-	g.Expect(originalWorksheetCount).To(BeNumerically("==", uint(1)),"Original Worksheets count should be 1")
+	g.Expect(originalWorksheetCount).To(BeNumerically("==", uint(1)), "Original Worksheets count should be 1")
 
 	addWorksheetCall := func() {
 		worksheets.Add()
 	}
 
-	g.Expect(addWorksheetCall).To(Not(Panic()),"Worksheets Add should not panic")
+	g.Expect(addWorksheetCall).To(Not(Panic()), "Worksheets Add should not panic")
 	newWorksheetCount := worksheets.Count()
 
-	g.Expect(newWorksheetCount).To(BeNumerically("==", originalWorksheetCount + uint(1)),"Worksheets add should increment count")
+	g.Expect(newWorksheetCount).To(BeNumerically("==", originalWorksheetCount+uint(1)), "Worksheets add should increment count")
 }
-

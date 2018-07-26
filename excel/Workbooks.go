@@ -8,7 +8,7 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Workbooks         struct {
+type Workbooks struct {
 	dispatch *ole.IDispatch
 }
 
@@ -42,12 +42,12 @@ func (this *Workbooks) Close() {
 	this.call("Close", false)
 }
 
-func (this *Workbooks) call(methodName string, parameters... interface{}) *ole.IDispatch {
+func (this *Workbooks) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(this.dispatch, methodName, parameters...)
 }
 
 func (this *Workbooks) Count() uint {
-	return	(uint)(getPropertyValue(this.dispatch, "Count"))
+	return (uint)(getPropertyValue(this.dispatch, "Count"))
 }
 
 func (this *Workbooks) setProperty(propertyName string, propertyValue interface{}) {

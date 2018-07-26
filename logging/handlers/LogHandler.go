@@ -66,6 +66,6 @@ func (this *LogHandlerBase) Formatter() LogFormatter {
 	return this.formatter
 }
 
-func (this *LogHandlerBase)  BeingDiscarded(logLevel LogLevel) bool {
+func (this *LogHandlerBase) BeingDiscarded(logLevel LogLevel) bool {
 	return this.destinations.Destinations[logLevel] == DISCARD
 }

@@ -13,14 +13,15 @@ type Annealer interface {
 	SetCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
-	SolutionTourer() SolutionTourer
-	SetSolutionTourer(tourer SolutionTourer) error
+	SolutionExplorer() SolutionExplorer
+	SetSolutionExplorer(explorer SolutionExplorer) error
 
 	SetMaxIterations(iterations uint)
 	MaxIterations() uint
 
 	SetEventNotifier(notifier AnnealingEventNotifier) error
 	AddObserver(observer AnnealingObserver) error
+
 	Observers() []AnnealingObserver
 
 	SetLogHandler(logger LogHandler) error

@@ -3,9 +3,9 @@
 package commandline
 
 import (
-	"github.com/LindsayBradford/crm/config"
 	"flag"
 	"fmt"
+	"github.com/LindsayBradford/crm/config"
 	"os"
 	"runtime"
 )
@@ -24,8 +24,8 @@ func ParseArguments() *Arguments {
 }
 
 type Arguments struct {
-	Version             bool
-	CpuProfile          string
+	Version    bool
+	CpuProfile string
 }
 
 // THe define sets up the relevant command-line

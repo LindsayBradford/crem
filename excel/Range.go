@@ -34,14 +34,14 @@ func (this *Range) AutoFit() {
 	this.call("AutoFit")
 }
 
-func (this *Range) getProperty(propertyName string, parameters... interface{})  *ole.IDispatch {
+func (this *Range) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Range) getPropertyValue(propertyName string, parameters... interface{}) int64 {
+func (this *Range) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
 	return getPropertyValue(this.dispatch, propertyName, parameters...)
 }
 
-func (this *Range) call(methodName string, parameters... interface{}) *ole.IDispatch {
+func (this *Range) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(this.dispatch, methodName, parameters...)
 }

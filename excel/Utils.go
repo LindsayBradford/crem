@@ -10,19 +10,19 @@ import (
 	"github.com/go-ole/go-ole/oleutil"
 )
 
-func getProperty(iDispatch *ole.IDispatch, propertyName string, parameters... interface{}) *ole.IDispatch {
+func getProperty(iDispatch *ole.IDispatch, propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return oleutil.MustGetProperty(iDispatch, propertyName, parameters...).ToIDispatch()
 }
 
-func getPropertyValue(iDispatch *ole.IDispatch, propertyName string, parameters... interface{}) int64 {
+func getPropertyValue(iDispatch *ole.IDispatch, propertyName string, parameters ...interface{}) int64 {
 	return oleutil.MustGetProperty(iDispatch, propertyName, parameters...).Val
 }
 
-func getPropertyVariant(iDispatch *ole.IDispatch, propertyName string, parameters... interface{}) interface{} {
+func getPropertyVariant(iDispatch *ole.IDispatch, propertyName string, parameters ...interface{}) interface{} {
 	return oleutil.MustGetProperty(iDispatch, propertyName, parameters...).Value()
 }
 
-func getPropertyString(iDispatch *ole.IDispatch, propertyName string, parameters... interface{}) string {
+func getPropertyString(iDispatch *ole.IDispatch, propertyName string, parameters ...interface{}) string {
 	return oleutil.MustGetProperty(iDispatch, propertyName, parameters...).ToString()
 }
 
@@ -30,13 +30,13 @@ func setProperty(iDispatch *ole.IDispatch, propertyName string, propertyValue in
 	oleutil.PutProperty(iDispatch, propertyName, propertyValue)
 }
 
-func callMethod(dispatch *ole.IDispatch, methodName string, parameters... interface{}) *ole.IDispatch {
+func callMethod(dispatch *ole.IDispatch, methodName string, parameters ...interface{}) *ole.IDispatch {
 	return oleutil.MustCallMethod(dispatch, methodName, parameters...).ToIDispatch()
 }
 
 func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook *Workbook) *Worksheet {
 	worksheets := workbook.Worksheets()
-	newWorksheet :=  worksheets.Add()
+	newWorksheet := worksheets.Add()
 
 	AddCsvFileContentToWorksheet(csvFilePath, newWorksheet)
 
@@ -48,11 +48,11 @@ func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string,
 
 func AddCsvFileContentToWorksheet(csvFilePath string, worksheet *Worksheet) {
 	worksheet.UsedRange().Clear()
-	topLeftOfWorksheet := worksheet.Cells(1,1)
+	topLeftOfWorksheet := worksheet.Cells(1, 1)
 
-	queryTableDispatch := worksheet.getProperty("QueryTables" )
-	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;" + csvFilePath, topLeftOfWorksheet.dispatch)
-	setProperty(newQueryTable, "TextFileParseType", 1)  // xlDelimited
+	queryTableDispatch := worksheet.getProperty("QueryTables")
+	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;"+csvFilePath, topLeftOfWorksheet.dispatch)
+	setProperty(newQueryTable, "TextFileParseType", 1) // xlDelimited
 	setProperty(newQueryTable, "TextFileCommaDelimiter", true)
 	setProperty(newQueryTable, "TextFileSpaceDelimiter", false)
 	setProperty(newQueryTable, "Refresh", false)

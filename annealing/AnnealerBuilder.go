@@ -2,8 +2,8 @@
 package annealing
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crm/annealing/solution"
 	crmerrors "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
@@ -58,9 +58,9 @@ func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerB
 	return this
 }
 
-func (this *AnnealerBuilder) WithSolutionTourer(tourer SolutionTourer) *AnnealerBuilder {
+func (this *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) *AnnealerBuilder {
 	annealer := this.annealer
-	if err := annealer.SetSolutionTourer(tourer); err != nil {
+	if err := annealer.SetSolutionExplorer(explorer); err != nil {
 		this.buildErrors.Add(err)
 	}
 	return this
@@ -74,11 +74,11 @@ func (this *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) 
 	return this
 }
 
-func (this *AnnealerBuilder) WithDumbObjectiveManager(initialObjectiveValue float64) *AnnealerBuilder {
+func (this *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue float64) *AnnealerBuilder {
 	annealer := this.annealer
-	objectiveManager := new(DumbSolutionTourer)
-	objectiveManager.SetObjectiveValue(initialObjectiveValue)
-	annealer.SetSolutionTourer(objectiveManager)
+	explorer := new(DumbSolutionExplorer)
+	explorer.SetObjectiveValue(initialObjectiveValue)
+	annealer.SetSolutionExplorer(explorer)
 	return this
 }
 

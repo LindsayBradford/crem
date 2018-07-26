@@ -18,8 +18,8 @@ const tracker = "Tracker"
 const data = "Data"
 
 var (
-	excelHandler *excel.ExcelHandler
-	workbook *excel.Workbook
+	excelHandler            *excel.ExcelHandler
+	workbook                *excel.Workbook
 	testFixtureAbsolutePath string
 )
 
@@ -59,10 +59,10 @@ func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 
 	const headerRowCount = uint(1)
 	worksheetRowCount := worksheet.UsedRange().Rows().Count()
-	table.rows = make([]annealingData, worksheetRowCount - headerRowCount)
+	table.rows = make([]annealingData, worksheetRowCount-headerRowCount)
 
 	for index := 0; index < len(table.rows); index++ {
-		rowOffset := uint(2+index)
+		rowOffset := uint(2 + index)
 		table.rows[index].Cost = worksheet.Cells(rowOffset, 2).Value().(float64)
 		table.rows[index].Feature = worksheet.Cells(rowOffset, 3).Value().(float64)
 		table.rows[index].PlanningUnitStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
@@ -112,7 +112,7 @@ func createNewTrackingTable() *trackingTable {
 	return newTrackingTable
 }
 
-func clearTrackingDataFromWorkbook() () {
+func clearTrackingDataFromWorkbook() {
 	worksheet := workbook.WorksheetNamed(tracker)
 	worksheet.UsedRange().Clear()
 }
@@ -129,7 +129,6 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	storeTrackingTableToWorksheet(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
 }
-
 
 func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
 	tempFile := writeTableToTempCsvFile(table)
@@ -148,38 +147,38 @@ func writeTableToTempCsvFile(table *trackingTable) string {
 
 	headingsAsStringArray := make([]string, len(table.headings))
 	for _, heading := range table.headings {
-		headingsAsStringArray[heading.Index() - 1] = heading.String()
+		headingsAsStringArray[heading.Index()-1] = heading.String()
 	}
 	if err := w.Write(headingsAsStringArray); err != nil {
 		panic(errors.Nest("error writing header to csv:", err))
 	}
 
-  for _, row := range table.rows {
-  	rowArray := make([]string, len(table.headings))
+	for _, row := range table.rows {
+		rowArray := make([]string, len(table.headings))
 
-  	objectivesFunctionValueAsString := fmt.Sprintf("%f",row.ObjectiveFunctionChange)
-	  rowArray[ObjFuncChange.Index() - 1] = objectivesFunctionValueAsString
+		objectivesFunctionValueAsString := fmt.Sprintf("%f", row.ObjectiveFunctionChange)
+		rowArray[ObjFuncChange.Index()-1] = objectivesFunctionValueAsString
 
-	  TemperatureAsString := fmt.Sprintf("%f",row.Temperature)
-	  rowArray[Temperature.Index() - 1] = TemperatureAsString
+		TemperatureAsString := fmt.Sprintf("%f", row.Temperature)
+		rowArray[Temperature.Index()-1] = TemperatureAsString
 
-	  ChangeIsDesirableAsString := fmt.Sprintf("%t",row.ChangeIsDesirable)
-	  rowArray[ChangeIsDesirable.Index() - 1] = ChangeIsDesirableAsString
+		ChangeIsDesirableAsString := fmt.Sprintf("%t", row.ChangeIsDesirable)
+		rowArray[ChangeIsDesirable.Index()-1] = ChangeIsDesirableAsString
 
-	  AcceptanceProbabilityAsString := fmt.Sprintf("%f",row.AcceptanceProbability)
-	  rowArray[AcceptanceProbability.Index() - 1] = AcceptanceProbabilityAsString
+		AcceptanceProbabilityAsString := fmt.Sprintf("%f", row.AcceptanceProbability)
+		rowArray[AcceptanceProbability.Index()-1] = AcceptanceProbabilityAsString
 
-	  ChangeAcceptedAsString := fmt.Sprintf("%t",row.ChangeAccepted)
-	  rowArray[ChangeAccepted.Index() - 1] = ChangeAcceptedAsString
+		ChangeAcceptedAsString := fmt.Sprintf("%t", row.ChangeAccepted)
+		rowArray[ChangeAccepted.Index()-1] = ChangeAcceptedAsString
 
-	  InFirst50AsString := fmt.Sprintf("%d",row.InFirst50)
-	  rowArray[InFirst50.Index() - 1] = InFirst50AsString
+		InFirst50AsString := fmt.Sprintf("%d", row.InFirst50)
+		rowArray[InFirst50.Index()-1] = InFirst50AsString
 
-	  InSecond50AsString := fmt.Sprintf("%d",row.InSecond50)
-	  rowArray[InSecond50.Index() - 1] = InSecond50AsString
+		InSecond50AsString := fmt.Sprintf("%d", row.InSecond50)
+		rowArray[InSecond50.Index()-1] = InSecond50AsString
 
-	  TotalCostAsString := fmt.Sprintf("%f",row.TotalCost)
-	  rowArray[TotalCost.Index() - 1] = TotalCostAsString
+		TotalCostAsString := fmt.Sprintf("%f", row.TotalCost)
+		rowArray[TotalCost.Index()-1] = TotalCostAsString
 
 		if err := w.Write(rowArray); err != nil {
 			panic(errors.Nest("error writing record to csv:", err))

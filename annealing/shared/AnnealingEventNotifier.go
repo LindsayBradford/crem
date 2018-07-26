@@ -13,11 +13,11 @@ type AnnealingEventNotifier interface {
 }
 
 type SynchronousAnnealingEventNotifier struct {
-	observers        []AnnealingObserver
+	observers []AnnealingObserver
 }
 
 func (this *SynchronousAnnealingEventNotifier) Observers() []AnnealingObserver {
-	if (len(this.observers) == 0) {
+	if len(this.observers) == 0 {
 		return nil
 	}
 	return this.observers
@@ -44,7 +44,7 @@ type ChanneledAnnealingEventNotifier struct {
 }
 
 func (this *ChanneledAnnealingEventNotifier) Observers() []AnnealingObserver {
-	if (len(this.observers) == 0) {
+	if len(this.observers) == 0 {
 		return nil
 	}
 	return this.observers
@@ -61,7 +61,7 @@ func (this *ChanneledAnnealingEventNotifier) AddObserver(newObserver AnnealingOb
 
 	go func() {
 		for {
-			newEvent := <- newEventChannel
+			newEvent := <-newEventChannel
 			newObserver.ObserveAnnealingEvent(newEvent)
 		}
 	}()
@@ -70,7 +70,7 @@ func (this *ChanneledAnnealingEventNotifier) AddObserver(newObserver AnnealingOb
 }
 
 func (this *ChanneledAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType AnnealingEventType) {
-	event := AnnealingEvent{ EventType: eventType, Annealer:  annealer}
+	event := AnnealingEvent{EventType: eventType, Annealer: annealer}
 	for _, observerChannel := range this.observerChannels {
 		observerChannel <- event
 	}

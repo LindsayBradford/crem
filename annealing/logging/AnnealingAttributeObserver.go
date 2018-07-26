@@ -28,11 +28,12 @@ func (this *AnnealingAttributeObserver) WithModulator(modulator LoggingModulator
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
 func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event)  {
+	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event) {
 		return
 	}
 
 	annealer := wrapAnnealer(event.Annealer)
+	explorer := wrapSolutionExplorer(event.Annealer.SolutionExplorer())
 
 	logAttributes := make(LogAttributes, 0)
 	logAttributes = append(logAttributes, NameValuePair{"Event", event.EventType.String()})
@@ -45,21 +46,19 @@ func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEve
 			NameValuePair{"CoolingFactor", annealer.CoolingFactor()},
 		)
 	case STARTED_ITERATION:
-		objectiveManager := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"Temperature", annealer.Temperature()},
-			NameValuePair{"ObjectiveValue", objectiveManager.ObjectiveValue()},
+			NameValuePair{"ObjectiveValue", explorer.ObjectiveValue()},
 		)
 	case FINISHED_ITERATION:
-		objectiveManager := wrapSolutionTourer(event.Annealer.SolutionTourer())
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
-			NameValuePair{"ObjectiveValue", objectiveManager.ObjectiveValue()},
-			NameValuePair{"ChangeInObjectiveValue", objectiveManager.ChangeInObjectiveValue()},
-			NameValuePair{"ChangeIsDesirable", objectiveManager.ChangeIsDesirable()},
-			NameValuePair{"AcceptanceProbability", objectiveManager.AcceptanceProbability()},
-			NameValuePair{"ChangeAccepted", objectiveManager.ChangeAccepted()},
+			NameValuePair{"ObjectiveValue", explorer.ObjectiveValue()},
+			NameValuePair{"ChangeInObjectiveValue", explorer.ChangeInObjectiveValue()},
+			NameValuePair{"ChangeIsDesirable", explorer.ChangeIsDesirable()},
+			NameValuePair{"AcceptanceProbability", explorer.AcceptanceProbability()},
+			NameValuePair{"ChangeAccepted", explorer.ChangeAccepted()},
 		)
 	case FINISHED_ANNEALING:
 		logAttributes = append(logAttributes,

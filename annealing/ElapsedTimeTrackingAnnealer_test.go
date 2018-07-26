@@ -17,7 +17,7 @@ func TestAnneal(t *testing.T) {
 		WithMaxIterations(100000).
 		Build()
 
-	elapsedTimeAnnealer, _:= annealer.(*ElapsedTimeTrackingAnnealer)
+	elapsedTimeAnnealer, _ := annealer.(*ElapsedTimeTrackingAnnealer)
 
 	g.Expect(
 		elapsedTimeAnnealer.ElapsedTime()).To(BeZero(), "Annealer should recorded zero elapsed time")

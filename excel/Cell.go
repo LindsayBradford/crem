@@ -6,7 +6,7 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Cell         struct {
+type Cell struct {
 	dispatch *ole.IDispatch
 }
 
@@ -14,11 +14,11 @@ func (this *Cell) Value() interface{} {
 	return this.getPropertyVariant("Value")
 }
 
-func (this *Cell) SetValue(value interface{})  {
+func (this *Cell) SetValue(value interface{}) {
 	this.setProperty("Value", value)
 }
 
-func (this *Cell) getPropertyVariant(propertyName string, parameters... interface{})  interface{} {
+func (this *Cell) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {
 	return getPropertyVariant(this.dispatch, propertyName, parameters...)
 }
 

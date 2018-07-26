@@ -9,7 +9,7 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Workbook         struct {
+type Workbook struct {
 	dispatch *ole.IDispatch
 }
 
@@ -26,7 +26,7 @@ func (this *Workbook) Worksheets() (worksheets *Worksheets) {
 	return worksheets
 }
 
-func (this *Workbook) getProperty(propertyName string, parameters ... interface{}) *ole.IDispatch {
+func (this *Workbook) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return getProperty(this.dispatch, propertyName, parameters...)
 }
 
@@ -66,7 +66,6 @@ func (this *Workbook) Close() {
 	this.call("Close")
 }
 
-func (this *Workbook) call(methodName string, parameters... interface{}) *ole.IDispatch {
+func (this *Workbook) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(this.dispatch, methodName, parameters...)
 }
-

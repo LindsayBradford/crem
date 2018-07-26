@@ -10,7 +10,7 @@ import (
 
 type AnnealerFormatWrapper struct {
 	AnnealerToFormat Annealer
-	MethodFormats map[string]string
+	MethodFormats    map[string]string
 }
 
 const default_float64_format = "%f"

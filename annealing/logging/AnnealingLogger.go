@@ -30,9 +30,9 @@ func wrapAnnealer(eventAnnealer Annealer) *AnnealerFormatWrapper {
 	return wrapper
 }
 
-func wrapSolutionTourer(eventSolutionTourer SolutionTourer) *SolutionTourerFormatWrapper {
-	wrapper := newSolutionTourerWrapper()
-	wrapper.Wrap(eventSolutionTourer)
+func wrapSolutionExplorer(explorer SolutionExplorer) *SolutionExplorerFormatWrapper {
+	wrapper := newSolutionExplorerWrapper()
+	wrapper.Wrap(explorer)
 	return wrapper
 }
 
@@ -48,8 +48,8 @@ func newAnnealerWrapper() *AnnealerFormatWrapper {
 	return &wrapper
 }
 
-func newSolutionTourerWrapper() *SolutionTourerFormatWrapper {
-	wrapper := SolutionTourerFormatWrapper{
+func newSolutionExplorerWrapper() *SolutionExplorerFormatWrapper {
+	wrapper := SolutionExplorerFormatWrapper{
 		MethodFormats: map[string]string{
 			"ObjectiveValue":         "%0.4f",
 			"ChangeInObjectiveValue": "%0.4f",

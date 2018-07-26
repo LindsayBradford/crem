@@ -27,7 +27,7 @@ func (this *IterationModuloLoggingModulator) ShouldModulate(event AnnealingEvent
 	annealer := event.Annealer
 	if event.EventType == FINISHED_ITERATION &&
 		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations() ||
-		annealer.CurrentIteration()%this.iterationModulo == 0) {
+			annealer.CurrentIteration()%this.iterationModulo == 0) {
 		return false
 	}
 

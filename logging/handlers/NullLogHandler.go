@@ -9,7 +9,7 @@ import (
 
 var NULL_LOG_HANDLER = new(NullLogHandler)
 
-type NullLogHandler struct {}
+type NullLogHandler struct{}
 
 func (this *NullLogHandler) Debug(message string)                                                    {}
 func (this *NullLogHandler) DebugWithAttributes(logAttributes LogAttributes)                         {}
@@ -24,7 +24,7 @@ func (this *NullLogHandler) LogAtLevel(logLevel LogLevel, message string)       
 func (this *NullLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {}
 func (this *NullLogHandler) Initialise()                                                             {}
 func (this *NullLogHandler) SetDestinations(*LogLevelDestinations)                                   {}
-func (this *NullLogHandler) Destinations() *LogLevelDestinations                                     {return nil}
+func (this *NullLogHandler) Destinations() *LogLevelDestinations                                     { return nil }
 func (this *NullLogHandler) SetFormatter(formatter LogFormatter)                                     {}
-func (this *NullLogHandler) Formatter() LogFormatter                                                 {return &NullFormatter{}}
+func (this *NullLogHandler) Formatter() LogFormatter                                                 { return &NullFormatter{} }
 func (this *NullLogHandler) BeingDiscarded(logLevel LogLevel) bool                                   { return true }

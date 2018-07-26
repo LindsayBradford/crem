@@ -37,8 +37,8 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with nullLogHandler")
 
 	g.Expect(
-		annealer.SolutionTourer()).To(Equal(solution.NULL_SOLUTION_TOURER),
-		"Annealer should have built with nullObjectiveManager")
+		annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
+		"Annealer should have built with Null Solution Explorer")
 
 	g.Expect(
 		annealer.Observers()).To(BeNil(),
@@ -70,11 +70,11 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	g.Expect(annealer.LogHandler()).To(Equal(handlers.NULL_LOG_HANDLER),
 		"Annealer should have ignored crap LogHandler set attempt")
 
-	tourerErr := annealer.SetSolutionTourer(nil)
+	explorerErr := annealer.SetSolutionExplorer(nil)
 
-	g.Expect(tourerErr).To(Not(BeNil()))
-	g.Expect(annealer.SolutionTourer()).To(Equal(solution.NULL_SOLUTION_TOURER),
-		"Annealer should have ignored crap Solution Tourer set attempt")
+	g.Expect(explorerErr).To(Not(BeNil()))
+	g.Expect(annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
+		"Annealer should have ignored crap Solution Explorer set attempt")
 
 	observersErr := annealer.AddObserver(nil)
 
@@ -82,7 +82,6 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	g.Expect(annealer.Observers()).To(BeNil(),
 		"Annealer should have ignored crap AnnealerObserver set attempt")
 }
-
 
 func TestSimpleAnnealer_Anneal(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -119,7 +118,7 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 }
 
 type CountingObserver struct {
-	eventCounts map[AnnealingEventType] uint
+	eventCounts map[AnnealingEventType]uint
 }
 
 func (this *CountingObserver) ObserveAnnealingEvent(event AnnealingEvent) {
@@ -139,7 +138,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	annealer.SetMaxIterations(expectedIterations)
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[AnnealingEventType] uint)
+	countingObserver.eventCounts = make(map[AnnealingEventType]uint)
 
 	observerError := annealer.AddObserver(countingObserver)
 
@@ -162,43 +161,43 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 		"Annealer should have posted <expectedIterations> of  FINISHED_ITERATION event")
 }
 
-type TryCountingObjectiveManager struct {
-	solution.NullSolutionTourer
+type TryCountingSolutionExplorer struct {
+	solution.NullSolutionExplorer
 	changesTried uint
 }
 
-func (this *TryCountingObjectiveManager) TryRandomChange(temperature float64) {
+func (this *TryCountingSolutionExplorer) TryRandomChange(temperature float64) {
 	this.changesTried += 1
 }
 
-func TestSimpleAnnealer_SetObjectiveManager(t *testing.T) {
+func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	const expectedObjectiveManagerTryCount = uint(3)
+	const expectedTryCount = uint(3)
 
 	annealer.SetTemperature(1000.0)
 	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(expectedObjectiveManagerTryCount)
+	annealer.SetMaxIterations(expectedTryCount)
 
-	expectedSolutionTourer := new(TryCountingObjectiveManager)
+	expectedSolutionExplorer := new(TryCountingSolutionExplorer)
 
-	tourerErr := annealer.SetSolutionTourer(expectedSolutionTourer)
+	explorerErr := annealer.SetSolutionExplorer(expectedSolutionExplorer)
 
-	g.Expect(tourerErr).To(BeNil())
-	g.Expect(annealer.stateTourer).To(BeIdenticalTo(expectedSolutionTourer),
-		"Annealer should have accepted CountingObserver as new SolutionTourer")
+	g.Expect(explorerErr).To(BeNil())
+	g.Expect(annealer.solutionExplorer).To(BeIdenticalTo(expectedSolutionExplorer),
+		"Annealer should have accepted CountingObserver as new SolutionExplorer")
 
 	annealer.Anneal()
 
-	g.Expect(expectedSolutionTourer.changesTried).To(BeIdenticalTo(expectedObjectiveManagerTryCount),
+	g.Expect(expectedSolutionExplorer.changesTried).To(BeIdenticalTo(expectedTryCount),
 		"Annealer should have tried same number of changes as iterations")
 }
 
 type DummyLogHandler struct {
-	 handlers.NullLogHandler
+	handlers.NullLogHandler
 }
 
 func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
@@ -207,11 +206,9 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	const expectedObjectiveManagerTryCount = uint(3)
-
 	annealer.SetTemperature(1000.0)
 	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(expectedObjectiveManagerTryCount)
+	annealer.SetMaxIterations(3)
 
 	expectedLogHandler := new(DummyLogHandler)
 

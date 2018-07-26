@@ -4,8 +4,8 @@ package annealing
 
 import (
 	. "fmt"
-	. "time"
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "time"
 )
 
 type ElapsedTimeTrackingAnnealer struct {

@@ -15,7 +15,7 @@ type SimpleAnnealer struct {
 	maxIterations    uint
 	currentIteration uint
 	eventNotifier    AnnealingEventNotifier
-	stateTourer      SolutionTourer
+	solutionExplorer SolutionExplorer
 	logger           LogHandler
 }
 
@@ -25,7 +25,7 @@ func (this *SimpleAnnealer) Initialise() {
 	this.maxIterations = 0
 	this.currentIteration = 0
 	this.eventNotifier = new(SynchronousAnnealingEventNotifier)
-	this.stateTourer = NULL_SOLUTION_TOURER
+	this.solutionExplorer = NULL_SOLUTION_EXPLORER
 	this.logger = NULL_LOG_HANDLER
 }
 
@@ -65,15 +65,15 @@ func (this *SimpleAnnealer) CurrentIteration() uint {
 	return this.currentIteration
 }
 
-func (this *SimpleAnnealer) SolutionTourer() SolutionTourer {
-	return this.stateTourer
+func (this *SimpleAnnealer) SolutionExplorer() SolutionExplorer {
+	return this.solutionExplorer
 }
 
-func (this *SimpleAnnealer) SetSolutionTourer(tourer SolutionTourer) error {
-	if tourer == nil {
-		return errors.New("Invalid attempt to set Solution Tourer to nil value")
+func (this *SimpleAnnealer) SetSolutionExplorer(explorer SolutionExplorer) error {
+	if explorer == nil {
+		return errors.New("Invalid attempt to set Solution Explorer to nil value")
 	}
-	this.stateTourer = tourer
+	this.solutionExplorer = explorer
 	return nil
 }
 
@@ -115,22 +115,22 @@ func (this *SimpleAnnealer) cloneState() *SimpleAnnealer {
 }
 
 func (this *SimpleAnnealer) Anneal() {
-	this.stateTourer.SetLogHandler(this.LogHandler())
-	this.stateTourer.Initialise()
+	this.solutionExplorer.SetLogHandler(this.LogHandler())
+	this.solutionExplorer.Initialise()
 
 	this.annealingStarted()
 
 	for done := this.initialDoneValue(); !done; {
 		this.iterationStarted()
 
-		this.stateTourer.TryRandomChange(this.temperature)
+		this.solutionExplorer.TryRandomChange(this.temperature)
 
 		this.iterationFinished()
 		this.cooldown()
 		done = this.checkIfDone()
 	}
 
-	this.stateTourer.TearDown()
+	this.solutionExplorer.TearDown()
 	this.annealingFinished()
 }
 

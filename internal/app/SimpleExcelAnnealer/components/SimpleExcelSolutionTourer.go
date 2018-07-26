@@ -14,8 +14,8 @@ var (
 	randomNumberGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-type SimpleExcelSolutionTourer struct {
-	BaseSolutionTourer
+type SimpleExcelSolutionExplorer struct {
+	BaseSolutionExplorer
 
 	dataSourcePath string
 	penalty        float64
@@ -67,7 +67,7 @@ func (this *annealingTable) setPlanningUnitStatusAtIndex(status InclusionStatus,
 
 type trackingTable struct {
 	headings []trackingTableHeadings
-	rows []trackingData
+	rows     []trackingData
 }
 
 type trackingTableHeadings int
@@ -96,7 +96,7 @@ func (heading trackingTableHeadings) String() string {
 		"InSecond50",
 		"TotalCost",
 	}
-	if heading < ObjFuncChange || heading> TotalCost {
+	if heading < ObjFuncChange || heading > TotalCost {
 		return columnNames[UNKNOWN]
 	}
 
@@ -118,8 +118,8 @@ type trackingData struct {
 	TotalCost               float64
 }
 
-func (this *SimpleExcelSolutionTourer) Initialise() {
-	this.BaseSolutionTourer.Initialise()
+func (this *SimpleExcelSolutionExplorer) Initialise() {
+	this.BaseSolutionExplorer.Initialise()
 
 	this.dataSourcePath = initialiseDataSource()
 	this.LogHandler().Info("Opening Excel workbook [" + this.dataSourcePath + "] as data source")
@@ -138,18 +138,18 @@ func (this *SimpleExcelSolutionTourer) Initialise() {
 	this.LogHandler().Info("Data retrieved from workbook [" + this.dataSourcePath + "]")
 }
 
-func (this *SimpleExcelSolutionTourer) WithPenalty(penalty float64) *SimpleExcelSolutionTourer {
+func (this *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
 	this.penalty = penalty
 	return this
 }
 
-func (this *SimpleExcelSolutionTourer) TearDown() {
-	this.BaseSolutionTourer.TearDown()
+func (this *SimpleExcelSolutionExplorer) TearDown() {
+	this.BaseSolutionExplorer.TearDown()
 	this.saveDataToWorkbookAndClose()
 	destroyExcelHandler()
 }
 
-func (this *SimpleExcelSolutionTourer) saveDataToWorkbookAndClose() {
+func (this *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
 	this.LogHandler().Info("Storing data to workbook [" + this.dataSourcePath + "]")
 	storeAnnealingTableToWorkbook(this.annealingData)
 	storeTrackingTableToWorkbook(this.trackingData)
@@ -160,13 +160,13 @@ func (this *SimpleExcelSolutionTourer) saveDataToWorkbookAndClose() {
 	this.LogHandler().Debug("Workbook [" + this.dataSourcePath + "] closed")
 }
 
-func (this *SimpleExcelSolutionTourer) TryRandomChange(temperature float64) {
+func (this *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
 	this.temperature = temperature
 	this.makeRandomChange(temperature)
 	DecideOnWhetherToAcceptChange(this, temperature)
 }
 
-func (this *SimpleExcelSolutionTourer) makeRandomChange(temperature float64) {
+func (this *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
 	previousPenalty := this.deriveTotalPenalty()
 	previousCost := this.deriveFeatureCost()
 
@@ -181,7 +181,7 @@ func (this *SimpleExcelSolutionTourer) makeRandomChange(temperature float64) {
 	this.SetObjectiveValue(this.ObjectiveValue() + this.ChangeInObjectiveValue())
 }
 
-func (this *SimpleExcelSolutionTourer) deriveTotalPenalty() float64 {
+func (this *SimpleExcelSolutionExplorer) deriveTotalPenalty() float64 {
 	totalPenalty := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
 		totalPenalty += float64(this.annealingData.rows[index].PlanningUnitStatus) * this.annealingData.rows[index].Cost
@@ -189,7 +189,7 @@ func (this *SimpleExcelSolutionTourer) deriveTotalPenalty() float64 {
 	return math.Max(0, this.penalty-totalPenalty)
 }
 
-func (this *SimpleExcelSolutionTourer) deriveFeatureCost() float64 {
+func (this *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {
 	totalFeatureCost := float64(0)
 	for index := 0; index < len(this.annealingData.rows); index++ {
 		totalFeatureCost +=
@@ -198,12 +198,12 @@ func (this *SimpleExcelSolutionTourer) deriveFeatureCost() float64 {
 	return totalFeatureCost
 }
 
-func (this *SimpleExcelSolutionTourer) AcceptLastChange() {
-	this.BaseSolutionTourer.AcceptLastChange()
+func (this *SimpleExcelSolutionExplorer) AcceptLastChange() {
+	this.BaseSolutionExplorer.AcceptLastChange()
 	this.addTrackerData()
 }
 
-func (this *SimpleExcelSolutionTourer) addTrackerData() {
+func (this *SimpleExcelSolutionExplorer) addTrackerData() {
 	newRow := new(trackingData)
 	newRow.ObjectiveFunctionChange = this.ChangeInObjectiveValue()
 	newRow.Temperature = this.temperature
@@ -216,16 +216,16 @@ func (this *SimpleExcelSolutionTourer) addTrackerData() {
 	this.trackingData.rows = append(this.trackingData.rows, *newRow)
 }
 
-func (this *SimpleExcelSolutionTourer) deriveSmallPUs() uint64 {
+func (this *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
 	totalSmallPUs := uint64(0)
 	var index = 0
-	for index = 0; index < len(this.annealingData.rows) / 2; index++ {
+	for index = 0; index < len(this.annealingData.rows)/2; index++ {
 		totalSmallPUs += uint64(this.annealingData.rows[index].PlanningUnitStatus)
 	}
 	return totalSmallPUs
 }
 
-func (this *SimpleExcelSolutionTourer) deriveLargePUs() uint64 {
+func (this *SimpleExcelSolutionExplorer) deriveLargePUs() uint64 {
 	totalLargePUs := uint64(0)
 	var index = 0
 	for index = len(this.annealingData.rows) / 2; index < len(this.annealingData.rows); index++ {
@@ -234,10 +234,10 @@ func (this *SimpleExcelSolutionTourer) deriveLargePUs() uint64 {
 	return totalLargePUs
 }
 
-func (this *SimpleExcelSolutionTourer) RevertLastChange() {
+func (this *SimpleExcelSolutionExplorer) RevertLastChange() {
 	this.annealingData.TogglePlanningUnitStatusAtIndex(this.previousPlanningUnitChanged)
 	this.SetObjectiveValue(this.ObjectiveValue() - this.ChangeInObjectiveValue())
 	this.SetChangeInObjectiveValue(0)
 	this.addTrackerData()
-	this.BaseSolutionTourer.RevertLastChange()
+	this.BaseSolutionExplorer.RevertLastChange()
 }

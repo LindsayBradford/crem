@@ -6,9 +6,7 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-
-	)
-
+)
 
 func TestAnnealingEventType_String(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -23,4 +21,3 @@ func TestAnnealingEventType_String(t *testing.T) {
 	tooLargeEventType := NOTE + 1
 	g.Expect(tooLargeEventType.String()).To(Equal("INVALID_EVENT"))
 }
-

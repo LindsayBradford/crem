@@ -24,5 +24,3 @@ func setup() {
 func teardown() {
 	excelHandlerUnderTest.Destroy()
 }
-
-

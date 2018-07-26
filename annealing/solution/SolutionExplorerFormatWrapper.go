@@ -6,8 +6,8 @@ import (
 	"fmt"
 )
 
-type SolutionTourerFormatWrapper struct {
-	StateToFormat SolutionTourer
+type SolutionExplorerFormatWrapper struct {
+	StateToFormat SolutionExplorer
 	MethodFormats map[string]string
 }
 
@@ -15,7 +15,7 @@ const default_float64_format = "%f"
 const default_bool_format = "%y"
 const default_percent_format = "%f"
 
-func (this *SolutionTourerFormatWrapper) Initialise() *SolutionTourerFormatWrapper {
+func (this *SolutionExplorerFormatWrapper) Initialise() *SolutionExplorerFormatWrapper {
 	this.MethodFormats = map[string]string{
 		"ObjectiveValue":         default_float64_format,
 		"ChangeInObjectiveValue": default_float64_format,
@@ -26,36 +26,36 @@ func (this *SolutionTourerFormatWrapper) Initialise() *SolutionTourerFormatWrapp
 	return this
 }
 
-func (this *SolutionTourerFormatWrapper) Wrapping(tourer SolutionTourer) *SolutionTourerFormatWrapper {
-	this.Wrap(tourer)
+func (this *SolutionExplorerFormatWrapper) Wrapping(explorer SolutionExplorer) *SolutionExplorerFormatWrapper {
+	this.Wrap(explorer)
 	return this
 }
 
-func (this *SolutionTourerFormatWrapper) Wrap(tourer SolutionTourer) {
-	this.StateToFormat = tourer
+func (this *SolutionExplorerFormatWrapper) Wrap(explorer SolutionExplorer) {
+	this.StateToFormat = explorer
 }
 
-func (this *SolutionTourerFormatWrapper) ObjectiveValue() string {
+func (this *SolutionExplorerFormatWrapper) ObjectiveValue() string {
 	return this.applyFormatting("ObjectiveValue", this.StateToFormat.ObjectiveValue())
 }
 
-func (this *SolutionTourerFormatWrapper) ChangeInObjectiveValue() string {
+func (this *SolutionExplorerFormatWrapper) ChangeInObjectiveValue() string {
 	return this.applyFormatting("ChangeInObjectiveValue", this.StateToFormat.ChangeInObjectiveValue())
 }
 
-func (this *SolutionTourerFormatWrapper) ChangeIsDesirable() string {
+func (this *SolutionExplorerFormatWrapper) ChangeIsDesirable() string {
 	return this.applyFormatting("ChangeIsDesirable", this.StateToFormat.ChangeIsDesirable())
 }
 
-func (this *SolutionTourerFormatWrapper) ChangeAccepted() string {
+func (this *SolutionExplorerFormatWrapper) ChangeAccepted() string {
 	return this.applyFormatting("ChangeAccepted", this.StateToFormat.ChangeAccepted())
 }
 
-func (this *SolutionTourerFormatWrapper) AcceptanceProbability() string {
+func (this *SolutionExplorerFormatWrapper) AcceptanceProbability() string {
 	return this.applyFormatting("AcceptanceProbability", this.StateToFormat.AcceptanceProbability())
 }
 
-func (this *SolutionTourerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+func (this *SolutionExplorerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
 	formatToApply := this.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

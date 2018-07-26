@@ -26,7 +26,7 @@ func BuildDumbAnnealer(logHandler LogHandler) Annealer {
 		WithStartingTemperature(10).
 		WithCoolingFactor(0.99).
 		WithMaxIterations(1000000).
-		WithDumbObjectiveManager(100).
+		WithDumbSolutionExplorer(100).
 		WithLogHandler(logHandler).
 		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
 		// WithEventNotifier(new(ChanneledAnnealingEventNotifier)).

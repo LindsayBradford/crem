@@ -47,7 +47,7 @@ func TestCompositeError_add(t *testing.T) {
 	actualCompositeErrorString := errorUnderTest.Error()
 
 	g.Expect(actualCompositeErrorString).To(ContainSubstring(expectedSubError0.Error()),
-			"Composite error should return error string of its first sub-error")
+		"Composite error should return error string of its first sub-error")
 
 	g.Expect(actualCompositeErrorString).To(ContainSubstring(expectedSubError1.Error()),
 		"Composite error should return error string of its second sub-error")
