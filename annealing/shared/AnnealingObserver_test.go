@@ -11,13 +11,13 @@ import (
 func TestAnnealingEventType_String(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	g.Expect(INVALID_EVENT.String()).To(Equal("INVALID_EVENT"))
+	g.Expect(InvalidEvent.String()).To(Equal("InvalidEvent"))
 
-	tooSmallEventType := INVALID_EVENT - 1
-	g.Expect(tooSmallEventType.String()).To(Equal("INVALID_EVENT"))
+	tooSmallEventType := InvalidEvent - 1
+	g.Expect(tooSmallEventType.String()).To(Equal("InvalidEvent"))
 
-	g.Expect(NOTE.String()).To(Equal("NOTE"))
+	g.Expect(Note.String()).To(Equal("Note"))
 
-	tooLargeEventType := NOTE + 1
-	g.Expect(tooLargeEventType.String()).To(Equal("INVALID_EVENT"))
+	tooLargeEventType := Note + 1
+	g.Expect(tooLargeEventType.String()).To(Equal("InvalidEvent"))
 }

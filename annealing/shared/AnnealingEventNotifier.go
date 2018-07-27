@@ -16,24 +16,24 @@ type SynchronousAnnealingEventNotifier struct {
 	observers []AnnealingObserver
 }
 
-func (this *SynchronousAnnealingEventNotifier) Observers() []AnnealingObserver {
-	if len(this.observers) == 0 {
+func (notifier *SynchronousAnnealingEventNotifier) Observers() []AnnealingObserver {
+	if len(notifier.observers) == 0 {
 		return nil
 	}
-	return this.observers
+	return notifier.observers
 }
 
-func (this *SynchronousAnnealingEventNotifier) AddObserver(newObserver AnnealingObserver) error {
+func (notifier *SynchronousAnnealingEventNotifier) AddObserver(newObserver AnnealingObserver) error {
 	if newObserver == nil {
-		return errors.New("Invalid attempt to add non-existant observer to annealing event notifier")
+		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
 	}
-	this.observers = append(this.observers, newObserver)
+	notifier.observers = append(notifier.observers, newObserver)
 	return nil
 }
 
-func (this *SynchronousAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType AnnealingEventType) {
+func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType AnnealingEventType) {
 	event := AnnealingEvent{EventType: eventType, Annealer: annealer}
-	for _, currObserver := range this.observers {
+	for _, currObserver := range notifier.observers {
 		currObserver.ObserveAnnealingEvent(event)
 	}
 }
@@ -43,21 +43,21 @@ type ChanneledAnnealingEventNotifier struct {
 	observerChannels []chan AnnealingEvent
 }
 
-func (this *ChanneledAnnealingEventNotifier) Observers() []AnnealingObserver {
-	if len(this.observers) == 0 {
+func (notifier *ChanneledAnnealingEventNotifier) Observers() []AnnealingObserver {
+	if len(notifier.observers) == 0 {
 		return nil
 	}
-	return this.observers
+	return notifier.observers
 }
 
-func (this *ChanneledAnnealingEventNotifier) AddObserver(newObserver AnnealingObserver) error {
+func (notifier *ChanneledAnnealingEventNotifier) AddObserver(newObserver AnnealingObserver) error {
 	if newObserver == nil {
-		return errors.New("Invalid attempt to add non-existant observer to annealing event notifier")
+		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
 	}
 
-	this.observers = append(this.observers, newObserver)
+	notifier.observers = append(notifier.observers, newObserver)
 	newEventChannel := make(chan AnnealingEvent)
-	this.observerChannels = append(this.observerChannels, newEventChannel)
+	notifier.observerChannels = append(notifier.observerChannels, newEventChannel)
 
 	go func() {
 		for {
@@ -69,9 +69,9 @@ func (this *ChanneledAnnealingEventNotifier) AddObserver(newObserver AnnealingOb
 	return nil
 }
 
-func (this *ChanneledAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType AnnealingEventType) {
+func (notifier *ChanneledAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType AnnealingEventType) {
 	event := AnnealingEvent{EventType: eventType, Annealer: annealer}
-	for _, observerChannel := range this.observerChannels {
+	for _, observerChannel := range notifier.observerChannels {
 		observerChannel <- event
 	}
 }

@@ -10,18 +10,18 @@ type Cell struct {
 	dispatch *ole.IDispatch
 }
 
-func (this *Cell) Value() interface{} {
-	return this.getPropertyVariant("Value")
+func (cell *Cell) Value() interface{} {
+	return cell.getPropertyVariant("Value")
 }
 
-func (this *Cell) SetValue(value interface{}) {
-	this.setProperty("Value", value)
+func (cell *Cell) SetValue(value interface{}) {
+	cell.setProperty("Value", value)
 }
 
-func (this *Cell) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {
-	return getPropertyVariant(this.dispatch, propertyName, parameters...)
+func (cell *Cell) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {
+	return getPropertyVariant(cell.dispatch, propertyName, parameters...)
 }
 
-func (this *Cell) setProperty(propertyName string, propertyValue interface{}) {
-	setProperty(this.dispatch, propertyName, propertyValue)
+func (cell *Cell) setProperty(propertyName string, propertyValue interface{}) {
+	setProperty(cell.dispatch, propertyName, propertyValue)
 }

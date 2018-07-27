@@ -1,7 +1,5 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 package shared
 
 import (
@@ -13,45 +11,45 @@ type AnnealerFormatWrapper struct {
 	MethodFormats    map[string]string
 }
 
-const default_float64_format = "%f"
-const default_uint_format = "%d"
+const defaultFloat64Format = "%f"
+const defaultUintFormat = "%d"
 
-func (this *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
-	this.MethodFormats = map[string]string{
-		"Temperature":      default_float64_format,
-		"CoolingFactor":    default_float64_format,
-		"MaxIterations":    default_uint_format,
-		"CurrentIteration": default_uint_format,
+func (wrapper *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
+	wrapper.MethodFormats = map[string]string{
+		"Temperature":      defaultFloat64Format,
+		"CoolingFactor":    defaultFloat64Format,
+		"MaxIterations":    defaultUintFormat,
+		"CurrentIteration": defaultUintFormat,
 	}
-	return this
+	return wrapper
 }
 
-func (this *AnnealerFormatWrapper) Wrapping(annealer Annealer) *AnnealerFormatWrapper {
-	this.Wrap(annealer)
-	return this
+func (wrapper *AnnealerFormatWrapper) Wrapping(annealer Annealer) *AnnealerFormatWrapper {
+	wrapper.Wrap(annealer)
+	return wrapper
 }
 
-func (this *AnnealerFormatWrapper) Wrap(annealer Annealer) {
-	this.AnnealerToFormat = annealer
+func (wrapper *AnnealerFormatWrapper) Wrap(annealer Annealer) {
+	wrapper.AnnealerToFormat = annealer
 }
 
-func (this *AnnealerFormatWrapper) Temperature() string {
-	return this.applyFormatting("Temperature", this.AnnealerToFormat.Temperature())
+func (wrapper *AnnealerFormatWrapper) Temperature() string {
+	return wrapper.applyFormatting("Temperature", wrapper.AnnealerToFormat.Temperature())
 }
 
-func (this *AnnealerFormatWrapper) CoolingFactor() string {
-	return this.applyFormatting("CoolingFactor", this.AnnealerToFormat.CoolingFactor())
+func (wrapper *AnnealerFormatWrapper) CoolingFactor() string {
+	return wrapper.applyFormatting("CoolingFactor", wrapper.AnnealerToFormat.CoolingFactor())
 }
 
-func (this *AnnealerFormatWrapper) MaxIterations() string {
-	return this.applyFormatting("MaxIterations", this.AnnealerToFormat.MaxIterations())
+func (wrapper *AnnealerFormatWrapper) MaxIterations() string {
+	return wrapper.applyFormatting("MaxIterations", wrapper.AnnealerToFormat.MaxIterations())
 }
 
-func (this *AnnealerFormatWrapper) CurrentIteration() string {
-	return this.applyFormatting("CurrentIteration", this.AnnealerToFormat.CurrentIteration())
+func (wrapper *AnnealerFormatWrapper) CurrentIteration() string {
+	return wrapper.applyFormatting("CurrentIteration", wrapper.AnnealerToFormat.CurrentIteration())
 }
 
-func (this *AnnealerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
-	formatToApply := this.MethodFormats[formatKey]
+func (wrapper *AnnealerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+	formatToApply := wrapper.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

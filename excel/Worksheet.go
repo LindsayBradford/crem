@@ -10,48 +10,48 @@ type Worksheet struct {
 	dispatch *ole.IDispatch
 }
 
-func (this *Worksheet) Name() string {
-	return this.getPropertyString("Name")
+func (ws *Worksheet) Name() string {
+	return ws.getPropertyString("Name")
 }
 
-func (this *Worksheet) SetName(name string) {
-	this.setProperty("Name", name)
+func (ws *Worksheet) SetName(name string) {
+	ws.setProperty("Name", name)
 }
 
-func (this *Worksheet) Delete() {
-	this.call("Delete")
+func (ws *Worksheet) Delete() {
+	ws.call("Delete")
 }
 
-func (this *Worksheet) UsedRange() (usedRange *Range) {
-	usedRange = new(Range)
-	usedRange.dispatch = this.getProperty("UsedRange")
+func (ws *Worksheet) UsedRange() *Range {
+	usedRange := new(Range)
+	usedRange.dispatch = ws.getProperty("UsedRange")
 	return usedRange
 }
 
-func (this *Worksheet) Cells(rowIndex uint, columnIndex uint) (cell *Cell) {
+func (ws *Worksheet) Cells(rowIndex uint, columnIndex uint) (cell *Cell) {
 	defer func() {
 		if r := recover(); r != nil {
 			cell = nil
 		}
 	}()
 
-	newCell := new(Cell)
-	newCell.dispatch = this.getProperty("Cells", rowIndex, columnIndex)
-	return newCell
+	cell = new(Cell)
+	cell.dispatch = ws.getProperty("Cells", rowIndex, columnIndex)
+	return cell
 }
 
-func (this *Worksheet) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
-	return getProperty(this.dispatch, propertyName, parameters...)
+func (ws *Worksheet) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
+	return getProperty(ws.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheet) getPropertyString(propertyName string, parameters ...interface{}) string {
-	return getPropertyString(this.dispatch, propertyName, parameters...)
+func (ws *Worksheet) getPropertyString(propertyName string, parameters ...interface{}) string {
+	return getPropertyString(ws.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheet) setProperty(propertyName string, propertyValue interface{}) {
-	setProperty(this.dispatch, propertyName, propertyValue)
+func (ws *Worksheet) setProperty(propertyName string, propertyValue interface{}) {
+	setProperty(ws.dispatch, propertyName, propertyValue)
 }
 
-func (this *Worksheet) call(methodName string, parameters ...interface{}) *ole.IDispatch {
-	return callMethod(this.dispatch, methodName, parameters...)
+func (ws *Worksheet) call(methodName string, parameters ...interface{}) *ole.IDispatch {
+	return callMethod(ws.dispatch, methodName, parameters...)
 }

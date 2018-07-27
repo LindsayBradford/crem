@@ -12,17 +12,17 @@ import (
 )
 
 var (
-	args             = commandline.ParseArguments()
-	annealingRunners = new(profiling.ProfiledAndUnProfiledFunctionPair)
+	args               = commandline.ParseArguments()
+	annealingFunctions = new(profiling.ProfiledAndUnProfiledFunctionPair)
 )
 
 func main() {
 	buildAnnealingRunners()
 
 	if profilingRequested() {
-		annealingRunners.ProfiledFunction()
+		annealingFunctions.ProfiledFunction()
 	} else {
-		annealingRunners.UnProfiledFunction()
+		annealingFunctions.UnProfiledFunction()
 	}
 
 	defer flushStreams()
@@ -34,17 +34,17 @@ func buildAnnealingRunners() {
 
 	annealer := components.BuildAnnealer(humanAudienceLogger, machineAudienceLogger)
 
-	annealingRunners.UnProfiledFunction = func() error {
+	annealingFunctions.UnProfiledFunction = func() error {
 		humanAudienceLogger.Debug("About to call annealer.Anneal()")
 		annealer.Anneal()
 		humanAudienceLogger.Debug("Call to annealer.Anneal() finished.")
 		return nil
 	}
 
-	annealingRunners.ProfiledFunction = func() error {
+	annealingFunctions.ProfiledFunction = func() error {
 		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
 		defer humanAudienceLogger.Debug("Cpu profiling to file [" + args.CpuProfile + "] now generated")
-		return profiling.CpuProfileOfFunctionToFile(annealingRunners.UnProfiledFunction, args.CpuProfile)
+		return profiling.CpuProfileOfFunctionToFile(annealingFunctions.UnProfiledFunction, args.CpuProfile)
 	}
 }
 

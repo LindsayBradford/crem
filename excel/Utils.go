@@ -67,7 +67,7 @@ func LastOfWorksheets(worksheets *Worksheets) (worksheet *Worksheet) {
 func MoveWorksheetToLastInWorksheets(worksheet *Worksheet, worksheets *Worksheets) {
 	defer func() {
 		if r := recover(); r != nil {
-			msg := fmt.Sprintf("Cannot excel worksheet [%s] to last position", r)
+			msg := fmt.Sprintf("cannot move excel worksheet [%s] to last position", r)
 			panic(errors.New(msg))
 		}
 	}()

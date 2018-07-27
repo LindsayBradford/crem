@@ -26,7 +26,7 @@ func (this *SimpleAnnealer) Initialise() {
 	this.currentIteration = 0
 	this.eventNotifier = new(SynchronousAnnealingEventNotifier)
 	this.solutionExplorer = NULL_SOLUTION_EXPLORER
-	this.logger = NULL_LOG_HANDLER
+	this.logger = new(NullLogHandler)
 }
 
 func (this *SimpleAnnealer) SetTemperature(temperature float64) error {
@@ -135,20 +135,20 @@ func (this *SimpleAnnealer) Anneal() {
 }
 
 func (this *SimpleAnnealer) annealingStarted() {
-	this.notifyObservers(STARTED_ANNEALING)
+	this.notifyObservers(StartedAnnealing)
 }
 
 func (this *SimpleAnnealer) iterationStarted() {
 	this.currentIteration++
-	this.notifyObservers(STARTED_ITERATION)
+	this.notifyObservers(StartedIteration)
 }
 
 func (this *SimpleAnnealer) iterationFinished() {
-	this.notifyObservers(FINISHED_ITERATION)
+	this.notifyObservers(FinishedIteration)
 }
 
 func (this *SimpleAnnealer) annealingFinished() {
-	this.notifyObservers(FINISHED_ANNEALING)
+	this.notifyObservers(FinishedAnnealing)
 }
 
 func (this *SimpleAnnealer) initialDoneValue() bool {

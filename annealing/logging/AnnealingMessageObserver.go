@@ -28,7 +28,7 @@ func (this *AnnealingMessageObserver) WithModulator(modulator LoggingModulator) 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
 func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.modulator.ShouldModulate(event) {
 		return
 	}
 
@@ -39,18 +39,18 @@ func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent
 	builder.Add("Event [", event.EventType.String(), "]: ")
 
 	switch event.EventType {
-	case STARTED_ANNEALING:
+	case StartedAnnealing:
 		builder.
 			Add("Maximum Iterations [", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
-	case STARTED_ITERATION:
+	case StartedIteration:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "]")
-	case FINISHED_ITERATION:
+	case FinishedIteration:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
@@ -58,16 +58,16 @@ func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent
 			Add("Desirable? [", explorer.ChangeIsDesirable(), "], ").
 			Add("Acceptance Probability [", explorer.AcceptanceProbability(), "], ").
 			Add("Accepted? [", explorer.ChangeAccepted(), "]")
-	case FINISHED_ANNEALING:
+	case FinishedAnnealing:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "]")
-	case NOTE:
+	case Note:
 		builder.Add("[", event.Note, "]")
 	default:
 		// deliberately does nothing extra
 	}
 
-	this.logHandler.LogAtLevel(ANNEALER, builder.String())
+	this.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 }

@@ -13,97 +13,99 @@ type AnnealerBuilder struct {
 	buildErrors *crmerrors.CompositeError
 }
 
-func (this *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
-	this.annealer = &OSThreadLockedAnnealer{}
-	this.annealer.Initialise()
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
-	return this
+func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
+	builder.annealer = &OSThreadLockedAnnealer{}
+	builder.annealer.Initialise()
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
+	return builder
 }
 
-func (this *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
-	this.annealer = &ElapsedTimeTrackingAnnealer{}
-	this.annealer.Initialise()
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
-	return this
+func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
+	builder.annealer = &ElapsedTimeTrackingAnnealer{}
+	builder.annealer.Initialise()
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	return builder
 }
 
-func (this *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
-	this.annealer = &SimpleAnnealer{}
-	this.annealer.Initialise()
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
-	return this
+func (builder *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
+	builder.annealer = &SimpleAnnealer{}
+	builder.annealer.Initialise()
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	return builder
 }
 
-func (this *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
-	annealer := this.annealer
-	if err := annealer.SetLogHandler(logHandler); err != nil {
-		this.buildErrors.Add(err)
+func (builder *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if err := annealerBeingBuilt.SetLogHandler(logHandler); err != nil {
+		builder.buildErrors.Add(err)
 	}
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
-	annealer := this.annealer
-	if err := annealer.SetTemperature(temperature); err != nil {
-		this.buildErrors.Add(err)
+func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if err := annealerBeingBuilt.SetTemperature(temperature); err != nil {
+		builder.buildErrors.Add(err)
 	}
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
-	annealer := this.annealer
-	if err := annealer.SetCoolingFactor(coolingFactor); err != nil {
-		this.buildErrors.Add(err)
+func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if err := annealerBeingBuilt.SetCoolingFactor(coolingFactor); err != nil {
+		builder.buildErrors.Add(err)
 	}
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) *AnnealerBuilder {
-	annealer := this.annealer
-	if err := annealer.SetSolutionExplorer(explorer); err != nil {
-		this.buildErrors.Add(err)
+func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if err := annealerBeingBuilt.SetSolutionExplorer(explorer); err != nil {
+		builder.buildErrors.Add(err)
 	}
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
-	annealer := this.annealer
-	if err := annealer.SetEventNotifier(delegate); err != nil {
-		this.buildErrors.Add(err)
+func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if err := annealerBeingBuilt.SetEventNotifier(delegate); err != nil {
+		builder.buildErrors.Add(err)
 	}
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue float64) *AnnealerBuilder {
-	annealer := this.annealer
+func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue float64) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
 	explorer := new(DumbSolutionExplorer)
 	explorer.SetObjectiveValue(initialObjectiveValue)
-	annealer.SetSolutionExplorer(explorer)
-	return this
+	annealerBeingBuilt.SetSolutionExplorer(explorer)
+	return builder
 }
 
-func (this *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
-	annealer := this.annealer
-	annealer.SetMaxIterations(iterations)
-	return this
+func (builder *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	annealerBeingBuilt.SetMaxIterations(iterations)
+	return builder
 }
 
-func (this *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
-	annealer := this.annealer
+func (builder *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
 
 	for _, currObserver := range observers {
-		if err := annealer.AddObserver(currObserver); err != nil {
-			this.buildErrors.Add(err)
+		if err := annealerBeingBuilt.AddObserver(currObserver); err != nil {
+			builder.buildErrors.Add(err)
 		}
 	}
 
-	return this
+	return builder
 }
 
-func (this *AnnealerBuilder) Build() (Annealer, *crmerrors.CompositeError) {
-	if this.buildErrors.Size() == 0 {
-		return this.annealer, nil
+func (builder *AnnealerBuilder) Build() (Annealer, *crmerrors.CompositeError) {
+	annealerBeingBuilt := builder.annealer
+	buildErrors := builder.buildErrors
+	if buildErrors.Size() == 0 {
+		return annealerBeingBuilt, nil
 	} else {
-		return this.annealer, this.buildErrors
+		return annealerBeingBuilt, buildErrors
 	}
 }

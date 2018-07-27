@@ -4,30 +4,30 @@ package modulators
 
 import . "github.com/LindsayBradford/crm/annealing/shared"
 
-// IterationModuloLoggingModulator modulates FINISHED_ITERATION Annealing Event instances at a rate of 1 every modulo
-// events. STARTED_ITERATION events are completely filtered out. All other event types are allowed through to the LogHandler.
+// IterationModuloLoggingModulator modulates FinishedIteration Annealing Event instances at a rate of 1 every modulo
+// events. StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
 type IterationModuloLoggingModulator struct {
 	iterationModulo uint
 }
 
-// WithModulo defines the modulo to apply against FINISHED_ITERATION Annealing Event instances.
-func (this *IterationModuloLoggingModulator) WithModulo(modulo uint) *IterationModuloLoggingModulator {
-	this.iterationModulo = modulo
-	return this
+// WithModulo defines the modulo to apply against FinishedIteration Annealing Event instances.
+func (m *IterationModuloLoggingModulator) WithModulo(modulo uint) *IterationModuloLoggingModulator {
+	m.iterationModulo = modulo
+	return m
 }
 
-// ShouldModulate modulates only FINISHED_ITERATION AnnealingEvent instances, and fully filters out all STARTED_ITERATION
-// events. Every modulo FINISHED_ITERATION events received, one is allowed through to the LogHandler.
-// The very first and very last FINISHED_ITERATION events are exceptions, and are also not modulated.
-func (this *IterationModuloLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
-	if event.EventType != STARTED_ITERATION && event.EventType != FINISHED_ITERATION {
+// ShouldModulate modulates only FinishedIteration AnnealingEvent instances, and fully filters out all StartedIteration
+// events. Every modulo FinishedIteration events received, one is allowed through to the LogHandler.
+// The very first and very last FinishedIteration events are exceptions, and are also not modulated.
+func (m *IterationModuloLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
+	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
 		return false
 	}
 
 	annealer := event.Annealer
-	if event.EventType == FINISHED_ITERATION &&
+	if event.EventType == FinishedIteration &&
 		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations() ||
-			annealer.CurrentIteration()%this.iterationModulo == 0) {
+			annealer.CurrentIteration()%m.iterationModulo == 0) {
 		return false
 	}
 

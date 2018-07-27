@@ -17,8 +17,8 @@ type LogHandlerBuilder struct {
 
 // ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
 // LogHandler
-func (this *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
+func (builder *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
 
 	newHandler := new(NativeLibraryLogHandler)
 
@@ -27,14 +27,14 @@ func (this *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
 	newHandler.SetFormatter(new(NullFormatter))
 	newHandler.Initialise()
 
-	this.logHandler = newHandler
-	return this
+	builder.logHandler = newHandler
+	return builder
 }
 
 // ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
 // LogHandler
-func (this *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
-	this.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
+func (builder *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
 
 	newHandler := new(BareBonesLogHandler)
 
@@ -43,34 +43,41 @@ func (this *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
 	newHandler.SetFormatter(new(NullFormatter))
 	newHandler.Initialise()
 
-	this.logHandler = newHandler
-	return this
+	builder.logHandler = newHandler
+	return builder
 }
 
 // WithFormatter instructs LogHandlerBuilder to ensure that the LogHandler constructed will use formatter for its log
 // entry formatting. If not called, the default NullFormatter will be used.
-func (this *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandlerBuilder {
+func (builder *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandlerBuilder {
 	formatter.Initialise()
-	this.logHandler.SetFormatter(formatter)
-	return this
+
+	handlerBeingBuilt := builder.logHandler
+	handlerBeingBuilt.SetFormatter(formatter)
+
+	return builder
 }
 
 // WithLogLevelDestination instructs LogHandlerBuilder to override the existing LogLevelDestinations with a new
 // destination for the given logLevel.
-func (this *LogHandlerBuilder) WithLogLevelDestination(logLevel LogLevel, destination LogDestination) *LogHandlerBuilder {
-	this.logHandler.Destinations().Override(logLevel, destination)
-	if nativeLibraryHandler, ok := this.logHandler.(*NativeLibraryLogHandler); ok {
+func (builder *LogHandlerBuilder) WithLogLevelDestination(logLevel LogLevel, destination LogDestination) *LogHandlerBuilder {
+	handlerBeingBuilt := builder.logHandler
+
+	handlerDestinations := handlerBeingBuilt.Destinations()
+	handlerDestinations.Override(logLevel, destination)
+	if nativeLibraryHandler, ok := handlerBeingBuilt.(*NativeLibraryLogHandler); ok {
 		nativeLibraryHandler.AddLogLevel(logLevel)
 	}
 
-	return this
+	return builder
 }
 
 // Build instructs LogHandlerBuilder to finalise building its LogHandler, and return it to he caller.
-func (this *LogHandlerBuilder) Build() (LogHandler, error) {
-	if this.buildErrors.Size() == 0 {
-		return this.logHandler, nil
+func (builder *LogHandlerBuilder) Build() (LogHandler, error) {
+	handlerBeingBuilt := builder.logHandler
+	if builder.buildErrors.Size() == 0 {
+		return handlerBeingBuilt, nil
 	} else {
-		return this.logHandler, this.buildErrors
+		return handlerBeingBuilt, builder.buildErrors
 	}
 }

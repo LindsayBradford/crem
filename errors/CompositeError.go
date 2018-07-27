@@ -21,19 +21,19 @@ func NewComposite(text string) *CompositeError {
 	return newError
 }
 
-func (this *CompositeError) Error() string {
-	if len(this.individualErrors) == 1 {
-		return this.individualErrors[0].Error()
+func (ce *CompositeError) Error() string {
+	if len(ce.individualErrors) == 1 {
+		return ce.individualErrors[0].Error()
 	}
-	return this.buildCompositeErrorString()
+	return ce.buildCompositeErrorString()
 }
 
-func (this *CompositeError) buildCompositeErrorString() string {
+func (ce *CompositeError) buildCompositeErrorString() string {
 	builder := strings.FluentBuilder{}
 
-	builder.Add(this.compositeText, ", composed of: [\n")
+	builder.Add(ce.compositeText, ", composed of: [\n")
 
-	for _, currError := range this.individualErrors {
+	for _, currError := range ce.individualErrors {
 		builder.Add("\t", currError.Error(), "\n")
 	}
 
@@ -43,16 +43,16 @@ func (this *CompositeError) buildCompositeErrorString() string {
 }
 
 // Size returns the number of sub-errors that have been composed together to form the given CompositeError
-func (this *CompositeError) Size() int {
-	return len(this.individualErrors)
+func (ce *CompositeError) Size() int {
+	return len(ce.individualErrors)
 }
 
 // Add combines newError to the array of sub-errors that have been composed together to form the given CompositeError
-func (this *CompositeError) Add(newError error) {
-	this.individualErrors = append(this.individualErrors, newError)
+func (ce *CompositeError) Add(newError error) {
+	ce.individualErrors = append(ce.individualErrors, newError)
 }
 
-//SubError returns the sub-error at the index specified by position for the given CompositeError
-func (this *CompositeError) SubError(position int) error {
-	return this.individualErrors[position]
+// SubError returns the sub-error at the index specified by position for the given CompositeError
+func (ce *CompositeError) SubError(position int) error {
+	return ce.individualErrors[position]
 }

@@ -47,65 +47,65 @@ type BaseSolutionExplorer struct {
 	logHandler             LogHandler
 }
 
-func (this *BaseSolutionExplorer) Initialise() {
-	this.logHandler.Debug("Initialising Solution Explorer")
-	this.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
+func (explorer *BaseSolutionExplorer) Initialise() {
+	explorer.logHandler.Debug("Initialising Solution Explorer")
+	explorer.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
 }
 
-func (this *BaseSolutionExplorer) TearDown() {
-	this.logHandler.Debug("Triggering tear-down of Solution Explorer")
+func (explorer *BaseSolutionExplorer) TearDown() {
+	explorer.logHandler.Debug("Triggering tear-down of Solution Explorer")
 }
 
-func (this *BaseSolutionExplorer) RandomNumberGenerator() *rand.Rand {
-	return this.randomNumberGenerator
+func (explorer *BaseSolutionExplorer) RandomNumberGenerator() *rand.Rand {
+	return explorer.randomNumberGenerator
 }
 
-func (this *BaseSolutionExplorer) SetRandomNumberGenerator(generator *rand.Rand) {
-	this.randomNumberGenerator = generator
+func (explorer *BaseSolutionExplorer) SetRandomNumberGenerator(generator *rand.Rand) {
+	explorer.randomNumberGenerator = generator
 }
 
-func (this *BaseSolutionExplorer) LogHandler() LogHandler {
-	return this.logHandler
+func (explorer *BaseSolutionExplorer) LogHandler() LogHandler {
+	return explorer.logHandler
 }
 
-func (this *BaseSolutionExplorer) SetLogHandler(logHandler LogHandler) error {
+func (explorer *BaseSolutionExplorer) SetLogHandler(logHandler LogHandler) error {
 	if logHandler == nil {
-		return errors.New("Invalid attempt to set log handler to nil value")
+		return errors.New("invalid attempt to set log handler to nil value")
 	}
-	this.logHandler = logHandler
+	explorer.logHandler = logHandler
 	return nil
 }
 
-func (this *BaseSolutionExplorer) TryRandomChange(temperature float64) {
-	this.makeRandomChange()
-	DecideOnWhetherToAcceptChange(this, temperature)
+func (explorer *BaseSolutionExplorer) TryRandomChange(temperature float64) {
+	explorer.makeRandomChange()
+	DecideOnWhetherToAcceptChange(explorer, temperature)
 }
 
-func (this *BaseSolutionExplorer) SetObjectiveValue(objectiveValue float64) {
-	this.objectiveValue = objectiveValue
+func (explorer *BaseSolutionExplorer) SetObjectiveValue(objectiveValue float64) {
+	explorer.objectiveValue = objectiveValue
 }
 
-func (this *BaseSolutionExplorer) ObjectiveValue() float64 {
-	return this.objectiveValue
+func (explorer *BaseSolutionExplorer) ObjectiveValue() float64 {
+	return explorer.objectiveValue
 }
 
-func (this *BaseSolutionExplorer) ChangeInObjectiveValue() float64 {
-	return this.changeInObjectiveValue
+func (explorer *BaseSolutionExplorer) ChangeInObjectiveValue() float64 {
+	return explorer.changeInObjectiveValue
 }
 
-func (this *BaseSolutionExplorer) SetChangeInObjectiveValue(change float64) {
-	this.changeInObjectiveValue = change
+func (explorer *BaseSolutionExplorer) SetChangeInObjectiveValue(change float64) {
+	explorer.changeInObjectiveValue = change
 }
 
-func (this *BaseSolutionExplorer) AcceptanceProbability() float64 {
-	return this.acceptanceProbability
+func (explorer *BaseSolutionExplorer) AcceptanceProbability() float64 {
+	return explorer.acceptanceProbability
 }
 
-func (this *BaseSolutionExplorer) SetAcceptanceProbability(probability float64) {
-	this.acceptanceProbability = probability
+func (explorer *BaseSolutionExplorer) SetAcceptanceProbability(probability float64) {
+	explorer.acceptanceProbability = probability
 }
 
-func (this *BaseSolutionExplorer) makeRandomChange() {}
+func (explorer *BaseSolutionExplorer) makeRandomChange() {}
 
 func DecideOnWhetherToAcceptChange(explorer SolutionExplorer, annealingTemperature float64) {
 	if explorer.ChangeIsDesirable() {
@@ -132,21 +132,21 @@ func newRandomValue(randomNumberGenerator *rand.Rand) float64 {
 	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange-1)
 }
 
-func (this *BaseSolutionExplorer) ChangeIsDesirable() bool {
-	if this.changeInObjectiveValue <= 0 {
+func (explorer *BaseSolutionExplorer) ChangeIsDesirable() bool {
+	if explorer.changeInObjectiveValue <= 0 {
 		return true
 	}
 	return false
 }
 
-func (this *BaseSolutionExplorer) AcceptLastChange() {
-	this.changeAccepted = true
+func (explorer *BaseSolutionExplorer) AcceptLastChange() {
+	explorer.changeAccepted = true
 }
 
-func (this *BaseSolutionExplorer) RevertLastChange() {
-	this.changeAccepted = false
+func (explorer *BaseSolutionExplorer) RevertLastChange() {
+	explorer.changeAccepted = false
 }
 
-func (this *BaseSolutionExplorer) ChangeAccepted() bool {
-	return this.changeAccepted
+func (explorer *BaseSolutionExplorer) ChangeAccepted() bool {
+	return explorer.changeAccepted
 }

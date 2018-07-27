@@ -10,9 +10,9 @@ type OSThreadLockedAnnealer struct {
 	ElapsedTimeTrackingAnnealer
 }
 
-func (this *OSThreadLockedAnnealer) Anneal() {
+func (annealer *OSThreadLockedAnnealer) Anneal() {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
-	this.ElapsedTimeTrackingAnnealer.Anneal()
+	annealer.ElapsedTimeTrackingAnnealer.Anneal()
 }

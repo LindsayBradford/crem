@@ -11,9 +11,9 @@ import (
 // TODO: Supply example encoding.
 type NameValuePairFormatter struct{}
 
-func (this *NameValuePairFormatter) Initialise() {}
+func (formatter *NameValuePairFormatter) Initialise() {}
 
-func (this *NameValuePairFormatter) Format(attributes LogAttributes) string {
+func (formatter *NameValuePairFormatter) Format(attributes LogAttributes) string {
 	var builder strings.FluentBuilder
 
 	needsComma := false

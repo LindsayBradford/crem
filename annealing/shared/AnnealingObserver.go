@@ -15,26 +15,26 @@ type AnnealingEvent struct {
 type AnnealingEventType int
 
 const (
-	INVALID_EVENT AnnealingEventType = iota
-	STARTED_ANNEALING
-	STARTED_ITERATION
-	FINISHED_ITERATION
-	FINISHED_ANNEALING
-	NOTE
+	InvalidEvent AnnealingEventType = iota
+	StartedAnnealing
+	StartedIteration
+	FinishedIteration
+	FinishedAnnealing
+	Note
 )
 
 func (eventType AnnealingEventType) String() string {
 	labels := [...]string{
-		"INVALID_EVENT",
-		"STARTED_ANNEALING",
-		"STARTED_ITERATION",
-		"FINISHED_ITERATION",
-		"FINISHED_ANNEALING",
-		"NOTE",
+		"InvalidEvent",
+		"StartedAnnealing",
+		"StartedIteration",
+		"FinishedIteration",
+		"FinishedAnnealing",
+		"Note",
 	}
 
-	if eventType < STARTED_ANNEALING || eventType > NOTE {
-		return labels[INVALID_EVENT]
+	if eventType < StartedAnnealing || eventType > Note {
+		return labels[InvalidEvent]
 	}
 
 	return labels[eventType]

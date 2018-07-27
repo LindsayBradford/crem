@@ -33,8 +33,8 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with current iteration of 0")
 
 	g.Expect(
-		annealer.LogHandler()).To(Equal(handlers.NULL_LOG_HANDLER),
-		"Annealer should have built with nullLogHandler")
+		annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
+		"Annealer should have built with NullLogHandler")
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
@@ -67,7 +67,7 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	logHandlerErr := annealer.SetLogHandler(nil)
 
 	g.Expect(logHandlerErr).To(Not(BeNil()))
-	g.Expect(annealer.LogHandler()).To(Equal(handlers.NULL_LOG_HANDLER),
+	g.Expect(annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
 		"Annealer should have ignored crap LogHandler set attempt")
 
 	explorerErr := annealer.SetSolutionExplorer(nil)
@@ -148,17 +148,17 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	annealer.Anneal()
 
-	g.Expect(countingObserver.eventCounts[STARTED_ANNEALING]).To(BeIdenticalTo(uint(1)),
-		"Annealer should have posted 1 STARTED_ANNEALING event")
+	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeIdenticalTo(uint(1)),
+		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[FINISHED_ANNEALING]).To(BeIdenticalTo(uint(1)),
-		"Annealer should have posted 1 FINISHED_ANNEALING event")
+	g.Expect(countingObserver.eventCounts[FinishedAnnealing]).To(BeIdenticalTo(uint(1)),
+		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[STARTED_ITERATION]).To(BeIdenticalTo(expectedIterations),
-		"Annealer should have posted <expectedIterations> of  STARTED_ITERATION event")
+	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeIdenticalTo(expectedIterations),
+		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[FINISHED_ITERATION]).To(BeIdenticalTo(expectedIterations),
-		"Annealer should have posted <expectedIterations> of  FINISHED_ITERATION event")
+	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeIdenticalTo(expectedIterations),
+		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
 type TryCountingSolutionExplorer struct {

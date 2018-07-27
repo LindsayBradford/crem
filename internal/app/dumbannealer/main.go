@@ -10,17 +10,17 @@ import (
 )
 
 var (
-	args             = commandline.ParseArguments()
-	annealingRunners = new(profiling.ProfiledAndUnProfiledFunctionPair)
+	args               = commandline.ParseArguments()
+	annealingFunctions = new(profiling.ProfiledAndUnProfiledFunctionPair)
 )
 
 func main() {
 	buildAnnealingRunners()
 
 	if profilingRequested() {
-		annealingRunners.ProfiledFunction()
+		annealingFunctions.ProfiledFunction()
 	} else {
-		annealingRunners.UnProfiledFunction()
+		annealingFunctions.UnProfiledFunction()
 	}
 
 	defer flushStreams()
@@ -29,7 +29,7 @@ func main() {
 func buildAnnealingRunners() {
 	logger := components.BuildLogHandler()
 
-	annealingRunners.UnProfiledFunction = func() error {
+	annealingFunctions.UnProfiledFunction = func() error {
 		annealer := components.BuildDumbAnnealer(logger)
 		logger.Debug("About to call annealer.Anneal()")
 		annealer.Anneal()
@@ -37,9 +37,9 @@ func buildAnnealingRunners() {
 		return nil
 	}
 
-	annealingRunners.ProfiledFunction = func() error {
+	annealingFunctions.ProfiledFunction = func() error {
 		logger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
-		return profiling.CpuProfileOfFunctionToFile(annealingRunners.UnProfiledFunction, args.CpuProfile)
+		return profiling.CpuProfileOfFunctionToFile(annealingFunctions.UnProfiledFunction, args.CpuProfile)
 	}
 }
 

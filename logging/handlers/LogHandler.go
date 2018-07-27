@@ -48,24 +48,24 @@ type LogHandlerBase struct {
 
 // SetDestinations allows a pre-defined LogLevelDestinations instance to be assigned, and subsequently used for
 // log destination stream resolution.
-func (this *LogHandlerBase) SetDestinations(destinations *LogLevelDestinations) {
-	this.destinations = destinations
+func (handlerBase *LogHandlerBase) SetDestinations(destinations *LogLevelDestinations) {
+	handlerBase.destinations = destinations
 }
 
-func (this *LogHandlerBase) Destinations() *LogLevelDestinations {
-	return this.destinations
+func (handlerBase *LogHandlerBase) Destinations() *LogLevelDestinations {
+	return handlerBase.destinations
 }
 
 // SetFormatter tells the LogHandlerBase to use the supplied formatter for preparing a given log entry for writing
 // to its final LogLevelDestination
-func (this *LogHandlerBase) SetFormatter(formatter LogFormatter) {
-	this.formatter = formatter
+func (handlerBase *LogHandlerBase) SetFormatter(formatter LogFormatter) {
+	handlerBase.formatter = formatter
 }
 
-func (this *LogHandlerBase) Formatter() LogFormatter {
-	return this.formatter
+func (handlerBase *LogHandlerBase) Formatter() LogFormatter {
+	return handlerBase.formatter
 }
 
-func (this *LogHandlerBase) BeingDiscarded(logLevel LogLevel) bool {
-	return this.destinations.Destinations[logLevel] == DISCARD
+func (handlerBase *LogHandlerBase) BeingDiscarded(logLevel LogLevel) bool {
+	return handlerBase.destinations.Destinations[logLevel] == DISCARD
 }

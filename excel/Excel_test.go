@@ -11,7 +11,7 @@ import (
 func TestMain(m *testing.M) {
 	setup()
 	retCode := m.Run()
-	teardown()
+	tearDown()
 	os.Exit(retCode)
 }
 
@@ -21,6 +21,6 @@ func setup() {
 	excelHandlerUnderTest = InitialiseHandler()
 }
 
-func teardown() {
+func tearDown() {
 	excelHandlerUnderTest.Destroy()
 }

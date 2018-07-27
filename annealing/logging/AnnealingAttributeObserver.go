@@ -28,7 +28,7 @@ func (this *AnnealingAttributeObserver) WithModulator(modulator LoggingModulator
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
 func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(ANNEALER) || this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.modulator.ShouldModulate(event) {
 		return
 	}
 
@@ -39,19 +39,19 @@ func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEve
 	logAttributes = append(logAttributes, NameValuePair{"Event", event.EventType.String()})
 
 	switch event.EventType {
-	case STARTED_ANNEALING:
+	case StartedAnnealing:
 		logAttributes = append(logAttributes,
 			NameValuePair{"MaximumIterations", annealer.MaxIterations()},
 			NameValuePair{"Temperature", annealer.Temperature()},
 			NameValuePair{"CoolingFactor", annealer.CoolingFactor()},
 		)
-	case STARTED_ITERATION:
+	case StartedIteration:
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"Temperature", annealer.Temperature()},
 			NameValuePair{"ObjectiveValue", explorer.ObjectiveValue()},
 		)
-	case FINISHED_ITERATION:
+	case FinishedIteration:
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"ObjectiveValue", explorer.ObjectiveValue()},
@@ -60,15 +60,15 @@ func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEve
 			NameValuePair{"AcceptanceProbability", explorer.AcceptanceProbability()},
 			NameValuePair{"ChangeAccepted", explorer.ChangeAccepted()},
 		)
-	case FINISHED_ANNEALING:
+	case FinishedAnnealing:
 		logAttributes = append(logAttributes,
 			NameValuePair{"CurrentIteration", annealer.CurrentIteration()},
 			NameValuePair{"Temperature", annealer.Temperature()},
 		)
-	case NOTE:
+	case Note:
 		logAttributes = append(logAttributes, NameValuePair{"Note", event.Note})
 	default:
 		// deliberately does nothing extra
 	}
-	this.logHandler.LogAtLevelWithAttributes(ANNEALER, logAttributes)
+	this.logHandler.LogAtLevelWithAttributes(AnnealerLogLevel, logAttributes)
 }

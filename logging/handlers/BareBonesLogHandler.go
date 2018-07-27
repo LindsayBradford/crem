@@ -3,7 +3,6 @@
 package handlers
 
 import (
-	"fmt"
 	"io"
 	"time"
 
@@ -21,81 +20,79 @@ type BareBonesLogHandler struct {
 	LogHandlerBase
 }
 
-func (this *BareBonesLogHandler) Initialise() {}
+func (handler *BareBonesLogHandler) Initialise() {}
 
-func (this *BareBonesLogHandler) WithFormatter(formatter LogFormatter) *BareBonesLogHandler {
+func (handler *BareBonesLogHandler) WithFormatter(formatter LogFormatter) *BareBonesLogHandler {
 	formatter.Initialise()
-	this.formatter = formatter
-	return this
+	handler.formatter = formatter
+	return handler
 }
 
-func (this *BareBonesLogHandler) Debug(message string) {
-	this.LogAtLevel(DEBUG, message)
+func (handler *BareBonesLogHandler) Debug(message string) {
+	handler.LogAtLevel(DEBUG, message)
 }
 
-func (this *BareBonesLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(DEBUG, logAttributes)
+func (handler *BareBonesLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(DEBUG, logAttributes)
 }
 
-func (this *BareBonesLogHandler) Info(message string) {
-	this.LogAtLevel(INFO, message)
+func (handler *BareBonesLogHandler) Info(message string) {
+	handler.LogAtLevel(INFO, message)
 }
 
-func (this *BareBonesLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(INFO, logAttributes)
+func (handler *BareBonesLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(INFO, logAttributes)
 }
 
-func (this *BareBonesLogHandler) Warn(message string) {
-	this.LogAtLevel(WARN, message)
+func (handler *BareBonesLogHandler) Warn(message string) {
+	handler.LogAtLevel(WARN, message)
 }
 
-func (this *BareBonesLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(WARN, logAttributes)
+func (handler *BareBonesLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(WARN, logAttributes)
 }
 
-func (this *BareBonesLogHandler) Error(message string) {
-	this.LogAtLevel(ERROR, message)
+func (handler *BareBonesLogHandler) Error(message string) {
+	handler.LogAtLevel(ERROR, message)
 }
 
-func (this *BareBonesLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(ERROR, logAttributes)
+func (handler *BareBonesLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(ERROR, logAttributes)
 }
 
-func (this *BareBonesLogHandler) ErrorWithError(err error) {
-	logAttributes := LogAttributes{NameValuePair{"Error", fmt.Sprintf(err.Error())}}
+func (handler *BareBonesLogHandler) ErrorWithError(err error) {
+	logAttributes := LogAttributes{NameValuePair{Name: "Error", Value: err.Error()}}
 	logAttributes = prependLogLevel(ERROR, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(ERROR, this.formatter.Format(logAttributes))
+	handler.writeString(ERROR, handler.formatter.Format(logAttributes))
 }
 
-func (this *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{NameValuePair{MESSAGE_LABEL, message}}
+func (handler *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message string) {
+	logAttributes := LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
 	logAttributes = prependLogLevel(logLevel, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(logLevel, this.formatter.Format(logAttributes))
+	handler.writeString(logLevel, handler.formatter.Format(logAttributes))
 }
 
-func (this *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
+func (handler *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
 	logAttributes = prependLogLevel(logLevel, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
-	this.writeString(logLevel, this.formatter.Format(logAttributes))
+	handler.writeString(logLevel, handler.formatter.Format(logAttributes))
 }
 
-func (this *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
+func (handler *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
 	var builder strings.FluentBuilder
 	builder.Add(text, "\n")
-	io.WriteString(this.destinations.Destinations[logLevel], builder.String())
+	io.WriteString(handler.destinations.Destinations[logLevel], builder.String())
 }
 
 func prependTimestamp(oldSlice []NameValuePair) []NameValuePair {
 	timeAsString := time.Now().Format("2006-01-02T15:04:05.999999-07:00")
-	return append([]NameValuePair{{"Time", timeAsString}}, oldSlice...)
+	newPair := NameValuePair{Name: "Time", Value: timeAsString}
+	return append([]NameValuePair{newPair}, oldSlice...)
 }
 
 func prependLogLevel(logLevel LogLevel, oldSlice []NameValuePair) []NameValuePair {
-	return append([]NameValuePair{{"LogLevel", string(logLevel)}}, oldSlice...)
-}
-
-func prepend(newValue NameValuePair, oldSlice []NameValuePair) []NameValuePair {
-	return append([]NameValuePair{newValue}, oldSlice...)
+	newPair := NameValuePair{Name: "LogLevel", Value: string(logLevel)}
+	return append([]NameValuePair{newPair}, oldSlice...)
 }

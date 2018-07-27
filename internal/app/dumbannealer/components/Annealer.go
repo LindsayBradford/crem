@@ -17,7 +17,7 @@ func BuildDumbAnnealer(logHandler LogHandler) Annealer {
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(logHandler).
 		// WithModulator(new(NullModulator))
-		WithModulator(new(IterationModuloLoggingModulator).WithModulo(100)) // No STARTED_ITERATION events, all FINISHED_ITERATION events
+		WithModulator(new(IterationModuloLoggingModulator).WithModulo(100)) // No StartedIteration events, all FinishedIteration events
 
 	logHandler.Debug("About to call AnnealerBuilder.Build() ")
 

@@ -109,7 +109,7 @@ func TestBuild_BadInputs(t *testing.T) {
 		"Annealer should have built with current iteration of 0")
 
 	g.Expect(
-		annealer.LogHandler()).To(Equal(handlers.NULL_LOG_HANDLER),
+		annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
 		"Annealer should have built with nullLogHandler")
 
 	g.Expect(

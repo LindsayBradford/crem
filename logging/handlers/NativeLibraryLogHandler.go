@@ -18,63 +18,63 @@ type NativeLibraryLogHandler struct {
 
 const metadataMask = log.Ldate | log.Ltime | log.Lmicroseconds
 
-func (this *NativeLibraryLogHandler) Initialise() {
-	this.loggerMap = make(map[LogLevel]*log.Logger)
-	this.AddLogLevel(DEBUG).AddLogLevel(INFO).AddLogLevel(WARN).AddLogLevel(ERROR)
+func (handler *NativeLibraryLogHandler) Initialise() {
+	handler.loggerMap = make(map[LogLevel]*log.Logger)
+	handler.AddLogLevel(DEBUG).AddLogLevel(INFO).AddLogLevel(WARN).AddLogLevel(ERROR)
 }
 
-func (this *NativeLibraryLogHandler) AddLogLevel(logLevel LogLevel) *NativeLibraryLogHandler {
-	this.loggerMap[logLevel] = log.New(this.destinations.Destinations[logLevel], "", metadataMask)
-	return this
+func (handler *NativeLibraryLogHandler) AddLogLevel(logLevel LogLevel) *NativeLibraryLogHandler {
+	handler.loggerMap[logLevel] = log.New(handler.destinations.Destinations[logLevel], "", metadataMask)
+	return handler
 }
 
-func (this *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *NativeLibraryLogHandler {
+func (handler *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *NativeLibraryLogHandler {
 	formatter.Initialise()
-	this.formatter = formatter
-	return this
+	handler.formatter = formatter
+	return handler
 }
 
-func (this *NativeLibraryLogHandler) Debug(message string) {
-	this.LogAtLevel(DEBUG, message)
+func (handler *NativeLibraryLogHandler) Debug(message string) {
+	handler.LogAtLevel(DEBUG, message)
 }
 
-func (this *NativeLibraryLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(DEBUG, logAttributes)
+func (handler *NativeLibraryLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(DEBUG, logAttributes)
 }
 
-func (this *NativeLibraryLogHandler) Info(message string) {
-	this.LogAtLevel(INFO, message)
+func (handler *NativeLibraryLogHandler) Info(message string) {
+	handler.LogAtLevel(INFO, message)
 }
 
-func (this *NativeLibraryLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(INFO, logAttributes)
+func (handler *NativeLibraryLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(INFO, logAttributes)
 }
 
-func (this *NativeLibraryLogHandler) Warn(message string) {
-	this.LogAtLevel(WARN, message)
+func (handler *NativeLibraryLogHandler) Warn(message string) {
+	handler.LogAtLevel(WARN, message)
 }
 
-func (this *NativeLibraryLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(WARN, logAttributes)
+func (handler *NativeLibraryLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(WARN, logAttributes)
 }
 
-func (this *NativeLibraryLogHandler) Error(message string) {
-	this.LogAtLevel(ERROR, message)
+func (handler *NativeLibraryLogHandler) Error(message string) {
+	handler.LogAtLevel(ERROR, message)
 }
 
-func (this *NativeLibraryLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	this.LogAtLevelWithAttributes(ERROR, logAttributes)
+func (handler *NativeLibraryLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
+	handler.LogAtLevelWithAttributes(ERROR, logAttributes)
 }
 
-func (this *NativeLibraryLogHandler) ErrorWithError(err error) {
-	this.LogAtLevel(ERROR, fmt.Sprintf(err.Error()))
+func (handler *NativeLibraryLogHandler) ErrorWithError(err error) {
+	handler.LogAtLevel(ERROR, fmt.Sprintf(err.Error()))
 }
 
-func (this *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{NameValuePair{MESSAGE_LABEL, message}}
-	this.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + this.formatter.Format(logAttributes))
+func (handler *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message string) {
+	logAttributes := LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
+	handler.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + handler.formatter.Format(logAttributes))
 }
 
-func (this *NativeLibraryLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
-	this.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + this.formatter.Format(logAttributes))
+func (handler *NativeLibraryLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
+	handler.loggerMap[logLevel].Println("[" + string(logLevel) + "] " + handler.formatter.Format(logAttributes))
 }

@@ -8,37 +8,37 @@ import (
 )
 
 // IterationElapsedTimeLoggingModulator is a LoggingModulator that will not modulate any AnnealingEvent types
-// except STARTED_ITERATION & FINISHED_ITERATION. It completely filters out all STARTED_ITERATION events, and modulates
-// FINISHED_ITERATION events at a rate of one event per every lapsed wait duration specified.
+// except StartedIteration & FinishedIteration. It completely filters out all StartedIteration events, and modulates
+// FinishedIteration events at a rate of one event per every lapsed wait duration specified.
 // The very first very last events are exceptions, and are also not modulated.
 type IterationElapsedTimeLoggingModulator struct {
 	waitDuration    time.Duration
 	lastTimeAllowed time.Time
 }
 
-// WithWait sets the wait duration between allowing FINISHED_ITERATION AnnealingEvent instances through to a LogHandler.
-func (this *IterationElapsedTimeLoggingModulator) WithWait(wait time.Duration) *IterationElapsedTimeLoggingModulator {
-	this.waitDuration = wait
-	return this
+// WithWait sets the wait duration between allowing FinishedIteration AnnealingEvent instances through to a LogHandler.
+func (m *IterationElapsedTimeLoggingModulator) WithWait(wait time.Duration) *IterationElapsedTimeLoggingModulator {
+	m.waitDuration = wait
+	return m
 }
 
-// ShouldModulate returns true for most FINISHED_ITERATION AnnealingEvent instances. Those allowed through to the logger
-// are either 1) the very first or very last event, or 2) the closest FINISHED_ITERATION event to have
+// ShouldModulate returns true for most FinishedIteration AnnealingEvent instances. Those allowed through to the logger
+// are either 1) the very first or very last event, or 2) the closest FinishedIteration event to have
 // occurred after the wait duration has passed since the last previous event allowed through.
-func (this *IterationElapsedTimeLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
-	if event.EventType != STARTED_ITERATION && event.EventType != FINISHED_ITERATION {
+func (m *IterationElapsedTimeLoggingModulator) ShouldModulate(event AnnealingEvent) bool {
+	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
 		return false
 	}
 
 	annealer := event.Annealer
-	if event.EventType == FINISHED_ITERATION &&
+	if event.EventType == FinishedIteration &&
 		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations()) {
-		this.lastTimeAllowed = time.Now()
+		m.lastTimeAllowed = time.Now()
 		return false
 	}
 
-	if event.EventType == FINISHED_ITERATION && time.Now().Sub(this.lastTimeAllowed) >= this.waitDuration {
-		this.lastTimeAllowed = this.lastTimeAllowed.Add(this.waitDuration)
+	if event.EventType == FinishedIteration && time.Now().Sub(m.lastTimeAllowed) >= m.waitDuration {
+		m.lastTimeAllowed = m.lastTimeAllowed.Add(m.waitDuration)
 		return false
 	}
 

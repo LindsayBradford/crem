@@ -12,7 +12,7 @@ import (
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
 
-const ANNEALER LogLevel = "Annealer"
+const AnnealerLogLevel LogLevel = "Annealer"
 
 // AnnealingLogger is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
 // drops any AnnealingEvents received.
@@ -22,7 +22,7 @@ type AnnealingLogger struct {
 }
 
 // Allows for the receipt of AnnealingEvent instances, but deliberately takes no action in logging those events.
-func (this *AnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {}
+func (l *AnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {}
 
 func wrapAnnealer(eventAnnealer Annealer) *AnnealerFormatWrapper {
 	wrapper := newAnnealerWrapper()

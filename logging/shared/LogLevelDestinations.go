@@ -26,27 +26,25 @@ type LogLevelDestinations struct {
 
 // Initialise creates and returns a LogLevelDestinations instance with a default LogLevelDestinations map.
 // Specifically, DEBUG is discarded, INFO and WARN are delivered to STDOUT, and ERROR to STDERR.
-func (this *LogLevelDestinations) Initialise() *LogLevelDestinations {
-	this = new(LogLevelDestinations)
-
-	this.Destinations = map[LogLevel]LogDestination{
+func (lld *LogLevelDestinations) Initialise() *LogLevelDestinations {
+	lld.Destinations = map[LogLevel]LogDestination{
 		DEBUG: DISCARD,
 		INFO:  STDOUT,
 		WARN:  STDOUT,
 		ERROR: STDERR,
 	}
 
-	return this
+	return lld
 }
 
 // WithOverride is a fluent method for overriding the existing LogLevelDestinations map entry for logLevel to instead
 // point to the new destination supplied.
-func (this *LogLevelDestinations) WithOverride(logLevel LogLevel, destination LogDestination) *LogLevelDestinations {
-	this.Override(logLevel, destination)
-	return this
+func (lld *LogLevelDestinations) WithOverride(logLevel LogLevel, destination LogDestination) *LogLevelDestinations {
+	lld.Override(logLevel, destination)
+	return lld
 }
 
 // Override remaps the given LogLevelDestination's logLevel mapping to the new destination supplied.
-func (this *LogLevelDestinations) Override(logLevel LogLevel, destination LogDestination) {
-	this.Destinations[logLevel] = destination
+func (lld *LogLevelDestinations) Override(logLevel LogLevel, destination LogDestination) {
+	lld.Destinations[logLevel] = destination
 }

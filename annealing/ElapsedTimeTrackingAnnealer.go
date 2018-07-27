@@ -15,20 +15,20 @@ type ElapsedTimeTrackingAnnealer struct {
 	finishTime Time
 }
 
-func (this *ElapsedTimeTrackingAnnealer) Anneal() {
-	this.LogHandler().Info("Elapsed-time tracking annealer")
+func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
+	annealer.LogHandler().Info("Elapsed-time tracking annealer")
 
-	this.startTime = Now()
-	this.SimpleAnnealer.Anneal()
-	this.finishTime = Now()
+	annealer.startTime = Now()
+	annealer.SimpleAnnealer.Anneal()
+	annealer.finishTime = Now()
 
-	this.LogHandler().Info(this.generateElapsedTimeString())
+	annealer.LogHandler().Info(annealer.generateElapsedTimeString())
 }
 
-func (this *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {
-	return Sprintf("Total elapsed time of annealing = [%v]", this.ElapsedTime())
+func (annealer *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {
+	return Sprintf("Total elapsed time of annealing = [%v]", annealer.ElapsedTime())
 }
 
-func (this *ElapsedTimeTrackingAnnealer) ElapsedTime() Duration {
-	return this.finishTime.Sub(this.startTime)
+func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() Duration {
+	return annealer.finishTime.Sub(annealer.startTime)
 }

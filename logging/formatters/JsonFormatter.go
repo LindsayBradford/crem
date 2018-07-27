@@ -11,9 +11,9 @@ import (
 // TODO: Supply example encoding.
 type JsonFormatter struct{}
 
-func (this *JsonFormatter) Initialise() {}
+func (formatter *JsonFormatter) Initialise() {}
 
-func (this *JsonFormatter) Format(attributes LogAttributes) string {
+func (formatter *JsonFormatter) Format(attributes LogAttributes) string {
 	var builder strings.FluentBuilder
 
 	builder.Add("{")

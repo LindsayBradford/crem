@@ -27,8 +27,8 @@ func TestUtils_AddWorksheetFromCsvFileToWorkbook(t *testing.T) {
 
 	const csvTestWorksheetName = "csvTestWorksheet"
 	addWorksheetCall := func() {
-		workingDirectory, _ := os.Getwd()
-		csvTestFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "CSVTestFixture.csv")
+		workingDir, _ := os.Getwd()
+		csvTestFixtureAbsolutePath := filepath.Join(workingDir, "testdata", "CSVTestFixture.csv")
 		AddWorksheetFromCsvFileToWorkbook(csvTestFixtureAbsolutePath, csvTestWorksheetName, workbook)
 	}
 

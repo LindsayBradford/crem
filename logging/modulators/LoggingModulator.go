@@ -18,6 +18,6 @@ type LoggingModulator interface {
 type NullModulator struct{}
 
 // ShouldModulate always returns false (do not modulate the log for event)
-func (this *NullModulator) ShouldModulate(event AnnealingEvent) bool {
+func (nm *NullModulator) ShouldModulate(event AnnealingEvent) bool {
 	return false
 }

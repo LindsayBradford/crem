@@ -13,7 +13,7 @@ type Worksheets struct {
 	dispatch *ole.IDispatch
 }
 
-func (this *Worksheets) Add() (worksheet *Worksheet) {
+func (sheets *Worksheets) Add() (worksheet *Worksheet) {
 	defer func() {
 		if r := recover(); r != nil {
 			msg := fmt.Sprintf("Cannot create new excel worksheet: %s", r)
@@ -23,28 +23,28 @@ func (this *Worksheets) Add() (worksheet *Worksheet) {
 	}()
 
 	worksheet = new(Worksheet)
-	worksheet.dispatch = this.call("Add")
+	worksheet.dispatch = sheets.call("Add")
 	return worksheet
 }
 
-func (this *Worksheets) Count() uint {
-	return (uint)(this.getPropertyValue("Count"))
+func (sheets *Worksheets) Count() uint {
+	return (uint)(sheets.getPropertyValue("Count"))
 }
 
-func (this *Worksheets) Item(index uint) *Worksheet {
+func (sheets *Worksheets) Item(index uint) *Worksheet {
 	worksheet := new(Worksheet)
-	worksheet.dispatch = this.getProperty("Item", index)
+	worksheet.dispatch = sheets.getProperty("Item", index)
 	return worksheet
 }
 
-func (this *Worksheets) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
-	return getProperty(this.dispatch, propertyName, parameters...)
+func (sheets *Worksheets) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
+	return getProperty(sheets.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheets) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
-	return getPropertyValue(this.dispatch, propertyName, parameters...)
+func (sheets *Worksheets) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
+	return getPropertyValue(sheets.dispatch, propertyName, parameters...)
 }
 
-func (this *Worksheets) call(methodName string, parameters ...interface{}) *ole.IDispatch {
-	return callMethod(this.dispatch, methodName, parameters...)
+func (sheets *Worksheets) call(methodName string, parameters ...interface{}) *ole.IDispatch {
+	return callMethod(sheets.dispatch, methodName, parameters...)
 }

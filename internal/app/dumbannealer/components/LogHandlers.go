@@ -18,7 +18,7 @@ func BuildLogHandler() LogHandler {
 		ForNativeLibraryLogHandler().
 		WithFormatter(new(RawMessageFormatter)).
 		WithLogLevelDestination(DEBUG, STDOUT).
-		WithLogLevelDestination(ANNEALER, STDOUT).
+		WithLogLevelDestination(AnnealerLogLevel, STDOUT).
 		Build()
 
 	if err != nil {

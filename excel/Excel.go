@@ -21,7 +21,7 @@ type ExcelHandler struct {
 	workbooks *Workbooks
 }
 
-func (this *ExcelHandler) Initialise() error {
+func (handler *ExcelHandler) Initialise() error {
 	err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED)
 	excelAppObject, err := oleutil.CreateObject("Excel.Application")
 
@@ -29,7 +29,7 @@ func (this *ExcelHandler) Initialise() error {
 		return err
 	}
 
-	this.appObject = excelAppObject
+	handler.appObject = excelAppObject
 
 	newExcelIDispatch, err := excelAppObject.QueryInterface(ole.IID_IDispatch)
 
@@ -40,7 +40,7 @@ func (this *ExcelHandler) Initialise() error {
 	newExcel := new(Excel)
 	newExcel.dispatch = newExcelIDispatch
 
-	this.excel = newExcel
+	handler.excel = newExcel
 
 	return nil
 }
@@ -62,48 +62,48 @@ func InitialiseHandler() *ExcelHandler {
 	return newHandler
 }
 
-func (this *ExcelHandler) Destroy() {
-	this.Close()
-	this.Quit()
-	defer (*ole.IDispatch)(this.excel.dispatch).Release()
+func (handler *ExcelHandler) Destroy() {
+	handler.Close()
+	handler.Quit()
+	defer (*ole.IDispatch)(handler.excel.dispatch).Release()
 	ole.CoUninitialize()
 }
 
-func (this *ExcelHandler) setProperty(propertyName string, propertyValue interface{}) {
-	setProperty(this.excel.dispatch, propertyName, propertyValue)
+func (handler *ExcelHandler) setProperty(propertyName string, propertyValue interface{}) {
+	setProperty(handler.excel.dispatch, propertyName, propertyValue)
 }
 
-func (this *ExcelHandler) getProperty(propertyName string) *ole.IDispatch {
-	return getProperty(this.excel.dispatch, propertyName)
+func (handler *ExcelHandler) getProperty(propertyName string) *ole.IDispatch {
+	return getProperty(handler.excel.dispatch, propertyName)
 }
 
-func (this *ExcelHandler) Workbooks() *Workbooks {
-	if this.workbooks == nil {
+func (handler *ExcelHandler) Workbooks() *Workbooks {
+	if handler.workbooks == nil {
 		newWorkbooks := new(Workbooks)
-		newWorkbooks.dispatch = this.getProperty("Workbooks")
+		newWorkbooks.dispatch = handler.getProperty("Workbooks")
 
-		this.workbooks = newWorkbooks
+		handler.workbooks = newWorkbooks
 	}
-	return this.workbooks
+	return handler.workbooks
 }
 
-func (this *ExcelHandler) Close() (err error) {
+func (handler *ExcelHandler) Close() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("Cannot save Excel")
+			err = errors.New("cannot close Excel handler")
 		}
 	}()
 
-	callMethod(this.excel.dispatch, "Save")
+	callMethod(handler.excel.dispatch, "Save")
 
-	workbooks := this.Workbooks()
+	workbooks := handler.Workbooks()
 	workbooks.Close()
 	workbooks.Release()
 
 	return nil
 }
 
-func (this *ExcelHandler) Quit() (err error) {
-	callMethod(this.excel.dispatch, "Quit")
+func (handler *ExcelHandler) Quit() (err error) {
+	callMethod(handler.excel.dispatch, "Quit")
 	return nil
 }

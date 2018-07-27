@@ -11,51 +11,51 @@ type SolutionExplorerFormatWrapper struct {
 	MethodFormats map[string]string
 }
 
-const default_float64_format = "%f"
-const default_bool_format = "%y"
-const default_percent_format = "%f"
+const defaultFloat64Format = "%f"
+const defaultBoolFormat = "%y"
+const defaultPercentFormat = "%f"
 
-func (this *SolutionExplorerFormatWrapper) Initialise() *SolutionExplorerFormatWrapper {
-	this.MethodFormats = map[string]string{
-		"ObjectiveValue":         default_float64_format,
-		"ChangeInObjectiveValue": default_float64_format,
-		"ChangeIsDesirable":      default_bool_format,
-		"ChangeAccepted":         default_bool_format,
-		"AcceptanceProbability":  default_percent_format,
+func (wrapper *SolutionExplorerFormatWrapper) Initialise() *SolutionExplorerFormatWrapper {
+	wrapper.MethodFormats = map[string]string{
+		"ObjectiveValue":         defaultFloat64Format,
+		"ChangeInObjectiveValue": defaultFloat64Format,
+		"ChangeIsDesirable":      defaultBoolFormat,
+		"ChangeAccepted":         defaultBoolFormat,
+		"AcceptanceProbability":  defaultPercentFormat,
 	}
-	return this
+	return wrapper
 }
 
-func (this *SolutionExplorerFormatWrapper) Wrapping(explorer SolutionExplorer) *SolutionExplorerFormatWrapper {
-	this.Wrap(explorer)
-	return this
+func (wrapper *SolutionExplorerFormatWrapper) Wrapping(explorer SolutionExplorer) *SolutionExplorerFormatWrapper {
+	wrapper.Wrap(explorer)
+	return wrapper
 }
 
-func (this *SolutionExplorerFormatWrapper) Wrap(explorer SolutionExplorer) {
-	this.StateToFormat = explorer
+func (wrapper *SolutionExplorerFormatWrapper) Wrap(explorer SolutionExplorer) {
+	wrapper.StateToFormat = explorer
 }
 
-func (this *SolutionExplorerFormatWrapper) ObjectiveValue() string {
-	return this.applyFormatting("ObjectiveValue", this.StateToFormat.ObjectiveValue())
+func (wrapper *SolutionExplorerFormatWrapper) ObjectiveValue() string {
+	return wrapper.applyFormatting("ObjectiveValue", wrapper.StateToFormat.ObjectiveValue())
 }
 
-func (this *SolutionExplorerFormatWrapper) ChangeInObjectiveValue() string {
-	return this.applyFormatting("ChangeInObjectiveValue", this.StateToFormat.ChangeInObjectiveValue())
+func (wrapper *SolutionExplorerFormatWrapper) ChangeInObjectiveValue() string {
+	return wrapper.applyFormatting("ChangeInObjectiveValue", wrapper.StateToFormat.ChangeInObjectiveValue())
 }
 
-func (this *SolutionExplorerFormatWrapper) ChangeIsDesirable() string {
-	return this.applyFormatting("ChangeIsDesirable", this.StateToFormat.ChangeIsDesirable())
+func (wrapper *SolutionExplorerFormatWrapper) ChangeIsDesirable() string {
+	return wrapper.applyFormatting("ChangeIsDesirable", wrapper.StateToFormat.ChangeIsDesirable())
 }
 
-func (this *SolutionExplorerFormatWrapper) ChangeAccepted() string {
-	return this.applyFormatting("ChangeAccepted", this.StateToFormat.ChangeAccepted())
+func (wrapper *SolutionExplorerFormatWrapper) ChangeAccepted() string {
+	return wrapper.applyFormatting("ChangeAccepted", wrapper.StateToFormat.ChangeAccepted())
 }
 
-func (this *SolutionExplorerFormatWrapper) AcceptanceProbability() string {
-	return this.applyFormatting("AcceptanceProbability", this.StateToFormat.AcceptanceProbability())
+func (wrapper *SolutionExplorerFormatWrapper) AcceptanceProbability() string {
+	return wrapper.applyFormatting("AcceptanceProbability", wrapper.StateToFormat.AcceptanceProbability())
 }
 
-func (this *SolutionExplorerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
-	formatToApply := this.MethodFormats[formatKey]
+func (wrapper *SolutionExplorerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+	formatToApply := wrapper.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

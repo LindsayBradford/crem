@@ -12,16 +12,16 @@ type FluentBuilder struct {
 
 // Add appends the contents of each supplied strings to its buffer, returning a reference to the FluentBuilder,
 // allowing a chaining of a number of Add() calls
-func (this *FluentBuilder) Add(strings ...string) *FluentBuilder {
-	this.writeStrings(strings...)
-	return this
+func (fb *FluentBuilder) Add(strings ...string) *FluentBuilder {
+	fb.writeStrings(strings...)
+	return fb
 }
 
 // WriteStrings appends the contents of each supplied strings to its buffer via the Builder.WriteString() method
-func (this *FluentBuilder) writeStrings(strings ...string) (int, error) {
+func (fb *FluentBuilder) writeStrings(strings ...string) (int, error) {
 	var fullLength = 0
 	for _, str := range strings {
-		strLength, _ := this.WriteString(str)
+		strLength, _ := fb.WriteString(str)
 		fullLength += strLength
 	}
 	return fullLength, nil
