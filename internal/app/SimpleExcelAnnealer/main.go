@@ -5,8 +5,10 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/LindsayBradford/crm/commandline"
+	config "github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crm/profiling"
 )
@@ -29,10 +31,12 @@ func main() {
 }
 
 func buildAnnealingRunners() {
-	humanAudienceLogger := components.BuildHumanLogger()
-	machineAudienceLogger := components.BuildMachineLogger()
+	configuration := retrieveConfig()
 
-	annealer := components.BuildAnnealer(humanAudienceLogger, machineAudienceLogger)
+	humanAudienceLogger := components.BuildHumanLogger(configuration)
+	machineAudienceLogger := components.BuildMachineLogger(configuration)
+
+	annealer := components.BuildAnnealer(configuration, humanAudienceLogger, machineAudienceLogger)
 
 	annealingFunctions.UnProfiledFunction = func() error {
 		humanAudienceLogger.Debug("About to call annealer.Anneal()")
@@ -55,4 +59,10 @@ func profilingRequested() bool {
 func flushStreams() {
 	os.Stdout.Sync()
 	os.Stderr.Sync()
+}
+
+func retrieveConfig() *config.CRMConfig {
+	workingDirectory, _ := os.Getwd()
+	configFileAbsolutePath := filepath.Join(workingDirectory, "testdata", "SimpleExcelAnnealerTestConfig.toml")
+	return config.RetrieveConfig(configFileAbsolutePath)
 }

@@ -17,6 +17,8 @@ A.  The following software licensed under an MIT licence (the MIT licence is pas
 Copyright (c) 2013-2014 Onsi Fakhouri
 2.  go-ole - https://github.com/go-ole/go-ole/blob/master/LICENSE
 Copyright © 2013-2017 Yasuhiro Matsumoto, <mattn.jp@gmail.com>
+3. BurntSushi/toml - https://github.com/BurntSushi/toml
+Copyright © 2013 TOML authors
 
 
 The MIT License

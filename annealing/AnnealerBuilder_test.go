@@ -21,7 +21,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 
 	const expectedTemperature float64 = 1000
 	const expectedCoolingFactor float64 = 0.5
-	const expectedIterations uint = 5000
+	const expectedIterations uint64 = 5000
 	expectedLogHandler := new(handlers.BareBonesLogHandler)
 	expectedSolutionExplorer := new(solution.DumbSolutionExplorer)
 	expectedObservers := []shared.AnnealingObserver{new(dummyObserver)}

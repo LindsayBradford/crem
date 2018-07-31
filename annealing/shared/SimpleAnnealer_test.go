@@ -88,7 +88,7 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 
 	const startTemperature float64 = 1000.0
 	const coolingFactor float64 = 0.5
-	const iterations uint = 3
+	const iterations uint64 = 3
 	const expectedEndTemperature float64 = ((startTemperature * coolingFactor) * coolingFactor) * coolingFactor
 
 	annealer := new(SimpleAnnealer)
@@ -118,7 +118,7 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 }
 
 type CountingObserver struct {
-	eventCounts map[AnnealingEventType]uint
+	eventCounts map[AnnealingEventType]uint64
 }
 
 func (this *CountingObserver) ObserveAnnealingEvent(event AnnealingEvent) {
@@ -131,14 +131,14 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	const expectedIterations = uint(3)
+	const expectedIterations = uint64(3)
 
 	annealer.SetTemperature(1000.0)
 	annealer.SetCoolingFactor(0.5)
 	annealer.SetMaxIterations(expectedIterations)
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[AnnealingEventType]uint)
+	countingObserver.eventCounts = make(map[AnnealingEventType]uint64)
 
 	observerError := annealer.AddObserver(countingObserver)
 
@@ -148,10 +148,10 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	annealer.Anneal()
 
-	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeIdenticalTo(uint(1)),
+	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[FinishedAnnealing]).To(BeIdenticalTo(uint(1)),
+	g.Expect(countingObserver.eventCounts[FinishedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
 	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeIdenticalTo(expectedIterations),
@@ -163,7 +163,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 type TryCountingSolutionExplorer struct {
 	solution.NullSolutionExplorer
-	changesTried uint
+	changesTried uint64
 }
 
 func (this *TryCountingSolutionExplorer) TryRandomChange(temperature float64) {
@@ -176,7 +176,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	const expectedTryCount = uint(3)
+	const expectedTryCount = uint64(3)
 
 	annealer.SetTemperature(1000.0)
 	annealer.SetCoolingFactor(0.5)

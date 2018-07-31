@@ -8,11 +8,12 @@ import (
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/annealing/logging"
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/config"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
-func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Annealer {
+func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, machineLogHandler LogHandler) Annealer {
 	builder := new(AnnealerBuilder)
 	machineAudienceObserver := new(AnnealingAttributeObserver).
 		WithLogHandler(machineLogHandler).
@@ -26,15 +27,16 @@ func BuildAnnealer(humanLogHandler LogHandler, machineLogHandler LogHandler) Ann
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 
+	annealerConfig := configuration.Annealer
+
 	newAnnealer, err := builder.
-		OSThreadLockedAnnealer().
-		WithStartingTemperature(50).
-		WithCoolingFactor(0.995).
-		WithMaxIterations(2000).
+		AnnealerOfType(annealerConfig.Type).
+		WithStartingTemperature(annealerConfig.StartingTemperature).
+		WithCoolingFactor(annealerConfig.CoolingFactor).
+		WithMaxIterations(annealerConfig.MaxIterations).
 		WithLogHandler(humanLogHandler).
 		WithSolutionExplorer(new(SimpleExcelSolutionExplorer).WithPenalty(100)).
-		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
-		// WithEventNotifier(new(ChanneledAnnealingEventNotifier)).
+		WithEventNotifier(annealerConfig.EventNotifier).
 		WithObservers(machineAudienceObserver, humanAudienceObserver).
 		Build()
 

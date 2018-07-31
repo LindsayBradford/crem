@@ -2,6 +2,8 @@
 package annealing
 
 import (
+	"errors"
+
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	. "github.com/LindsayBradford/crm/annealing/solution"
 	crmerrors "github.com/LindsayBradford/crm/errors"
@@ -11,6 +13,21 @@ import (
 type AnnealerBuilder struct {
 	annealer    Annealer
 	buildErrors *crmerrors.CompositeError
+}
+
+func (builder *AnnealerBuilder) AnnealerOfType(annealerType string) *AnnealerBuilder {
+	switch annealerType {
+	case "OSThreadLocked":
+		return builder.OSThreadLockedAnnealer()
+	case "ElapsedTimeTracking":
+	case "":
+		return builder.ElapsedTimeTrackingAnnealer()
+	case "Simple":
+		return builder.SimpleAnnealer()
+	default:
+		panic(errors.New("attempted to build unsupported annealer of type [" + annealerType + "]"))
+	}
+	return nil
 }
 
 func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
@@ -30,7 +47,7 @@ func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
 func (builder *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
 	builder.annealer = &SimpleAnnealer{}
 	builder.annealer.Initialise()
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	builder.buildErrors = crmerrors.NewComposite("Failed to build valid simple annealer")
 	return builder
 }
 
@@ -66,7 +83,20 @@ func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) 
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithEventNotifier(eventNotifierType string) *AnnealerBuilder {
+	switch eventNotifierType {
+	case "Synchronous":
+	case "":
+		return builder.withEventNotifier(new(SynchronousAnnealingEventNotifier))
+	case "Channeled":
+		return builder.withEventNotifier(new(ChanneledAnnealingEventNotifier))
+	default:
+		panic(errors.New("attempted to build unsupported annealer event notifier  of type [" + eventNotifierType + "]"))
+	}
+	return nil
+}
+
+func (builder *AnnealerBuilder) withEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetEventNotifier(delegate); err != nil {
 		builder.buildErrors.Add(err)
@@ -82,7 +112,7 @@ func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue f
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithMaxIterations(iterations uint) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithMaxIterations(iterations uint64) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	annealerBeingBuilt.SetMaxIterations(iterations)
 	return builder

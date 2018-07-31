@@ -1,0 +1,10 @@
+# An example TOML config file setting up SimpleExcelAnnealer
+
+Title = "SimpleExcelAnnealer"
+
+[Annealer]
+Type = "OSThreadLocked"  # "OSThreadLocked" | "ElapsedTimeTracking" (default) | "Simple"
+StartingTemperature = 50.0 #50
+CoolingFactor =  0.995  # 0.995
+MaxIterations = 2000 # 2000
+EventNotifier = "Synchronous" # "Synchronous" (default) | "Channeled"

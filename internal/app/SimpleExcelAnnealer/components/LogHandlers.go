@@ -6,12 +6,13 @@ import (
 	"os"
 
 	. "github.com/LindsayBradford/crm/annealing/logging"
+	"github.com/LindsayBradford/crm/config"
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
 
-func BuildHumanLogger() LogHandler {
+func BuildHumanLogger(config *config.CRMConfig) LogHandler {
 	logBuilder := new(LogHandlerBuilder)
 
 	newLogger, err := logBuilder.
@@ -28,7 +29,7 @@ func BuildHumanLogger() LogHandler {
 	return newLogger
 }
 
-func BuildMachineLogger() LogHandler {
+func BuildMachineLogger(config *config.CRMConfig) LogHandler {
 	logBuilder := new(LogHandlerBuilder)
 	newLogger, err := logBuilder.
 		ForBareBonesLogHandler().

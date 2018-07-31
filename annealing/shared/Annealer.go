@@ -16,8 +16,8 @@ type Annealer interface {
 	SolutionExplorer() SolutionExplorer
 	SetSolutionExplorer(explorer SolutionExplorer) error
 
-	SetMaxIterations(iterations uint)
-	MaxIterations() uint
+	SetMaxIterations(iterations uint64)
+	MaxIterations() uint64
 
 	SetEventNotifier(notifier AnnealingEventNotifier) error
 	AddObserver(observer AnnealingObserver) error
@@ -29,7 +29,7 @@ type Annealer interface {
 
 	Initialise()
 
-	CurrentIteration() uint
+	CurrentIteration() uint64
 
 	Anneal()
 }

@@ -12,8 +12,8 @@ import (
 type SimpleAnnealer struct {
 	temperature      float64
 	coolingFactor    float64
-	maxIterations    uint
-	currentIteration uint
+	maxIterations    uint64
+	currentIteration uint64
 	eventNotifier    AnnealingEventNotifier
 	solutionExplorer SolutionExplorer
 	logger           LogHandler
@@ -53,15 +53,15 @@ func (this *SimpleAnnealer) CoolingFactor() float64 {
 	return this.coolingFactor
 }
 
-func (this *SimpleAnnealer) SetMaxIterations(iterations uint) {
+func (this *SimpleAnnealer) SetMaxIterations(iterations uint64) {
 	this.maxIterations = iterations
 }
 
-func (this *SimpleAnnealer) MaxIterations() uint {
+func (this *SimpleAnnealer) MaxIterations() uint64 {
 	return this.maxIterations
 }
 
-func (this *SimpleAnnealer) CurrentIteration() uint {
+func (this *SimpleAnnealer) CurrentIteration() uint64 {
 	return this.currentIteration
 }
 
