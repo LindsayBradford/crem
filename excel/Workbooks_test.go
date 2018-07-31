@@ -18,7 +18,7 @@ func TestWorkbooks_Add(t *testing.T) {
 	originalWorkbookCount := workbooksUnderTest.Count()
 	g.Expect(originalWorkbookCount).To(BeNumerically("==", 1), "Original Workbooks count should be 1")
 
-	var workbook *Workbook
+	var workbook Workbook
 	addWWorkbookCall := func() {
 		workbook = workbooksUnderTest.Add()
 	}
@@ -51,7 +51,7 @@ func TestWorkbooks_Open_Good(t *testing.T) {
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
 
-	var validWorkbook *Workbook
+	var validWorkbook Workbook
 	addWWorkbookCall := func() {
 		validWorkbook = workbooksUnderTest.Open(testFixtureAbsolutePath)
 	}

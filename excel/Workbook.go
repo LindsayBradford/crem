@@ -9,11 +9,20 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Workbook struct {
+type Workbook interface {
+	Worksheets() (worksheets Worksheets)
+	Worksheet(index uint) Worksheet
+	WorksheetNamed(name string) Worksheet
+	Save()
+	SaveAs(newFileName string)
+	Close()
+}
+
+type WorkbookImpl struct {
 	dispatch *ole.IDispatch
 }
 
-func (wb *Workbook) Worksheets() (worksheets *Worksheets) {
+func (wb *WorkbookImpl) Worksheets() (worksheets Worksheets) {
 	defer func() {
 		if r := recover(); r != nil {
 			panic(errors.New("cannot retrieve worksheets"))
@@ -21,51 +30,51 @@ func (wb *Workbook) Worksheets() (worksheets *Worksheets) {
 		}
 	}()
 
-	worksheets = new(Worksheets)
-	worksheets.dispatch = wb.getProperty("Worksheets")
-	return worksheets
+	newWorksheets := new(WorksheetsImpl)
+	newWorksheets.dispatch = wb.getProperty("Worksheets")
+	return newWorksheets
 }
 
-func (wb *Workbook) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
-	return getProperty(wb.dispatch, propertyName, parameters...)
-}
-
-func (wb *Workbook) Worksheet(index uint) *Worksheet {
+func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
 	defer func() {
 		if r := recover(); r != nil {
 			panic("cannot open worksheet at index [" + fmt.Sprintf("%d", index) + "]")
 		}
 	}()
 
-	worksheet := new(Worksheet)
-	worksheet.dispatch = wb.getProperty("Worksheets", index)
-	return worksheet
+	newWorksheet := new(WorksheetImpl)
+	newWorksheet.dispatch = wb.getProperty("Worksheets", index)
+	return newWorksheet
 }
 
-func (wb *Workbook) WorksheetNamed(name string) *Worksheet {
+func (wb *WorkbookImpl) WorksheetNamed(name string) Worksheet {
 	defer func() {
 		if r := recover(); r != nil {
 			panic("cannot open worksheet [" + name + "]")
 		}
 	}()
 
-	worksheet := new(Worksheet)
-	worksheet.dispatch = wb.getProperty("Worksheets", name)
-	return worksheet
+	namedWorksheet := new(WorksheetImpl)
+	namedWorksheet.dispatch = wb.getProperty("Worksheets", name)
+	return namedWorksheet
 }
 
-func (wb *Workbook) Save() {
+func (wb *WorkbookImpl) Save() {
 	wb.call("Save")
 }
 
-func (wb *Workbook) SaveAs(newFileName string) {
+func (wb *WorkbookImpl) SaveAs(newFileName string) {
 	wb.call("SaveAs", newFileName)
 }
 
-func (wb *Workbook) Close() {
+func (wb *WorkbookImpl) Close() {
 	wb.call("Close")
 }
 
-func (wb *Workbook) call(methodName string, parameters ...interface{}) *ole.IDispatch {
+func (wb *WorkbookImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
+	return getProperty(wb.dispatch, propertyName, parameters...)
+}
+
+func (wb *WorkbookImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(wb.dispatch, methodName, parameters...)
 }

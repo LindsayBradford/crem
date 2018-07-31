@@ -6,22 +6,32 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Cell struct {
+type Cell interface {
+	Value() interface{}
+	SetValue(value interface{})
+}
+
+type CellImpl struct {
 	dispatch *ole.IDispatch
 }
 
-func (cell *Cell) Value() interface{} {
+func (cell *CellImpl) Value() interface{} {
 	return cell.getPropertyVariant("Value")
 }
 
-func (cell *Cell) SetValue(value interface{}) {
+func (cell *CellImpl) SetValue(value interface{}) {
 	cell.setProperty("Value", value)
 }
 
-func (cell *Cell) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {
+func (cell *CellImpl) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {
 	return getPropertyVariant(cell.dispatch, propertyName, parameters...)
 }
 
-func (cell *Cell) setProperty(propertyName string, propertyValue interface{}) {
+func (cell *CellImpl) setProperty(propertyName string, propertyValue interface{}) {
 	setProperty(cell.dispatch, propertyName, propertyValue)
+}
+
+// TODO: can I find a way not to expose this?
+func (cell *CellImpl) oleDispatch() *ole.IDispatch {
+	return cell.dispatch
 }

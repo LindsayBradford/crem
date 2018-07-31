@@ -8,11 +8,19 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Workbooks struct {
+type Workbooks interface {
+	Add() (workbook Workbook)
+	Open(filePath string) (workbook Workbook)
+	Close()
+	Count() uint
+	Release()
+}
+
+type WorkbooksImpl struct {
 	dispatch *ole.IDispatch
 }
 
-func (books *Workbooks) Add() (workbook *Workbook) {
+func (books *WorkbooksImpl) Add() (workbook Workbook) {
 	defer func() {
 		if r := recover(); r != nil {
 			panic(errors.New("cannot create new excel workbook"))
@@ -20,12 +28,12 @@ func (books *Workbooks) Add() (workbook *Workbook) {
 		}
 	}()
 
-	workbook = new(Workbook)
-	workbook.dispatch = books.call("Add")
-	return workbook
+	newWorkbook := new(WorkbookImpl)
+	newWorkbook.dispatch = books.call("Add")
+	return newWorkbook
 }
 
-func (books *Workbooks) Open(filePath string) (workbook *Workbook) {
+func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
 	defer func() {
 		if r := recover(); r != nil {
 			panic(errors.New("cannot open excel file [" + filePath + "]"))
@@ -33,35 +41,35 @@ func (books *Workbooks) Open(filePath string) (workbook *Workbook) {
 		}
 	}()
 
-	workbook = new(Workbook)
-	workbook.dispatch = books.call("Open", filePath, true)
-	return workbook
+	newWorkbook := new(WorkbookImpl)
+	newWorkbook.dispatch = books.call("Open", filePath, true)
+	return newWorkbook
 }
 
-func (books *Workbooks) Close() {
+func (books *WorkbooksImpl) Close() {
 	books.call("Close", false)
 }
 
-func (books *Workbooks) call(methodName string, parameters ...interface{}) *ole.IDispatch {
-	return callMethod(books.dispatch, methodName, parameters...)
-}
-
-func (books *Workbooks) Count() uint {
+func (books *WorkbooksImpl) Count() uint {
 	return (uint)(getPropertyValue(books.dispatch, "Count"))
 }
 
-func (books *Workbooks) setProperty(propertyName string, propertyValue interface{}) {
+func (books *WorkbooksImpl) Release() {
+	books.dispatch.Release()
+}
+
+func (books *WorkbooksImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {
+	return callMethod(books.dispatch, methodName, parameters...)
+}
+
+func (books *WorkbooksImpl) setProperty(propertyName string, propertyValue interface{}) {
 	setProperty(books.dispatch, propertyName, propertyValue)
 }
 
-func (books *Workbooks) getProperty(propertyName string) *ole.IDispatch {
+func (books *WorkbooksImpl) getProperty(propertyName string) *ole.IDispatch {
 	return getProperty(books.dispatch, propertyName)
 }
 
-func (books *Workbooks) getPropertyValue(propertyName string) *ole.IDispatch {
+func (books *WorkbooksImpl) getPropertyValue(propertyName string) *ole.IDispatch {
 	return getProperty(books.dispatch, propertyName)
-}
-
-func (books *Workbooks) Release() {
-	books.dispatch.Release()
 }

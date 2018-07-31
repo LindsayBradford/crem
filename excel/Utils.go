@@ -34,7 +34,7 @@ func callMethod(dispatch *ole.IDispatch, methodName string, parameters ...interf
 	return oleutil.MustCallMethod(dispatch, methodName, parameters...).ToIDispatch()
 }
 
-func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook *Workbook) *Worksheet {
+func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook Workbook) Worksheet {
 	worksheets := workbook.Worksheets()
 	newWorksheet := worksheets.Add()
 
@@ -46,31 +46,29 @@ func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string,
 	return newWorksheet
 }
 
-func AddCsvFileContentToWorksheet(csvFilePath string, worksheet *Worksheet) {
+func AddCsvFileContentToWorksheet(csvFilePath string, worksheet Worksheet) {
 	worksheet.UsedRange().Clear()
-	topLeftOfWorksheet := worksheet.Cells(1, 1)
 
-	queryTableDispatch := worksheet.getProperty("QueryTables")
-	newQueryTable := callMethod(queryTableDispatch, "Add", "TEXT;"+csvFilePath, topLeftOfWorksheet.dispatch)
-	setProperty(newQueryTable, "TextFileParseType", 1) // xlDelimited
-	setProperty(newQueryTable, "TextFileCommaDelimiter", true)
-	setProperty(newQueryTable, "TextFileSpaceDelimiter", false)
-	setProperty(newQueryTable, "Refresh", false)
+	queryTables := worksheet.QueryTables()
+	newQueryTable := queryTables.AddCsvFileToWorksheet(csvFilePath, worksheet)
+	newQueryTable.SetProperty("TextFileParseType", 1) // xlDelimited
+	newQueryTable.SetProperty("TextFileCommaDelimiter", true)
+	newQueryTable.SetProperty("TextFileSpaceDelimiter", false)
+	newQueryTable.SetProperty("Refresh", false)
 }
 
-func LastOfWorksheets(worksheets *Worksheets) (worksheet *Worksheet) {
+func LastOfWorksheets(worksheets Worksheets) (worksheet Worksheet) {
 	worksheetCount := worksheets.Count()
 	lastWorksheet := worksheets.Item(worksheetCount)
 	return lastWorksheet
 }
 
-func MoveWorksheetToLastInWorksheets(worksheet *Worksheet, worksheets *Worksheets) {
+func MoveWorksheetToLastInWorksheets(worksheet Worksheet, worksheets Worksheets) {
 	defer func() {
 		if r := recover(); r != nil {
 			msg := fmt.Sprintf("cannot move excel worksheet [%s] to last position", r)
 			panic(errors.New(msg))
 		}
 	}()
-
-	worksheet.call("Move", nil, LastOfWorksheets(worksheets).dispatch)
+	worksheet.MoveToAfterWorksheet(LastOfWorksheets(worksheets))
 }

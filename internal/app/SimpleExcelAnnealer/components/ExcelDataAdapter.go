@@ -19,7 +19,7 @@ const data = "Data"
 
 var (
 	excelHandler            *excel.ExcelHandler
-	workbook                *excel.Workbook
+	workbook                excel.Workbook
 	testFixtureAbsolutePath string
 )
 
@@ -130,7 +130,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
-func storeTrackingTableToWorksheet(table *trackingTable, worksheet *excel.Worksheet) {
+func storeTrackingTableToWorksheet(table *trackingTable, worksheet excel.Worksheet) {
 	tempFile := writeTableToTempCsvFile(table)
 	loadTempCsvFileIntoWorksheet(tempFile, worksheet)
 	deleteTempCsvFile(tempFile)
@@ -194,7 +194,7 @@ func writeTableToTempCsvFile(table *trackingTable) string {
 	return tmpFileHandle.Name()
 }
 
-func loadTempCsvFileIntoWorksheet(tempFileName string, worksheet *excel.Worksheet) {
+func loadTempCsvFileIntoWorksheet(tempFileName string, worksheet excel.Worksheet) {
 	excel.AddCsvFileContentToWorksheet(tempFileName, worksheet)
 }
 

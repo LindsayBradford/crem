@@ -9,11 +9,17 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
-type Worksheets struct {
+type Worksheets interface {
+	Add() (worksheet Worksheet)
+	Count() uint
+	Item(index uint) Worksheet
+}
+
+type WorksheetsImpl struct {
 	dispatch *ole.IDispatch
 }
 
-func (sheets *Worksheets) Add() (worksheet *Worksheet) {
+func (sheets *WorksheetsImpl) Add() (worksheet Worksheet) {
 	defer func() {
 		if r := recover(); r != nil {
 			msg := fmt.Sprintf("Cannot create new excel worksheet: %s", r)
@@ -22,29 +28,29 @@ func (sheets *Worksheets) Add() (worksheet *Worksheet) {
 		}
 	}()
 
-	worksheet = new(Worksheet)
-	worksheet.dispatch = sheets.call("Add")
-	return worksheet
+	newWorksheet := new(WorksheetImpl)
+	newWorksheet.dispatch = sheets.call("Add")
+	return newWorksheet
 }
 
-func (sheets *Worksheets) Count() uint {
+func (sheets *WorksheetsImpl) Count() uint {
 	return (uint)(sheets.getPropertyValue("Count"))
 }
 
-func (sheets *Worksheets) Item(index uint) *Worksheet {
-	worksheet := new(Worksheet)
-	worksheet.dispatch = sheets.getProperty("Item", index)
-	return worksheet
+func (sheets *WorksheetsImpl) Item(index uint) Worksheet {
+	worksheetAtIndex := new(WorksheetImpl)
+	worksheetAtIndex.dispatch = sheets.getProperty("Item", index)
+	return worksheetAtIndex
 }
 
-func (sheets *Worksheets) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
+func (sheets *WorksheetsImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
 	return getProperty(sheets.dispatch, propertyName, parameters...)
 }
 
-func (sheets *Worksheets) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
+func (sheets *WorksheetsImpl) getPropertyValue(propertyName string, parameters ...interface{}) int64 {
 	return getPropertyValue(sheets.dispatch, propertyName, parameters...)
 }
 
-func (sheets *Worksheets) call(methodName string, parameters ...interface{}) *ole.IDispatch {
+func (sheets *WorksheetsImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(sheets.dispatch, methodName, parameters...)
 }

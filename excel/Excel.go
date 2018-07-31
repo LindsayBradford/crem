@@ -18,7 +18,7 @@ type Excel struct {
 type ExcelHandler struct {
 	appObject ApplicationObject
 	excel     *Excel
-	workbooks *Workbooks
+	workbooks Workbooks
 }
 
 func (handler *ExcelHandler) Initialise() error {
@@ -77,9 +77,9 @@ func (handler *ExcelHandler) getProperty(propertyName string) *ole.IDispatch {
 	return getProperty(handler.excel.dispatch, propertyName)
 }
 
-func (handler *ExcelHandler) Workbooks() *Workbooks {
+func (handler *ExcelHandler) Workbooks() Workbooks {
 	if handler.workbooks == nil {
-		newWorkbooks := new(Workbooks)
+		newWorkbooks := new(WorkbooksImpl)
 		newWorkbooks.dispatch = handler.getProperty("Workbooks")
 
 		handler.workbooks = newWorkbooks
