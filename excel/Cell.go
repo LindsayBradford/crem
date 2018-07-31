@@ -30,8 +30,3 @@ func (cell *CellImpl) getPropertyVariant(propertyName string, parameters ...inte
 func (cell *CellImpl) setProperty(propertyName string, propertyValue interface{}) {
 	setProperty(cell.dispatch, propertyName, propertyValue)
 }
-
-// TODO: can I find a way not to expose this?
-func (cell *CellImpl) oleDispatch() *ole.IDispatch {
-	return cell.dispatch
-}

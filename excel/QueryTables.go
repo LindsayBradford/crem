@@ -17,7 +17,7 @@ func (qt *QueryTablesImpl) AddCsvFileToWorksheet(csvFilePath string, worksheet W
 	cellImpl := topLeftCellOfWorksheet.(*CellImpl)
 
 	newQueryTable := new(QueryTableImpl)
-	newQueryTable.dispatch = qt.call("Add", "TEXT;"+csvFilePath, cellImpl.oleDispatch())
+	newQueryTable.dispatch = qt.call("Add", "TEXT;"+csvFilePath, cellImpl.dispatch)
 	return newQueryTable
 }
 
