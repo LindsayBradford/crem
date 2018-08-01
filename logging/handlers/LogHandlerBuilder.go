@@ -47,6 +47,20 @@ func (builder *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
 	return builder
 }
 
+// WithName instructs LogHandlerBuilder to label the LogHandler being built with the specified human-friendly name.
+func (builder *LogHandlerBuilder) WithName(name string) *LogHandlerBuilder {
+	handlerBeingBuilt := builder.logHandler
+	handlerBeingBuilt.SetName(name)
+	return builder
+}
+
+// AsDefault instructs LogHandlerBuilder to label the LogHandler as the default LogHandler when there are several.
+func (builder *LogHandlerBuilder) AsDefault(isDefault bool) *LogHandlerBuilder {
+	handlerBeingBuilt := builder.logHandler
+	handlerBeingBuilt.SetAsDefault(isDefault)
+	return builder
+}
+
 // WithFormatter instructs LogHandlerBuilder to ensure that the LogHandler constructed will use formatter for its log
 // entry formatting. If not called, the default NullFormatter will be used.
 func (builder *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandlerBuilder {

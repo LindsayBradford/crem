@@ -11,6 +11,9 @@ import (
 )
 
 type SolutionExplorer interface {
+	Name() string
+	SetName(name string)
+
 	Initialise()
 	TryRandomChange(temperature float64)
 
@@ -38,6 +41,7 @@ type SolutionExplorer interface {
 }
 
 type BaseSolutionExplorer struct {
+	name                   string
 	objectiveValue         float64
 	changeInObjectiveValue float64
 	changeIsDesirable      bool
@@ -62,6 +66,19 @@ func (explorer *BaseSolutionExplorer) RandomNumberGenerator() *rand.Rand {
 
 func (explorer *BaseSolutionExplorer) SetRandomNumberGenerator(generator *rand.Rand) {
 	explorer.randomNumberGenerator = generator
+}
+
+func (explorer *BaseSolutionExplorer) Name() string {
+	return explorer.name
+}
+
+func (explorer *BaseSolutionExplorer) SetName(name string) {
+	explorer.name = name
+}
+
+func (explorer *BaseSolutionExplorer) WithName(name string) *BaseSolutionExplorer {
+	explorer.name = name
+	return explorer
 }
 
 func (explorer *BaseSolutionExplorer) LogHandler() LogHandler {

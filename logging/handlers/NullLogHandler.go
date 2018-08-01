@@ -11,6 +11,10 @@ var DefaultNullLogHandler = new(NullLogHandler)
 
 type NullLogHandler struct{}
 
+func (handler *NullLogHandler) IsDefault() bool                                 { return false }
+func (handler *NullLogHandler) SetAsDefault(isDefault bool)                     {}
+func (handler *NullLogHandler) Name() string                                    { return "NULL" }
+func (handler *NullLogHandler) SetName(name string)                             {}
 func (handler *NullLogHandler) Debug(message string)                            {}
 func (handler *NullLogHandler) DebugWithAttributes(logAttributes LogAttributes) {}
 func (handler *NullLogHandler) Info(message string)                             {}

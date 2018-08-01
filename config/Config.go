@@ -16,11 +16,12 @@ const VERSION = "0.1.1"
 const DEBUG = false
 
 type CRMConfig struct {
-	Title                    string
-	FilePath                 string
-	Annealer                 AnnealingConfig
-	loggerConfigList         []LoggerConfig
-	annealingObserversConfig []AnnealingObserverConfig
+	Title              string
+	FilePath           string
+	Annealer           AnnealingConfig
+	Loggers            []LoggerConfig
+	AnnealingObservers []AnnealingObserverConfig
+	SolutionExplorers  []SolutionExplorerConfig
 }
 
 type EventNotifierType string
@@ -37,12 +38,29 @@ type AnnealingConfig struct {
 	CoolingFactor       float64
 	MaximumIterations   uint64
 	EventNotifier       EventNotifierType
+	SolutionExplorer    string
 }
 
 type LoggerConfig struct {
+	Name                 string
+	Type                 string
+	Formatter            string
+	LogLevelDestinations map[string]string
+	Default              bool
 }
 
 type AnnealingObserverConfig struct {
+	Type            string
+	Logger          string
+	IterationFilter string
+	FilterRate      int64
+}
+
+type SolutionExplorerConfig struct {
+	Type      string
+	Name      string
+	Penalty   float64
+	InputFile string
 }
 
 func Retrieve(configFilePath string) *CRMConfig {

@@ -13,6 +13,12 @@ import (
 // LogLevels of either a free-form string (traditional), or LogAttributes (for machine-friendly logging). It delegates
 // formatting to a LogFormatter, and resolution of log destination streams to LogLevelDestinations.
 type LogHandler interface {
+	Name() string
+	SetName(name string)
+
+	IsDefault() bool
+	SetAsDefault(isDefault bool)
+
 	Debug(message string)
 	DebugWithAttributes(logAttributes LogAttributes)
 
@@ -42,8 +48,28 @@ type LogHandler interface {
 
 // LogHandlerBase is a base struct that implements default behaviour that matches the LogHandler interface
 type LogHandlerBase struct {
+	name         string
+	isDefault    bool
 	destinations *LogLevelDestinations
 	formatter    LogFormatter
+}
+
+// SetDefault allows a LogHandler to be identified as the default handler for logging.
+func (handlerBase *LogHandlerBase) SetAsDefault(isDefault bool) {
+	handlerBase.isDefault = isDefault
+}
+
+func (handlerBase *LogHandlerBase) IsDefault() bool {
+	return handlerBase.isDefault
+}
+
+// SetName allows a human-friendly name to be assigned to the loghandler to make it easier to configure
+func (handlerBase *LogHandlerBase) SetName(name string) {
+	handlerBase.name = name
+}
+
+func (handlerBase *LogHandlerBase) Name() string {
+	return handlerBase.name
 }
 
 // SetDestinations allows a pre-defined LogLevelDestinations instance to be assigned, and subsequently used for

@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
+	. "github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
 )
 
@@ -32,12 +33,20 @@ func main() {
 func buildAnnealingRunners() {
 	configuration := config.Retrieve(args.ConfigFile)
 
-	humanAudienceLogger := components.BuildHumanLogger(configuration)
-	machineAudienceLogger := components.BuildMachineLogger(configuration)
+	logHandlers := components.BuildLogHandlers(configuration)
+
+	var humanAudienceLogger LogHandler
+	for _, handler := range logHandlers {
+		if handler.IsDefault() {
+			humanAudienceLogger = handler
+		}
+	}
 
 	humanAudienceLogger.Info("Configuring with [" + configuration.FilePath + "]")
 
-	annealer := components.BuildAnnealer(configuration, humanAudienceLogger, machineAudienceLogger)
+	observers := components.BuildObservers(configuration, logHandlers)
+
+	annealer := components.BuildAnnealer(configuration, humanAudienceLogger, observers...)
 
 	annealingFunctions.UnProfiledFunction = func() error {
 		humanAudienceLogger.Debug("About to call annealer.Anneal()")
