@@ -1,0 +1,8 @@
+# An example TOML config file setting up DumbAnnealer
+
+Title = "DumbAnnealer"
+
+[Annealer]
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
+MaximumIterations = 1_000_000 # 1M

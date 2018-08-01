@@ -17,17 +17,26 @@ const DEBUG = false
 
 type CRMConfig struct {
 	Title                    string
+	FilePath                 string
 	Annealer                 AnnealingConfig
 	loggerConfigList         []LoggerConfig
 	annealingObserversConfig []AnnealingObserverConfig
 }
 
+type EventNotifierType string
+
+const (
+	Unspecified EventNotifierType = ""
+	Synchronous EventNotifierType = "Synchronous"
+	Concurrent  EventNotifierType = "Concurrent"
+)
+
 type AnnealingConfig struct {
 	Type                string
 	StartingTemperature float64
 	CoolingFactor       float64
-	MaxIterations       uint64
-	EventNotifier       string
+	MaximumIterations   uint64
+	EventNotifier       EventNotifierType
 }
 
 type LoggerConfig struct {
@@ -36,10 +45,11 @@ type LoggerConfig struct {
 type AnnealingObserverConfig struct {
 }
 
-func RetrieveConfig(configFilePath string) *CRMConfig {
+func Retrieve(configFilePath string) *CRMConfig {
 	var conf CRMConfig
 	if _, err := toml.DecodeFile(configFilePath, &conf); err != nil {
-		panic(errors.New("failed to load config at[" + configFilePath + "]"))
+		panic(errors.New("failed to retrieve config [" + configFilePath + "]"))
 	}
+	conf.FilePath = configFilePath
 	return &conf
 }

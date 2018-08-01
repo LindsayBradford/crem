@@ -6,6 +6,7 @@ import (
 
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	. "github.com/LindsayBradford/crm/annealing/solution"
+	"github.com/LindsayBradford/crm/config"
 	crmerrors "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
@@ -19,8 +20,7 @@ func (builder *AnnealerBuilder) AnnealerOfType(annealerType string) *AnnealerBui
 	switch annealerType {
 	case "OSThreadLocked":
 		return builder.OSThreadLockedAnnealer()
-	case "ElapsedTimeTracking":
-	case "":
+	case "ElapsedTimeTracking", "":
 		return builder.ElapsedTimeTrackingAnnealer()
 	case "Simple":
 		return builder.SimpleAnnealer()
@@ -83,15 +83,18 @@ func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) 
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithEventNotifier(eventNotifierType string) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithEventNotifier(eventNotifierType config.EventNotifierType) *AnnealerBuilder {
 	switch eventNotifierType {
-	case "Synchronous":
-	case "":
+	case config.Synchronous, config.Unspecified:
 		return builder.withEventNotifier(new(SynchronousAnnealingEventNotifier))
-	case "Channeled":
-		return builder.withEventNotifier(new(ChanneledAnnealingEventNotifier))
+	case config.Concurrent:
+		return builder.withEventNotifier(new(ConcurrentAnnealingEventNotifier))
 	default:
-		panic(errors.New("attempted to build unsupported annealer event notifier  of type [" + eventNotifierType + "]"))
+		typeAsString := (string)(eventNotifierType)
+		synchronousAsString := (string)(config.Synchronous)
+		concurrentAsString := (string)(config.Concurrent)
+		panic(errors.New("attempted to build unsupported annealer event notifier of type [\"" + typeAsString + "\"]. " +
+			"Supported values: [\"" + synchronousAsString + "\", \"" + concurrentAsString + "\"]"))
 	}
 	return nil
 }

@@ -8,11 +8,12 @@ import (
 	. "github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/annealing/logging"
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/config"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
-func BuildDumbAnnealer(logHandler LogHandler) Annealer {
+func BuildDumbAnnealer(config *config.CRMConfig, logHandler LogHandler) Annealer {
 	builder := new(AnnealerBuilder)
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(logHandler).
@@ -23,13 +24,12 @@ func BuildDumbAnnealer(logHandler LogHandler) Annealer {
 
 	newAnnealer, err := builder.
 		ElapsedTimeTrackingAnnealer().
-		WithStartingTemperature(10).
-		WithCoolingFactor(0.99).
-		WithMaxIterations(1000000).
+		WithStartingTemperature(config.Annealer.StartingTemperature).
+		WithCoolingFactor(config.Annealer.CoolingFactor).
+		WithMaxIterations(config.Annealer.MaximumIterations).
 		WithDumbSolutionExplorer(100).
 		WithLogHandler(logHandler).
-		WithEventNotifier(new(SynchronousAnnealingEventNotifier)).
-		// WithEventNotifier(new(ChanneledAnnealingEventNotifier)).
+		WithEventNotifier(config.Annealer.EventNotifier).
 		WithObservers(humanAudienceObserver).
 		Build()
 

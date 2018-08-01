@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crm/commandline"
+	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/dumbannealer/components"
 	"github.com/LindsayBradford/crm/profiling"
 )
@@ -27,10 +28,13 @@ func main() {
 }
 
 func buildAnnealingRunners() {
+	configuration := config.Retrieve(args.ConfigFile)
+
 	logger := components.BuildLogHandler()
 
 	annealingFunctions.UnProfiledFunction = func() error {
-		annealer := components.BuildDumbAnnealer(logger)
+		logger.Info("Configuring with [" + configuration.FilePath + "]")
+		annealer := components.BuildDumbAnnealer(configuration, logger)
 		logger.Debug("About to call annealer.Anneal()")
 		annealer.Anneal()
 		logger.Debug("Call to annealer.Anneal() finished.")

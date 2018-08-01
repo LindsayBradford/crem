@@ -6,5 +6,5 @@ Title = "SimpleExcelAnnealer"
 Type = "OSThreadLocked"  # "OSThreadLocked" | "ElapsedTimeTracking" (default) | "Simple"
 StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995
-MaxIterations = 2000 # 2000
-EventNotifier = "Synchronous" # "Synchronous" (default) | "Channeled"
+MaximumIterations = 2_000 # 2000
+EventNotifier = "Synchronous" # "Synchronous" (default) | "Concurrent"

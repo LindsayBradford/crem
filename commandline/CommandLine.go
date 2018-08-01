@@ -5,9 +5,11 @@ package commandline
 import (
 	"flag"
 	"fmt"
-	"github.com/LindsayBradford/crm/config"
 	"os"
+	"path/filepath"
 	"runtime"
+
+	"github.com/LindsayBradford/crm/config"
 )
 
 // ParseArguments processes the command-line arguments supplied
@@ -26,6 +28,7 @@ func ParseArguments() *Arguments {
 type Arguments struct {
 	Version    bool
 	CpuProfile string
+	ConfigFile string
 }
 
 // THe define sets up the relevant command-line
@@ -38,6 +41,13 @@ func (args *Arguments) define() {
 		"CpuProfile",
 		"",
 		"write cpu profile to file",
+	)
+
+	flag.StringVar(
+		&args.ConfigFile,
+		"ConfigFile",
+		"",
+		"file dictating run-time behaviour",
 	)
 
 	flag.BoolVar(
@@ -58,6 +68,11 @@ func (args *Arguments) define() {
 
 func (args *Arguments) process() {
 
+	if args.ConfigFile == "" {
+		usageMessage()
+		os.Exit(0)
+	}
+
 	if args.Version == true {
 		fmt.Println(
 			GetVersionString(),
@@ -65,10 +80,16 @@ func (args *Arguments) process() {
 		os.Exit(0)
 	}
 
-	var mustExitWithError = false
-
-	if mustExitWithError {
-		os.Exit(1)
+	if args.ConfigFile != "" {
+		pathInfo, err := os.Stat(args.ConfigFile)
+		if os.IsNotExist(err) {
+			fmt.Fprintf(os.Stderr, "Error: Could not find configuration file [%s]. Exiting.\n", args.ConfigFile)
+			os.Exit(1)
+		}
+		if pathInfo.Mode().IsDir() {
+			fmt.Fprintf(os.Stderr, "Error: Configuration file [%s] is a directory. Exiting.\n", args.ConfigFile)
+			os.Exit(1)
+		}
 	}
 }
 
@@ -79,10 +100,11 @@ func usageMessage() {
 	fmt.Printf("Help for %s\n", GetVersionString())
 	fmt.Println("  --Help                        Prints this help message.")
 	fmt.Println("  --Version                     Prints the version number of this utility.")
+	fmt.Println("  --ConfigFile  <FilePath>      File that configures the applications run-time behaviour.")
 	fmt.Println("  --CpuProfile  <FilePath>      Capture CPU profiling to file.")
 	fmt.Println()
 	fmt.Println("General usage takes the form:")
-	fmt.Printf("  %s\n", os.Args[0])
+	fmt.Printf("  %s --ConfigFile <FilePath>\n", justExecutableName())
 	os.Exit(0)
 }
 
@@ -90,5 +112,10 @@ func usageMessage() {
 // version number as defined in the utility's configuration.
 
 func GetVersionString() string {
-	return fmt.Sprintf("%s %s (%s)", os.Args[0], config.VERSION, runtime.Version())
+	return fmt.Sprintf("%s v%s (%s)", justExecutableName(), config.VERSION, runtime.Version())
+}
+
+func justExecutableName() string {
+	appName := filepath.Base(os.Args[0])
+	return appName
 }

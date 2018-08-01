@@ -33,7 +33,7 @@ func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, 
 		AnnealerOfType(annealerConfig.Type).
 		WithStartingTemperature(annealerConfig.StartingTemperature).
 		WithCoolingFactor(annealerConfig.CoolingFactor).
-		WithMaxIterations(annealerConfig.MaxIterations).
+		WithMaxIterations(annealerConfig.MaximumIterations).
 		WithLogHandler(humanLogHandler).
 		WithSolutionExplorer(new(SimpleExcelSolutionExplorer).WithPenalty(100)).
 		WithEventNotifier(annealerConfig.EventNotifier).
