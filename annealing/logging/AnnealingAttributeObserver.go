@@ -4,8 +4,8 @@ package logging
 
 import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/modulators"
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
 
@@ -20,15 +20,15 @@ func (this *AnnealingAttributeObserver) WithLogHandler(handler LogHandler) *Anne
 	return this
 }
 
-func (this *AnnealingAttributeObserver) WithModulator(modulator LoggingModulator) *AnnealingAttributeObserver {
-	this.modulator = modulator
+func (this *AnnealingAttributeObserver) WithFilter(Filter LoggingFilter) *AnnealingAttributeObserver {
+	this.filter = Filter
 	return this
 }
 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
 func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.filter.ShouldFilter(event) {
 		return
 	}
 

@@ -64,7 +64,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 
 	g.Expect(
 		annealer.Observers()).To(Equal(expectedObservers),
-		"Annealer should have built with supplied AnnealingObservers")
+		"Annealer should have built with supplied Observers")
 }
 
 func TestBuild_BadInputs(t *testing.T) {

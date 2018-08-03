@@ -4,8 +4,8 @@ package logging
 
 import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/modulators"
 	"github.com/LindsayBradford/crm/strings"
 )
 
@@ -20,15 +20,15 @@ func (this *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *Anneal
 	return this
 }
 
-func (this *AnnealingMessageObserver) WithModulator(modulator LoggingModulator) *AnnealingMessageObserver {
-	this.modulator = modulator
+func (this *AnnealingMessageObserver) WithModulator(modulator LoggingFilter) *AnnealingMessageObserver {
+	this.filter = modulator
 	return this
 }
 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
 func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.modulator.ShouldModulate(event) {
+	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.filter.ShouldFilter(event) {
 		return
 	}
 

@@ -5,32 +5,34 @@ package components
 import (
 	. "github.com/LindsayBradford/crm/annealing/logging"
 	"github.com/LindsayBradford/crm/config"
+	. "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
 
-func BuildLogHandlers(crmConfig *config.CRMConfig) []LogHandler {
+func BuildLogHandlers(crmConfig *config.CRMConfig) ([]LogHandler, error) {
 	loggingConfig := crmConfig.Loggers
 
+	listError := new(CompositeError)
 	handlerList := make([]LogHandler, len(loggingConfig))
+
 	for index, currConfig := range loggingConfig {
 		logBuilder := new(LogHandlerBuilder)
 
 		switch currConfig.Type {
-		case "NativeLibrary", "":
-			logBuilder.ForNativeLibraryLogHandler().WithName(currConfig.Name).AsDefault(currConfig.Default)
-		case "BareBones":
-			logBuilder.ForBareBonesLogHandler().WithName(currConfig.Name).AsDefault(currConfig.Default)
-		}
-
-		switch currConfig.Formatter {
-		case "JSON":
-			logBuilder.WithFormatter(new(JsonFormatter))
-		case "NameValuePair":
-			logBuilder.WithFormatter(new(NameValuePairFormatter))
-		case "RawMessage", "":
-			logBuilder.WithFormatter(new(RawMessageFormatter))
+		case config.NativeLibrary, config.UnspecifiedLoggerType:
+			logBuilder.
+				ForNativeLibraryLogHandler().
+				WithFormatter(newFormatterFromConfig(currConfig)).
+				WithName(currConfig.Name)
+		case config.BareBones:
+			logBuilder.
+				ForBareBonesLogHandler().
+				WithFormatter(newFormatterFromConfig(currConfig)).
+				WithName(currConfig.Name)
+		default:
+			panic("Should not reach here")
 		}
 
 		logBuilder.WithLogLevelDestination(AnnealerLogLevel, STDOUT) // default, may be overridden with currConfig below.
@@ -62,8 +64,28 @@ func BuildLogHandlers(crmConfig *config.CRMConfig) []LogHandler {
 			logBuilder.WithLogLevelDestination(mappedKey, mappedValue)
 		}
 
-		// TODO: I'm throwing away errors... bad.. fix it.
-		handlerList[index], _ = logBuilder.Build()
+		var newLogError error
+		if handlerList[index], newLogError = logBuilder.Build(); newLogError != nil {
+			listError.Add(newLogError)
+		}
 	}
-	return handlerList
+
+	if listError.Size() > 0 {
+		return nil, listError
+	}
+
+	return handlerList, nil
+}
+
+func newFormatterFromConfig(loggerConfig config.LoggerConfig) LogFormatter {
+	switch loggerConfig.Formatter {
+	case config.RawMessage, config.UnspecifiedFormatterType:
+		return new(RawMessageFormatter)
+	case config.Json:
+		return new(JsonFormatter)
+	case config.NameValuePair:
+		return new(NameValuePairFormatter)
+	default:
+		panic("Should not reach here")
+	}
 }

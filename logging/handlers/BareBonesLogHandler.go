@@ -11,7 +11,7 @@ import (
 	"github.com/LindsayBradford/crm/strings"
 )
 
-// Type is here for the purposes of documentation only. It is a stand-in
+// value is here for the purposes of documentation only. It is a stand-in
 // for any Go type, but represents the same type for any given function
 // invocation.
 type Type int

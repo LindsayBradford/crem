@@ -9,16 +9,16 @@ import (
 	. "github.com/LindsayBradford/crm/annealing/logging"
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/config"
+	. "github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/modulators"
 )
 
 func BuildDumbAnnealer(config *config.CRMConfig, logHandler LogHandler) Annealer {
 	builder := new(AnnealerBuilder)
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(logHandler).
-		// WithModulator(new(NullModulator))
-		WithModulator(new(IterationModuloLoggingModulator).WithModulo(100)) // No StartedIteration events, all FinishedIteration events
+		// WithFilter(new(NullFilter))
+		WithModulator(new(IterationCountLoggingFilter).WithModulo(100)) // No StartedIteration events, all FinishedIteration events
 
 	logHandler.Debug("About to call AnnealerBuilder.Build() ")
 

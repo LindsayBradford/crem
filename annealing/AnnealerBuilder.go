@@ -2,8 +2,6 @@
 package annealing
 
 import (
-	"errors"
-
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	. "github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/config"
@@ -16,38 +14,47 @@ type AnnealerBuilder struct {
 	buildErrors *crmerrors.CompositeError
 }
 
-func (builder *AnnealerBuilder) AnnealerOfType(annealerType string) *AnnealerBuilder {
+func (builder *AnnealerBuilder) AnnealerOfType(annealerType config.AnnealerType) *AnnealerBuilder {
+
+	builder.buildErrors = crmerrors.NewComposite("failed to build configured annealer")
+
 	switch annealerType {
-	case "OSThreadLocked":
-		return builder.OSThreadLockedAnnealer()
-	case "ElapsedTimeTracking", "":
+	case config.ElapsedTimeTracking, config.UnspecifiedAnnealerType:
 		return builder.ElapsedTimeTrackingAnnealer()
-	case "Simple":
+	case config.OSThreadLocked:
+		return builder.OSThreadLockedAnnealer()
+	case config.Simple:
 		return builder.SimpleAnnealer()
 	default:
-		panic(errors.New("attempted to build unsupported annealer of type [" + annealerType + "]"))
+		panic("Should not reach here")
 	}
-	return nil
+	return builder
 }
 
 func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
 	builder.annealer = &OSThreadLockedAnnealer{}
 	builder.annealer.Initialise()
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
+	if builder.buildErrors == nil {
+		builder.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
+	}
 	return builder
 }
 
 func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
 	builder.annealer = &ElapsedTimeTrackingAnnealer{}
 	builder.annealer.Initialise()
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	if builder.buildErrors == nil {
+		builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
+	}
 	return builder
 }
 
 func (builder *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
 	builder.annealer = &SimpleAnnealer{}
 	builder.annealer.Initialise()
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid simple annealer")
+	if builder.buildErrors == nil {
+		builder.buildErrors = crmerrors.NewComposite("Failed to build valid simple annealer")
+	}
 	return builder
 }
 
@@ -85,18 +92,14 @@ func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) 
 
 func (builder *AnnealerBuilder) WithEventNotifier(eventNotifierType config.EventNotifierType) *AnnealerBuilder {
 	switch eventNotifierType {
-	case config.Synchronous, config.Unspecified:
+	case config.Sequential, config.UnspecifiedEventNotifierType:
 		return builder.withEventNotifier(new(SynchronousAnnealingEventNotifier))
 	case config.Concurrent:
 		return builder.withEventNotifier(new(ConcurrentAnnealingEventNotifier))
 	default:
-		typeAsString := (string)(eventNotifierType)
-		synchronousAsString := (string)(config.Synchronous)
-		concurrentAsString := (string)(config.Concurrent)
-		panic(errors.New("attempted to build unsupported annealer event notifier of type [\"" + typeAsString + "\"]. " +
-			"Supported values: [\"" + synchronousAsString + "\", \"" + concurrentAsString + "\"]"))
+		panic("Should not reach here")
 	}
-	return nil
+	return builder
 }
 
 func (builder *AnnealerBuilder) withEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
@@ -139,6 +142,6 @@ func (builder *AnnealerBuilder) Build() (Annealer, *crmerrors.CompositeError) {
 	if buildErrors.Size() == 0 {
 		return annealerBeingBuilt, nil
 	} else {
-		return annealerBeingBuilt, buildErrors
+		return nil, buildErrors
 	}
 }

@@ -7,8 +7,8 @@ package logging
 import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	. "github.com/LindsayBradford/crm/annealing/solution"
+	. "github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	. "github.com/LindsayBradford/crm/logging/modulators"
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
 
@@ -18,7 +18,7 @@ const AnnealerLogLevel LogLevel = "Annealer"
 // drops any AnnealingEvents received.
 type AnnealingLogger struct {
 	logHandler LogHandler
-	modulator  LoggingModulator
+	filter     LoggingFilter
 }
 
 // Allows for the receipt of AnnealingEvent instances, but deliberately takes no action in logging those events.

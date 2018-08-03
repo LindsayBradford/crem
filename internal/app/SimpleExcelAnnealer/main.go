@@ -4,12 +4,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
-	. "github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
 )
 
@@ -31,33 +31,37 @@ func main() {
 }
 
 func buildAnnealingRunners() {
-	configuration := config.Retrieve(args.ConfigFile)
+	configuration, retrieveError := config.Retrieve(args.ConfigFile)
 
-	logHandlers := components.BuildLogHandlers(configuration)
-
-	var humanAudienceLogger LogHandler
-	for _, handler := range logHandlers {
-		if handler.IsDefault() {
-			humanAudienceLogger = handler
-		}
+	if retrieveError != nil {
+		panic(retrieveError)
 	}
 
-	humanAudienceLogger.Info("Configuring with [" + configuration.FilePath + "]")
+	logHandlers, logHandlerErrors := components.BuildLogHandlers(configuration)
+
+	if logHandlerErrors != nil {
+		panicMsg := fmt.Sprintf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
+		panic(panicMsg)
+	}
+
+	defaultLogHandler := logHandlers[0]
+
+	defaultLogHandler.Info("Configuring with [" + configuration.FilePath + "]")
 
 	observers := components.BuildObservers(configuration, logHandlers)
 
-	annealer := components.BuildAnnealer(configuration, humanAudienceLogger, observers...)
+	annealer := components.BuildAnnealer(configuration, defaultLogHandler, observers...)
 
 	annealingFunctions.UnProfiledFunction = func() error {
-		humanAudienceLogger.Debug("About to call annealer.Anneal()")
+		defaultLogHandler.Debug("About to call annealer.Anneal()")
 		annealer.Anneal()
-		humanAudienceLogger.Debug("Call to annealer.Anneal() finished.")
+		defaultLogHandler.Debug("Call to annealer.Anneal() finished.")
 		return nil
 	}
 
 	annealingFunctions.ProfiledFunction = func() error {
-		humanAudienceLogger.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
-		defer humanAudienceLogger.Debug("Cpu profiling to file [" + args.CpuProfile + "] now generated")
+		defaultLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+		defer defaultLogHandler.Debug("Cpu profiling to file [" + args.CpuProfile + "] now generated")
 		return profiling.CpuProfileOfFunctionToFile(annealingFunctions.UnProfiledFunction, args.CpuProfile)
 	}
 }

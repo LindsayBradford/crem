@@ -16,9 +16,6 @@ type LogHandler interface {
 	Name() string
 	SetName(name string)
 
-	IsDefault() bool
-	SetAsDefault(isDefault bool)
-
 	Debug(message string)
 	DebugWithAttributes(logAttributes LogAttributes)
 
@@ -49,18 +46,8 @@ type LogHandler interface {
 // LogHandlerBase is a base struct that implements default behaviour that matches the LogHandler interface
 type LogHandlerBase struct {
 	name         string
-	isDefault    bool
 	destinations *LogLevelDestinations
 	formatter    LogFormatter
-}
-
-// SetDefault allows a LogHandler to be identified as the default handler for logging.
-func (handlerBase *LogHandlerBase) SetAsDefault(isDefault bool) {
-	handlerBase.isDefault = isDefault
-}
-
-func (handlerBase *LogHandlerBase) IsDefault() bool {
-	return handlerBase.isDefault
 }
 
 // SetName allows a human-friendly name to be assigned to the loghandler to make it easier to configure

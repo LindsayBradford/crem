@@ -54,13 +54,6 @@ func (builder *LogHandlerBuilder) WithName(name string) *LogHandlerBuilder {
 	return builder
 }
 
-// AsDefault instructs LogHandlerBuilder to label the LogHandler as the default LogHandler when there are several.
-func (builder *LogHandlerBuilder) AsDefault(isDefault bool) *LogHandlerBuilder {
-	handlerBeingBuilt := builder.logHandler
-	handlerBeingBuilt.SetAsDefault(isDefault)
-	return builder
-}
-
 // WithFormatter instructs LogHandlerBuilder to ensure that the LogHandler constructed will use formatter for its log
 // entry formatting. If not called, the default NullFormatter will be used.
 func (builder *LogHandlerBuilder) WithFormatter(formatter LogFormatter) *LogHandlerBuilder {

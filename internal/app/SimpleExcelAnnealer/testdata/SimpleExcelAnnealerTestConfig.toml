@@ -1,17 +1,14 @@
 # An example TOML config file setting up SimpleExcelAnnealer
-
 Title = "SimpleExcelAnnealer"
 
 [[Loggers]]
 Name = "HumanAudienceLogger"
-Default = true  # Used for all general-purpose logging. If more than one is marked default, first in list is picked.
 
 [[Loggers]]
 Name = "MachineAudienceLogger"
 Type = "BareBones"
 Formatter = "JSON"
 [Loggers.LogLevelDestinations]
-#Annealing = "Discarded"
 Annealing = "StandardOutput"
 
 [[Loggers]]
@@ -28,33 +25,25 @@ Annealing = "Discarded"   # "Discarded"  | "StandardOutput" (Default) | "Standar
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver"
 Logger = "HumanAudienceLogger" # Must be one of the [[Loggers]] entries "Name" value
-IterationFilter = "FinishedIterationModulo" # "AllowAll" | "FinishedTterationEveryModulo" | "FinishedIterationEveryElapsedSeconds"
-FilterRate = 200 # 200
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 200 # 200
 
 [[AnnealingObservers]]
 Type = "AttributeObserver"
 Logger = "MachineAudienceLogger"
-IterationFilter = "FinishedIterationModulo"
-FilterRate = 200
+IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+PercentileOfIterations = 0.0
 
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-#InputFile = "testdata\SimpleExcelAnnealerTestFixture.xls"
-#Penalty = 100.0 # 100.0
-
-[[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
-Name = "DeploraDaExplora"
-
-[[SolutionExplorers]]
-Type = "NullSolutionExplorer"
-Name = "NotEvenGonnaMove"
+InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"  # TODO: Tie into builder.
+Penalty = 100.0 # 100.0
 
 [Annealer]
 Type = "OSThreadLocked"  # "OSThreadLocked" | "ElapsedTimeTracking" (default) | "Simple"
 StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995
 MaximumIterations = 2_000 # 2000
-EventNotifier = "Synchronous" # "Synchronous" (default) | "Concurrent"
 SolutionExplorer = "DoraTheExplorer"
+EventNotifier = "Sequential"
