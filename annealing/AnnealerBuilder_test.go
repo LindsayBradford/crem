@@ -93,32 +93,8 @@ func TestBuild_BadInputs(t *testing.T) {
 		"Annealer should have built with "+fmt.Sprintf("%d", expectedErrors)+"errors")
 
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(float64(1)),
-		"Annealer should have built with default Temperature of 1")
-
-	g.Expect(
-		annealer.CoolingFactor()).To(BeIdenticalTo(float64(1)),
-		"Annealer should have built with default Cooling Factor of 1")
-
-	g.Expect(
-		annealer.MaxIterations()).To(BeZero(),
-		"Annealer should have built with default iterations of 0")
-
-	g.Expect(
-		annealer.CurrentIteration()).To(BeZero(),
-		"Annealer should have built with current iteration of 0")
-
-	g.Expect(
-		annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
-		"Annealer should have built with nullLogHandler")
-
-	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
-		"Annealer should have built with Null Solution Explorer")
-
-	g.Expect(
-		annealer.Observers()).To(BeNil(),
-		"Annealer should have built with no AnnealerObservers")
+		annealer).To(BeNil(),
+		"Annealer should not have been built")
 }
 
 func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {

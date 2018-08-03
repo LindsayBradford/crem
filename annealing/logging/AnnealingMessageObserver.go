@@ -20,7 +20,7 @@ func (this *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *Anneal
 	return this
 }
 
-func (this *AnnealingMessageObserver) WithModulator(modulator LoggingFilter) *AnnealingMessageObserver {
+func (this *AnnealingMessageObserver) WithFilter(modulator LoggingFilter) *AnnealingMessageObserver {
 	this.filter = modulator
 	return this
 }

@@ -13,60 +13,107 @@ import (
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crm/logging/shared"
 )
 
 func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
+	if len(configuration.AnnealingObservers) == 0 {
+		return buildDefaultObservers(configuration)
+	} else {
+		return buildObservers(configuration, loggers)
+	}
+}
+
+func buildDefaultObservers(configuration *config.CRMConfig) []AnnealingObserver {
+	defaultLogger := buildDefaultLogger()
+	defaultFilter := buildDefaultFilter(configuration)
+
+	defaultObserver := new(logging.AnnealingMessageObserver).
+		WithLogHandler(defaultLogger).
+		WithFilter(defaultFilter)
+
+	return []AnnealingObserver{defaultObserver}
+}
+
+func buildDefaultFilter(configuration *config.CRMConfig) *filters.PercentileOfIterationsPerAnnealingFilter {
+	filter := new(filters.PercentileOfIterationsPerAnnealingFilter).
+		WithPercentileOfIterations(100).
+		WithMaxIterations(configuration.Annealer.MaximumIterations)
+	return filter
+}
+
+func buildDefaultLogger() LogHandler {
+	logBuilder := new(LogHandlerBuilder)
+	defaultLogHandler, _ := logBuilder.
+		ForDefaultLogHandler().
+		WithLogLevelDestination(logging.AnnealerLogLevel, shared.STDOUT).
+		Build()
+	return defaultLogHandler
+}
+
+func buildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
 	observerConfig := configuration.AnnealingObservers
 	observerList := make([]AnnealingObserver, len(observerConfig))
 
 	for index, currConfig := range observerConfig {
-		var newObserver AnnealingObserver
+		filter := buildFilter(currConfig, configuration)
+		logger := findLoggerNamed(loggers, currConfig.Logger)
 
-		var filter filters.LoggingFilter
-		switch currConfig.IterationFilter {
-		case config.UnspecifiedIterationFilter:
-			filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
-				WithPercentileOfIterations(100).
-				WithMaxIterations(configuration.Annealer.MaximumIterations)
-		case config.EveryNumberOfIterations:
-			modulo := currConfig.NumberOfIterations
-			filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
-		case config.EveryElapsedSeconds:
-			waitAsDuration := (time.Duration)(currConfig.SecondsBetweenEvents) * time.Second
-			filter = new(filters.IterationElapsedTimeFilter).WithWait(waitAsDuration)
-		case config.EveryPercentileOfFinishedIterations:
-			percentileOfIterations := currConfig.PercentileOfIterations
-			filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
-				WithPercentileOfIterations(percentileOfIterations).
-				WithMaxIterations(configuration.Annealer.MaximumIterations)
-		default:
-			panic("Should not reach here")
-		}
-
-		var observerLogger LogHandler
-		for _, logger := range loggers {
-			if logger.Name() == currConfig.Logger {
-				observerLogger = logger
-			}
-		}
-
-		switch currConfig.Type {
-		case config.AttributeObserver:
-			newObserver = new(logging.AnnealingAttributeObserver).
-				WithLogHandler(observerLogger).
-				WithFilter(filter)
-		case config.MessageObserver, config.UnspecifiedAnnealingObserverType:
-			newObserver = new(logging.AnnealingMessageObserver).
-				WithLogHandler(observerLogger).
-				WithModulator(filter)
-		default:
-			panic("Should not get here")
-		}
-
-		observerList[index] = newObserver
+		observerList[index] = buildObserver(currConfig.Type, logger, filter)
 	}
 
 	return observerList
+}
+
+func buildObserver(observerType config.AnnealingObserverType, logger LogHandler, filter filters.LoggingFilter) AnnealingObserver {
+	var newObserver AnnealingObserver
+	switch observerType {
+	case config.AttributeObserver:
+		newObserver = new(logging.AnnealingAttributeObserver).
+			WithLogHandler(logger).
+			WithFilter(filter)
+	case config.MessageObserver, config.UnspecifiedAnnealingObserverType:
+		newObserver = new(logging.AnnealingMessageObserver).
+			WithLogHandler(logger).
+			WithFilter(filter)
+	default:
+		panic("Should not get here")
+	}
+	return newObserver
+}
+
+func findLoggerNamed(loggers []LogHandler, name string) LogHandler {
+	var observerLogger LogHandler
+	for _, logger := range loggers {
+		if logger.Name() == name {
+			observerLogger = logger
+		}
+	}
+	return observerLogger
+}
+
+func buildFilter(currConfig config.AnnealingObserverConfig, configuration *config.CRMConfig) filters.LoggingFilter {
+	var filter filters.LoggingFilter
+	switch currConfig.IterationFilter {
+	case config.UnspecifiedIterationFilter:
+		filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
+			WithPercentileOfIterations(100).
+			WithMaxIterations(configuration.Annealer.MaximumIterations)
+	case config.EveryNumberOfIterations:
+		modulo := currConfig.NumberOfIterations
+		filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
+	case config.EveryElapsedSeconds:
+		waitAsDuration := (time.Duration)(currConfig.SecondsBetweenEvents) * time.Second
+		filter = new(filters.IterationElapsedTimeFilter).WithWait(waitAsDuration)
+	case config.EveryPercentileOfFinishedIterations:
+		percentileOfIterations := currConfig.PercentileOfIterations
+		filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
+			WithPercentileOfIterations(percentileOfIterations).
+			WithMaxIterations(configuration.Annealer.MaximumIterations)
+	default:
+		panic("Should not reach here")
+	}
+	return filter
 }
 
 func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, observers ...AnnealingObserver) Annealer {

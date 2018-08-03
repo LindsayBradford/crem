@@ -14,11 +14,19 @@ import (
 func BuildLogHandlers(crmConfig *config.CRMConfig) ([]LogHandler, error) {
 	loggingConfig := crmConfig.Loggers
 
-	listError := new(CompositeError)
-	handlerList := make([]LogHandler, len(loggingConfig))
+	if len(loggingConfig) == 0 {
+		defaultLogHandler := buildDefaultLogger()
+		return []LogHandler{defaultLogHandler}, nil
+	} else {
+		return buildLogHandlers(loggingConfig)
+	}
+}
 
+func buildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {
+	listError := new(CompositeError)
+	logBuilder := new(LogHandlerBuilder)
+	handlerList := make([]LogHandler, len(loggingConfig))
 	for index, currConfig := range loggingConfig {
-		logBuilder := new(LogHandlerBuilder)
 
 		switch currConfig.Type {
 		case config.NativeLibrary, config.UnspecifiedLoggerType:
@@ -69,11 +77,9 @@ func BuildLogHandlers(crmConfig *config.CRMConfig) ([]LogHandler, error) {
 			listError.Add(newLogError)
 		}
 	}
-
 	if listError.Size() > 0 {
 		return nil, listError
 	}
-
 	return handlerList, nil
 }
 

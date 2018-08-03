@@ -45,11 +45,9 @@ func buildAnnealingRunners() {
 	}
 
 	defaultLogHandler := logHandlers[0]
-
 	defaultLogHandler.Info("Configuring with [" + configuration.FilePath + "]")
 
 	observers := components.BuildObservers(configuration, logHandlers)
-
 	annealer := components.BuildAnnealer(configuration, defaultLogHandler, observers...)
 
 	annealingFunctions.UnProfiledFunction = func() error {

@@ -18,7 +18,7 @@ func BuildDumbAnnealer(config *config.CRMConfig, logHandler LogHandler) Annealer
 	humanAudienceObserver := new(AnnealingMessageObserver).
 		WithLogHandler(logHandler).
 		// WithFilter(new(NullFilter))
-		WithModulator(new(IterationCountLoggingFilter).WithModulo(100)) // No StartedIteration events, all FinishedIteration events
+		WithFilter(new(IterationCountLoggingFilter).WithModulo(100)) // No StartedIteration events, all FinishedIteration events
 
 	logHandler.Debug("About to call AnnealerBuilder.Build() ")
 

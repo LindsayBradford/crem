@@ -28,7 +28,11 @@ func main() {
 }
 
 func buildAnnealingRunners() {
-	configuration := config.Retrieve(args.ConfigFile)
+	configuration, retrieveError := config.Retrieve(args.ConfigFile)
+
+	if retrieveError != nil {
+		panic(retrieveError)
+	}
 
 	logger := components.BuildLogHandler()
 

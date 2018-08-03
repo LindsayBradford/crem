@@ -9,7 +9,7 @@ Name = "MachineAudienceLogger"
 Type = "BareBones"
 Formatter = "JSON"
 [Loggers.LogLevelDestinations]
-Annealing = "StandardOutput"
+Annealing = "Discarded"
 
 [[Loggers]]
 Name = "FullyDescribedButDiscardedLogger"

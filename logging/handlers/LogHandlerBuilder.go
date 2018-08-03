@@ -15,6 +15,13 @@ type LogHandlerBuilder struct {
 	buildErrors *crmerrors.CompositeError
 }
 
+func (builder *LogHandlerBuilder) ForDefaultLogHandler() *LogHandlerBuilder {
+	return builder.
+		ForNativeLibraryLogHandler().
+		WithName("DefaultLogHandler").
+		WithFormatter(new(RawMessageFormatter))
+}
+
 // ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
 // LogHandler
 func (builder *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {

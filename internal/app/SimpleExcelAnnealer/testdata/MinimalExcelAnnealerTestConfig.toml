@@ -1,0 +1,14 @@
+# A minimal TOML config file setting up SimpleExcelAnnealer
+
+[[SolutionExplorers]]
+Type = "SimpleExcelSolutionExplorer"
+Name = "DoraTheExplorer"
+InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"  # TODO: Tie into builder.
+Penalty = 100.0 # 100.0
+
+[Annealer]
+Type = "OSThreadLocked"  # "OSThreadLocked" | "ElapsedTimeTracking" (default) | "Simple"
+StartingTemperature = 50.0 #50
+CoolingFactor =  0.995  # 0.995
+MaximumIterations = 2_000 # 2000
+SolutionExplorer = "DoraTheExplorer"
