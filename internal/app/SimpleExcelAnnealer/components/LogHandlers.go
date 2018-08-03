@@ -3,6 +3,8 @@
 package components
 
 import (
+	"fmt"
+
 	. "github.com/LindsayBradford/crm/annealing/logging"
 	"github.com/LindsayBradford/crm/config"
 	. "github.com/LindsayBradford/crm/errors"
@@ -62,6 +64,8 @@ func buildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error)
 				mappedKey = ERROR
 			case "Annealing":
 				mappedKey = AnnealerLogLevel
+			default:
+				listError.Add(fmt.Errorf("attempted to map to unrecognised log level [%s]", key))
 			}
 
 			var mappedValue LogDestination
@@ -72,6 +76,8 @@ func buildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error)
 				mappedValue = STDERR
 			case "Discarded":
 				mappedValue = DISCARD
+			default:
+				listError.Add(fmt.Errorf("attempted to map log level [%s] to unrecognised destination [%s]", key, value))
 			}
 			logBuilder.WithLogLevelDestination(mappedKey, mappedValue)
 		}
