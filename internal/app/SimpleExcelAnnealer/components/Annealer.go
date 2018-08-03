@@ -18,15 +18,15 @@ import (
 
 func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
 	if len(configuration.AnnealingObservers) == 0 {
-		return buildDefaultObservers(configuration)
+		return buildDefaultObservers()
 	} else {
 		return buildObservers(configuration, loggers)
 	}
 }
 
-func buildDefaultObservers(configuration *config.CRMConfig) []AnnealingObserver {
+func buildDefaultObservers() []AnnealingObserver {
 	defaultLogger := buildDefaultLogger()
-	defaultFilter := buildDefaultFilter(configuration)
+	defaultFilter := buildDefaultFilter()
 
 	defaultObserver := new(logging.AnnealingMessageObserver).
 		WithLogHandler(defaultLogger).
@@ -35,10 +35,8 @@ func buildDefaultObservers(configuration *config.CRMConfig) []AnnealingObserver 
 	return []AnnealingObserver{defaultObserver}
 }
 
-func buildDefaultFilter(configuration *config.CRMConfig) *filters.PercentileOfIterationsPerAnnealingFilter {
-	filter := new(filters.PercentileOfIterationsPerAnnealingFilter).
-		WithPercentileOfIterations(100).
-		WithMaxIterations(configuration.Annealer.MaximumIterations)
+func buildDefaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
+	filter := new(filters.PercentileOfIterationsPerAnnealingFilter)
 	return filter
 }
 
