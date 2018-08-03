@@ -15,11 +15,15 @@ func BuildLogHandlers(crmConfig *config.CRMConfig) ([]LogHandler, error) {
 	loggingConfig := crmConfig.Loggers
 
 	if len(loggingConfig) == 0 {
-		defaultLogHandler := buildDefaultLogger()
-		return []LogHandler{defaultLogHandler}, nil
+		return buildDefaultLogHandlers()
 	} else {
 		return buildLogHandlers(loggingConfig)
 	}
+}
+
+func buildDefaultLogHandlers() ([]LogHandler, error) {
+	defaultLogHandler := buildDefaultLogger()
+	return []LogHandler{defaultLogHandler}, nil
 }
 
 func buildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {

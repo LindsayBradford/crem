@@ -23,7 +23,7 @@ Errors = "Discarded"      # "Discarded"  | "StandardOutput" | "StandardError" (D
 Annealing = "Discarded"   # "Discarded"  | "StandardOutput" (Default) | "StandardError"
 
 [[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver"
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 Logger = "HumanAudienceLogger" # Must be one of the [[Loggers]] entries "Name" value
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 200 # 200
@@ -31,7 +31,7 @@ NumberOfIterations = 200 # 200
 [[AnnealingObservers]]
 Type = "AttributeObserver"
 Logger = "MachineAudienceLogger"
-IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations" (default)
 PercentileOfIterations = 0.0
 
 [[SolutionExplorers]]
@@ -46,4 +46,4 @@ StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995
 MaximumIterations = 2_000 # 2000
 SolutionExplorer = "DoraTheExplorer"
-EventNotifier = "Sequential"
+EventNotifier = "Concurrent"  # "Sequential" | Concurrent"

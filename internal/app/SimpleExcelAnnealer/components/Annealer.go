@@ -94,9 +94,7 @@ func buildFilter(currConfig config.AnnealingObserverConfig, configuration *confi
 	var filter filters.LoggingFilter
 	switch currConfig.IterationFilter {
 	case config.UnspecifiedIterationFilter:
-		filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
-			WithPercentileOfIterations(100).
-			WithMaxIterations(configuration.Annealer.MaximumIterations)
+		filter = buildDefaultFilter()
 	case config.EveryNumberOfIterations:
 		modulo := currConfig.NumberOfIterations
 		filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
@@ -175,7 +173,8 @@ func BuildSolutionExplorers(configuration *config.CRMConfig) []solution.Solution
 				WithName(currConfig.Name)
 		case "SimpleExcelSolutionExplorer":
 			explorer = new(SimpleExcelSolutionExplorer).
-				WithPenalty(currConfig.Penalty).WithName(currConfig.Name)
+				WithPenalty(currConfig.Penalty).
+				WithName(currConfig.Name)
 		}
 
 		// TODO: I'm throwing away errors... bad.. fix it.

@@ -246,3 +246,8 @@ func (explorer *SimpleExcelSolutionExplorer) RevertLastChange() {
 	explorer.addTrackerData()
 	explorer.BaseSolutionExplorer.RevertLastChange()
 }
+
+func (explorer *SimpleExcelSolutionExplorer) WithName(name string) *SimpleExcelSolutionExplorer {
+	explorer.BaseSolutionExplorer.SetName(name)
+	return explorer
+}
