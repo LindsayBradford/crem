@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
 package handlers
@@ -80,7 +82,7 @@ func (builder *LogHandlerBuilder) WithLogLevelDestination(logLevel LogLevel, des
 	handlerDestinations := handlerBeingBuilt.Destinations()
 	handlerDestinations.Override(logLevel, destination)
 	if nativeLibraryHandler, ok := handlerBeingBuilt.(*NativeLibraryLogHandler); ok {
-		nativeLibraryHandler.AddLogLevel(logLevel)
+		nativeLibraryHandler.addLogLevel(logLevel)
 	}
 
 	return builder
