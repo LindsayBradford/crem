@@ -41,6 +41,9 @@ type LogHandler interface {
 
 	SetFormatter(formatter LogFormatter)
 	Formatter() LogFormatter
+
+	SupportsLogLevel(logLevel LogLevel) bool
+	Override(logLevel LogLevel, destination LogDestination)
 }
 
 // LogHandlerBase is a base struct that implements default behaviour that matches the LogHandler interface
@@ -81,4 +84,13 @@ func (handlerBase *LogHandlerBase) Formatter() LogFormatter {
 
 func (handlerBase *LogHandlerBase) BeingDiscarded(logLevel LogLevel) bool {
 	return handlerBase.destinations.Destinations[logLevel] == DISCARD
+}
+
+func (handlerBase *LogHandlerBase) SupportsLogLevel(logLevel LogLevel) bool {
+	_, present := handlerBase.destinations.Destinations[logLevel]
+	return present
+}
+
+func (handlerBase *LogHandlerBase) Override(logLevel LogLevel, destination LogDestination) {
+	handlerBase.destinations.Override(logLevel, destination)
 }

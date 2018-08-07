@@ -83,7 +83,11 @@ func (handler *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, 
 func (handler *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
 	var builder strings.FluentBuilder
 	builder.Add(text, "\n")
-	io.WriteString(handler.destinations.Destinations[logLevel], builder.String())
+	io.WriteString(handler.deriveDestination(logLevel), builder.String())
+}
+
+func (handler *BareBonesLogHandler) deriveDestination(logLevel LogLevel) LogDestination {
+	return handler.destinations.Destinations[logLevel]
 }
 
 func prependTimestamp(oldSlice []NameValuePair) []NameValuePair {

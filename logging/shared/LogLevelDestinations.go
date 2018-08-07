@@ -48,3 +48,9 @@ func (lld *LogLevelDestinations) WithOverride(logLevel LogLevel, destination Log
 func (lld *LogLevelDestinations) Override(logLevel LogLevel, destination LogDestination) {
 	lld.Destinations[logLevel] = destination
 }
+
+// Override remaps the given LogLevelDestination's logLevel mapping to the new destination supplied.
+func (lld *LogLevelDestinations) SupportsLogLevel(logLevel LogLevel) bool {
+	_, present := lld.Destinations[logLevel]
+	return present
+}

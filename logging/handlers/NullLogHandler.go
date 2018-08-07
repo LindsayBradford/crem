@@ -27,9 +27,11 @@ func (handler *NullLogHandler) ErrorWithError(err error)                        
 func (handler *NullLogHandler) LogAtLevel(logLevel LogLevel, message string)    {}
 func (handler *NullLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
 }
-func (handler *NullLogHandler) Initialise()                           {}
-func (handler *NullLogHandler) SetDestinations(*LogLevelDestinations) {}
-func (handler *NullLogHandler) Destinations() *LogLevelDestinations   { return nil }
-func (handler *NullLogHandler) SetFormatter(formatter LogFormatter)   {}
-func (handler *NullLogHandler) Formatter() LogFormatter               { return &NullFormatter{} }
-func (handler *NullLogHandler) BeingDiscarded(logLevel LogLevel) bool { return true }
+func (handler *NullLogHandler) Initialise()                                            {}
+func (handler *NullLogHandler) SetDestinations(*LogLevelDestinations)                  {}
+func (handler *NullLogHandler) Destinations() *LogLevelDestinations                    { return nil }
+func (handler *NullLogHandler) SetFormatter(formatter LogFormatter)                    {}
+func (handler *NullLogHandler) Formatter() LogFormatter                                { return &NullFormatter{} }
+func (handler *NullLogHandler) BeingDiscarded(logLevel LogLevel) bool                  { return true }
+func (handler *NullLogHandler) SupportsLogLevel(logLevel LogLevel) bool                { return true }
+func (handler *NullLogHandler) Override(logLevel LogLevel, destination LogDestination) {}

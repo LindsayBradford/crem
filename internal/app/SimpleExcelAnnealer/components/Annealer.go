@@ -11,12 +11,34 @@ import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/config"
+	. "github.com/LindsayBradford/crm/errors"
 	"github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/logging/shared"
 )
 
 const defaultLoggerIndex = 0
+
+func BuildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {
+
+	handlerList, buildError := new(LogHandlerBuilder).FromConfig(loggingConfig)
+	ensureAnnealerLogLevel(handlerList)
+
+	compositeError, ok := buildError.(*CompositeError)
+	if ok && compositeError.Size() > 0 {
+		return nil, compositeError
+	}
+
+	return handlerList, nil
+}
+
+func ensureAnnealerLogLevel(handlers []LogHandler) {
+	for _, logger := range handlers {
+		if !logger.SupportsLogLevel(logging.AnnealerLogLevel) {
+			logger.Override(logging.AnnealerLogLevel, shared.STDOUT)
+		}
+	}
+}
 
 func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
 	if len(configuration.AnnealingObservers) == 0 {
