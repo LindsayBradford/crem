@@ -37,7 +37,7 @@ func buildAnnealingRunners() {
 		panic(retrieveError)
 	}
 
-	logHandlers, logHandlerErrors := components.BuildLogHandlers(configuration)
+	logHandlers, logHandlerErrors := components.BuildLogHandlers(configuration.Loggers)
 
 	if logHandlerErrors != nil {
 		panicMsg := fmt.Sprintf("failed to establish log handlers from config: %s", logHandlerErrors.Error())

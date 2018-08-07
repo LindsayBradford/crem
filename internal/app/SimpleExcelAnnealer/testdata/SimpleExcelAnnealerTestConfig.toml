@@ -1,38 +1,10 @@
 # An example TOML config file setting up SimpleExcelAnnealer
 Title = "SimpleExcelAnnealer"
 
-[[Loggers]]
-Name = "HumanAudienceLogger"
-
-[[Loggers]]
-Name = "MachineAudienceLogger"
-Type = "BareBones"
-Formatter = "JSON"
-[Loggers.LogLevelDestinations]
-Annealing = "Discarded"
-
-[[Loggers]]
-Name = "FullyDescribedButDiscardedLogger"
-Type = "NativeLibrary"  # "NativeLibrary" (default) | "BareBones"
-Formatter = "RawMessage"  # "JSON" | "NameValuePair" | "RawMessage" (default)
-[Loggers.LogLevelDestinations]
-Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Information = "Discarded" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Warnings = "Discarded"    # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Errors = "Discarded"      # "Discarded"  | "StandardOutput" | "StandardError" (Default)
-Annealing = "Discarded"   # "Discarded"  | "StandardOutput" (Default) | "StandardError"
-
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
-Logger = "HumanAudienceLogger" # Must be one of the [[Loggers]] entries "Name" value
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 200 # 200
-
-[[AnnealingObservers]]
-Type = "AttributeObserver"
-Logger = "MachineAudienceLogger"
-IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations" (default)
-PercentileOfIterations = 0.0
 
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
@@ -46,4 +18,3 @@ StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995
 MaximumIterations = 2_000 # 2000
 SolutionExplorer = "DoraTheExplorer"
-EventNotifier = "Concurrent"  # "Sequential" | Concurrent"

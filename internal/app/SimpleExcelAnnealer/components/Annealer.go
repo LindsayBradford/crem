@@ -16,6 +16,8 @@ import (
 	"github.com/LindsayBradford/crm/logging/shared"
 )
 
+const defaultLoggerIndex = 0
+
 func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
 	if len(configuration.AnnealingObservers) == 0 {
 		return buildDefaultObservers()
@@ -55,7 +57,7 @@ func buildObservers(configuration *config.CRMConfig, loggers []LogHandler) []Ann
 
 	for index, currConfig := range observerConfig {
 		filter := buildFilter(currConfig, configuration)
-		logger := findLoggerNamed(loggers, currConfig.Logger)
+		logger := findLoggerNamedOrDefault(loggers, currConfig.Logger)
 
 		observerList[index] = buildObserver(currConfig.Type, logger, filter)
 	}
@@ -80,14 +82,13 @@ func buildObserver(observerType config.AnnealingObserverType, logger LogHandler,
 	return newObserver
 }
 
-func findLoggerNamed(loggers []LogHandler, name string) LogHandler {
-	var observerLogger LogHandler
+func findLoggerNamedOrDefault(loggers []LogHandler, name string) LogHandler {
 	for _, logger := range loggers {
 		if logger.Name() == name {
-			observerLogger = logger
+			return logger
 		}
 	}
-	return observerLogger
+	return loggers[defaultLoggerIndex]
 }
 
 func buildFilter(currConfig config.AnnealingObserverConfig, configuration *config.CRMConfig) filters.LoggingFilter {
