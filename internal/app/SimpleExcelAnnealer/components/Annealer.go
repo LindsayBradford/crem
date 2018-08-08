@@ -9,31 +9,20 @@ import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/config"
-	. "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
 func BuildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {
-	handlerList, buildError :=
-		new(config.LogHandlersBuilder).
-			WithConfig(loggingConfig).
-			Build()
-
-	compositeError, ok := buildError.(*CompositeError)
-	if ok && compositeError.Size() > 0 {
-		return nil, compositeError
-	}
-
-	return handlerList, nil
+	return new(config.LogHandlersBuilder).
+		WithConfig(loggingConfig).
+		Build()
 }
 
-func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
-	observerList :=
-		new(config.AnnealingObserversBuilder).
-			WithConfig(configuration).
-			WithLogHandlers(loggers).
-			Build()
-	return observerList
+func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) ([]AnnealingObserver, error) {
+	return new(config.AnnealingObserversBuilder).
+		WithConfig(configuration).
+		WithLogHandlers(loggers).
+		Build()
 }
 
 func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, observers ...AnnealingObserver) Annealer {

@@ -3,6 +3,7 @@
 package config
 
 import (
+	"errors"
 	"time"
 
 	"github.com/LindsayBradford/crm/annealing/logging"
@@ -10,7 +11,6 @@ import (
 	. "github.com/LindsayBradford/crm/errors"
 	"github.com/LindsayBradford/crm/logging/filters"
 	"github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/logging/shared"
 )
 
 type AnnealingObserversBuilder struct {
@@ -38,37 +38,34 @@ func (builder *AnnealingObserversBuilder) WithLogHandlers(handlers []handlers.Lo
 	return builder
 }
 
-func (builder *AnnealingObserversBuilder) Build() []observers.AnnealingObserver {
+func (builder *AnnealingObserversBuilder) Build() ([]observers.AnnealingObserver, error) {
+	var observers []observers.AnnealingObserver
 	if len(builder.config) == 0 {
-		return builder.buildDefaultObservers()
+		observers = builder.buildDefaultObservers()
 	} else {
-		return builder.buildObservers()
+		observers = builder.buildObservers()
 	}
+
+	if builder.errors.Size() > 0 {
+		return nil, builder.errors
+	}
+	return observers, nil
 }
 
 func (builder *AnnealingObserversBuilder) buildDefaultObservers() []observers.AnnealingObserver {
-	defaultLogger := buildDefaultLogger()
-	defaultFilter := buildDefaultFilter()
-
 	defaultObserver := new(logging.AnnealingMessageObserver).
-		WithLogHandler(defaultLogger).
-		WithFilter(defaultFilter)
-
+		WithLogHandler(builder.defaultLogger()).
+		WithFilter(builder.defaultFilter())
 	return []observers.AnnealingObserver{defaultObserver}
 }
 
-func buildDefaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
+func (builder *AnnealingObserversBuilder) defaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
 	filter := new(filters.PercentileOfIterationsPerAnnealingFilter)
 	return filter
 }
 
-func buildDefaultLogger() handlers.LogHandler {
-	logBuilder := new(handlers.LogHandlerBuilder)
-	defaultLogHandler, _ := logBuilder.
-		ForDefaultLogHandler().
-		WithLogLevelDestination(logging.AnnealerLogLevel, shared.STDOUT).
-		Build()
-	return defaultLogHandler
+func (builder *AnnealingObserversBuilder) defaultLogger() handlers.LogHandler {
+	return builder.handlers[defaultLoggerIndex]
 }
 
 func (builder *AnnealingObserversBuilder) buildObservers() []observers.AnnealingObserver {
@@ -76,7 +73,11 @@ func (builder *AnnealingObserversBuilder) buildObservers() []observers.Annealing
 
 	for index, currConfig := range builder.config {
 		filter := builder.buildFilter(currConfig)
-		logger := builder.findLoggerNamedOrDefault(currConfig)
+		logger, loggerError := builder.findLoggerNamedOrDefault(currConfig)
+
+		if loggerError != nil {
+			builder.errors.Add(loggerError)
+		}
 
 		observerList[index] = buildObserver(currConfig.Type, logger, filter)
 	}
@@ -101,20 +102,24 @@ func buildObserver(observerType AnnealingObserverType, logger handlers.LogHandle
 	return newObserver
 }
 
-func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) handlers.LogHandler {
+func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) (handlers.LogHandler, error) {
+	if currConfig.Logger == "" {
+		return builder.handlers[defaultLoggerIndex], nil
+	}
+
 	for _, logger := range builder.handlers {
 		if logger.Name() == currConfig.Logger {
-			return logger
+			return logger, nil
 		}
 	}
-	return builder.handlers[defaultLoggerIndex]
+	return nil, errors.New("configuration specifies a non-existent logger [\"" + currConfig.Logger + "\"] for an AnnealingObserver")
 }
 
 func (builder *AnnealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.LoggingFilter {
 	var filter filters.LoggingFilter
 	switch currConfig.IterationFilter {
 	case UnspecifiedIterationFilter:
-		filter = buildDefaultFilter()
+		filter = builder.defaultFilter()
 	case EveryNumberOfIterations:
 		modulo := currConfig.NumberOfIterations
 		filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
