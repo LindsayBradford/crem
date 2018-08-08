@@ -47,7 +47,13 @@ func buildAnnealingRunners() {
 	defaultLogHandler := logHandlers[0]
 	defaultLogHandler.Info("Configuring with [" + configuration.FilePath + "]")
 
-	observers := components.BuildObservers(configuration, logHandlers)
+	observers, observerErrors := components.BuildObservers(configuration, logHandlers)
+
+	if observerErrors != nil {
+		panicMsg := fmt.Sprintf("failed to establish annealing observes from config: %s", observerErrors.Error())
+		panic(panicMsg)
+	}
+
 	annealer := components.BuildAnnealer(configuration, defaultLogHandler, observers...)
 
 	annealingFunctions.UnProfiledFunction = func() error {

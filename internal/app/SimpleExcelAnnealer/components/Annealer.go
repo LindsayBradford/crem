@@ -4,20 +4,14 @@ package components
 
 import (
 	"os"
-	"time"
 
 	. "github.com/LindsayBradford/crm/annealing"
-	"github.com/LindsayBradford/crm/annealing/logging"
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/config"
 	. "github.com/LindsayBradford/crm/errors"
-	"github.com/LindsayBradford/crm/logging/filters"
 	. "github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/logging/shared"
 )
-
-const defaultLoggerIndex = 0
 
 func BuildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {
 	handlerList, buildError :=
@@ -34,98 +28,12 @@ func BuildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error)
 }
 
 func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
-	if len(configuration.AnnealingObservers) == 0 {
-		return buildDefaultObservers()
-	} else {
-		return buildObservers(configuration, loggers)
-	}
-}
-
-func buildDefaultObservers() []AnnealingObserver {
-	defaultLogger := buildDefaultLogger()
-	defaultFilter := buildDefaultFilter()
-
-	defaultObserver := new(logging.AnnealingMessageObserver).
-		WithLogHandler(defaultLogger).
-		WithFilter(defaultFilter)
-
-	return []AnnealingObserver{defaultObserver}
-}
-
-func buildDefaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
-	filter := new(filters.PercentileOfIterationsPerAnnealingFilter)
-	return filter
-}
-
-func buildDefaultLogger() LogHandler {
-	logBuilder := new(LogHandlerBuilder)
-	defaultLogHandler, _ := logBuilder.
-		ForDefaultLogHandler().
-		WithLogLevelDestination(logging.AnnealerLogLevel, shared.STDOUT).
-		Build()
-	return defaultLogHandler
-}
-
-func buildObservers(configuration *config.CRMConfig, loggers []LogHandler) []AnnealingObserver {
-	observerConfig := configuration.AnnealingObservers
-	observerList := make([]AnnealingObserver, len(observerConfig))
-
-	for index, currConfig := range observerConfig {
-		filter := buildFilter(currConfig, configuration)
-		logger := findLoggerNamedOrDefault(loggers, currConfig.Logger)
-
-		observerList[index] = buildObserver(currConfig.Type, logger, filter)
-	}
-
+	observerList :=
+		new(config.AnnealingObserversBuilder).
+			WithConfig(configuration).
+			WithLogHandlers(loggers).
+			Build()
 	return observerList
-}
-
-func buildObserver(observerType config.AnnealingObserverType, logger LogHandler, filter filters.LoggingFilter) AnnealingObserver {
-	var newObserver AnnealingObserver
-	switch observerType {
-	case config.AttributeObserver:
-		newObserver = new(logging.AnnealingAttributeObserver).
-			WithLogHandler(logger).
-			WithFilter(filter)
-	case config.MessageObserver, config.UnspecifiedAnnealingObserverType:
-		newObserver = new(logging.AnnealingMessageObserver).
-			WithLogHandler(logger).
-			WithFilter(filter)
-	default:
-		panic("Should not get here")
-	}
-	return newObserver
-}
-
-func findLoggerNamedOrDefault(loggers []LogHandler, name string) LogHandler {
-	for _, logger := range loggers {
-		if logger.Name() == name {
-			return logger
-		}
-	}
-	return loggers[defaultLoggerIndex]
-}
-
-func buildFilter(currConfig config.AnnealingObserverConfig, configuration *config.CRMConfig) filters.LoggingFilter {
-	var filter filters.LoggingFilter
-	switch currConfig.IterationFilter {
-	case config.UnspecifiedIterationFilter:
-		filter = buildDefaultFilter()
-	case config.EveryNumberOfIterations:
-		modulo := currConfig.NumberOfIterations
-		filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
-	case config.EveryElapsedSeconds:
-		waitAsDuration := (time.Duration)(currConfig.SecondsBetweenEvents) * time.Second
-		filter = new(filters.IterationElapsedTimeFilter).WithWait(waitAsDuration)
-	case config.EveryPercentileOfFinishedIterations:
-		percentileOfIterations := currConfig.PercentileOfIterations
-		filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
-			WithPercentileOfIterations(percentileOfIterations).
-			WithMaxIterations(configuration.Annealer.MaximumIterations)
-	default:
-		panic("Should not reach here")
-	}
-	return filter
 }
 
 func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, observers ...AnnealingObserver) Annealer {
