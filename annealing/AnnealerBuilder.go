@@ -4,7 +4,6 @@ package annealing
 import (
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	. "github.com/LindsayBradford/crm/annealing/solution"
-	"github.com/LindsayBradford/crm/config"
 	crmerrors "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
@@ -12,23 +11,6 @@ import (
 type AnnealerBuilder struct {
 	annealer    Annealer
 	buildErrors *crmerrors.CompositeError
-}
-
-func (builder *AnnealerBuilder) AnnealerOfType(annealerType config.AnnealerType) *AnnealerBuilder {
-
-	builder.buildErrors = crmerrors.NewComposite("failed to build configured annealer")
-
-	switch annealerType {
-	case config.ElapsedTimeTracking, config.UnspecifiedAnnealerType:
-		return builder.ElapsedTimeTrackingAnnealer()
-	case config.OSThreadLocked:
-		return builder.OSThreadLockedAnnealer()
-	case config.Simple:
-		return builder.SimpleAnnealer()
-	default:
-		panic("Should not reach here")
-	}
-	return builder
 }
 
 func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
@@ -90,19 +72,7 @@ func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) 
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithEventNotifier(eventNotifierType config.EventNotifierType) *AnnealerBuilder {
-	switch eventNotifierType {
-	case config.Sequential, config.UnspecifiedEventNotifierType:
-		return builder.withEventNotifier(new(SynchronousAnnealingEventNotifier))
-	case config.Concurrent:
-		return builder.withEventNotifier(new(ConcurrentAnnealingEventNotifier))
-	default:
-		panic("Should not reach here")
-	}
-	return builder
-}
-
-func (builder *AnnealerBuilder) withEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetEventNotifier(delegate); err != nil {
 		builder.buildErrors.Add(err)

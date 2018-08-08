@@ -2,7 +2,17 @@
 
 Title = "DumbAnnealer"
 
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 2_00_000 # 200
+
+[[SolutionExplorers]]
+Type = "DumbSolutionExplorer"
+Name = "DerpaDaExBurba"
+
 [Annealer]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
 MaximumIterations = 1_000_000 # 1M
+SolutionExplorer = "DerpaDaExBurba"
