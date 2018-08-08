@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
@@ -54,7 +55,8 @@ func buildAnnealerOffConfig() shared.Annealer {
 	config := retrieveConfig()
 	logHandlers := buildLogHandlers(config)
 	observers := buildObservers(config, logHandlers)
-	annealer := components.BuildAnnealer(config, defaultLogHandler, observers...)
+	explorer := buildSolutionExplorer(config)
+	annealer := components.BuildAnnealer(config, defaultLogHandler, explorer, observers...)
 	return annealer
 }
 
@@ -95,6 +97,28 @@ func buildObservers(configuration *config.CRMConfig, logHandlers []handlers.LogH
 		panic(panicMsg)
 	}
 	return observers
+}
+
+func buildSolutionExplorer(configuration *config.CRMConfig) solution.SolutionExplorer {
+	myExplorerName := configuration.Annealer.SolutionExplorer
+
+	explorer, buildErrors :=
+		new(config.SolutionExplorerBuilder).
+			WithConfig(configuration).
+			RegisteringExplorer(
+				"SimpleExcelSolutionExplorer",
+				func(config config.SolutionExplorerConfig) solution.SolutionExplorer {
+					return new(components.SimpleExcelSolutionExplorer).
+						WithPenalty(config.Penalty).
+						WithName(config.Name)
+				},
+			).Build(myExplorerName)
+
+	if buildErrors != nil {
+		panicMsg := fmt.Sprintf("failed to establish solution explorer from config: %s", buildErrors.Error())
+		panic(panicMsg)
+	}
+	return explorer
 }
 
 func profilingRequested() bool {

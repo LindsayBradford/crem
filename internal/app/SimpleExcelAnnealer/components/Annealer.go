@@ -12,15 +12,12 @@ import (
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
-func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, observers ...AnnealingObserver) Annealer {
+func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, explorer solution.SolutionExplorer, observers ...AnnealingObserver) Annealer {
 	builder := new(AnnealerBuilder)
 
 	humanLogHandler.Debug("About to call AnnealerBuilder.Build() ")
 
 	annealerConfig := configuration.Annealer
-
-	solutionExplorers := BuildSolutionExplorers(configuration)
-	mySolutionExplorer := findMyExplorer(solutionExplorers, annealerConfig)
 
 	newAnnealer, err := builder.
 		AnnealerOfType(annealerConfig.Type).
@@ -28,7 +25,7 @@ func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, 
 		WithCoolingFactor(annealerConfig.CoolingFactor).
 		WithMaxIterations(annealerConfig.MaximumIterations).
 		WithLogHandler(humanLogHandler).
-		WithSolutionExplorer(mySolutionExplorer).
+		WithSolutionExplorer(explorer).
 		WithEventNotifier(annealerConfig.EventNotifier).
 		WithObservers(observers...).
 		Build()
@@ -42,43 +39,4 @@ func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, 
 	}
 
 	return newAnnealer
-}
-
-func findMyExplorer(solutionExplorers []solution.SolutionExplorer, annealerConfig config.AnnealingConfig) solution.SolutionExplorer {
-	var mySolutionExplorer solution.SolutionExplorer
-	for _, explorer := range solutionExplorers {
-		if annealerConfig.SolutionExplorer == explorer.Name() {
-			mySolutionExplorer = explorer
-		}
-	}
-	return mySolutionExplorer
-}
-
-func BuildSolutionExplorers(configuration *config.CRMConfig) []solution.SolutionExplorer {
-	explorerConfig := configuration.SolutionExplorers
-
-	explorerList := make([]solution.SolutionExplorer, len(explorerConfig))
-	for index, currConfig := range explorerConfig {
-		var explorer solution.SolutionExplorer
-
-		// TODO: Works for this example, but generally speaking, this explorer is local, whereas the other two
-		// TODO: are "pre-canned"... how to handle gracefully going forward?
-
-		switch currConfig.Type {
-		case "NullSolutionExplorer", "":
-			explorer = new(solution.NullSolutionExplorer).
-				WithName(currConfig.Name)
-		case "DumbSolutionExplorer":
-			explorer = new(solution.DumbSolutionExplorer).
-				WithName(currConfig.Name)
-		case "SimpleExcelSolutionExplorer":
-			explorer = new(SimpleExcelSolutionExplorer).
-				WithPenalty(currConfig.Penalty).
-				WithName(currConfig.Name)
-		}
-
-		// TODO: I'm throwing away errors... bad.. fix it.
-		explorerList[index] = explorer
-	}
-	return explorerList
 }

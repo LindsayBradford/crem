@@ -73,12 +73,7 @@ func (builder *AnnealingObserversBuilder) buildObservers() []observers.Annealing
 
 	for index, currConfig := range builder.config {
 		filter := builder.buildFilter(currConfig)
-		logger, loggerError := builder.findLoggerNamedOrDefault(currConfig)
-
-		if loggerError != nil {
-			builder.errors.Add(loggerError)
-		}
-
+		logger := builder.findLoggerNamedOrDefault(currConfig)
 		observerList[index] = buildObserver(currConfig.Type, logger, filter)
 	}
 
@@ -102,17 +97,23 @@ func buildObserver(observerType AnnealingObserverType, logger handlers.LogHandle
 	return newObserver
 }
 
-func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) (handlers.LogHandler, error) {
+func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) handlers.LogHandler {
 	if currConfig.Logger == "" {
-		return builder.handlers[defaultLoggerIndex], nil
+		return builder.handlers[defaultLoggerIndex]
 	}
 
 	for _, logger := range builder.handlers {
 		if logger.Name() == currConfig.Logger {
-			return logger, nil
+			return logger
 		}
 	}
-	return nil, errors.New("configuration specifies a non-existent logger [\"" + currConfig.Logger + "\"] for an AnnealingObserver")
+
+	builder.errors.Add(
+		errors.New("configuration specifies a non-existent logger [\"" +
+			currConfig.Logger + "\"] for an AnnealingObserver"),
+	)
+
+	return nil
 }
 
 func (builder *AnnealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.LoggingFilter {
