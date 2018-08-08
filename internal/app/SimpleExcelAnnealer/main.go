@@ -7,19 +7,22 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
+	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
 )
 
 var (
 	args               = commandline.ParseArguments()
 	annealingFunctions = new(profiling.ProfiledAndUnProfiledFunctionPair)
+	defaultLogHandler  handlers.LogHandler
 )
 
 func main() {
-	buildAnnealingRunners()
+	buildAnnealingFunctions()
 
 	if profilingRequested() {
 		annealingFunctions.ProfiledFunction()
@@ -30,31 +33,8 @@ func main() {
 	defer flushStreams()
 }
 
-func buildAnnealingRunners() {
-	configuration, retrieveError := config.Retrieve(args.ConfigFile)
-
-	if retrieveError != nil {
-		panic(retrieveError)
-	}
-
-	logHandlers, logHandlerErrors := components.BuildLogHandlers(configuration.Loggers)
-
-	if logHandlerErrors != nil {
-		panicMsg := fmt.Sprintf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
-		panic(panicMsg)
-	}
-
-	defaultLogHandler := logHandlers[0]
-	defaultLogHandler.Info("Configuring with [" + configuration.FilePath + "]")
-
-	observers, observerErrors := components.BuildObservers(configuration, logHandlers)
-
-	if observerErrors != nil {
-		panicMsg := fmt.Sprintf("failed to establish annealing observes from config: %s", observerErrors.Error())
-		panic(panicMsg)
-	}
-
-	annealer := components.BuildAnnealer(configuration, defaultLogHandler, observers...)
+func buildAnnealingFunctions() {
+	annealer := buildAnnealerOffConfig()
 
 	annealingFunctions.UnProfiledFunction = func() error {
 		defaultLogHandler.Debug("About to call annealer.Anneal()")
@@ -68,6 +48,53 @@ func buildAnnealingRunners() {
 		defer defaultLogHandler.Debug("Cpu profiling to file [" + args.CpuProfile + "] now generated")
 		return profiling.CpuProfileOfFunctionToFile(annealingFunctions.UnProfiledFunction, args.CpuProfile)
 	}
+}
+
+func buildAnnealerOffConfig() shared.Annealer {
+	config := retrieveConfig()
+	logHandlers := buildLogHandlers(config)
+	observers := buildObservers(config, logHandlers)
+	annealer := components.BuildAnnealer(config, defaultLogHandler, observers...)
+	return annealer
+}
+
+func retrieveConfig() *config.CRMConfig {
+	configuration, retrieveError := config.Retrieve(args.ConfigFile)
+	if retrieveError != nil {
+		panic(retrieveError)
+	}
+	return configuration
+}
+
+func buildLogHandlers(configuration *config.CRMConfig) []handlers.LogHandler {
+	logHandlers, logHandlerErrors :=
+		new(config.LogHandlersBuilder).
+			WithConfig(configuration.Loggers).
+			Build()
+	if logHandlerErrors != nil {
+		panicMsg := fmt.Sprintf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
+		panic(panicMsg)
+	}
+
+	defer func() {
+		defaultLogHandler = logHandlers[0]
+		defaultLogHandler.Info("Configuring with [" + configuration.FilePath + "]")
+	}()
+
+	return logHandlers
+}
+
+func buildObservers(configuration *config.CRMConfig, logHandlers []handlers.LogHandler) []shared.AnnealingObserver {
+	observers, observerErrors :=
+		new(config.AnnealingObserversBuilder).
+			WithConfig(configuration).
+			WithLogHandlers(logHandlers).
+			Build()
+	if observerErrors != nil {
+		panicMsg := fmt.Sprintf("failed to establish annealing observes from config: %s", observerErrors.Error())
+		panic(panicMsg)
+	}
+	return observers
 }
 
 func profilingRequested() bool {

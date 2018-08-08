@@ -12,19 +12,6 @@ import (
 	. "github.com/LindsayBradford/crm/logging/handlers"
 )
 
-func BuildLogHandlers(loggingConfig []config.LoggerConfig) ([]LogHandler, error) {
-	return new(config.LogHandlersBuilder).
-		WithConfig(loggingConfig).
-		Build()
-}
-
-func BuildObservers(configuration *config.CRMConfig, loggers []LogHandler) ([]AnnealingObserver, error) {
-	return new(config.AnnealingObserversBuilder).
-		WithConfig(configuration).
-		WithLogHandlers(loggers).
-		Build()
-}
-
 func BuildAnnealer(configuration *config.CRMConfig, humanLogHandler LogHandler, observers ...AnnealingObserver) Annealer {
 	builder := new(AnnealerBuilder)
 
