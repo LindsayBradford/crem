@@ -13,32 +13,32 @@ import (
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
-type AnnealingObserversBuilder struct {
+type annealingObserversBuilder struct {
 	errors            *CompositeError
 	config            []AnnealingObserverConfig
 	handlers          []handlers.LogHandler
 	maximumIterations uint64
 }
 
-func (builder *AnnealingObserversBuilder) initialise() *AnnealingObserversBuilder {
+func (builder *annealingObserversBuilder) initialise() *annealingObserversBuilder {
 	builder.errors = new(CompositeError)
 	return builder
 }
 
-func (builder *AnnealingObserversBuilder) WithConfig(crmConfig *CRMConfig) *AnnealingObserversBuilder {
+func (builder *annealingObserversBuilder) WithConfig(crmConfig *CRMConfig) *annealingObserversBuilder {
 	builder.initialise()
 	builder.config = crmConfig.AnnealingObservers
 	builder.maximumIterations = crmConfig.Annealer.MaximumIterations
 	return builder
 }
 
-func (builder *AnnealingObserversBuilder) WithLogHandlers(handlers []handlers.LogHandler) *AnnealingObserversBuilder {
+func (builder *annealingObserversBuilder) WithLogHandlers(handlers []handlers.LogHandler) *annealingObserversBuilder {
 	builder.initialise()
 	builder.handlers = handlers
 	return builder
 }
 
-func (builder *AnnealingObserversBuilder) Build() ([]observers.AnnealingObserver, error) {
+func (builder *annealingObserversBuilder) Build() ([]observers.AnnealingObserver, error) {
 	var observers []observers.AnnealingObserver
 	if len(builder.config) == 0 {
 		observers = builder.buildDefaultObservers()
@@ -52,23 +52,23 @@ func (builder *AnnealingObserversBuilder) Build() ([]observers.AnnealingObserver
 	return observers, nil
 }
 
-func (builder *AnnealingObserversBuilder) buildDefaultObservers() []observers.AnnealingObserver {
+func (builder *annealingObserversBuilder) buildDefaultObservers() []observers.AnnealingObserver {
 	defaultObserver := new(logging.AnnealingMessageObserver).
 		WithLogHandler(builder.defaultLogger()).
 		WithFilter(builder.defaultFilter())
 	return []observers.AnnealingObserver{defaultObserver}
 }
 
-func (builder *AnnealingObserversBuilder) defaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
+func (builder *annealingObserversBuilder) defaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
 	filter := new(filters.PercentileOfIterationsPerAnnealingFilter)
 	return filter
 }
 
-func (builder *AnnealingObserversBuilder) defaultLogger() handlers.LogHandler {
+func (builder *annealingObserversBuilder) defaultLogger() handlers.LogHandler {
 	return builder.handlers[defaultLoggerIndex]
 }
 
-func (builder *AnnealingObserversBuilder) buildObservers() []observers.AnnealingObserver {
+func (builder *annealingObserversBuilder) buildObservers() []observers.AnnealingObserver {
 	observerList := make([]observers.AnnealingObserver, len(builder.config))
 
 	for index, currConfig := range builder.config {
@@ -97,7 +97,7 @@ func buildObserver(observerType AnnealingObserverType, logger handlers.LogHandle
 	return newObserver
 }
 
-func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) handlers.LogHandler {
+func (builder *annealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) handlers.LogHandler {
 	if currConfig.Logger == "" {
 		return builder.handlers[defaultLoggerIndex]
 	}
@@ -116,7 +116,7 @@ func (builder *AnnealingObserversBuilder) findLoggerNamedOrDefault(currConfig An
 	return nil
 }
 
-func (builder *AnnealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.LoggingFilter {
+func (builder *annealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.LoggingFilter {
 	var filter filters.LoggingFilter
 	switch currConfig.IterationFilter {
 	case UnspecifiedIterationFilter:

@@ -15,9 +15,9 @@ type AnnealerBuilder struct {
 	config *CRMConfig
 
 	baseBuilder      annealing.AnnealerBuilder
-	loggersBuilder   LogHandlersBuilder
-	observersBuilder AnnealingObserversBuilder
-	explorersBuilder SolutionExplorerBuilder
+	loggersBuilder   logHandlersBuilder
+	observersBuilder annealingObserversBuilder
+	explorersBuilder solutionExplorerBuilder
 
 	defaultLogHandler handlers.LogHandler
 	logHandlers       []handlers.LogHandler
@@ -97,7 +97,7 @@ func (builder *AnnealerBuilder) setDefaultLogHandler() {
 
 func (builder *AnnealerBuilder) buildObservers() {
 	configuredObservers, observerErrors :=
-		new(AnnealingObserversBuilder).
+		new(annealingObserversBuilder).
 			WithConfig(builder.config).
 			WithLogHandlers(builder.logHandlers).
 			Build()

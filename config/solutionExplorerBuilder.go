@@ -9,7 +9,7 @@ import (
 	. "github.com/LindsayBradford/crm/errors"
 )
 
-type SolutionExplorerBuilder struct {
+type solutionExplorerBuilder struct {
 	errors              *CompositeError
 	config              []SolutionExplorerConfig
 	registeredExplorers map[string]ExplorerConfigFunction
@@ -17,7 +17,7 @@ type SolutionExplorerBuilder struct {
 
 type ExplorerConfigFunction func(config SolutionExplorerConfig) solution.SolutionExplorer
 
-func (builder *SolutionExplorerBuilder) initialise() *SolutionExplorerBuilder {
+func (builder *solutionExplorerBuilder) initialise() *solutionExplorerBuilder {
 	if builder.errors == nil {
 		builder.errors = new(CompositeError)
 	}
@@ -29,7 +29,7 @@ func (builder *SolutionExplorerBuilder) initialise() *SolutionExplorerBuilder {
 	return builder
 }
 
-func (builder *SolutionExplorerBuilder) registerBaseExplorers() {
+func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	builder.registeredExplorers = make(map[string]ExplorerConfigFunction, 2)
 
 	builder.RegisteringExplorer(
@@ -47,19 +47,19 @@ func (builder *SolutionExplorerBuilder) registerBaseExplorers() {
 	)
 }
 
-func (builder *SolutionExplorerBuilder) WithConfig(crmConfig *CRMConfig) *SolutionExplorerBuilder {
+func (builder *solutionExplorerBuilder) WithConfig(crmConfig *CRMConfig) *solutionExplorerBuilder {
 	builder.initialise()
 	builder.config = crmConfig.SolutionExplorers
 	return builder
 }
 
-func (builder *SolutionExplorerBuilder) RegisteringExplorer(explorerName string, configFunction ExplorerConfigFunction) *SolutionExplorerBuilder {
+func (builder *solutionExplorerBuilder) RegisteringExplorer(explorerName string, configFunction ExplorerConfigFunction) *solutionExplorerBuilder {
 	builder.initialise()
 	builder.registeredExplorers[explorerName] = configFunction
 	return builder
 }
 
-func (builder *SolutionExplorerBuilder) Build(explorerName string) (solution.SolutionExplorer, error) {
+func (builder *solutionExplorerBuilder) Build(explorerName string) (solution.SolutionExplorer, error) {
 	var myExplorer solution.SolutionExplorer
 	if len(builder.config) == 0 {
 		builder.errors.Add(errors.New("configuration failed to specify any solution explorers"))
@@ -74,7 +74,7 @@ func (builder *SolutionExplorerBuilder) Build(explorerName string) (solution.Sol
 	return myExplorer, nil
 }
 
-func (builder *SolutionExplorerBuilder) findMyExplorer(myExplorerName string, explorers []solution.SolutionExplorer) solution.SolutionExplorer {
+func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, explorers []solution.SolutionExplorer) solution.SolutionExplorer {
 	for _, explorer := range explorers {
 		if explorer.Name() == myExplorerName {
 			return explorer
@@ -87,7 +87,7 @@ func (builder *SolutionExplorerBuilder) findMyExplorer(myExplorerName string, ex
 	return nil
 }
 
-func (builder *SolutionExplorerBuilder) buildExplorers() []solution.SolutionExplorer {
+func (builder *solutionExplorerBuilder) buildExplorers() []solution.SolutionExplorer {
 	explorerList := make([]solution.SolutionExplorer, len(builder.config))
 	for index, currConfig := range builder.config {
 		_, foundExplorer := builder.registeredExplorers[currConfig.Type]
