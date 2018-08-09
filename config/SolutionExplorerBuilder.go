@@ -91,6 +91,7 @@ func (builder *SolutionExplorerBuilder) buildExplorers() []solution.SolutionExpl
 	explorerList := make([]solution.SolutionExplorer, len(builder.config))
 	for index, currConfig := range builder.config {
 		_, foundExplorer := builder.registeredExplorers[currConfig.Type]
+
 		if foundExplorer {
 			configFunction := builder.registeredExplorers[currConfig.Type]
 			explorerList[index] = configFunction(currConfig)

@@ -17,12 +17,12 @@ type AnnealerBuilder struct {
 	baseBuilder      annealing.AnnealerBuilder
 	loggersBuilder   LogHandlersBuilder
 	observersBuilder AnnealingObserversBuilder
-	explorerBuilder  SolutionExplorerBuilder
+	explorersBuilder SolutionExplorerBuilder
 
 	defaultLogHandler handlers.LogHandler
 	logHandlers       []handlers.LogHandler
 	observers         []AnnealingObserver
-	explorer          solution.SolutionExplorer
+	annealingExplorer solution.SolutionExplorer
 }
 
 type ExplorerRegistration struct {
@@ -33,7 +33,7 @@ type ExplorerRegistration struct {
 func (builder *AnnealerBuilder) initialise() {
 	builder.loggersBuilder.WithConfig(builder.config.Loggers)
 	builder.observersBuilder.WithConfig(builder.config)
-	builder.explorerBuilder.WithConfig(builder.config)
+	builder.explorersBuilder.WithConfig(builder.config)
 }
 
 func (builder *AnnealerBuilder) WithConfig(suppliedConfig *CRMConfig) *AnnealerBuilder {
@@ -43,7 +43,7 @@ func (builder *AnnealerBuilder) WithConfig(suppliedConfig *CRMConfig) *AnnealerB
 }
 
 func (builder *AnnealerBuilder) RegisteringExplorer(registration ExplorerRegistration) *AnnealerBuilder {
-	builder.explorerBuilder.RegisteringExplorer(registration.ExplorerType, registration.ConfigFunction)
+	builder.explorersBuilder.RegisteringExplorer(registration.ExplorerType, registration.ConfigFunction)
 	return builder
 }
 
@@ -62,7 +62,7 @@ func (builder *AnnealerBuilder) Build() (Annealer, handlers.LogHandler, error) {
 			WithCoolingFactor(annealerConfig.CoolingFactor).
 			WithMaxIterations(annealerConfig.MaximumIterations).
 			WithLogHandler(builder.defaultLogHandler).
-			WithSolutionExplorer(builder.explorer).
+			WithSolutionExplorer(builder.annealingExplorer).
 			WithEventNotifier(builder.buildEventNotifier()).
 			WithObservers(builder.observers...).
 			Build()
@@ -101,23 +101,25 @@ func (builder *AnnealerBuilder) buildObservers() {
 			WithConfig(builder.config).
 			WithLogHandlers(builder.logHandlers).
 			Build()
+
 	if observerErrors != nil {
 		panicMsg := fmt.Sprintf("failed to establish annealing observes from config: %s", observerErrors.Error())
 		panic(panicMsg)
 	}
+
 	builder.observers = configuredObservers
 }
 
 func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	myExplorerName := builder.config.Annealer.SolutionExplorer
-	newExplorer, buildErrors := builder.explorerBuilder.Build(myExplorerName)
+	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
 		panicMsg := fmt.Sprintf("failed to establish solution newExplorer from config: %s", buildErrors.Error())
 		panic(panicMsg)
 	}
 
-	builder.explorer = newExplorer
+	builder.annealingExplorer = newExplorer
 }
 
 func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *annealing.AnnealerBuilder {

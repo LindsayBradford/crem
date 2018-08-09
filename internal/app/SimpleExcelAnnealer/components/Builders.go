@@ -33,7 +33,8 @@ func buildSimpleExcelExplorerRegistration() config.ExplorerRegistration {
 		ConfigFunction: func(config config.SolutionExplorerConfig) solution.SolutionExplorer {
 			return new(SimpleExcelSolutionExplorer).
 				WithPenalty(config.Penalty).
-				WithName(config.Name)
+				WithName(config.Name).
+				WithInputFile(config.InputFile)
 		},
 	}
 }

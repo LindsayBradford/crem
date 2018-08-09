@@ -121,7 +121,7 @@ type trackingData struct {
 func (explorer *SimpleExcelSolutionExplorer) Initialise() {
 	explorer.BaseSolutionExplorer.Initialise()
 
-	explorer.dataSourcePath = initialiseDataSource()
+	initialiseDataSource(explorer.dataSourcePath)
 	explorer.LogHandler().Info("Opening Excel workbook [" + explorer.dataSourcePath + "] as data source")
 
 	explorer.LogHandler().Debug("Retrieving annealing data from workbook")
@@ -140,6 +140,11 @@ func (explorer *SimpleExcelSolutionExplorer) Initialise() {
 
 func (explorer *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
 	explorer.penalty = penalty
+	return explorer
+}
+
+func (explorer *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string) *SimpleExcelSolutionExplorer {
+	explorer.dataSourcePath = inputFilePath
 	return explorer
 }
 

@@ -18,9 +18,9 @@ const tracker = "Tracker"
 const data = "Data"
 
 var (
-	excelHandler            *excel.ExcelHandler
-	workbook                excel.Workbook
-	testFixtureAbsolutePath string
+	excelHandler     *excel.ExcelHandler
+	workbook         excel.Workbook
+	absoluteFilePath string
 )
 
 func init() {
@@ -34,19 +34,17 @@ func init() {
 	excelHandler = excel.InitialiseHandler()
 }
 
-func initialiseDataSource() (filePath string) {
+func initialiseDataSource(filePath string) {
 	workingDirectory, _ := os.Getwd()
-	testFixtureAbsolutePath = filepath.Join(workingDirectory, "testdata", "SimpleExcelAnnealerTestFixture.xls")
+	absoluteFilePath = filepath.Join(workingDirectory, filePath)
 
 	defer func() {
 		if r := recover(); r != nil {
-			panic("Workbook [" + testFixtureAbsolutePath + "] could not be opened. Data source initialisation failed.")
+			panic("Workbook [" + filePath + "] could not be opened. Data source initialisation failed.")
 		}
 	}()
 
-	workbook = excelHandler.Workbooks().Open(testFixtureAbsolutePath)
-
-	return testFixtureAbsolutePath
+	workbook = excelHandler.Workbooks().Open(absoluteFilePath)
 }
 
 func destroyExcelHandler() {
@@ -121,7 +119,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("Failed storing data to Excel data-source [" + testFixtureAbsolutePath + "]")
+			panic("Failed storing data to Excel data-source [" + absoluteFilePath + "]")
 		}
 	}()
 
@@ -206,7 +204,7 @@ func saveAndCloseWorkbook() {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("Failed saving data to Excel data-source [" + testFixtureAbsolutePath + "]")
+			panic("Failed saving data to Excel data-source [" + absoluteFilePath + "]")
 		}
 	}()
 
