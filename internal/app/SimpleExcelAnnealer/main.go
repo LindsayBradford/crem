@@ -51,14 +51,8 @@ func buildAnnealingFunctions() {
 
 func buildAnnealerOffConfig() shared.Annealer {
 	config := retrieveConfig()
-
-	var logHandlers []handlers.LogHandler
-	logHandlers, defaultLogHandler = components.BuildLogHandlers(config)
-
-	observers := components.BuildObservers(config, logHandlers)
-	explorer := components.BuildSolutionExplorer(config)
-	annealer := components.BuildAnnealer(config, defaultLogHandler, explorer, observers...)
-
+	annealer, annealerLogHandler := components.BuildAnnealer(config)
+	defaultLogHandler = annealerLogHandler
 	return annealer
 }
 

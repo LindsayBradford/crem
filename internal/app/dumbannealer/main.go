@@ -38,7 +38,7 @@ func buildAnnealingRunners() {
 
 	annealingFunctions.UnProfiledFunction = func() error {
 		logger.Info("Configuring with [" + configuration.FilePath + "]")
-		annealer := components.BuildDumbAnnealer(configuration, logger)
+		annealer := components.BuildDumbAnnealer(configuration)
 		logger.Debug("About to call annealer.Anneal()")
 		annealer.Anneal()
 		logger.Debug("Call to annealer.Anneal() finished.")
