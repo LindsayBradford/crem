@@ -6,25 +6,30 @@ type DumbSolutionExplorer struct {
 	BaseSolutionExplorer
 }
 
-func (this *DumbSolutionExplorer) SetObjectiveValue(initialObjectiveValue float64) {
-	this.objectiveValue = initialObjectiveValue
+func (dse *DumbSolutionExplorer) WithName(name string) *DumbSolutionExplorer {
+	dse.BaseSolutionExplorer.WithName(name)
+	return dse
 }
 
-func (this *DumbSolutionExplorer) Initialise() {
-	this.BaseSolutionExplorer.Initialise()
+func (dse *DumbSolutionExplorer) SetObjectiveValue(initialObjectiveValue float64) {
+	dse.objectiveValue = initialObjectiveValue
 }
 
-func (this *DumbSolutionExplorer) TearDown() {
-	this.BaseSolutionExplorer.TearDown()
+func (dse *DumbSolutionExplorer) Initialise() {
+	dse.BaseSolutionExplorer.Initialise()
 }
 
-func (this *DumbSolutionExplorer) TryRandomChange(temperature float64) {
-	this.makeRandomChange()
-	DecideOnWhetherToAcceptChange(this, temperature)
+func (dse *DumbSolutionExplorer) TearDown() {
+	dse.BaseSolutionExplorer.TearDown()
 }
 
-func (this *DumbSolutionExplorer) makeRandomChange() {
-	randomValue := this.RandomNumberGenerator().Intn(2)
+func (dse *DumbSolutionExplorer) TryRandomChange(temperature float64) {
+	dse.makeRandomChange()
+	DecideOnWhetherToAcceptChange(dse, temperature)
+}
+
+func (dse *DumbSolutionExplorer) makeRandomChange() {
+	randomValue := dse.RandomNumberGenerator().Intn(2)
 
 	var changeInObjectiveValue float64
 	switch randomValue {
@@ -33,20 +38,20 @@ func (this *DumbSolutionExplorer) makeRandomChange() {
 	case 1:
 		changeInObjectiveValue = 1
 	}
-	if this.objectiveValue+changeInObjectiveValue >= 0 {
-		this.changeInObjectiveValue = changeInObjectiveValue
+	if dse.objectiveValue+changeInObjectiveValue >= 0 {
+		dse.changeInObjectiveValue = changeInObjectiveValue
 	} else {
-		this.changeInObjectiveValue = 0
+		dse.changeInObjectiveValue = 0
 	}
 
-	this.objectiveValue += this.changeInObjectiveValue
+	dse.objectiveValue += dse.changeInObjectiveValue
 }
 
-func (this *DumbSolutionExplorer) AcceptLastChange() {
-	this.BaseSolutionExplorer.AcceptLastChange()
+func (dse *DumbSolutionExplorer) AcceptLastChange() {
+	dse.BaseSolutionExplorer.AcceptLastChange()
 }
 
-func (this *DumbSolutionExplorer) RevertLastChange() {
-	this.objectiveValue -= this.changeInObjectiveValue
-	this.BaseSolutionExplorer.RevertLastChange()
+func (dse *DumbSolutionExplorer) RevertLastChange() {
+	dse.objectiveValue -= dse.changeInObjectiveValue
+	dse.BaseSolutionExplorer.RevertLastChange()
 }

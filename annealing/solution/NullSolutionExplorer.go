@@ -8,11 +8,16 @@ type NullSolutionExplorer struct {
 	BaseSolutionExplorer
 }
 
-func (this *NullSolutionExplorer) Initialise() {
-	this.objectiveValue = float64(0)
+func (nse *NullSolutionExplorer) Initialise() {
+	nse.objectiveValue = float64(0)
 }
 
-func (this *NullSolutionExplorer) SetObjectiveValue(temperature float64) {}
-func (this *NullSolutionExplorer) TryRandomChange(temperature float64)   {}
-func (this *NullSolutionExplorer) AcceptLastChange()                     {}
-func (this *NullSolutionExplorer) RevertLastChange()                     {}
+func (nse *NullSolutionExplorer) WithName(name string) *NullSolutionExplorer {
+	nse.BaseSolutionExplorer.WithName(name)
+	return nse
+}
+
+func (nse *NullSolutionExplorer) SetObjectiveValue(temperature float64) {}
+func (nse *NullSolutionExplorer) TryRandomChange(temperature float64)   {}
+func (nse *NullSolutionExplorer) AcceptLastChange()                     {}
+func (nse *NullSolutionExplorer) RevertLastChange()                     {}

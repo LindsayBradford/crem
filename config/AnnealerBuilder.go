@@ -8,11 +8,13 @@ import (
 	"github.com/LindsayBradford/crm/annealing"
 	. "github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/annealing/solution"
+	"github.com/LindsayBradford/crm/errors"
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
 type AnnealerBuilder struct {
 	config *CRMConfig
+	errors *errors.CompositeError
 
 	baseBuilder      annealing.AnnealerBuilder
 	loggersBuilder   logHandlersBuilder
@@ -31,6 +33,7 @@ type ExplorerRegistration struct {
 }
 
 func (builder *AnnealerBuilder) initialise() {
+	builder.errors = new(errors.CompositeError)
 	builder.loggersBuilder.WithConfig(builder.config.Loggers)
 	builder.observersBuilder.WithConfig(builder.config)
 	builder.explorersBuilder.WithConfig(builder.config)
@@ -70,8 +73,14 @@ func (builder *AnnealerBuilder) Build() (Annealer, handlers.LogHandler, error) {
 	builder.defaultLogHandler.Debug("Call to AnnealerBuilder.Build() finished")
 
 	if baseBuildError != nil {
-		return nil, builder.defaultLogHandler, baseBuildError
+		newError := fmt.Errorf("failed to establish annealer from config: %s", baseBuildError.Error())
+		builder.errors.Add(newError)
 	}
+
+	if builder.errors.Size() > 0 {
+		return nil, builder.defaultLogHandler, builder.errors
+	}
+
 	return newAnnealer, builder.defaultLogHandler, nil
 }
 
@@ -79,8 +88,8 @@ func (builder *AnnealerBuilder) buildLogHandlers() {
 	logHandlers, logHandlerErrors := builder.loggersBuilder.Build()
 
 	if logHandlerErrors != nil {
-		panicMsg := fmt.Sprintf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
-		panic(panicMsg)
+		newError := fmt.Errorf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
+		builder.errors.Add(newError)
 	}
 
 	builder.logHandlers = logHandlers
@@ -103,8 +112,8 @@ func (builder *AnnealerBuilder) buildObservers() {
 			Build()
 
 	if observerErrors != nil {
-		panicMsg := fmt.Sprintf("failed to establish annealing observes from config: %s", observerErrors.Error())
-		panic(panicMsg)
+		newError := fmt.Errorf("failed to establish annealing observes from config: %s", observerErrors.Error())
+		builder.errors.Add(newError)
 	}
 
 	builder.observers = configuredObservers
@@ -115,8 +124,8 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
-		panicMsg := fmt.Sprintf("failed to establish solution newExplorer from config: %s", buildErrors.Error())
-		panic(panicMsg)
+		newError := fmt.Errorf("failed to establish solution explorer from config: %s", buildErrors.Error())
+		builder.errors.Add(newError)
 	}
 
 	builder.annealingExplorer = newExplorer

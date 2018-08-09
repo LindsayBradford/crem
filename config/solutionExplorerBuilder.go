@@ -53,9 +53,9 @@ func (builder *solutionExplorerBuilder) WithConfig(crmConfig *CRMConfig) *soluti
 	return builder
 }
 
-func (builder *solutionExplorerBuilder) RegisteringExplorer(explorerName string, configFunction ExplorerConfigFunction) *solutionExplorerBuilder {
+func (builder *solutionExplorerBuilder) RegisteringExplorer(explorerType string, configFunction ExplorerConfigFunction) *solutionExplorerBuilder {
 	builder.initialise()
-	builder.registeredExplorers[explorerName] = configFunction
+	builder.registeredExplorers[explorerType] = configFunction
 	return builder
 }
 
@@ -76,7 +76,7 @@ func (builder *solutionExplorerBuilder) Build(explorerName string) (solution.Sol
 
 func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, explorers []solution.SolutionExplorer) solution.SolutionExplorer {
 	for _, explorer := range explorers {
-		if explorer.Name() == myExplorerName {
+		if explorer != nil && explorer.Name() == myExplorerName {
 			return explorer
 		}
 	}

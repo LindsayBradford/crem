@@ -45,7 +45,7 @@ func (builder *logHandlersBuilder) Build() ([]handlers.LogHandler, error) {
 	}
 
 	if builder.errors.Size() > 0 {
-		return nil, builder.errors
+		return handlerList, builder.errors
 	}
 	return handlerList, nil
 }

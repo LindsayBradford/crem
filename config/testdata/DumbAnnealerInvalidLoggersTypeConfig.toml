@@ -1,0 +1,17 @@
+[[Loggers]]
+Type = "BorkedLoggerType"
+Name = "I'm a lumberjack and I'm OK"
+
+[[AnnealingObservers]]
+Type = "MessageObserver"
+Logger = "I'm a lumberjack and I'm OK"
+
+[[SolutionExplorers]]
+Type = "DumbSolutionExplorer"
+Name = "validConfig"
+
+[Annealer]
+StartingTemperature = 10.0
+CoolingFactor =  0.99
+MaximumIterations = 5
+SolutionExplorer = "validConfig"
