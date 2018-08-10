@@ -10,6 +10,7 @@ import (
 	"runtime"
 
 	"github.com/LindsayBradford/crm/config"
+	"github.com/pkg/errors"
 )
 
 // ParseArguments processes the command-line arguments supplied
@@ -83,14 +84,31 @@ func (args *Arguments) process() {
 	if args.ConfigFile != "" {
 		pathInfo, err := os.Stat(args.ConfigFile)
 		if os.IsNotExist(err) {
-			fmt.Fprintf(os.Stderr, "Error: Could not find configuration file [%s]. Exiting.\n", args.ConfigFile)
-			os.Exit(1)
+			exitError := errors.Errorf("config file specified [%s] does not exist", args.ConfigFile)
+			ExitWithError(exitError)
 		}
 		if pathInfo.Mode().IsDir() {
-			fmt.Fprintf(os.Stderr, "Error: Configuration file [%s] is a directory. Exiting.\n", args.ConfigFile)
-			os.Exit(1)
+			exitError := errors.Errorf("config file specified [%s] is a directory, not a file", args.ConfigFile)
+			ExitWithError(exitError)
 		}
 	}
+
+	if args.CpuProfile != "" {
+		pathInfo, err := os.Stat(args.CpuProfile)
+		if !os.IsNotExist(err) {
+			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing file", args.CpuProfile)
+			ExitWithError(exitError)
+		}
+		if pathInfo != nil && pathInfo.Mode().IsDir() {
+			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing directory", args.CpuProfile)
+			ExitWithError(exitError)
+		}
+	}
+}
+
+func ExitWithError(exitingError error) {
+	fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.", exitingError)
+	os.Exit(1)
 }
 
 // usageMessage is the function we supply to the flags package to upon

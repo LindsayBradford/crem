@@ -3,7 +3,7 @@
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"  # TODO: Tie into builder.
+InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.0 # 100.0
 
 [Annealer]

@@ -3,13 +3,13 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"github.com/LindsayBradford/crm/annealing/logging"
 	. "github.com/LindsayBradford/crm/errors"
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/logging/shared"
+	"github.com/pkg/errors"
 )
 
 const defaultLoggerIndex = 0
@@ -62,8 +62,9 @@ func (builder *logHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handle
 func (builder *logHandlersBuilder) buildDefaultLogHandler() handlers.LogHandler {
 	defaultLogger, defaultLogError := baseBuilder.ForDefaultLogHandler().Build()
 	if defaultLogError != nil {
-		// TODO: Prime candidate for error wrapping?
-		builder.errors.Add(errors.New("failed creating default log handler"))
+		builder.errors.Add(
+			errors.Wrap(defaultLogError, "failed creating default log handler"),
+		)
 	}
 	ensureSupportForAnnealerLogLevel(defaultLogger)
 	return defaultLogger

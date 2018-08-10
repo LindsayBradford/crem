@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
@@ -16,17 +17,23 @@ import (
 
 var (
 	args               = commandline.ParseArguments()
-	annealingFunctions = new(profiling.ProfiledAndUnProfiledFunctionPair)
+	annealingFunctions = new(profiling.OptionalProfilingFunctionPair)
 	defaultLogHandler  handlers.LogHandler
 )
 
 func main() {
 	buildAnnealingFunctions()
 
+	var runErr error
 	if profilingRequested() {
-		annealingFunctions.ProfiledFunction()
+		runErr = annealingFunctions.ProfiledFunction()
 	} else {
-		annealingFunctions.UnProfiledFunction()
+		runErr = annealingFunctions.UnProfiledFunction()
+	}
+
+	if runErr != nil {
+		fmt.Printf("%+v", runErr)
+		os.Exit(1)
 	}
 
 	defer flushStreams()
@@ -59,7 +66,7 @@ func buildAnnealerOffConfig() shared.Annealer {
 func retrieveConfig() *config.CRMConfig {
 	configuration, retrieveError := config.Retrieve(args.ConfigFile)
 	if retrieveError != nil {
-		panic(retrieveError)
+		commandline.ExitWithError(retrieveError)
 	}
 	return configuration
 }

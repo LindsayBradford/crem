@@ -12,16 +12,21 @@ import (
 
 var (
 	args               = commandline.ParseArguments()
-	annealingFunctions = new(profiling.ProfiledAndUnProfiledFunctionPair)
+	annealingFunctions = new(profiling.OptionalProfilingFunctionPair)
 )
 
 func main() {
 	buildAnnealingRunners()
 
+	var runError error
 	if profilingRequested() {
-		annealingFunctions.ProfiledFunction()
+		runError = annealingFunctions.ProfiledFunction()
 	} else {
-		annealingFunctions.UnProfiledFunction()
+		runError = annealingFunctions.UnProfiledFunction()
+	}
+
+	if runError != nil {
+		commandline.ExitWithError(runError)
 	}
 
 	defer flushStreams()
@@ -31,7 +36,7 @@ func buildAnnealingRunners() {
 	configuration, retrieveError := config.Retrieve(args.ConfigFile)
 
 	if retrieveError != nil {
-		panic(retrieveError)
+		commandline.ExitWithError(retrieveError)
 	}
 
 	logger := components.BuildLogHandler()

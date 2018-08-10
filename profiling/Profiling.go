@@ -1,39 +1,41 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
 package profiling
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 	"os"
 	"runtime/pprof"
 )
 
-type NoParameterFunction func() error
+type ProfileableFunction func() error
 
-type ProfiledAndUnProfiledFunctionPair struct {
-	UnProfiledFunction NoParameterFunction
-	ProfiledFunction   NoParameterFunction
+type OptionalProfilingFunctionPair struct {
+	UnProfiledFunction ProfileableFunction
+	ProfiledFunction   ProfileableFunction
 }
 
 // CpuProfileOfFunctionToFile establishes profiling based on what is passed as the cpuProfile
 // parameter. If an empty string, it's assumed profiling is not needed.  A non-empty
 // string is assumed to contain a path to a file in which profiling data is to be collated.
 
-func CpuProfileOfFunctionToFile(functionToProfile NoParameterFunction, cpuProfilePath string) error {
+func CpuProfileOfFunctionToFile(functionToProfile ProfileableFunction, cpuProfilePath string) error {
 	if cpuProfilePath == "" {
-		return errors.New("empty cpuProfilePath supplied")
+		return errors.New("empty cpu profile path supplied")
 	}
 
-	f, err := os.Create(cpuProfilePath)
-	if err != nil {
-		return err
+	fileHandle, createErr := os.Create(cpuProfilePath)
+	if createErr != nil {
+		return errors.Wrap(createErr, "creation of cpu profiling file failed")
 	}
 
-	pprof.StartCPUProfile(f)
-
-	err = functionToProfile()
-
+	pprof.StartCPUProfile(fileHandle)
+	functionErr := functionToProfile()
 	defer pprof.StopCPUProfile()
 
-	return err
+	if functionErr != nil {
+		return errors.Wrap(functionErr, "cpu profiling function error")
+	}
+
+	return nil
 }

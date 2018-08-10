@@ -8,6 +8,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/LindsayBradford/crm/strings"
+	"github.com/pkg/errors"
 )
 
 // Version number of the Catchment Resilience Modelling tool
@@ -15,9 +16,9 @@ const VERSION = "0.1.1"
 
 func Retrieve(configFilePath string) (*CRMConfig, error) {
 	var conf CRMConfig
-	_, err := toml.DecodeFile(configFilePath, &conf)
-	if err != nil {
-		return nil, fmt.Errorf("failed reading config file [%s]: %s", configFilePath, err)
+	_, decodeErr := toml.DecodeFile(configFilePath, &conf)
+	if decodeErr != nil {
+		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
 	}
 	conf.FilePath = configFilePath
 	return &conf, nil
