@@ -16,7 +16,7 @@ func BuildDumbAnnealer(annealerConfig *config.CRMConfig) Annealer {
 			Build()
 
 	if buildError != nil {
-		logHandler.ErrorWithError(buildError)
+		logHandler.Error(buildError)
 		logHandler.Error("Exiting program due to failed Annealer build")
 		os.Exit(1)
 	}

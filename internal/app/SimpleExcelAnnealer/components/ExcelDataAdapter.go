@@ -6,12 +6,11 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/LindsayBradford/crm/excel"
-	"github.com/onsi/gomega/gstruct/errors"
+	"github.com/pkg/errors"
 )
 
 const tracker = "Tracker"
@@ -40,7 +39,7 @@ func initialiseDataSource(filePath string) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			panic("Workbook [" + filePath + "] could not be opened. Data source initialisation failed.")
+			panic("workbook [" + filePath + "] could not be opened; data source initialisation failed")
 		}
 	}()
 
@@ -119,7 +118,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("Failed storing data to Excel data-source [" + absoluteFilePath + "]")
+			panic("failed storing data to excel data-source [" + absoluteFilePath + "]")
 		}
 	}()
 
@@ -135,9 +134,9 @@ func storeTrackingTableToWorksheet(table *trackingTable, worksheet excel.Workshe
 }
 
 func writeTableToTempCsvFile(table *trackingTable) string {
-	tmpFileHandle, err := ioutil.TempFile("", "trackingTableCsv")
-	if err != nil {
-		log.Fatal(err)
+	tmpFileHandle, tmpFileErr := ioutil.TempFile("", "trackingTableCsv")
+	if tmpFileErr != nil {
+		panic(errors.Wrap(tmpFileErr, "failed creating temporary table csv file"))
 	}
 
 	w := csv.NewWriter(tmpFileHandle)
@@ -147,11 +146,11 @@ func writeTableToTempCsvFile(table *trackingTable) string {
 	for _, heading := range table.headings {
 		headingsAsStringArray[heading.Index()-1] = heading.String()
 	}
-	if err := w.Write(headingsAsStringArray); err != nil {
-		panic(errors.Nest("error writing header to csv:", err))
+	if headingWriteError := w.Write(headingsAsStringArray); headingWriteError != nil {
+		panic(errors.Wrap(headingWriteError, "failed writing header row to csv file"))
 	}
 
-	for _, row := range table.rows {
+	for rowIndex, row := range table.rows {
 		rowArray := make([]string, len(table.headings))
 
 		objectivesFunctionValueAsString := fmt.Sprintf("%f", row.ObjectiveFunctionChange)
@@ -178,15 +177,15 @@ func writeTableToTempCsvFile(table *trackingTable) string {
 		TotalCostAsString := fmt.Sprintf("%f", row.TotalCost)
 		rowArray[TotalCost.Index()-1] = TotalCostAsString
 
-		if err := w.Write(rowArray); err != nil {
-			panic(errors.Nest("error writing record to csv:", err))
+		if writeError := w.Write(rowArray); writeError != nil {
+			panic(errors.Wrapf(writeError, "failed writing record [%d} to csv file", rowIndex))
 		}
 	}
 
 	w.Flush()
 
-	if err := tmpFileHandle.Close(); err != nil {
-		panic(errors.Nest("error closing csv:", err))
+	if closeErr := tmpFileHandle.Close(); closeErr != nil {
+		panic(errors.Wrap(closeErr, "failed to close csv file"))
 	}
 
 	return tmpFileHandle.Name()
@@ -204,7 +203,7 @@ func saveAndCloseWorkbook() {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("Failed saving data to Excel data-source [" + absoluteFilePath + "]")
+			panic("failed saving data to Excel data-source [" + absoluteFilePath + "]")
 		}
 	}()
 

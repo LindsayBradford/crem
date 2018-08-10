@@ -22,7 +22,7 @@ func BuildLogHandler() LogHandler {
 		Build()
 
 	if err != nil {
-		newLogger.ErrorWithError(err)
+		newLogger.Error(err)
 		os.Exit(1)
 	}
 	return newLogger

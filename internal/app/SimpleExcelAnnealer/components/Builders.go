@@ -19,7 +19,7 @@ func BuildAnnealer(configuration *config.CRMConfig) (shared.Annealer, handlers.L
 			Build()
 
 	if buildError != nil {
-		humanLogHandler.ErrorWithError(buildError)
+		humanLogHandler.Error(buildError)
 		humanLogHandler.Error("Exiting program due to failed Annealer build")
 		os.Exit(1)
 	}

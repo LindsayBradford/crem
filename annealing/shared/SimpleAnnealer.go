@@ -19,146 +19,146 @@ type SimpleAnnealer struct {
 	logger           LogHandler
 }
 
-func (this *SimpleAnnealer) Initialise() {
-	this.temperature = 1
-	this.coolingFactor = 1
-	this.maxIterations = 0
-	this.currentIteration = 0
-	this.eventNotifier = new(SynchronousAnnealingEventNotifier)
-	this.solutionExplorer = NULL_SOLUTION_EXPLORER
-	this.logger = new(NullLogHandler)
+func (sa *SimpleAnnealer) Initialise() {
+	sa.temperature = 1
+	sa.coolingFactor = 1
+	sa.maxIterations = 0
+	sa.currentIteration = 0
+	sa.eventNotifier = new(SynchronousAnnealingEventNotifier)
+	sa.solutionExplorer = NULL_SOLUTION_EXPLORER
+	sa.logger = new(NullLogHandler)
 }
 
-func (this *SimpleAnnealer) SetTemperature(temperature float64) error {
+func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 	if temperature <= 0 {
-		return errors.New("Invalid attempt to set annealer temperature to value <= 0")
+		return errors.New("invalid attempt to set annealer temperature to value <= 0")
 	}
-	this.temperature = temperature
+	sa.temperature = temperature
 	return nil
 }
 
-func (this *SimpleAnnealer) Temperature() float64 {
-	return this.temperature
+func (sa *SimpleAnnealer) Temperature() float64 {
+	return sa.temperature
 }
 
-func (this *SimpleAnnealer) SetCoolingFactor(coolingFactor float64) error {
+func (sa *SimpleAnnealer) SetCoolingFactor(coolingFactor float64) error {
 	if coolingFactor <= 0 || coolingFactor > 1 {
-		return errors.New("Invalid attempt to set annealer cooling factor to value <= 0 or > 1")
+		return errors.New("invalid attempt to set annealer cooling factor to value <= 0 or > 1")
 	}
-	this.coolingFactor = coolingFactor
+	sa.coolingFactor = coolingFactor
 	return nil
 }
 
-func (this *SimpleAnnealer) CoolingFactor() float64 {
-	return this.coolingFactor
+func (sa *SimpleAnnealer) CoolingFactor() float64 {
+	return sa.coolingFactor
 }
 
-func (this *SimpleAnnealer) SetMaxIterations(iterations uint64) {
-	this.maxIterations = iterations
+func (sa *SimpleAnnealer) SetMaxIterations(iterations uint64) {
+	sa.maxIterations = iterations
 }
 
-func (this *SimpleAnnealer) MaxIterations() uint64 {
-	return this.maxIterations
+func (sa *SimpleAnnealer) MaxIterations() uint64 {
+	return sa.maxIterations
 }
 
-func (this *SimpleAnnealer) CurrentIteration() uint64 {
-	return this.currentIteration
+func (sa *SimpleAnnealer) CurrentIteration() uint64 {
+	return sa.currentIteration
 }
 
-func (this *SimpleAnnealer) SolutionExplorer() SolutionExplorer {
-	return this.solutionExplorer
+func (sa *SimpleAnnealer) SolutionExplorer() SolutionExplorer {
+	return sa.solutionExplorer
 }
 
-func (this *SimpleAnnealer) SetSolutionExplorer(explorer SolutionExplorer) error {
+func (sa *SimpleAnnealer) SetSolutionExplorer(explorer SolutionExplorer) error {
 	if explorer == nil {
-		return errors.New("Invalid attempt to set Solution Explorer to nil value")
+		return errors.New("invalid attempt to set Solution Explorer to nil value")
 	}
-	this.solutionExplorer = explorer
+	sa.solutionExplorer = explorer
 	return nil
 }
 
-func (this *SimpleAnnealer) SetLogHandler(logger LogHandler) error {
+func (sa *SimpleAnnealer) SetLogHandler(logger LogHandler) error {
 	if logger == nil {
-		return errors.New("Invalid attempt to set log handler to nil value")
+		return errors.New("invalid attempt to set log handler to nil value")
 	}
-	this.logger = logger
+	sa.logger = logger
 	return nil
 }
 
-func (this *SimpleAnnealer) LogHandler() LogHandler {
-	return this.logger
+func (sa *SimpleAnnealer) LogHandler() LogHandler {
+	return sa.logger
 }
 
-func (this *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) error {
+func (sa *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) error {
 	if delegate == nil {
-		return errors.New("Invalid attempt to set event notifier to nil value")
+		return errors.New("invalid attempt to set event notifier to nil value")
 	}
-	this.eventNotifier = delegate
+	sa.eventNotifier = delegate
 	return nil
 }
 
-func (this *SimpleAnnealer) AddObserver(observer AnnealingObserver) error {
-	return this.eventNotifier.AddObserver(observer)
+func (sa *SimpleAnnealer) AddObserver(observer AnnealingObserver) error {
+	return sa.eventNotifier.AddObserver(observer)
 }
 
-func (this *SimpleAnnealer) Observers() []AnnealingObserver {
-	return this.eventNotifier.Observers()
+func (sa *SimpleAnnealer) Observers() []AnnealingObserver {
+	return sa.eventNotifier.Observers()
 }
 
-func (this *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
-	this.eventNotifier.NotifyObserversOfAnnealingEvent(this.cloneState(), eventType)
+func (sa *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
+	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.cloneState(), eventType)
 }
 
-func (this *SimpleAnnealer) cloneState() *SimpleAnnealer {
-	cloneOfThis := *this
+func (sa *SimpleAnnealer) cloneState() *SimpleAnnealer {
+	cloneOfThis := *sa
 	return &cloneOfThis
 }
 
-func (this *SimpleAnnealer) Anneal() {
-	this.solutionExplorer.SetLogHandler(this.LogHandler())
-	this.solutionExplorer.Initialise()
+func (sa *SimpleAnnealer) Anneal() {
+	sa.solutionExplorer.SetLogHandler(sa.LogHandler())
+	sa.solutionExplorer.Initialise()
 
-	this.annealingStarted()
+	sa.annealingStarted()
 
-	for done := this.initialDoneValue(); !done; {
-		this.iterationStarted()
+	for done := sa.initialDoneValue(); !done; {
+		sa.iterationStarted()
 
-		this.solutionExplorer.TryRandomChange(this.temperature)
+		sa.solutionExplorer.TryRandomChange(sa.temperature)
 
-		this.iterationFinished()
-		this.cooldown()
-		done = this.checkIfDone()
+		sa.iterationFinished()
+		sa.cooldown()
+		done = sa.checkIfDone()
 	}
 
-	this.solutionExplorer.TearDown()
-	this.annealingFinished()
+	sa.solutionExplorer.TearDown()
+	sa.annealingFinished()
 }
 
-func (this *SimpleAnnealer) annealingStarted() {
-	this.notifyObservers(StartedAnnealing)
+func (sa *SimpleAnnealer) annealingStarted() {
+	sa.notifyObservers(StartedAnnealing)
 }
 
-func (this *SimpleAnnealer) iterationStarted() {
-	this.currentIteration++
-	this.notifyObservers(StartedIteration)
+func (sa *SimpleAnnealer) iterationStarted() {
+	sa.currentIteration++
+	sa.notifyObservers(StartedIteration)
 }
 
-func (this *SimpleAnnealer) iterationFinished() {
-	this.notifyObservers(FinishedIteration)
+func (sa *SimpleAnnealer) iterationFinished() {
+	sa.notifyObservers(FinishedIteration)
 }
 
-func (this *SimpleAnnealer) annealingFinished() {
-	this.notifyObservers(FinishedAnnealing)
+func (sa *SimpleAnnealer) annealingFinished() {
+	sa.notifyObservers(FinishedAnnealing)
 }
 
-func (this *SimpleAnnealer) initialDoneValue() bool {
-	return this.maxIterations == 0
+func (sa *SimpleAnnealer) initialDoneValue() bool {
+	return sa.maxIterations == 0
 }
 
-func (this *SimpleAnnealer) checkIfDone() bool {
-	return this.currentIteration >= this.maxIterations
+func (sa *SimpleAnnealer) checkIfDone() bool {
+	return sa.currentIteration >= sa.maxIterations
 }
 
-func (this *SimpleAnnealer) cooldown() {
-	this.temperature *= this.coolingFactor
+func (sa *SimpleAnnealer) cooldown() {
+	sa.temperature *= sa.coolingFactor
 }

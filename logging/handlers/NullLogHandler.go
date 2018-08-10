@@ -11,22 +11,16 @@ var DefaultNullLogHandler = new(NullLogHandler)
 
 type NullLogHandler struct{}
 
-func (handler *NullLogHandler) IsDefault() bool                                 { return false }
-func (handler *NullLogHandler) SetAsDefault(isDefault bool)                     {}
-func (handler *NullLogHandler) Name() string                                    { return "NULL" }
-func (handler *NullLogHandler) SetName(name string)                             {}
-func (handler *NullLogHandler) Debug(message string)                            {}
-func (handler *NullLogHandler) DebugWithAttributes(logAttributes LogAttributes) {}
-func (handler *NullLogHandler) Info(message string)                             {}
-func (handler *NullLogHandler) InfoWithAttributes(logAttributes LogAttributes)  {}
-func (handler *NullLogHandler) Warn(message string)                             {}
-func (handler *NullLogHandler) WarnWithAttributes(logAttributes LogAttributes)  {}
-func (handler *NullLogHandler) Error(message string)                            {}
-func (handler *NullLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {}
-func (handler *NullLogHandler) ErrorWithError(err error)                        {}
-func (handler *NullLogHandler) LogAtLevel(logLevel LogLevel, message string)    {}
-func (handler *NullLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
-}
+func (handler *NullLogHandler) IsDefault() bool                                   { return false }
+func (handler *NullLogHandler) SetAsDefault(isDefault bool)                       {}
+func (handler *NullLogHandler) Name() string                                      { return "NULL" }
+func (handler *NullLogHandler) SetName(name string)                               {}
+func (handler *NullLogHandler) Debug(message interface{})                         {}
+func (handler *NullLogHandler) Info(message interface{})                          {}
+func (handler *NullLogHandler) Warn(message interface{})                          {}
+func (handler *NullLogHandler) Error(message interface{})                         {}
+func (handler *NullLogHandler) LogAtLevel(logLevel LogLevel, message interface{}) {}
+
 func (handler *NullLogHandler) Initialise()                                            {}
 func (handler *NullLogHandler) SetDestinations(*LogLevelDestinations)                  {}
 func (handler *NullLogHandler) Destinations() *LogLevelDestinations                    { return nil }

@@ -16,21 +16,15 @@ type LogHandler interface {
 	Name() string
 	SetName(name string)
 
-	Debug(message string)
-	DebugWithAttributes(logAttributes LogAttributes)
+	Debug(message interface{})
 
-	Info(message string)
-	InfoWithAttributes(logAttributes LogAttributes)
+	Info(message interface{})
 
-	Warn(message string)
-	WarnWithAttributes(logAttributes LogAttributes)
+	Warn(message interface{})
 
-	Error(message string)
-	ErrorWithAttributes(logAttributes LogAttributes)
-	ErrorWithError(err error)
+	Error(message interface{})
 
-	LogAtLevel(logLevel LogLevel, message string)
-	LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes)
+	LogAtLevel(logLevel LogLevel, message interface{})
 
 	Initialise()
 
@@ -93,4 +87,19 @@ func (handlerBase *LogHandlerBase) SupportsLogLevel(logLevel LogLevel) bool {
 
 func (handlerBase *LogHandlerBase) Override(logLevel LogLevel, destination LogDestination) {
 	handlerBase.destinations.Override(logLevel, destination)
+}
+
+func toLogAttributes(message interface{}) LogAttributes {
+	switch message.(type) {
+	case string:
+		return LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
+	case error:
+		messageAsError, _ := message.(error)
+		return LogAttributes{NameValuePair{Name: "Error", Value: messageAsError.Error()}}
+	case LogAttributes:
+		messageAsAttributes, _ := message.(LogAttributes)
+		return messageAsAttributes
+	default:
+		panic("should not get here")
+	}
 }

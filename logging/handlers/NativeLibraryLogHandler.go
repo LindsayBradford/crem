@@ -3,7 +3,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 
 	. "github.com/LindsayBradford/crm/logging/formatters"
@@ -41,45 +40,25 @@ func (handler *NativeLibraryLogHandler) WithFormatter(formatter LogFormatter) *N
 	return handler
 }
 
-func (handler *NativeLibraryLogHandler) Debug(message string) {
+func (handler *NativeLibraryLogHandler) Debug(message interface{}) {
 	handler.LogAtLevel(DEBUG, message)
 }
 
-func (handler *NativeLibraryLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(DEBUG, logAttributes)
-}
-
-func (handler *NativeLibraryLogHandler) Info(message string) {
+func (handler *NativeLibraryLogHandler) Info(message interface{}) {
 	handler.LogAtLevel(INFO, message)
 }
 
-func (handler *NativeLibraryLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(INFO, logAttributes)
-}
-
-func (handler *NativeLibraryLogHandler) Warn(message string) {
+func (handler *NativeLibraryLogHandler) Warn(message interface{}) {
 	handler.LogAtLevel(WARN, message)
 }
 
-func (handler *NativeLibraryLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(WARN, logAttributes)
-}
-
-func (handler *NativeLibraryLogHandler) Error(message string) {
+func (handler *NativeLibraryLogHandler) Error(message interface{}) {
 	handler.LogAtLevel(ERROR, message)
 }
 
-func (handler *NativeLibraryLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(ERROR, logAttributes)
-}
-
-func (handler *NativeLibraryLogHandler) ErrorWithError(err error) {
-	handler.LogAtLevel(ERROR, fmt.Sprintf(err.Error()))
-}
-
-func (handler *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
-	handler.deriveDestination(logLevel).Println("[" + string(logLevel) + "] " + handler.formatter.Format(logAttributes))
+func (handler *NativeLibraryLogHandler) LogAtLevel(logLevel LogLevel, message interface{}) {
+	messageAttributes := toLogAttributes(message)
+	handler.deriveDestination(logLevel).Println("[" + string(logLevel) + "] " + handler.formatter.Format(messageAttributes))
 }
 
 func (handler *NativeLibraryLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {

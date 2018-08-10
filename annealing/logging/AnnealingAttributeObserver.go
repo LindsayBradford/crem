@@ -70,5 +70,5 @@ func (this *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEve
 	default:
 		// deliberately does nothing extra
 	}
-	this.logHandler.LogAtLevelWithAttributes(AnnealerLogLevel, logAttributes)
+	this.logHandler.LogAtLevel(AnnealerLogLevel, logAttributes)
 }

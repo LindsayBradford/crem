@@ -28,56 +28,27 @@ func (handler *BareBonesLogHandler) WithFormatter(formatter LogFormatter) *BareB
 	return handler
 }
 
-func (handler *BareBonesLogHandler) Debug(message string) {
+func (handler *BareBonesLogHandler) Debug(message interface{}) {
 	handler.LogAtLevel(DEBUG, message)
 }
 
-func (handler *BareBonesLogHandler) DebugWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(DEBUG, logAttributes)
-}
-
-func (handler *BareBonesLogHandler) Info(message string) {
+func (handler *BareBonesLogHandler) Info(message interface{}) {
 	handler.LogAtLevel(INFO, message)
 }
 
-func (handler *BareBonesLogHandler) InfoWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(INFO, logAttributes)
-}
-
-func (handler *BareBonesLogHandler) Warn(message string) {
+func (handler *BareBonesLogHandler) Warn(message interface{}) {
 	handler.LogAtLevel(WARN, message)
 }
 
-func (handler *BareBonesLogHandler) WarnWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(WARN, logAttributes)
-}
-
-func (handler *BareBonesLogHandler) Error(message string) {
+func (handler *BareBonesLogHandler) Error(message interface{}) {
 	handler.LogAtLevel(ERROR, message)
 }
 
-func (handler *BareBonesLogHandler) ErrorWithAttributes(logAttributes LogAttributes) {
-	handler.LogAtLevelWithAttributes(ERROR, logAttributes)
-}
-
-func (handler *BareBonesLogHandler) ErrorWithError(err error) {
-	logAttributes := LogAttributes{NameValuePair{Name: "Error", Value: err.Error()}}
-	logAttributes = prependLogLevel(ERROR, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	handler.writeString(ERROR, handler.formatter.Format(logAttributes))
-}
-
-func (handler *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message string) {
-	logAttributes := LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
-	logAttributes = prependLogLevel(logLevel, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	handler.writeString(logLevel, handler.formatter.Format(logAttributes))
-}
-
-func (handler *BareBonesLogHandler) LogAtLevelWithAttributes(logLevel LogLevel, logAttributes LogAttributes) {
-	logAttributes = prependLogLevel(logLevel, logAttributes)
-	logAttributes = prependTimestamp(logAttributes)
-	handler.writeString(logLevel, handler.formatter.Format(logAttributes))
+func (handler *BareBonesLogHandler) LogAtLevel(logLevel LogLevel, message interface{}) {
+	messageAttributes := toLogAttributes(message)
+	messageAttributes = prependLogLevel(logLevel, messageAttributes)
+	messageAttributes = prependTimestamp(messageAttributes)
+	handler.writeString(logLevel, handler.formatter.Format(messageAttributes))
 }
 
 func (handler *BareBonesLogHandler) writeString(logLevel LogLevel, text string) {
