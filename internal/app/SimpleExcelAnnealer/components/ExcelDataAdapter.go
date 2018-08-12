@@ -26,7 +26,7 @@ func init() {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("Failed initialising via Excel data-source")
+			panic(errors.New("Failed initialising via Excel data-source"))
 		}
 	}()
 
@@ -39,7 +39,7 @@ func initialiseDataSource(filePath string) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			panic("workbook [" + filePath + "] could not be opened; data source initialisation failed")
+			panic(errors.New("could not open data source [" + filePath + "] for initialisation."))
 		}
 	}()
 
@@ -118,7 +118,7 @@ func storeTrackingTableToWorkbook(table *trackingTable) {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("failed storing data to excel data-source [" + absoluteFilePath + "]")
+			panic(errors.New("failed storing data to excel data-source [" + absoluteFilePath + "]"))
 		}
 	}()
 
@@ -203,7 +203,7 @@ func saveAndCloseWorkbook() {
 	defer func() {
 		if r := recover(); r != nil {
 			excelHandler.Destroy()
-			panic("failed saving data to Excel data-source [" + absoluteFilePath + "]")
+			panic(errors.New("failed saving data to Excel data-source [" + absoluteFilePath + "]"))
 		}
 	}()
 

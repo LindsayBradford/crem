@@ -136,6 +136,7 @@ func (explorer *SimpleExcelSolutionExplorer) Initialise() {
 	explorer.trackingData = initialiseTrackingTable()
 
 	explorer.LogHandler().Info("Data retrieved from workbook [" + explorer.dataSourcePath + "]")
+
 }
 
 func (explorer *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {

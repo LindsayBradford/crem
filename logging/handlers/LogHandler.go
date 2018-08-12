@@ -5,6 +5,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	. "github.com/LindsayBradford/crm/logging/formatters"
 	. "github.com/LindsayBradford/crm/logging/shared"
 )
@@ -95,7 +97,8 @@ func toLogAttributes(message interface{}) LogAttributes {
 		return LogAttributes{NameValuePair{Name: MessageNameLabel, Value: message}}
 	case error:
 		messageAsError, _ := message.(error)
-		return LogAttributes{NameValuePair{Name: "Error", Value: messageAsError.Error()}}
+		errorText := fmt.Sprintf("%v", messageAsError.Error())
+		return LogAttributes{NameValuePair{Name: "Error", Value: errorText}}
 	case LogAttributes:
 		messageAsAttributes, _ := message.(LogAttributes)
 		return messageAsAttributes

@@ -3,7 +3,7 @@
 package shared
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	. "github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/LindsayBradford/crm/logging/handlers"
@@ -116,7 +116,19 @@ func (sa *SimpleAnnealer) cloneState() *SimpleAnnealer {
 
 func (sa *SimpleAnnealer) Anneal() {
 	sa.solutionExplorer.SetLogHandler(sa.LogHandler())
+
+	defer func() {
+		if r := recover(); r != nil {
+			baseError, ok := r.(error)
+			if ok {
+				wrappingError := errors.Wrap(baseError, "annealing function failed")
+				panic(wrappingError)
+			}
+		}
+	}()
+
 	sa.solutionExplorer.Initialise()
+	defer sa.solutionExplorer.TearDown()
 
 	sa.annealingStarted()
 
@@ -130,7 +142,6 @@ func (sa *SimpleAnnealer) Anneal() {
 		done = sa.checkIfDone()
 	}
 
-	sa.solutionExplorer.TearDown()
 	sa.annealingFinished()
 }
 

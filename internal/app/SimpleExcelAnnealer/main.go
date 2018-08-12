@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
@@ -13,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -32,7 +32,6 @@ func main() {
 	}
 
 	if runErr != nil {
-		fmt.Printf("%+v", runErr)
 		os.Exit(1)
 	}
 
@@ -42,15 +41,36 @@ func main() {
 func buildAnnealingFunctions() {
 	annealer := buildAnnealerOffConfig()
 
-	annealingFunctions.UnProfiledFunction = func() error {
-		defaultLogHandler.Debug("About to call annealer.Anneal()")
-		annealer.Anneal()
-		defaultLogHandler.Debug("Call to annealer.Anneal() finished.")
+	handleRecovery := func(wrapperMessage string, recoveryMsg interface{}) error {
+		recoveryError, ok := recoveryMsg.(error)
+		if ok {
+			wrappedError := errors.Wrap(recoveryError, wrapperMessage)
+			defaultLogHandler.Error(wrappedError)
+			return wrappedError
+		}
 		return nil
 	}
 
-	annealingFunctions.ProfiledFunction = func() error {
-		defaultLogHandler.Debug("About to generate cpu profile to file [" + args.CpuProfile + "]")
+	annealingFunctions.UnProfiledFunction = func() (functionError error) {
+		defer func() {
+			if r := recover(); r != nil {
+				functionError = handleRecovery("un-profiled annealer", r)
+			}
+		}()
+
+		defaultLogHandler.Debug("About to call annealer.Anneal()")
+		annealer.Anneal()
+		defaultLogHandler.Debug("Call to annealer.Anneal() finished.")
+		return
+	}
+
+	annealingFunctions.ProfiledFunction = func() (functionError error) {
+		defer func() {
+			if r := recover(); r != nil {
+				functionError = handleRecovery("profiled annealer", r)
+			}
+		}()
+
 		defer defaultLogHandler.Debug("Cpu profiling to file [" + args.CpuProfile + "] now generated")
 		return profiling.CpuProfileOfFunctionToFile(annealingFunctions.UnProfiledFunction, args.CpuProfile)
 	}
@@ -66,7 +86,7 @@ func buildAnnealerOffConfig() shared.Annealer {
 func retrieveConfig() *config.CRMConfig {
 	configuration, retrieveError := config.Retrieve(args.ConfigFile)
 	if retrieveError != nil {
-		commandline.ExitWithError(retrieveError)
+		commandline.Exit(retrieveError)
 	}
 	return configuration
 }

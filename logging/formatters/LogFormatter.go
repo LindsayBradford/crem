@@ -32,20 +32,24 @@ func (formatter *NullFormatter) Format(attributes LogAttributes) string {
 // The default label for a LogAttributes entry that is used for storing free-form messages.
 const MessageNameLabel = "Message"
 
+const MessageErrorLabel = "Error"
+
 // RawMessageFormatter implements the Formatter interface by ignoring all logAttributes attributes supplied except
 // the 'message' (MessageNameLabel) attribute, and returns a "formatted" string exactly as was supplied
 // in that attribute.
 type RawMessageFormatter struct {
 	messageLabel string
+	errorLabel   string
 }
 
 func (formatter *RawMessageFormatter) Initialise() {
 	formatter.messageLabel = MessageNameLabel
+	formatter.errorLabel = MessageErrorLabel
 }
 
 func (formatter *RawMessageFormatter) Format(attributes LogAttributes) string {
 	for _, attribute := range attributes {
-		if attribute.Name == formatter.messageLabel {
+		if attribute.Name == formatter.messageLabel || attribute.Name == formatter.errorLabel {
 			return attribute.Value.(string)
 		}
 	}

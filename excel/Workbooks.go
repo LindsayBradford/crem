@@ -36,7 +36,7 @@ func (books *WorkbooksImpl) Add() (workbook Workbook) {
 func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
 	defer func() {
 		if r := recover(); r != nil {
-			panic(errors.New("cannot open excel file [" + filePath + "]"))
+			panic(errors.New("cannot open file [" + filePath + "]"))
 			workbook = nil
 		}
 	}()

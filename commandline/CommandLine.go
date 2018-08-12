@@ -71,25 +71,25 @@ func (args *Arguments) process() {
 
 	if args.ConfigFile == "" {
 		usageMessage()
-		os.Exit(0)
+		Exit(0)
 	}
 
 	if args.Version == true {
 		fmt.Println(
 			GetVersionString(),
 		)
-		os.Exit(0)
+		Exit(0)
 	}
 
 	if args.ConfigFile != "" {
 		pathInfo, err := os.Stat(args.ConfigFile)
 		if os.IsNotExist(err) {
 			exitError := errors.Errorf("config file specified [%s] does not exist", args.ConfigFile)
-			ExitWithError(exitError)
+			Exit(exitError)
 		}
 		if pathInfo.Mode().IsDir() {
 			exitError := errors.Errorf("config file specified [%s] is a directory, not a file", args.ConfigFile)
-			ExitWithError(exitError)
+			Exit(exitError)
 		}
 	}
 
@@ -97,18 +97,29 @@ func (args *Arguments) process() {
 		pathInfo, err := os.Stat(args.CpuProfile)
 		if !os.IsNotExist(err) {
 			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing file", args.CpuProfile)
-			ExitWithError(exitError)
+			Exit(exitError)
 		}
 		if pathInfo != nil && pathInfo.Mode().IsDir() {
 			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing directory", args.CpuProfile)
-			ExitWithError(exitError)
+			Exit(exitError)
 		}
 	}
 }
 
-func ExitWithError(exitingError error) {
-	fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.", exitingError)
-	os.Exit(1)
+func Exit(exitValue interface{}) {
+	var exitCode int
+	switch exitValue.(type) {
+	case error:
+		exitingError, _ := exitValue.(error)
+		fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.", exitingError)
+		exitCode = 1
+	case int:
+		exitValueAsInt, _ := exitValue.(int)
+		exitCode = exitValueAsInt
+	default:
+		exitCode = 0
+	}
+	os.Exit(exitCode)
 }
 
 // usageMessage is the function we supply to the flags package to upon
@@ -123,7 +134,7 @@ func usageMessage() {
 	fmt.Println()
 	fmt.Println("General usage takes the form:")
 	fmt.Printf("  %s --ConfigFile <FilePath>\n", justExecutableName())
-	os.Exit(0)
+	Exit(0)
 }
 
 // Returns a formatted string, identifying the utility, and it's
