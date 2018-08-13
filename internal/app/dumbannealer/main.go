@@ -26,7 +26,7 @@ func main() {
 	}
 
 	if runError != nil {
-		commandline.ExitWithError(runError)
+		commandline.Exit(runError)
 	}
 
 	defer flushStreams()
@@ -36,7 +36,7 @@ func buildAnnealingRunners() {
 	configuration, retrieveError := config.Retrieve(args.ConfigFile)
 
 	if retrieveError != nil {
-		commandline.ExitWithError(retrieveError)
+		commandline.Exit(retrieveError)
 	}
 
 	logger := components.BuildLogHandler()
