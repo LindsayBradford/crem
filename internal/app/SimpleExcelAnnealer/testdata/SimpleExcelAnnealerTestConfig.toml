@@ -9,7 +9,7 @@ NumberOfIterations = 200 # 200
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls``````````"
+InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.0 # 100.0
 
 [Annealer]
