@@ -33,25 +33,27 @@ func (formatter *NullFormatter) Format(attributes LogAttributes) string {
 const MessageNameLabel = "Message"
 
 const MessageErrorLabel = "Error"
+const MessageWarnLabel = "Warn"
 
 // RawMessageFormatter implements the Formatter interface by ignoring all logAttributes attributes supplied except
-// the 'message' (MessageNameLabel) attribute, and returns a "formatted" string exactly as was supplied
-// in that attribute.
-type RawMessageFormatter struct {
-	messageLabel string
-	errorLabel   string
-}
+// the 'Message, 'Error' and 'Warn' attribute, returning a "formatted" string exactly as per the attribute's value.
+type RawMessageFormatter struct{}
 
-func (formatter *RawMessageFormatter) Initialise() {
-	formatter.messageLabel = MessageNameLabel
-	formatter.errorLabel = MessageErrorLabel
-}
+func (formatter *RawMessageFormatter) Initialise() {}
 
 func (formatter *RawMessageFormatter) Format(attributes LogAttributes) string {
 	for _, attribute := range attributes {
-		if attribute.Name == formatter.messageLabel || attribute.Name == formatter.errorLabel {
+		if isSupportedName(attribute.Name) {
 			return attribute.Value.(string)
 		}
 	}
 	return ""
+}
+
+func isSupportedName(name string) bool {
+	switch name {
+	case MessageNameLabel, MessageErrorLabel, MessageWarnLabel:
+		return true
+	}
+	return false
 }
