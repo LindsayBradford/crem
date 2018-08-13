@@ -38,7 +38,7 @@ func (wb *WorkbookImpl) Worksheets() (worksheets Worksheets) {
 func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
 	defer func() {
 		if r := recover(); r != nil {
-			panic("cannot open worksheet at index [" + fmt.Sprintf("%d", index) + "]")
+			panic(errors.New("cannot open worksheet at index [" + fmt.Sprintf("%d", index) + "]"))
 		}
 	}()
 
@@ -50,7 +50,7 @@ func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
 func (wb *WorkbookImpl) WorksheetNamed(name string) Worksheet {
 	defer func() {
 		if r := recover(); r != nil {
-			panic("cannot open worksheet [" + name + "]")
+			panic(errors.New("cannot open worksheet [" + name + "]"))
 		}
 	}()
 
