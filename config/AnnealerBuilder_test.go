@@ -47,13 +47,13 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 
 	g.Expect(
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.DumbSolutionExplorer)
+	dummyExplorer := new(solution.DumbExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 }
 
 func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
@@ -92,13 +92,13 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 
 	g.Expect(
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.NullSolutionExplorer)
+	dummyExplorer := new(solution.NullExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 }
 
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
@@ -298,13 +298,13 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 
 	g.Expect(
 		solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.DumbSolutionExplorer)
+	dummyExplorer := new(solution.DumbExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
-		"Annealer should have built with config supplied SolutionExplorer")
+		"Annealer should have built with config supplied Explorer")
 
 	actualObservers := annealerUnderTest.Observers()
 

@@ -64,7 +64,7 @@ func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *Anneal
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithSolutionExplorer(explorer SolutionExplorer) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithSolutionExplorer(explorer Explorer) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetSolutionExplorer(explorer); err != nil {
 		builder.buildErrors.Add(err)
@@ -82,7 +82,7 @@ func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifie
 
 func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue float64) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
-	explorer := new(DumbSolutionExplorer)
+	explorer := new(DumbExplorer)
 	explorer.SetObjectiveValue(initialObjectiveValue)
 	annealerBeingBuilt.SetSolutionExplorer(explorer)
 	return builder

@@ -15,7 +15,7 @@ type SimpleAnnealer struct {
 	maxIterations    uint64
 	currentIteration uint64
 	eventNotifier    AnnealingEventNotifier
-	solutionExplorer SolutionExplorer
+	solutionExplorer Explorer
 	logger           LogHandler
 }
 
@@ -25,7 +25,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.maxIterations = 0
 	sa.currentIteration = 0
 	sa.eventNotifier = new(SynchronousAnnealingEventNotifier)
-	sa.solutionExplorer = NULL_SOLUTION_EXPLORER
+	sa.solutionExplorer = NULL_EXPLORER
 	sa.logger = new(NullLogHandler)
 }
 
@@ -65,11 +65,11 @@ func (sa *SimpleAnnealer) CurrentIteration() uint64 {
 	return sa.currentIteration
 }
 
-func (sa *SimpleAnnealer) SolutionExplorer() SolutionExplorer {
+func (sa *SimpleAnnealer) SolutionExplorer() Explorer {
 	return sa.solutionExplorer
 }
 
-func (sa *SimpleAnnealer) SetSolutionExplorer(explorer SolutionExplorer) error {
+func (sa *SimpleAnnealer) SetSolutionExplorer(explorer Explorer) error {
 	if explorer == nil {
 		return errors.New("invalid attempt to set Solution Explorer to nil value")
 	}

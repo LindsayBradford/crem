@@ -30,7 +30,7 @@ func BuildAnnealer(configuration *config.CRMConfig) (shared.Annealer, handlers.L
 func buildSimpleExcelExplorerRegistration() config.ExplorerRegistration {
 	return config.ExplorerRegistration{
 		ExplorerType: "SimpleExcelSolutionExplorer",
-		ConfigFunction: func(config config.SolutionExplorerConfig) solution.SolutionExplorer {
+		ConfigFunction: func(config config.SolutionExplorerConfig) solution.Explorer {
 			return new(SimpleExcelSolutionExplorer).
 				WithPenalty(config.Penalty).
 				WithName(config.Name).

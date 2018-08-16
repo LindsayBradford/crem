@@ -23,7 +23,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	const expectedCoolingFactor float64 = 0.5
 	const expectedIterations uint64 = 5000
 	expectedLogHandler := new(handlers.BareBonesLogHandler)
-	expectedSolutionExplorer := new(solution.DumbSolutionExplorer)
+	expectedSolutionExplorer := new(solution.DumbExplorer)
 	expectedObservers := []shared.AnnealingObserver{new(dummyObserver)}
 
 	builder := new(AnnealerBuilder)
@@ -60,7 +60,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer),
-		"Annealer should have built with supplied SolutionExplorer")
+		"Annealer should have built with supplied Explorer")
 
 	g.Expect(
 		annealer.Observers()).To(Equal(expectedObservers),
@@ -73,7 +73,7 @@ func TestBuild_BadInputs(t *testing.T) {
 	const badTemperature float64 = -1
 	const badCoolingFactor float64 = 1.0000001
 	badLogHandler := handlers.LogHandler(nil)
-	badExplorer := solution.SolutionExplorer(nil)
+	badExplorer := solution.Explorer(nil)
 
 	expectedErrors := 5
 
@@ -102,7 +102,7 @@ func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {
 
 	expectedObjectiveValue := float64(10)
 
-	expectedSolutionExplorer := new(solution.DumbSolutionExplorer)
+	expectedSolutionExplorer := new(solution.DumbExplorer)
 	expectedSolutionExplorer.SetObjectiveValue(expectedObjectiveValue)
 
 	builder := new(AnnealerBuilder)
@@ -116,6 +116,6 @@ func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(Equal(expectedSolutionExplorer),
-		"Annealer should have built with expected DumbSolutionExplorer")
+		"Annealer should have built with expected DumbExplorer")
 
 }

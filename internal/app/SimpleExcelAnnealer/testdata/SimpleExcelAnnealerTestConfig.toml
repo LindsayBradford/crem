@@ -1,6 +1,10 @@
 # An example TOML config file setting up SimpleExcelAnnealer
 Title = "SimpleExcelAnnealer"
 
+[[Loggers]]
+[Loggers.LogLevelDestinations]
+Debugging = "StandardOutput"
+
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"

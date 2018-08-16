@@ -37,7 +37,7 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with NullLogHandler")
 
 	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
+		annealer.SolutionExplorer()).To(Equal(solution.NULL_EXPLORER),
 		"Annealer should have built with Null Solution Explorer")
 
 	g.Expect(
@@ -73,7 +73,7 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	explorerErr := annealer.SetSolutionExplorer(nil)
 
 	g.Expect(explorerErr).To(Not(BeNil()))
-	g.Expect(annealer.SolutionExplorer()).To(Equal(solution.NULL_SOLUTION_EXPLORER),
+	g.Expect(annealer.SolutionExplorer()).To(Equal(solution.NULL_EXPLORER),
 		"Annealer should have ignored crap Solution Explorer set attempt")
 
 	observersErr := annealer.AddObserver(nil)
@@ -162,7 +162,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 }
 
 type TryCountingSolutionExplorer struct {
-	solution.NullSolutionExplorer
+	solution.NullExplorer
 	changesTried uint64
 }
 
@@ -188,7 +188,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 
 	g.Expect(explorerErr).To(BeNil())
 	g.Expect(annealer.solutionExplorer).To(BeIdenticalTo(expectedSolutionExplorer),
-		"Annealer should have accepted CountingObserver as new SolutionExplorer")
+		"Annealer should have accepted CountingObserver as new Explorer")
 
 	annealer.Anneal()
 

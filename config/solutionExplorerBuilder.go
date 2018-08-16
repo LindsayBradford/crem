@@ -15,7 +15,7 @@ type solutionExplorerBuilder struct {
 	registeredExplorers map[string]ExplorerConfigFunction
 }
 
-type ExplorerConfigFunction func(config SolutionExplorerConfig) solution.SolutionExplorer
+type ExplorerConfigFunction func(config SolutionExplorerConfig) solution.Explorer
 
 func (builder *solutionExplorerBuilder) initialise() *solutionExplorerBuilder {
 	if builder.errors == nil {
@@ -34,15 +34,15 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 
 	builder.RegisteringExplorer(
 		"NullSolutionExplorer",
-		func(config SolutionExplorerConfig) solution.SolutionExplorer {
-			return new(solution.NullSolutionExplorer).WithName(config.Name)
+		func(config SolutionExplorerConfig) solution.Explorer {
+			return new(solution.NullExplorer).WithName(config.Name)
 		},
 	)
 
 	builder.RegisteringExplorer(
 		"DumbSolutionExplorer",
-		func(config SolutionExplorerConfig) solution.SolutionExplorer {
-			return new(solution.DumbSolutionExplorer).WithName(config.Name)
+		func(config SolutionExplorerConfig) solution.Explorer {
+			return new(solution.DumbExplorer).WithName(config.Name)
 		},
 	)
 }
@@ -59,8 +59,8 @@ func (builder *solutionExplorerBuilder) RegisteringExplorer(explorerType string,
 	return builder
 }
 
-func (builder *solutionExplorerBuilder) Build(explorerName string) (solution.SolutionExplorer, error) {
-	var myExplorer solution.SolutionExplorer
+func (builder *solutionExplorerBuilder) Build(explorerName string) (solution.Explorer, error) {
+	var myExplorer solution.Explorer
 	if len(builder.config) == 0 {
 		builder.errors.Add(errors.New("configuration failed to specify any solution explorers"))
 	} else {
@@ -74,7 +74,7 @@ func (builder *solutionExplorerBuilder) Build(explorerName string) (solution.Sol
 	return myExplorer, nil
 }
 
-func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, explorers []solution.SolutionExplorer) solution.SolutionExplorer {
+func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, explorers []solution.Explorer) solution.Explorer {
 	for _, explorer := range explorers {
 		if explorer != nil && explorer.Name() == myExplorerName {
 			return explorer
@@ -87,8 +87,8 @@ func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, ex
 	return nil
 }
 
-func (builder *solutionExplorerBuilder) buildExplorers() []solution.SolutionExplorer {
-	explorerList := make([]solution.SolutionExplorer, len(builder.config))
+func (builder *solutionExplorerBuilder) buildExplorers() []solution.Explorer {
+	explorerList := make([]solution.Explorer, len(builder.config))
 	for index, currConfig := range builder.config {
 		_, foundExplorer := builder.registeredExplorers[currConfig.Type]
 

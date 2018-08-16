@@ -13,8 +13,8 @@ type Annealer interface {
 	SetCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
-	SolutionExplorer() SolutionExplorer
-	SetSolutionExplorer(explorer SolutionExplorer) error
+	SolutionExplorer() Explorer
+	SetSolutionExplorer(explorer Explorer) error
 
 	SetMaxIterations(iterations uint64)
 	MaxIterations() uint64

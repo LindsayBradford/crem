@@ -15,7 +15,7 @@ var (
 )
 
 type SimpleExcelSolutionExplorer struct {
-	BaseSolutionExplorer
+	SingleObjectiveAnnealableExplorer
 
 	dataSourcePath string
 	penalty        float64
@@ -119,7 +119,7 @@ type trackingData struct {
 }
 
 func (explorer *SimpleExcelSolutionExplorer) Initialise() {
-	explorer.BaseSolutionExplorer.Initialise()
+	explorer.SingleObjectiveAnnealableExplorer.Initialise()
 
 	initialiseDataSource(explorer.dataSourcePath)
 	explorer.LogHandler().Info("Opening Excel workbook [" + explorer.dataSourcePath + "] as data source")
@@ -150,7 +150,7 @@ func (explorer *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string)
 }
 
 func (explorer *SimpleExcelSolutionExplorer) TearDown() {
-	explorer.BaseSolutionExplorer.TearDown()
+	explorer.SingleObjectiveAnnealableExplorer.TearDown()
 	explorer.saveDataToWorkbookAndClose()
 	destroyExcelHandler()
 }
@@ -169,7 +169,7 @@ func (explorer *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
 func (explorer *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
 	explorer.temperature = temperature
 	explorer.makeRandomChange(temperature)
-	DecideOnWhetherToAcceptChange(explorer, temperature)
+	explorer.DecideOnWhetherToAcceptChange(temperature)
 }
 
 func (explorer *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
@@ -206,7 +206,7 @@ func (explorer *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {
 }
 
 func (explorer *SimpleExcelSolutionExplorer) AcceptLastChange() {
-	explorer.BaseSolutionExplorer.AcceptLastChange()
+	explorer.SingleObjectiveAnnealableExplorer.AcceptLastChange()
 	explorer.addTrackerData()
 }
 
@@ -250,10 +250,10 @@ func (explorer *SimpleExcelSolutionExplorer) RevertLastChange() {
 	explorer.SetObjectiveValue(explorer.ObjectiveValue() - explorer.ChangeInObjectiveValue())
 	explorer.SetChangeInObjectiveValue(0)
 	explorer.addTrackerData()
-	explorer.BaseSolutionExplorer.RevertLastChange()
+	explorer.SingleObjectiveAnnealableExplorer.RevertLastChange()
 }
 
 func (explorer *SimpleExcelSolutionExplorer) WithName(name string) *SimpleExcelSolutionExplorer {
-	explorer.BaseSolutionExplorer.SetName(name)
+	explorer.SingleObjectiveAnnealableExplorer.SetName(name)
 	return explorer
 }

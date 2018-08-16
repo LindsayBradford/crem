@@ -24,7 +24,7 @@ type AnnealerBuilder struct {
 	defaultLogHandler handlers.LogHandler
 	logHandlers       []handlers.LogHandler
 	observers         []AnnealingObserver
-	annealingExplorer solution.SolutionExplorer
+	annealingExplorer solution.Explorer
 }
 
 type ExplorerRegistration struct {
