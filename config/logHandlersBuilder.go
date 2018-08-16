@@ -36,18 +36,28 @@ func (builder *logHandlersBuilder) WithConfig(loggingConfig []LoggerConfig) *log
 
 func (builder *logHandlersBuilder) Build() ([]handlers.LogHandler, error) {
 
-	handlerList := make([]handlers.LogHandler, 1)
-	handlerList[defaultLoggerIndex] = builder.buildDefaultLogHandler()
+	handlerList := make([]handlers.LogHandler, 0)
+	handlerList = append(handlerList, builder.buildDefaultLogHandler()) // system-supplied default logger JIC config sux
 
 	for _, currConfig := range builder.config {
 		newLogHandler := builder.newHandlerFor(currConfig)
 		handlerList = append(handlerList, newLogHandler)
 	}
 
+	handlerList = builder.makeFirstConfigSuppliedLoggerTheDefault(handlerList)
+
 	if builder.errors.Size() > 0 {
 		return handlerList, builder.errors
+	} else {
+		return handlerList, nil
 	}
-	return handlerList, nil
+}
+
+func (builder *logHandlersBuilder) makeFirstConfigSuppliedLoggerTheDefault(handlerList []handlers.LogHandler) []handlers.LogHandler {
+	if len(builder.config) > 0 && builder.errors.Size() == 0 {
+		return handlerList[1:]
+	}
+	return handlerList
 }
 
 func (builder *logHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handlers.LogHandler {
