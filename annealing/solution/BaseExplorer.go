@@ -64,10 +64,7 @@ func (explorer *BaseExplorer) SetLogHandler(logHandler handlers.LogHandler) erro
 	return nil
 }
 
-func (explorer *BaseExplorer) TryRandomChange(temperature float64) {
-	explorer.makeRandomChange()
-	explorer.DecideOnWhetherToAcceptChange(temperature)
-}
+func (explorer *BaseExplorer) TryRandomChange(temperature float64) {}
 
 func (explorer *BaseExplorer) SetObjectiveValue(objectiveValue float64) {
 	explorer.objectiveValue = objectiveValue
@@ -93,24 +90,7 @@ func (explorer *BaseExplorer) SetAcceptanceProbability(probability float64) {
 	explorer.acceptanceProbability = probability
 }
 
-func (explorer *BaseExplorer) makeRandomChange() {}
-
-func (explorer *BaseExplorer) DecideOnWhetherToAcceptChange(annealingTemperature float64) {
-	if explorer.ChangeIsDesirable() {
-		explorer.SetAcceptanceProbability(1)
-		explorer.AcceptLastChange()
-	} else {
-		probabilityToAcceptBadChange := math.Exp(-explorer.ChangeInObjectiveValue() / annealingTemperature)
-		explorer.SetAcceptanceProbability(probabilityToAcceptBadChange)
-
-		randomValue := newRandomValue(explorer.RandomNumberGenerator())
-		if probabilityToAcceptBadChange > randomValue {
-			explorer.AcceptLastChange()
-		} else {
-			explorer.RevertLastChange()
-		}
-	}
-}
+func (explorer *BaseExplorer) DecideOnWhetherToAcceptChange(annealingTemperature float64) {}
 
 // newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
 // (which by default returns a random number in the range [0,1).
