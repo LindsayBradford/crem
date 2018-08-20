@@ -34,6 +34,14 @@ func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder 
 	return builder
 }
 
+func (builder *AnnealerBuilder) WithTitle(title string) *AnnealerBuilder {
+	annealerBeingBuilt := builder.annealer
+	if title != "" {
+		annealerBeingBuilt.SetTitle(title)
+	}
+	return builder
+}
+
 func (builder *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetLogHandler(logHandler); err != nil {

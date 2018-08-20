@@ -7,8 +7,8 @@ import (
 )
 
 type Annealer interface {
-	SetType(annealerType string)
-	Type() string
+	SetTitle(title string)
+	Title() string
 
 	SetTemperature(temperature float64) error
 	Temperature() float64

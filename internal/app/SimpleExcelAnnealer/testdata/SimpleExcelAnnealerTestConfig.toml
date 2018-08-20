@@ -1,5 +1,4 @@
-# An example TOML config file setting up SimpleExcelAnnealer
-Title = "SimpleExcelAnnealer"
+Title = "Example Simple Excel Annealer"
 
 [[Loggers]]
 [Loggers.LogLevelDestinations]

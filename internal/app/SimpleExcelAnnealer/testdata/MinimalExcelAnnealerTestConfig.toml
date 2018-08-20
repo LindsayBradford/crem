@@ -1,4 +1,4 @@
-# A minimal TOML config file setting up SimpleExcelAnnealer
+Title = "Example Minimal-Config Simple Excel Annealer"
 
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"

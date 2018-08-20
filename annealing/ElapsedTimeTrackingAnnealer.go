@@ -17,11 +17,11 @@ type ElapsedTimeTrackingAnnealer struct {
 
 func (annealer *ElapsedTimeTrackingAnnealer) Initialise() {
 	annealer.SimpleAnnealer.Initialise()
-	annealer.SimpleAnnealer.SetType("Elapsed-time tracking annealer")
+	annealer.SimpleAnnealer.SetTitle("Elapsed-Time Tracking Annealer")
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
-	annealer.LogHandler().Info(annealer.Type() + ": Starting")
+	annealer.LogHandler().Info(annealer.Title() + ": Starting")
 
 	annealer.startTime = Now()
 	annealer.SimpleAnnealer.Anneal()

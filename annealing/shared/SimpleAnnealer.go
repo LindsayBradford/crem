@@ -10,7 +10,7 @@ import (
 )
 
 type SimpleAnnealer struct {
-	annealerType     string
+	title            string
 	temperature      float64
 	coolingFactor    float64
 	maxIterations    uint64
@@ -21,7 +21,7 @@ type SimpleAnnealer struct {
 }
 
 func (sa *SimpleAnnealer) Initialise() {
-	sa.annealerType = "Simple"
+	sa.title = "Simple Annealer"
 	sa.temperature = 1
 	sa.coolingFactor = 1
 	sa.maxIterations = 0
@@ -31,12 +31,12 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.logger = new(NullLogHandler)
 }
 
-func (sa *SimpleAnnealer) SetType(annealerType string) {
-	sa.annealerType = annealerType
+func (sa *SimpleAnnealer) SetTitle(title string) {
+	sa.title = title
 }
 
-func (sa *SimpleAnnealer) Type() string {
-	return sa.annealerType
+func (sa *SimpleAnnealer) Title() string {
+	return sa.title
 }
 
 func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
