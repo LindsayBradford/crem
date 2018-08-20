@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
 // logging package contains AnnealingObserver implementations  that capture annealing events and log them to various
 // destinations in potentially very different formats (as dictated by handlers passed to a logger at build-time)

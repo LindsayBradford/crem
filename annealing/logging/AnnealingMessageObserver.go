@@ -1,4 +1,4 @@
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// (c) 2018 Australian Rivers Institute.
 
 package logging
 
@@ -15,20 +15,20 @@ type AnnealingMessageObserver struct {
 	AnnealingLogger
 }
 
-func (this *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *AnnealingMessageObserver {
-	this.logHandler = handler
-	return this
+func (amo *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *AnnealingMessageObserver {
+	amo.logHandler = handler
+	return amo
 }
 
-func (this *AnnealingMessageObserver) WithFilter(modulator LoggingFilter) *AnnealingMessageObserver {
-	this.filter = modulator
-	return this
+func (amo *AnnealingMessageObserver) WithFilter(modulator LoggingFilter) *AnnealingMessageObserver {
+	amo.filter = modulator
+	return amo
 }
 
 // ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
-func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	if this.logHandler.BeingDiscarded(AnnealerLogLevel) || this.filter.ShouldFilter(event) {
+func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
+	if amo.logHandler.BeingDiscarded(AnnealerLogLevel) || amo.filter.ShouldFilter(event) {
 		return
 	}
 
@@ -69,5 +69,5 @@ func (this *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent
 		// deliberately does nothing extra
 	}
 
-	this.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 }
