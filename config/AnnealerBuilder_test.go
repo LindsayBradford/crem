@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/annealing/logging"
+	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/annealing/solution"
 	. "github.com/onsi/gomega"
 )
@@ -70,7 +71,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(annealing.ElapsedTimeTrackingAnnealer)
+	dummyAnnealer := new(shared.SimpleAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
@@ -276,7 +277,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(annealing.OSThreadLockedAnnealer)
+	dummyAnnealer := new(shared.SimpleAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
@@ -309,7 +310,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	actualObservers := annealerUnderTest.Observers()
 
 	g.Expect(
-		len(actualObservers)).To(BeNumerically("==", 2),
+		len(actualObservers)).To(BeNumerically("==", 3),
 		"Annealer should have built with config supplied annealing observers")
 
 	dummyMessageObserver := new(logging.AnnealingMessageObserver)
@@ -321,4 +322,47 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 
 	g.Expect(actualObservers[1]).To(BeAssignableToTypeOf(dummyAttributeObserver),
 		"Annealer should have built with config supplied annealing attribute observer")
+}
+
+type TestRegistereableExplorer struct {
+	solution.BaseExplorer
+}
+
+func (tre *TestRegistereableExplorer) WithName(name string) *TestRegistereableExplorer {
+	tre.BaseExplorer.WithName(name)
+	return tre
+}
+
+func TestAnnealerBuilder_NullAnnealerWithCustomExplorer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	configUnderTest, retrieveError := Retrieve("testdata/NullAnnealerWithCustomExplorerConfig.toml")
+	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
+
+	builderUnderTest := new(AnnealerBuilder).RegisteringExplorer(
+		ExplorerRegistration{
+			ExplorerType: "TestDefinedSolutionExplorer",
+			ConfigFunction: func(config SolutionExplorerConfig) solution.Explorer {
+				return new(TestRegistereableExplorer).WithName(config.Name)
+			},
+		},
+	)
+
+	annealerUnderTest, logHandler, buildError :=
+		builderUnderTest.WithConfig(configUnderTest).Build()
+
+	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
+	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
+
+	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
+
+	g.Expect(
+		solutionExplorerUnderTest.Name()).To(Equal("testyName"),
+		"Annealer should have built with config supplied Explorer")
+
+	dummyExplorer := new(TestRegistereableExplorer)
+
+	g.Expect(
+		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
+		"Annealer should have built with config supplied Explorer")
 }

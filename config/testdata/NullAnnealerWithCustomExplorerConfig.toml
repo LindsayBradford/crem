@@ -1,10 +1,10 @@
 [[SolutionExplorers]]
-Type = "NullSolutionExplorer"
-Name = "validConfig"
+Type = "TestDefinedSolutionExplorer"
+Name = "testyName"
 
 [Annealer]
 Type = "Simple"
 StartingTemperature = 10.0
 CoolingFactor =  0.99
 MaximumIterations = 5
-SolutionExplorer = "validConfig"
+SolutionExplorer = "testyName"

@@ -64,8 +64,9 @@ func (builder *logHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handle
 	newLogger, newLogError := builder.deriveLogHandler(currConfig)
 	if newLogError != nil {
 		builder.errors.Add(newLogError)
+	} else {
+		ensureSupportForAnnealerLogLevel(newLogger)
 	}
-	ensureSupportForAnnealerLogLevel(newLogger)
 	return newLogger
 }
 

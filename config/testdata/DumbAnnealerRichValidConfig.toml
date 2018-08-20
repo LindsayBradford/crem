@@ -11,25 +11,29 @@ Annealing = "Discarded"
 [[Loggers]]
 Name = "FullyDescribedButDiscardedLogger"
 Type = "NativeLibrary"  # "NativeLibrary" (default) | "BareBones"
-Formatter = "RawMessage"  # "JSON" | "NameValuePair" | "RawMessage" (default)
+Formatter = "NameValuePair"  # "JSON" | "NameValuePair" | "RawMessage" (default)
 [Loggers.LogLevelDestinations]
-Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Information = "Discarded" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Warnings = "Discarded"    # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Errors = "Discarded"      # "Discarded"  | "StandardOutput" | "StandardError" (Default)
+Debugging = "StandardError"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"    # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"      # "Discarded"  | "StandardOutput" | "StandardError" (Default)
 Annealing = "Discarded"   # "Discarded"  | "StandardOutput" (Default) | "StandardError"
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
-Logger = "HumanAudienceLogger" # Must be one of the [[Loggers]] entries "Name" value
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 200 # 200
 
 [[AnnealingObservers]]
 Type = "AttributeObserver"
 Logger = "MachineAudienceLogger"
-IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations" (default)
-PercentileOfIterations = 0.0
+IterationFilter = "EveryElapsedSeconds" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations" (default)
+NumberOfSeconds = 1
+
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+PercentileOfIterations = 10.0
 
 [[SolutionExplorers]]
 Type = "DumbSolutionExplorer"
