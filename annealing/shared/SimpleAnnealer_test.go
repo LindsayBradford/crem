@@ -55,13 +55,13 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 
 	g.Expect(tempErr).To(Not(BeNil()))
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(float64(1)),
+		annealer.Temperature()).To(BeNumerically("==", 1),
 		"Annealer should have ignored crap Temperature set attempt")
 
 	coolingFactorErr := annealer.SetCoolingFactor(1.000001)
 
 	g.Expect(coolingFactorErr).To(Not(BeNil()))
-	g.Expect(annealer.CoolingFactor()).To(BeIdenticalTo(float64(1)),
+	g.Expect(annealer.CoolingFactor()).To(BeNumerically("==", 1),
 		"Annealer should have ignored crap CoolingFactor set attempt")
 
 	logHandlerErr := annealer.SetLogHandler(nil)
@@ -89,7 +89,7 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 	const startTemperature float64 = 1000.0
 	const coolingFactor float64 = 0.5
 	const iterations uint64 = 3
-	const expectedEndTemperature float64 = ((startTemperature * coolingFactor) * coolingFactor) * coolingFactor
+	const expectedEndTemperature = ((startTemperature * coolingFactor) * coolingFactor) * coolingFactor
 
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
@@ -103,26 +103,18 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 		"Annealer should have started with current iteration of 0")
 
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(startTemperature),
+		annealer.Temperature()).To(BeNumerically("==", startTemperature),
 		"Annealer should have started with expected start temperature")
 
 	annealer.Anneal()
 
 	g.Expect(
-		annealer.CurrentIteration()).To(BeIdenticalTo(annealer.MaxIterations()),
+		annealer.CurrentIteration()).To(BeNumerically("==", iterations),
 		"Annealer should have ended with current iteration = max iterations")
 
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(expectedEndTemperature),
+		annealer.Temperature()).To(BeNumerically("==", expectedEndTemperature),
 		"Annealer should have ended with temperature modified by cooling factor * iterations")
-}
-
-type CountingObserver struct {
-	eventCounts map[AnnealingEventType]uint64
-}
-
-func (this *CountingObserver) ObserveAnnealingEvent(event AnnealingEvent) {
-	this.eventCounts[event.EventType] += 1
 }
 
 func TestSimpleAnnealer_AddObserver(t *testing.T) {
@@ -137,10 +129,16 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	annealer.SetCoolingFactor(0.5)
 	annealer.SetMaxIterations(expectedIterations)
 
+	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
+
+	observerError := annealer.AddObserver(nil)
+
+	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
+
 	countingObserver := new(CountingObserver)
 	countingObserver.eventCounts = make(map[AnnealingEventType]uint64)
 
-	observerError := annealer.AddObserver(countingObserver)
+	observerError = annealer.AddObserver(countingObserver)
 
 	g.Expect(observerError).To(BeNil())
 	g.Expect(annealer.Observers()).To(ContainElement(countingObserver),
@@ -154,20 +152,70 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	g.Expect(countingObserver.eventCounts[FinishedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeIdenticalTo(expectedIterations),
+	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeIdenticalTo(expectedIterations),
+	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
-type TryCountingSolutionExplorer struct {
-	solution.NullExplorer
-	changesTried uint64
+func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	annealer := new(SimpleAnnealer)
+	annealer.Initialise()
+
+	notifier := new(ConcurrentAnnealingEventNotifier)
+	annealer.SetEventNotifier(notifier)
+	g.Expect(annealer.eventNotifier).To(Equal(notifier),
+		"Annealer should use the event notifier assigned to it")
+
+	const expectedIterations = uint64(3)
+
+	annealer.SetTemperature(1000.0)
+	annealer.SetCoolingFactor(0.5)
+	annealer.SetMaxIterations(expectedIterations)
+
+	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
+
+	observerError := annealer.AddObserver(nil)
+	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
+
+	countingObserver := new(CountingObserver)
+	countingObserver.eventCounts = make(map[AnnealingEventType]uint64)
+
+	observerError = annealer.AddObserver(countingObserver)
+
+	g.Expect(observerError).To(BeNil())
+	g.Expect(annealer.Observers()).To(ContainElement(countingObserver),
+		"Annealer should have accepted CountingObserver as new AnnealerObserver")
+
+	annealer.Anneal()
+
+	// Poll on last expected event with gomega's Eventually().  Expect rest to hold (without polling).
+
+	g.Eventually(
+		func() uint64 {
+			return countingObserver.eventCounts[FinishedAnnealing]
+		}).Should(BeNumerically("==", 1),
+		"Annealer should have posted 1 FinishedAnnealing event")
+
+	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeNumerically("==", 1),
+		"Annealer should have posted 1 StartedAnnealing event")
+
+	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeNumerically("==", expectedIterations),
+		"Annealer should have posted <expectedIterations> of  StartedIteration event")
+
+	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeNumerically("==", expectedIterations),
+		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
-func (this *TryCountingSolutionExplorer) TryRandomChange(temperature float64) {
-	this.changesTried += 1
+type CountingObserver struct {
+	eventCounts map[AnnealingEventType]uint64
+}
+
+func (co *CountingObserver) ObserveAnnealingEvent(event AnnealingEvent) {
+	co.eventCounts[event.EventType] += 1
 }
 
 func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
@@ -192,12 +240,17 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 
 	annealer.Anneal()
 
-	g.Expect(expectedSolutionExplorer.changesTried).To(BeIdenticalTo(expectedTryCount),
+	g.Expect(expectedSolutionExplorer.changesTried).To(BeNumerically("==", expectedTryCount),
 		"Annealer should have tried same number of changes as iterations")
 }
 
-type DummyLogHandler struct {
-	handlers.NullLogHandler
+type TryCountingSolutionExplorer struct {
+	solution.NullExplorer
+	changesTried uint64
+}
+
+func (tcse *TryCountingSolutionExplorer) TryRandomChange(temperature float64) {
+	tcse.changesTried += 1
 }
 
 func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
@@ -217,4 +270,8 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 	g.Expect(logHandlerErr).To(BeNil())
 	g.Expect(annealer.logger).To(BeIdenticalTo(expectedLogHandler),
 		"Annealer should have accepted DummyLogHandler as new logger")
+}
+
+type DummyLogHandler struct {
+	handlers.NullLogHandler
 }

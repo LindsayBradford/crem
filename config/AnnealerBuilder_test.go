@@ -277,7 +277,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(shared.SimpleAnnealer)
+	dummyAnnealer := new(annealing.OSThreadLockedAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),

@@ -14,28 +14,22 @@ type AnnealerBuilder struct {
 }
 
 func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
-	builder.annealer = &OSThreadLockedAnnealer{}
-	builder.annealer.Initialise()
-	if builder.buildErrors == nil {
-		builder.buildErrors = crmerrors.NewComposite("Failed to build valid OS thread-locked annealer")
-	}
-	return builder
+	return builder.forAnnealer(&OSThreadLockedAnnealer{})
 }
 
 func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
-	builder.annealer = &ElapsedTimeTrackingAnnealer{}
-	builder.annealer.Initialise()
-	if builder.buildErrors == nil {
-		builder.buildErrors = crmerrors.NewComposite("Failed to build valid elapsed-timed tracking annealer")
-	}
-	return builder
+	return builder.forAnnealer(&ElapsedTimeTrackingAnnealer{})
 }
 
 func (builder *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
-	builder.annealer = &SimpleAnnealer{}
+	return builder.forAnnealer(&SimpleAnnealer{})
+}
+
+func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder {
+	builder.annealer = annealer
 	builder.annealer.Initialise()
 	if builder.buildErrors == nil {
-		builder.buildErrors = crmerrors.NewComposite("Failed to build valid simple annealer")
+		builder.buildErrors = crmerrors.NewComposite("Failed to build valid annealer")
 	}
 	return builder
 }
