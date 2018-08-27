@@ -40,7 +40,7 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) (annealing.CallableSc
 		runner = profilableRunner
 	}
 
-	threadLockedRunner := new(annealing.OsThreadLockedRunner).
+	threadLockedRunner := new(annealing.OleSafeScenarioRunner).
 		ThatLocks(runner)
 
 	return threadLockedRunner, humanLogHandler

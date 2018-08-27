@@ -46,7 +46,7 @@ func (handler *ExcelHandler) Initialise() error {
 }
 
 func InitialiseHandler() *ExcelHandler {
-	ole.CoInitialize(0)
+	// ole.CoInitialize(0)
 
 	newHandler := new(ExcelHandler)
 
@@ -66,7 +66,7 @@ func (handler *ExcelHandler) Destroy() {
 	handler.Close()
 	handler.Quit()
 	defer (*ole.IDispatch)(handler.excel.dispatch).Release()
-	ole.CoUninitialize()
+	// ole.CoUninitialize()
 }
 
 func (handler *ExcelHandler) setProperty(propertyName string, propertyValue interface{}) {

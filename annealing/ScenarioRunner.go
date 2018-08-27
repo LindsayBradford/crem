@@ -11,6 +11,7 @@ import (
 	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
+	"github.com/go-ole/go-ole"
 )
 
 type CallableScenarioRunner interface {
@@ -186,25 +187,27 @@ func (runner *ProfilableScenarioRunner) Run() error {
 	return profiling.CpuProfileOfFunctionToFile(runner.base.Run, runner.profilePath)
 }
 
-type OsThreadLockedRunner struct {
+type OleSafeScenarioRunner struct {
 	base CallableScenarioRunner
 }
 
-func (runner *OsThreadLockedRunner) ThatLocks(base CallableScenarioRunner) *OsThreadLockedRunner {
+func (runner *OleSafeScenarioRunner) ThatLocks(base CallableScenarioRunner) *OleSafeScenarioRunner {
 	runner.base = base
 	return runner
 }
 
-func (runner *OsThreadLockedRunner) LogHandler() handlers.LogHandler {
+func (runner *OleSafeScenarioRunner) LogHandler() handlers.LogHandler {
 	return runner.base.LogHandler()
 }
 
-func (runner *OsThreadLockedRunner) Run() error {
-	runner.LogHandler().Debug("Locking scenario runner goroutine to the OS thread")
+func (runner *OleSafeScenarioRunner) Run() error {
+	runner.LogHandler().Debug("Locking scenario runner goroutine to the OS thread and co-initialising OLE")
 	runtime.LockOSThread()
+	ole.CoInitialize(0)
 
+	defer ole.CoUninitialize()
 	defer runtime.UnlockOSThread()
-	defer runner.LogHandler().Debug("Unlocked scenario runner goroutine from the OS thread")
+	defer runner.LogHandler().Debug("Unlocked scenario runner goroutine from the OS thread and Co-unitialised OLE")
 
 	return runner.base.Run()
 }
