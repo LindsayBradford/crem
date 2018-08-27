@@ -36,6 +36,7 @@ func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEven
 	explorer := wrapSolutionExplorer(event.Annealer.SolutionExplorer())
 
 	logAttributes := make(LogAttributes, 0)
+	logAttributes = append(logAttributes, NameValuePair{Name: "Id", Value: annealer.Id()})
 	logAttributes = append(logAttributes, NameValuePair{Name: "Event", Value: event.EventType.String()})
 
 	switch event.EventType {

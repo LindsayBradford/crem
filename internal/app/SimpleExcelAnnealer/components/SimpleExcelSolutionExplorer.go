@@ -5,6 +5,8 @@ package components
 import (
 	"math"
 	"math/rand"
+	"path/filepath"
+	"strings"
 	"time"
 
 	. "github.com/LindsayBradford/crm/annealing/solution"
@@ -26,6 +28,7 @@ type SimpleExcelSolutionExplorer struct {
 	temperature float64
 
 	previousPlanningUnitChanged uint64
+	excelDataAdapter            *ExcelDataAdapter
 }
 
 type annealingTable struct {
@@ -120,12 +123,14 @@ type trackingData struct {
 
 func (explorer *SimpleExcelSolutionExplorer) Initialise() {
 	explorer.SingleObjectiveAnnealableExplorer.Initialise()
+	explorer.excelDataAdapter = new(ExcelDataAdapter)
+	explorer.excelDataAdapter.Initialise()
 
-	initialiseDataSource(explorer.dataSourcePath)
+	explorer.excelDataAdapter.initialiseDataSource(explorer.dataSourcePath)
 	explorer.LogHandler().Info("Opening Excel workbook [" + explorer.dataSourcePath + "] as data source")
 
 	explorer.LogHandler().Debug("Retrieving annealing data from workbook")
-	explorer.annealingData = retrieveAnnealingTableFromWorkbook()
+	explorer.annealingData = explorer.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
 
 	currentPenalty := explorer.deriveTotalPenalty()
 	currentCost := explorer.deriveFeatureCost()
@@ -133,10 +138,9 @@ func (explorer *SimpleExcelSolutionExplorer) Initialise() {
 	explorer.SetObjectiveValue(currentCost*0.8 + currentPenalty)
 
 	explorer.LogHandler().Debug("Clearing tracking data from workbook")
-	explorer.trackingData = initialiseTrackingTable()
+	explorer.trackingData = explorer.excelDataAdapter.initialiseTrackingTable()
 
 	explorer.LogHandler().Info("Data retrieved from workbook [" + explorer.dataSourcePath + "]")
-
 }
 
 func (explorer *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
@@ -152,18 +156,32 @@ func (explorer *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string)
 func (explorer *SimpleExcelSolutionExplorer) TearDown() {
 	explorer.SingleObjectiveAnnealableExplorer.TearDown()
 	explorer.saveDataToWorkbookAndClose()
-	destroyExcelHandler()
+	explorer.excelDataAdapter.destroyExcelHandler()
 }
 
 func (explorer *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
-	explorer.LogHandler().Info("Storing data to workbook [" + explorer.dataSourcePath + "]")
-	storeAnnealingTableToWorkbook(explorer.annealingData)
-	storeTrackingTableToWorkbook(explorer.trackingData)
+	newFileName := toSafeFileName(explorer.ScenarioId())
 
-	explorer.LogHandler().Debug("Saving workbook [" + explorer.dataSourcePath + "]")
-	saveAndCloseWorkbook()
+	originalFilePath := filepath.Dir(explorer.excelDataAdapter.absoluteFilePath)
+	outputPath := filepath.Join(originalFilePath, newFileName)
 
-	explorer.LogHandler().Debug("Workbook [" + explorer.dataSourcePath + "] closed")
+	explorer.LogHandler().Info("Storing data to workbook [" + outputPath + "]")
+	explorer.excelDataAdapter.storeAnnealingTableToWorkbook(explorer.annealingData)
+	explorer.excelDataAdapter.storeTrackingTableToWorkbook(explorer.trackingData)
+
+	explorer.LogHandler().Debug("Saving workbook [" + outputPath + "]")
+	explorer.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
+
+	explorer.LogHandler().Debug("Workbook [" + outputPath + "] closed")
+}
+
+func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
+	response = strings.Replace(possiblyUnsafeFilePath, " ", "", -1)
+	// response = strings.Replace(response, "(", "_", -1)
+	// response = strings.Replace(response, ")", "_", -1)
+	response = strings.Replace(response, "/", "_of_", -1)
+	response = response + ".xls"
+	return response
 }
 
 func (explorer *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
@@ -256,4 +274,9 @@ func (explorer *SimpleExcelSolutionExplorer) RevertLastChange() {
 func (explorer *SimpleExcelSolutionExplorer) WithName(name string) *SimpleExcelSolutionExplorer {
 	explorer.SingleObjectiveAnnealableExplorer.SetName(name)
 	return explorer
+}
+
+func (explorer *SimpleExcelSolutionExplorer) Clone() Explorer {
+	clone := *explorer
+	return &clone
 }

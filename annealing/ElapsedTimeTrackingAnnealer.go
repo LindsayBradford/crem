@@ -17,12 +17,10 @@ type ElapsedTimeTrackingAnnealer struct {
 
 func (annealer *ElapsedTimeTrackingAnnealer) Initialise() {
 	annealer.SimpleAnnealer.Initialise()
-	annealer.SimpleAnnealer.SetTitle("Elapsed-Time Tracking Annealer")
+	annealer.SimpleAnnealer.SetId("Elapsed-Time Tracking Annealer")
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
-	annealer.LogHandler().Info(annealer.Title() + ": Starting")
-
 	annealer.startTime = Now()
 	annealer.SimpleAnnealer.Anneal()
 	annealer.finishTime = Now()
@@ -31,9 +29,16 @@ func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {
-	return Sprintf("Total elapsed time of annealing = [%v]", annealer.ElapsedTime())
+	return Sprintf("%s: total elapsed time of annealing = [%v]", annealer.Id(), annealer.ElapsedTime())
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() Duration {
 	return annealer.finishTime.Sub(annealer.startTime)
+}
+
+func (annealer *ElapsedTimeTrackingAnnealer) Clone() Annealer {
+	clone := *annealer
+	explorerClone := annealer.SolutionExplorer().Clone()
+	clone.SetSolutionExplorer(explorerClone)
+	return &clone
 }

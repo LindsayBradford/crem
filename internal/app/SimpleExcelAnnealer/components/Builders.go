@@ -5,16 +5,16 @@ package components
 import (
 	"os"
 
-	"github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/annealing/solution"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
-func BuildAnnealer(configuration *config.CRMConfig) (shared.Annealer, handlers.LogHandler) {
+func BuildScenarioRunner(scenarioConfig *config.CRMConfig) (*annealing.ScenarioRunner, handlers.LogHandler) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
-			WithConfig(configuration).
+			WithConfig(scenarioConfig).
 			RegisteringExplorer(buildSimpleExcelExplorerRegistration()).
 			Build()
 
@@ -24,7 +24,13 @@ func BuildAnnealer(configuration *config.CRMConfig) (shared.Annealer, handlers.L
 		os.Exit(1)
 	}
 
-	return newAnnealer, humanLogHandler
+	runner := new(annealing.ScenarioRunner).
+		ForAnnealer(newAnnealer).
+		WithName(scenarioConfig.ScenarioName).
+		WithRunNumber(scenarioConfig.RunNumber).
+		Concurrently(scenarioConfig.RunConcurrently)
+
+	return runner, humanLogHandler
 }
 
 func buildSimpleExcelExplorerRegistration() config.ExplorerRegistration {

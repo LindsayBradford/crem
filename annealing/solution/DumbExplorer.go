@@ -55,3 +55,8 @@ func (dse *DumbExplorer) RevertLastChange() {
 	dse.objectiveValue -= dse.changeInObjectiveValue
 	dse.SingleObjectiveAnnealableExplorer.RevertLastChange()
 }
+
+func (dse *DumbExplorer) Clone() Explorer {
+	clone := *dse
+	return &clone
+}

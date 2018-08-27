@@ -1,6 +1,6 @@
-# An example TOML config file setting up DumbAnnealer
-
-Title = "DumbAnnealer"
+ScenarioName = "Example Dumb Annealer"
+RunNumber = 2
+RunConcurrently = false
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)

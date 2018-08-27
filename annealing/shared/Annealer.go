@@ -7,8 +7,8 @@ import (
 )
 
 type Annealer interface {
-	SetTitle(title string)
-	Title() string
+	SetId(title string)
+	Id() string
 
 	SetTemperature(temperature float64) error
 	Temperature() float64
@@ -31,6 +31,7 @@ type Annealer interface {
 	LogHandler() LogHandler
 
 	Initialise()
+	Clone() Annealer
 
 	CurrentIteration() uint64
 

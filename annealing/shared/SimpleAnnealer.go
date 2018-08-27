@@ -10,7 +10,7 @@ import (
 )
 
 type SimpleAnnealer struct {
-	title            string
+	id               string
 	temperature      float64
 	coolingFactor    float64
 	maxIterations    uint64
@@ -21,7 +21,7 @@ type SimpleAnnealer struct {
 }
 
 func (sa *SimpleAnnealer) Initialise() {
-	sa.title = "Simple Annealer"
+	sa.id = "Simple Annealer"
 	sa.temperature = 1
 	sa.coolingFactor = 1
 	sa.maxIterations = 0
@@ -31,12 +31,13 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.logger = new(NullLogHandler)
 }
 
-func (sa *SimpleAnnealer) SetTitle(title string) {
-	sa.title = title
+func (sa *SimpleAnnealer) SetId(title string) {
+	sa.id = title
+	sa.solutionExplorer.SetScenarioId(title)
 }
 
-func (sa *SimpleAnnealer) Title() string {
-	return sa.title
+func (sa *SimpleAnnealer) Id() string {
+	return sa.id
 }
 
 func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
@@ -116,12 +117,14 @@ func (sa *SimpleAnnealer) Observers() []AnnealingObserver {
 }
 
 func (sa *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
-	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.cloneState(), eventType)
+	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.Clone(), eventType)
 }
 
-func (sa *SimpleAnnealer) cloneState() *SimpleAnnealer {
-	cloneOfThis := *sa
-	return &cloneOfThis
+func (sa *SimpleAnnealer) Clone() Annealer {
+	clone := *sa
+	explorerClone := sa.SolutionExplorer().Clone()
+	clone.SetSolutionExplorer(explorerClone)
+	return &clone
 }
 
 func (sa *SimpleAnnealer) Anneal() {

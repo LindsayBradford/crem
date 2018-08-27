@@ -11,11 +11,13 @@ type AnnealerFormatWrapper struct {
 	MethodFormats    map[string]string
 }
 
+const defaultStringFormat = "%s"
 const defaultFloat64Format = "%f"
 const defaultUintFormat = "%d"
 
 func (wrapper *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
 	wrapper.MethodFormats = map[string]string{
+		"iD":               defaultStringFormat,
 		"Temperature":      defaultFloat64Format,
 		"CoolingFactor":    defaultFloat64Format,
 		"MaxIterations":    defaultUintFormat,
@@ -31,6 +33,10 @@ func (wrapper *AnnealerFormatWrapper) Wrapping(annealer Annealer) *AnnealerForma
 
 func (wrapper *AnnealerFormatWrapper) Wrap(annealer Annealer) {
 	wrapper.AnnealerToFormat = annealer
+}
+
+func (wrapper *AnnealerFormatWrapper) Id() string {
+	return wrapper.applyFormatting("Id", wrapper.AnnealerToFormat.Id())
 }
 
 func (wrapper *AnnealerFormatWrapper) Temperature() string {

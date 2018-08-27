@@ -6,7 +6,7 @@ package main
 import (
 	"os"
 
-	"github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
@@ -39,7 +39,7 @@ func main() {
 }
 
 func buildAnnealingFunctions() {
-	annealer := buildAnnealerOffConfig()
+	scenarioRunner := buildScenarioOffConfig()
 
 	handleRecovery := func(wrapperMessage string, recoveryMsg interface{}) error {
 		recoveryError, ok := recoveryMsg.(error)
@@ -54,20 +54,18 @@ func buildAnnealingFunctions() {
 	annealingFunctions.UnProfiledFunction = func() (functionError error) {
 		defer func() {
 			if r := recover(); r != nil {
-				functionError = handleRecovery("un-profiled annealer", r)
+				functionError = handleRecovery("un-profiled scenarioRunner", r)
 			}
 		}()
 
-		defaultLogHandler.Debug("About to call annealer.Anneal()")
-		annealer.Anneal()
-		defaultLogHandler.Debug("Call to annealer.Anneal() finished.")
+		scenarioRunner.Run()
 		return
 	}
 
 	annealingFunctions.ProfiledFunction = func() (functionError error) {
 		defer func() {
 			if r := recover(); r != nil {
-				functionError = handleRecovery("profiled annealer", r)
+				functionError = handleRecovery("profiled scenarioRunner", r)
 			}
 		}()
 
@@ -76,11 +74,11 @@ func buildAnnealingFunctions() {
 	}
 }
 
-func buildAnnealerOffConfig() shared.Annealer {
-	config := retrieveConfig()
-	annealer, annealerLogHandler := components.BuildAnnealer(config)
+func buildScenarioOffConfig() *annealing.ScenarioRunner {
+	scenarioConfig := retrieveConfig()
+	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig)
 	defaultLogHandler = annealerLogHandler
-	return annealer
+	return scenarioRunner
 }
 
 func retrieveConfig() *config.CRMConfig {

@@ -11,7 +11,11 @@ type Explorer interface {
 	Name() string
 	SetName(name string)
 
+	ScenarioId() string
+	SetScenarioId(name string)
+
 	Initialise()
+	Clone() Explorer
 	TryRandomChange(temperature float64)
 
 	ObjectiveValue() float64

@@ -42,7 +42,9 @@ func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
 	}()
 
 	newWorkbook := new(WorkbookImpl)
-	newWorkbook.dispatch = books.call("Open", filePath, true)
+	const dontUpdateLinks = false
+	const openReadOnly = false
+	newWorkbook.dispatch = books.call("Open", filePath, dontUpdateLinks, openReadOnly)
 	return newWorkbook
 }
 

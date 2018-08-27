@@ -1,3 +1,7 @@
+ScenarioName = "Example Rich Valid Configuration"
+RunNumber = 2
+RunConcurrently = true
+
 [[Loggers]]
 Name = "HumanAudienceLogger"
 

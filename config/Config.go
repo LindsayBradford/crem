@@ -25,8 +25,12 @@ func Retrieve(configFilePath string) (*CRMConfig, error) {
 }
 
 type CRMConfig struct {
-	Title              string
-	FilePath           string
+	FilePath string
+
+	ScenarioName    string
+	RunNumber       uint64
+	RunConcurrently bool
+
 	Annealer           AnnealingConfig
 	Loggers            []LoggerConfig
 	AnnealingObservers []AnnealingObserverConfig

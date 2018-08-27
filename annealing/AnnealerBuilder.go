@@ -34,10 +34,10 @@ func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder 
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithTitle(title string) *AnnealerBuilder {
+func (builder *AnnealerBuilder) WithId(title string) *AnnealerBuilder {
 	annealerBeingBuilt := builder.annealer
 	if title != "" {
-		annealerBeingBuilt.SetTitle(title)
+		annealerBeingBuilt.SetId(title)
 	}
 	return builder
 }
@@ -86,6 +86,7 @@ func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue f
 	annealerBeingBuilt := builder.annealer
 	explorer := new(DumbExplorer)
 	explorer.SetObjectiveValue(initialObjectiveValue)
+	explorer.SetScenarioId(annealerBeingBuilt.Id())
 	annealerBeingBuilt.SetSolutionExplorer(explorer)
 	return builder
 }

@@ -13,6 +13,7 @@ import (
 
 type BaseExplorer struct {
 	name                   string
+	scenarioId             string
 	objectiveValue         float64
 	changeInObjectiveValue float64
 	changeIsDesirable      bool
@@ -49,6 +50,19 @@ func (explorer *BaseExplorer) SetName(name string) {
 
 func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
 	explorer.name = name
+	return explorer
+}
+
+func (explorer *BaseExplorer) ScenarioId() string {
+	return explorer.scenarioId
+}
+
+func (explorer *BaseExplorer) SetScenarioId(id string) {
+	explorer.scenarioId = id
+}
+
+func (explorer *BaseExplorer) WithScenarioId(id string) *BaseExplorer {
+	explorer.scenarioId = id
 	return explorer
 }
 
@@ -117,4 +131,9 @@ func (explorer *BaseExplorer) RevertLastChange() {
 
 func (explorer *BaseExplorer) ChangeAccepted() bool {
 	return explorer.changeAccepted
+}
+
+func (explorer *BaseExplorer) Clone() Explorer {
+	clone := *explorer
+	return &clone
 }

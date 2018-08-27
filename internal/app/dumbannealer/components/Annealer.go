@@ -5,14 +5,14 @@ package components
 import (
 	"os"
 
-	. "github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/config"
 )
 
-func BuildDumbAnnealer(annealerConfig *config.CRMConfig) Annealer {
+func BuildScenarioRunner(scenarioConfig *config.CRMConfig) *annealing.ScenarioRunner {
 	newAnnealer, logHandler, buildError :=
 		new(config.AnnealerBuilder).
-			WithConfig(annealerConfig).
+			WithConfig(scenarioConfig).
 			Build()
 
 	if buildError != nil {
@@ -21,5 +21,11 @@ func BuildDumbAnnealer(annealerConfig *config.CRMConfig) Annealer {
 		os.Exit(1)
 	}
 
-	return newAnnealer
+	runner := new(annealing.ScenarioRunner).
+		ForAnnealer(newAnnealer).
+		WithName(scenarioConfig.ScenarioName).
+		WithRunNumber(scenarioConfig.RunNumber).
+		Concurrently(scenarioConfig.RunConcurrently)
+
+	return runner
 }

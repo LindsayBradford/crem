@@ -16,26 +16,26 @@ import (
 const tracker = "Tracker"
 const data = "Data"
 
-var (
+type ExcelDataAdapter struct {
 	excelHandler     *excel.ExcelHandler
 	workbook         excel.Workbook
 	absoluteFilePath string
-)
+}
 
-func init() {
+func (eda *ExcelDataAdapter) Initialise() {
 	defer func() {
 		if r := recover(); r != nil {
-			excelHandler.Destroy()
+			eda.excelHandler.Destroy()
 			panic(errors.New("Failed initialising via Excel data-source"))
 		}
 	}()
 
-	excelHandler = excel.InitialiseHandler()
+	eda.excelHandler = excel.InitialiseHandler()
 }
 
-func initialiseDataSource(filePath string) {
+func (eda *ExcelDataAdapter) initialiseDataSource(filePath string) {
 	workingDirectory, _ := os.Getwd()
-	absoluteFilePath = filepath.Join(workingDirectory, filePath)
+	eda.absoluteFilePath = filepath.Join(workingDirectory, filePath)
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -43,16 +43,16 @@ func initialiseDataSource(filePath string) {
 		}
 	}()
 
-	workbook = excelHandler.Workbooks().Open(absoluteFilePath)
+	eda.workbook = eda.excelHandler.Workbooks().Open(eda.absoluteFilePath)
 }
 
-func destroyExcelHandler() {
-	excelHandler.Destroy()
+func (eda *ExcelDataAdapter) destroyExcelHandler() {
+	eda.excelHandler.Destroy()
 }
 
-func retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
+func (eda *ExcelDataAdapter) retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 	table = new(annealingTable)
-	worksheet := workbook.WorksheetNamed(data)
+	worksheet := eda.workbook.WorksheetNamed(data)
 
 	const headerRowCount = uint(1)
 	worksheetRowCount := worksheet.UsedRange().Rows().Count()
@@ -80,16 +80,16 @@ func generateRandomInOutValue() InclusionStatus {
 	return (InclusionStatus)(randomNumberGenerator.Intn(2))
 }
 
-func storeAnnealingTableToWorkbook(table *annealingTable) {
-	worksheet := workbook.WorksheetNamed(data)
+func (eda *ExcelDataAdapter) storeAnnealingTableToWorkbook(table *annealingTable) {
+	worksheet := eda.workbook.WorksheetNamed(data)
 	for index := 0; index < len(table.rows); index++ {
 		worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PlanningUnitStatus))
 	}
 	worksheet.UsedRange().Columns().AutoFit()
 }
 
-func initialiseTrackingTable() *trackingTable {
-	clearTrackingDataFromWorkbook()
+func (eda *ExcelDataAdapter) initialiseTrackingTable() *trackingTable {
+	eda.clearTrackingDataFromWorkbook()
 	return createNewTrackingTable()
 }
 
@@ -109,20 +109,20 @@ func createNewTrackingTable() *trackingTable {
 	return newTrackingTable
 }
 
-func clearTrackingDataFromWorkbook() {
-	worksheet := workbook.WorksheetNamed(tracker)
+func (eda *ExcelDataAdapter) clearTrackingDataFromWorkbook() {
+	worksheet := eda.workbook.WorksheetNamed(tracker)
 	worksheet.UsedRange().Clear()
 }
 
-func storeTrackingTableToWorkbook(table *trackingTable) {
+func (eda *ExcelDataAdapter) storeTrackingTableToWorkbook(table *trackingTable) {
 	defer func() {
 		if r := recover(); r != nil {
-			excelHandler.Destroy()
-			panic(errors.New("failed storing data to excel data-source [" + absoluteFilePath + "]"))
+			eda.excelHandler.Destroy()
+			panic(errors.New("failed storing data to excel data-source [" + eda.absoluteFilePath + "]"))
 		}
 	}()
 
-	worksheet := workbook.WorksheetNamed(tracker)
+	worksheet := eda.workbook.WorksheetNamed(tracker)
 	storeTrackingTableToWorksheet(table, worksheet)
 	worksheet.UsedRange().Columns().AutoFit()
 }
@@ -199,14 +199,18 @@ func deleteTempCsvFile(tempFileName string) {
 	defer os.Remove(tempFileName)
 }
 
-func saveAndCloseWorkbook() {
+func (eda *ExcelDataAdapter) saveWorkbookAs(filePath string) {
+	eda.workbook.SaveAs(filePath)
+}
+
+func (eda *ExcelDataAdapter) saveAndCloseWorkbookAs(filePath string) {
 	defer func() {
 		if r := recover(); r != nil {
-			excelHandler.Destroy()
-			panic(errors.New("failed saving data to Excel data-source [" + absoluteFilePath + "]"))
+			eda.excelHandler.Destroy()
+			panic(errors.New("failed saving data to Excel data-source [" + filePath + "]"))
 		}
 	}()
 
-	workbook.Save()
-	workbook.Close()
+	eda.saveWorkbookAs(filePath)
+	eda.workbook.Close()
 }

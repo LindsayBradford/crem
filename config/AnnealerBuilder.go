@@ -61,7 +61,7 @@ func (builder *AnnealerBuilder) Build() (Annealer, handlers.LogHandler, error) {
 
 	newAnnealer, baseBuildError :=
 		builder.buildAnnealerOfType(annealerConfig.Type).
-			WithTitle(builder.config.Title).
+			WithId(builder.config.ScenarioName).
 			WithStartingTemperature(annealerConfig.StartingTemperature).
 			WithCoolingFactor(annealerConfig.CoolingFactor).
 			WithMaxIterations(annealerConfig.MaximumIterations).
@@ -95,10 +95,6 @@ func (builder *AnnealerBuilder) buildLogHandlers() {
 
 	builder.logHandlers = logHandlers
 	builder.setDefaultLogHandler()
-
-	defer func() {
-		builder.defaultLogHandler.Info("Configuring with [" + builder.config.FilePath + "]")
-	}()
 }
 
 func (builder *AnnealerBuilder) setDefaultLogHandler() {

@@ -104,6 +104,7 @@ func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {
 
 	expectedSolutionExplorer := new(solution.DumbExplorer)
 	expectedSolutionExplorer.SetObjectiveValue(expectedObjectiveValue)
+	expectedSolutionExplorer.SetScenarioId("Simple Annealer")
 
 	builder := new(AnnealerBuilder)
 

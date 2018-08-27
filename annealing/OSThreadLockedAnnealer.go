@@ -12,7 +12,7 @@ type OSThreadLockedAnnealer struct {
 
 func (annealer *OSThreadLockedAnnealer) Initialise() {
 	annealer.ElapsedTimeTrackingAnnealer.Initialise()
-	annealer.SimpleAnnealer.SetTitle("Operating System Thread-Locked Annealer")
+	annealer.SimpleAnnealer.SetId("Operating System Thread-Locked Annealer")
 }
 
 func (annealer *OSThreadLockedAnnealer) Anneal() {
