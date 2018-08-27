@@ -9,7 +9,7 @@ import (
 	"github.com/LindsayBradford/crm/config"
 )
 
-func BuildScenarioRunner(scenarioConfig *config.CRMConfig) *annealing.ScenarioRunner {
+func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
 	newAnnealer, logHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
@@ -26,6 +26,12 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) *annealing.ScenarioRu
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
 		Concurrently(scenarioConfig.RunConcurrently)
+
+	if scenarioConfig.CpuProfilePath != "" {
+		return new(annealing.ProfilableScenarioRunner).
+			ThatProfiles(runner).
+			ToFile(scenarioConfig.CpuProfilePath)
+	}
 
 	return runner
 }

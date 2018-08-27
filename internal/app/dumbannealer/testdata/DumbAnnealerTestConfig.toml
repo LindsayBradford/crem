@@ -1,6 +1,11 @@
 ScenarioName = "Example Dumb Annealer"
 RunNumber = 2
 RunConcurrently = false
+#CpuProfilePath = "testdata/cpuProfileData.dat"
+
+#[[Loggers]]
+#[Loggers.LogLevelDestinations]
+#Debugging = "StandardOutput"
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)

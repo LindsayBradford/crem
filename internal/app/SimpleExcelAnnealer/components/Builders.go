@@ -11,7 +11,7 @@ import (
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
-func BuildScenarioRunner(scenarioConfig *config.CRMConfig) (*annealing.ScenarioRunner, handlers.LogHandler) {
+func BuildScenarioRunner(scenarioConfig *config.CRMConfig) (annealing.CallableScenarioRunner, handlers.LogHandler) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
@@ -24,13 +24,26 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) (*annealing.ScenarioR
 		os.Exit(1)
 	}
 
-	runner := new(annealing.ScenarioRunner).
+	var runner annealing.CallableScenarioRunner
+
+	runner = new(annealing.ScenarioRunner).
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
 		Concurrently(scenarioConfig.RunConcurrently)
 
-	return runner, humanLogHandler
+	if scenarioConfig.CpuProfilePath != "" {
+		profilableRunner := new(annealing.ProfilableScenarioRunner).
+			ThatProfiles(runner).
+			ToFile(scenarioConfig.CpuProfilePath)
+
+		runner = profilableRunner
+	}
+
+	threadLockedRunner := new(annealing.OsThreadLockedRunner).
+		ThatLocks(runner)
+
+	return threadLockedRunner, humanLogHandler
 }
 
 func buildSimpleExcelExplorerRegistration() config.ExplorerRegistration {

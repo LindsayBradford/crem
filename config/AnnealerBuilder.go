@@ -132,8 +132,6 @@ func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *
 	switch annealerType {
 	case ElapsedTimeTracking, UnspecifiedAnnealerType:
 		return builder.baseBuilder.ElapsedTimeTrackingAnnealer()
-	case OSThreadLocked:
-		return builder.baseBuilder.OSThreadLockedAnnealer()
 	case Simple:
 		return builder.baseBuilder.SimpleAnnealer()
 	default:

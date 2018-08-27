@@ -30,6 +30,7 @@ type CRMConfig struct {
 	ScenarioName    string
 	RunNumber       uint64
 	RunConcurrently bool
+	CpuProfilePath  string
 
 	Annealer           AnnealingConfig
 	Loggers            []LoggerConfig

@@ -4,12 +4,19 @@ package annealing
 
 import (
 	"fmt"
+	"runtime"
 	"sync"
 	. "time"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crm/profiling"
 )
+
+type CallableScenarioRunner interface {
+	Run() error
+	LogHandler() handlers.LogHandler
+}
 
 type ScenarioRunner struct {
 	annealer   shared.Annealer
@@ -56,20 +63,27 @@ func (ao *ScenarioRunner) Concurrently(concurrently bool) *ScenarioRunner {
 	return ao
 }
 
-func (ao *ScenarioRunner) Run() {
+func (ao *ScenarioRunner) Run() error {
 	ao.logScenarioStartMessage()
 	ao.startTime = Now()
 
+	var runError error
 	if ao.concurrently {
-		ao.runConcurrently()
+		runError = ao.runConcurrently()
 	} else {
-		ao.runSequentially()
+		runError = ao.runSequentially()
 	}
 
 	ao.finishTime = Now()
 	ao.logHandler.Info("Finished running scenario \"" + ao.name + "\"")
 
 	ao.logHandler.Info(ao.generateElapsedTimeString())
+
+	return runError
+}
+
+func (ao *ScenarioRunner) LogHandler() handlers.LogHandler {
+	return ao.logHandler
 }
 
 func (ao *ScenarioRunner) logScenarioStartMessage() {
@@ -92,7 +106,7 @@ func (ao *ScenarioRunner) ElapsedTime() Duration {
 	return ao.finishTime.Sub(ao.startTime)
 }
 
-func (ao *ScenarioRunner) runConcurrently() {
+func (ao *ScenarioRunner) runConcurrently() error {
 	var wg sync.WaitGroup
 
 	runThenDone := func(runNumber uint64) {
@@ -105,12 +119,15 @@ func (ao *ScenarioRunner) runConcurrently() {
 		go runThenDone(runNumber)
 	}
 	wg.Wait()
+
+	return nil
 }
 
-func (ao *ScenarioRunner) runSequentially() {
+func (ao *ScenarioRunner) runSequentially() error {
 	for runNumber := uint64(1); runNumber <= ao.runNumber; runNumber++ {
 		ao.run(runNumber)
 	}
+	return nil
 }
 
 func (ao *ScenarioRunner) run(runNumber uint64) {
@@ -141,4 +158,53 @@ func (ao *ScenarioRunner) logRunFinishedMessage(runNumber uint64) {
 	if ao.runNumber > 1 {
 		ao.logHandler.Info(ao.generateCloneId(runNumber) + ": run finished")
 	}
+}
+
+type ProfilableScenarioRunner struct {
+	base        CallableScenarioRunner
+	profilePath string
+}
+
+func (runner *ProfilableScenarioRunner) ThatProfiles(base CallableScenarioRunner) *ProfilableScenarioRunner {
+	runner.base = base
+	return runner
+}
+
+func (runner *ProfilableScenarioRunner) ToFile(filePath string) *ProfilableScenarioRunner {
+	runner.profilePath = filePath
+	return runner
+}
+
+func (runner *ProfilableScenarioRunner) LogHandler() handlers.LogHandler {
+	return runner.base.LogHandler()
+}
+
+func (runner *ProfilableScenarioRunner) Run() error {
+	runner.LogHandler().Info("About to collect cpu profiling data to file [" + runner.profilePath + "]")
+	defer runner.LogHandler().Info("Collection of cpu profiling data to file [" + runner.profilePath + "] complete.")
+
+	return profiling.CpuProfileOfFunctionToFile(runner.base.Run, runner.profilePath)
+}
+
+type OsThreadLockedRunner struct {
+	base CallableScenarioRunner
+}
+
+func (runner *OsThreadLockedRunner) ThatLocks(base CallableScenarioRunner) *OsThreadLockedRunner {
+	runner.base = base
+	return runner
+}
+
+func (runner *OsThreadLockedRunner) LogHandler() handlers.LogHandler {
+	return runner.base.LogHandler()
+}
+
+func (runner *OsThreadLockedRunner) Run() error {
+	runner.LogHandler().Debug("Locking scenario runner goroutine to the OS thread")
+	runtime.LockOSThread()
+
+	defer runtime.UnlockOSThread()
+	defer runner.LogHandler().Debug("Unlocked scenario runner goroutine from the OS thread")
+
+	return runner.base.Run()
 }

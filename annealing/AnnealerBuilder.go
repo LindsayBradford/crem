@@ -13,10 +13,6 @@ type AnnealerBuilder struct {
 	buildErrors *crmerrors.CompositeError
 }
 
-func (builder *AnnealerBuilder) OSThreadLockedAnnealer() *AnnealerBuilder {
-	return builder.forAnnealer(&OSThreadLockedAnnealer{})
-}
-
 func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
 	return builder.forAnnealer(&ElapsedTimeTrackingAnnealer{})
 }

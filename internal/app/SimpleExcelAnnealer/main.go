@@ -74,7 +74,7 @@ func buildAnnealingFunctions() {
 	}
 }
 
-func buildScenarioOffConfig() *annealing.ScenarioRunner {
+func buildScenarioOffConfig() annealing.CallableScenarioRunner {
 	scenarioConfig := retrieveConfig()
 	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig)
 	defaultLogHandler = annealerLogHandler

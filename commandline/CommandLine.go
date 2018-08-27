@@ -38,13 +38,6 @@ type Arguments struct {
 func (args *Arguments) define() {
 
 	flag.StringVar(
-		&args.CpuProfile,
-		"CpuProfile",
-		"",
-		"write cpu profile to file",
-	)
-
-	flag.StringVar(
 		&args.ConfigFile,
 		"ConfigFile",
 		"",
@@ -92,18 +85,6 @@ func (args *Arguments) process() {
 			Exit(exitError)
 		}
 	}
-
-	if args.CpuProfile != "" {
-		pathInfo, err := os.Stat(args.CpuProfile)
-		if !os.IsNotExist(err) {
-			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing file", args.CpuProfile)
-			Exit(exitError)
-		}
-		if pathInfo != nil && pathInfo.Mode().IsDir() {
-			exitError := errors.Errorf("cpu profile file specified [%s] is a pre-existing directory", args.CpuProfile)
-			Exit(exitError)
-		}
-	}
 }
 
 func Exit(exitValue interface{}) {
@@ -130,7 +111,6 @@ func usageMessage() {
 	fmt.Println("  --Help                        Prints this help message.")
 	fmt.Println("  --Version                     Prints the version number of this utility.")
 	fmt.Println("  --ConfigFile  <FilePath>      File that configures the applications run-time behaviour.")
-	fmt.Println("  --CpuProfile  <FilePath>      Capture CPU profiling to file.")
 	fmt.Println()
 	fmt.Println("General usage takes the form:")
 	fmt.Printf("  %s --ConfigFile <FilePath>\n", justExecutableName())
