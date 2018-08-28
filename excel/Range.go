@@ -12,22 +12,26 @@ type Range interface {
 	Count() uint
 	Clear()
 	AutoFit()
+	Release()
 }
 
 type RangeImpl struct {
 	dispatch *ole.IDispatch
 }
 
+func (r *RangeImpl) WithDispatch(dispatch *ole.IDispatch) *RangeImpl {
+	r.dispatch = dispatch
+	return r
+}
+
 func (r *RangeImpl) Rows() Range {
-	rows := new(RangeImpl)
-	rows.dispatch = r.getProperty("Rows")
-	return rows
+	dispatch := r.getProperty("Rows")
+	return new(RangeImpl).WithDispatch(dispatch)
 }
 
 func (r *RangeImpl) Columns() Range {
-	columns := new(RangeImpl)
-	columns.dispatch = r.getProperty("Columns")
-	return columns
+	dispatch := r.getProperty("Columns")
+	return new(RangeImpl).WithDispatch(dispatch)
 }
 
 func (r *RangeImpl) Count() uint {
@@ -40,6 +44,10 @@ func (r *RangeImpl) Clear() {
 
 func (r *RangeImpl) AutoFit() {
 	r.call("AutoFit")
+}
+
+func (r *RangeImpl) Release() {
+	r.dispatch.Release()
 }
 
 func (r *RangeImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {

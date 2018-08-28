@@ -42,6 +42,7 @@ func doOleFunction(f func()) {
 
 func closeOleFunctionChannel() {
 	close(oleFunctionsChannel)
+	runtime.UnlockOSThread()
 }
 
 func main() {

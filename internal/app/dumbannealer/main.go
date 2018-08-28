@@ -7,12 +7,10 @@ import (
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/dumbannealer/components"
-	"github.com/LindsayBradford/crm/profiling"
 )
 
 var (
-	args               = commandline.ParseArguments()
-	annealingFunctions = new(profiling.OptionalProfilingFunctionPair)
+	args = commandline.ParseArguments()
 )
 
 func main() {

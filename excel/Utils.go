@@ -36,6 +36,7 @@ func callMethod(dispatch *ole.IDispatch, methodName string, parameters ...interf
 
 func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string, workbook Workbook) Worksheet {
 	worksheets := workbook.Worksheets()
+	defer worksheets.Release()
 	newWorksheet := worksheets.Add()
 
 	AddCsvFileContentToWorksheet(csvFilePath, newWorksheet)
@@ -47,20 +48,39 @@ func AddWorksheetFromCsvFileToWorkbook(csvFilePath string, worksheetName string,
 }
 
 func AddCsvFileContentToWorksheet(csvFilePath string, worksheet Worksheet) {
-	worksheet.UsedRange().Clear()
+	ClearUsedRange(worksheet)
 
 	queryTables := worksheet.QueryTables()
+	defer queryTables.Release()
+
 	newQueryTable := queryTables.AddCsvFileToWorksheet(csvFilePath, worksheet)
 	newQueryTable.SetProperty("TextFileParseType", 1) // xlDelimited
 	newQueryTable.SetProperty("TextFileCommaDelimiter", true)
 	newQueryTable.SetProperty("TextFileSpaceDelimiter", false)
 	newQueryTable.SetProperty("Refresh", false)
+
+	newQueryTable.Release()
 }
 
 func LastOfWorksheets(worksheets Worksheets) (worksheet Worksheet) {
 	worksheetCount := worksheets.Count()
-	lastWorksheet := worksheets.Item(worksheetCount)
-	return lastWorksheet
+	return worksheets.Item(worksheetCount)
+}
+
+func ColumnCount(worksheet Worksheet) uint {
+	usedRange := worksheet.UsedRange()
+	defer usedRange.Release()
+	columns := usedRange.Columns()
+	defer columns.Release()
+	return columns.Count()
+}
+
+func RowCount(worksheet Worksheet) uint {
+	usedRange := worksheet.UsedRange()
+	defer usedRange.Release()
+	rows := usedRange.Rows()
+	defer rows.Release()
+	return rows.Count()
 }
 
 func MoveWorksheetToLastInWorksheets(worksheet Worksheet, worksheets Worksheets) {
@@ -70,5 +90,21 @@ func MoveWorksheetToLastInWorksheets(worksheet Worksheet, worksheets Worksheets)
 			panic(errors.New(msg))
 		}
 	}()
-	worksheet.MoveToAfterWorksheet(LastOfWorksheets(worksheets))
+	lastWorksheet := LastOfWorksheets(worksheets)
+	defer lastWorksheet.Release()
+	worksheet.MoveToAfterWorksheet(lastWorksheet)
+}
+
+func AutoFitColumns(worksheet Worksheet) {
+	usedRange := worksheet.UsedRange()
+	defer usedRange.Release()
+	columns := usedRange.Columns()
+	defer columns.Release()
+	columns.AutoFit()
+}
+
+func ClearUsedRange(worksheet Worksheet) {
+	usedRange := worksheet.UsedRange()
+	defer usedRange.Release()
+	usedRange.Clear()
 }

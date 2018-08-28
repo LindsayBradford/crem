@@ -3,107 +3,87 @@
 package excel
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 )
 
-type ApplicationObject *ole.IUnknown
-
-type Excel struct {
+type oleWrapper struct {
 	dispatch *ole.IDispatch
 }
 
-type ExcelHandler struct {
-	appObject ApplicationObject
-	excel     *Excel
-	workbooks Workbooks
+func (ep *oleWrapper) Release() {
+	ep.dispatch.Release()
 }
 
-func (handler *ExcelHandler) Initialise() error {
-	err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED)
-	excelAppObject, err := oleutil.CreateObject("Excel.Application")
-
-	if err != nil {
-		return err
-	}
-
-	handler.appObject = excelAppObject
-
-	newExcelIDispatch, err := excelAppObject.QueryInterface(ole.IID_IDispatch)
-
-	if err != nil {
-		return err
-	}
-
-	newExcel := new(Excel)
-	newExcel.dispatch = newExcelIDispatch
-
-	handler.excel = newExcel
-
-	return nil
+type Excel struct {
+	oleWrapper
 }
 
-func InitialiseHandler() *ExcelHandler {
-	// ole.CoInitialize(0)
-
-	newHandler := new(ExcelHandler)
-
-	initialiseError := newHandler.Initialise()
-	if initialiseError != nil {
-		panic(initialiseError)
-	}
-
-	newHandler.setProperty("Visible", false)
-	newHandler.setProperty("DisplayAlerts", false)
-	newHandler.setProperty("ScreenUpdating", false)
-
-	return newHandler
+func (excel *Excel) WithDispatch(dispatch *ole.IDispatch) *Excel {
+	excel.dispatch = dispatch
+	return excel
 }
 
-func (handler *ExcelHandler) Destroy() {
-	handler.Close()
-	handler.Quit()
-	defer (*ole.IDispatch)(handler.excel.dispatch).Release()
-	// ole.CoUninitialize()
+type Handler struct {
+	excel *Excel
 }
 
-func (handler *ExcelHandler) setProperty(propertyName string, propertyValue interface{}) {
-	setProperty(handler.excel.dispatch, propertyName, propertyValue)
-}
-
-func (handler *ExcelHandler) getProperty(propertyName string) *ole.IDispatch {
-	return getProperty(handler.excel.dispatch, propertyName)
-}
-
-func (handler *ExcelHandler) Workbooks() Workbooks {
-	if handler.workbooks == nil {
-		newWorkbooks := new(WorkbooksImpl)
-		newWorkbooks.dispatch = handler.getProperty("Workbooks")
-
-		handler.workbooks = newWorkbooks
-	}
-	return handler.workbooks
-}
-
-func (handler *ExcelHandler) Close() (err error) {
+func (handler *Handler) Initialise() *Handler {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New("cannot close Excel handler")
+			recoveredError, ok := r.(error)
+			if ok {
+				wrappedError := errors.Wrap(recoveredError, "excel handler initialise failed")
+				panic(wrappedError)
+			}
+			panic(r)
 		}
 	}()
 
-	callMethod(handler.excel.dispatch, "Save")
+	if err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED); err != nil {
+		panic(err)
+	}
 
-	workbooks := handler.Workbooks()
-	workbooks.Close()
-	workbooks.Release()
+	appObject, err := oleutil.CreateObject("Excel.Application")
+	if err != nil {
+		panic(err)
+	}
+	defer appObject.Release()
 
-	return nil
+	excelDispatch, err := appObject.QueryInterface(ole.IID_IDispatch)
+	if err != nil {
+		panic(err)
+	}
+
+	handler.excel = new(Excel).WithDispatch(excelDispatch)
+	handler.setPropertiesForSilentOperation()
+
+	return handler
 }
 
-func (handler *ExcelHandler) Quit() (err error) {
-	callMethod(handler.excel.dispatch, "Quit")
-	return nil
+func (handler *Handler) setPropertiesForSilentOperation() {
+	handler.setProperty("Visible", false)
+	handler.setProperty("DisplayAlerts", false)
+	handler.setProperty("ScreenUpdating", false)
+}
+
+func (handler *Handler) Destroy() {
+	handler.excel.Release()
+	ole.CoUninitialize()
+}
+
+func (handler *Handler) Workbooks() Workbooks {
+	workbooksDispatch := handler.getProperty("Workbooks")
+	newWorkbooks := new(WorkbooksImpl).WithDispatch(workbooksDispatch)
+	return newWorkbooks
+}
+
+func (handler *Handler) setProperty(propertyName string, propertyValue interface{}) {
+	setProperty(handler.excel.dispatch, propertyName, propertyValue)
+}
+
+func (handler *Handler) getProperty(propertyName string) *ole.IDispatch {
+	return getProperty(handler.excel.dispatch, propertyName)
 }

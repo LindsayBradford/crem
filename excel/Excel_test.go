@@ -10,15 +10,16 @@ import (
 
 func TestMain(m *testing.M) {
 	setup()
-	retCode := m.Run()
+	returnCode := m.Run()
 	tearDown()
-	os.Exit(retCode)
+
+	os.Exit(returnCode)
 }
 
-var excelHandlerUnderTest *ExcelHandler
+var excelHandlerUnderTest *Handler
 
 func setup() {
-	excelHandlerUnderTest = InitialiseHandler()
+	excelHandlerUnderTest = new(Handler).Initialise()
 }
 
 func tearDown() {

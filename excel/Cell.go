@@ -9,10 +9,16 @@ import (
 type Cell interface {
 	Value() interface{}
 	SetValue(value interface{})
+	Release()
 }
 
 type CellImpl struct {
-	dispatch *ole.IDispatch
+	oleWrapper
+}
+
+func (cell *CellImpl) WithDispatch(dispatch *ole.IDispatch) *CellImpl {
+	cell.dispatch = dispatch
+	return cell
 }
 
 func (cell *CellImpl) Value() interface{} {

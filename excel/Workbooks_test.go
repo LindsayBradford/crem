@@ -14,9 +14,10 @@ func TestWorkbooks_Add(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
+	defer workbooksUnderTest.Release()
 
 	originalWorkbookCount := workbooksUnderTest.Count()
-	g.Expect(originalWorkbookCount).To(BeNumerically("==", 1), "Original Workbooks count should be 1")
+	g.Expect(originalWorkbookCount).To(BeNumerically("==", 0), "Original Workbooks count should be 1")
 
 	var workbook Workbook
 	addWWorkbookCall := func() {
@@ -28,13 +29,17 @@ func TestWorkbooks_Add(t *testing.T) {
 
 	newWorkbookCount := workbooksUnderTest.Count()
 
-	g.Expect(newWorkbookCount).To(BeNumerically("==", 2), "Workbooks add should increment count")
+	g.Expect(newWorkbookCount).To(BeNumerically("==", 1), "Workbooks add should increment count")
+
+	workbook.Close()
+	workbook.Release()
 }
 
 func TestWorkbooks_Open_Bad(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
+	defer workbooksUnderTest.Release()
 
 	var workbook *Workbook
 	addWWorkbookCall := func() {
@@ -50,6 +55,7 @@ func TestWorkbooks_Open_Good(t *testing.T) {
 	workingDirectory, _ := os.Getwd()
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
+	defer workbooksUnderTest.Release()
 
 	var validWorkbook Workbook
 	addWWorkbookCall := func() {
@@ -59,5 +65,5 @@ func TestWorkbooks_Open_Good(t *testing.T) {
 	g.Expect(addWWorkbookCall).To(Not(Panic()), "Workbooks Open of good file path should not panic")
 	g.Expect(validWorkbook).To(Not(BeNil()), "Open Workbooks to good file path should return workbook")
 
-	defer validWorkbook.Close()
+	validWorkbook.Close()
 }

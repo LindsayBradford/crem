@@ -4,14 +4,12 @@ package annealing
 
 import (
 	"fmt"
-	"runtime"
 	"sync"
 	. "time"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
-	"github.com/go-ole/go-ole"
 )
 
 type CallableScenarioRunner interface {
@@ -37,6 +35,7 @@ func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRun
 	runner.runNumber = 1
 	runner.concurrently = false
 	runner.name = "Default Scenario"
+	runner.tearDown = defaultTeadDown
 
 	runner.logHandler = annealer.LogHandler()
 	runner.annealer = annealer
@@ -218,11 +217,9 @@ func (runner *OleSafeScenarioRunner) LogHandler() handlers.LogHandler {
 
 func (runner *OleSafeScenarioRunner) Run() error {
 	runner.LogHandler().Debug("Making scenario runner goroutine OLE thread-safe")
-	runtime.LockOSThread()
-	ole.CoInitialize(0)
-
-	defer ole.CoUninitialize()
-	defer runtime.UnlockOSThread()
+	// ole.CoInitialize(0)
+	//
+	// defer ole.CoUninitialize()
 	defer runner.LogHandler().Debug("Released OLE thread-safe scenario runner goroutine resources")
 
 	return runner.base.Run()

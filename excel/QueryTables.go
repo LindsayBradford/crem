@@ -6,19 +6,24 @@ import "github.com/go-ole/go-ole"
 
 type QueryTables interface {
 	AddCsvFileToWorksheet(csvFilePath string, worksheet Worksheet) QueryTable
+	Release()
 }
 
 type QueryTablesImpl struct {
-	dispatch *ole.IDispatch
+	oleWrapper
+}
+
+func (qt *QueryTablesImpl) WithDispatch(dispatch *ole.IDispatch) *QueryTablesImpl {
+	qt.dispatch = dispatch
+	return qt
 }
 
 func (qt *QueryTablesImpl) AddCsvFileToWorksheet(csvFilePath string, worksheet Worksheet) QueryTable {
 	topLeftCellOfWorksheet := worksheet.Cells(1, 1)
+	defer topLeftCellOfWorksheet.Release()
 	cellImpl := topLeftCellOfWorksheet.(*CellImpl)
-
-	newQueryTable := new(QueryTableImpl)
-	newQueryTable.dispatch = qt.call("Add", "TEXT;"+csvFilePath, cellImpl.dispatch)
-	return newQueryTable
+	dispatch := qt.call("Add", "TEXT;"+csvFilePath, cellImpl.dispatch)
+	return new(QueryTableImpl).WithDispatch(dispatch)
 }
 
 func (qt *QueryTablesImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {

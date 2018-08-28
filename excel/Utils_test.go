@@ -14,6 +14,7 @@ func TestUtils_AddWorksheetFromCsvFileToWorkbook(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
+	defer workbooksUnderTest.Release()
 
 	workingDirectory, _ := os.Getwd()
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")

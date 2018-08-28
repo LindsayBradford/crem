@@ -177,7 +177,7 @@ func (e *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
 	e.excelDataAdapter.storeTrackingTableToWorkbook(e.trackingData)
 
 	e.LogHandler().Debug("Saving workbook [" + outputPath + "]")
-	e.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
+	e.excelDataAdapter.saveWorkbookAs(outputPath)
 
 	e.LogHandler().Debug("Workbook [" + outputPath + "] closed")
 }

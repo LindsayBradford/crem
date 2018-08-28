@@ -15,11 +15,18 @@ type Workbook interface {
 	WorksheetNamed(name string) Worksheet
 	Save()
 	SaveAs(newFileName string)
-	Close()
+	Close(args ...interface{})
+	SetProperty(propertyName string, propertyValue interface{})
+	Release()
 }
 
 type WorkbookImpl struct {
-	dispatch *ole.IDispatch
+	oleWrapper
+}
+
+func (wb *WorkbookImpl) WithDispatch(dispatch *ole.IDispatch) *WorkbookImpl {
+	wb.dispatch = dispatch
+	return wb
 }
 
 func (wb *WorkbookImpl) Worksheets() (worksheets Worksheets) {
@@ -30,9 +37,8 @@ func (wb *WorkbookImpl) Worksheets() (worksheets Worksheets) {
 		}
 	}()
 
-	newWorksheets := new(WorksheetsImpl)
-	newWorksheets.dispatch = wb.getProperty("Worksheets")
-	return newWorksheets
+	dispatch := wb.getProperty("Worksheets")
+	return new(WorksheetsImpl).WithDispatch(dispatch)
 }
 
 func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
@@ -42,9 +48,8 @@ func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
 		}
 	}()
 
-	newWorksheet := new(WorksheetImpl)
-	newWorksheet.dispatch = wb.getProperty("Worksheets", index)
-	return newWorksheet
+	dispatch := wb.getProperty("Worksheets", index)
+	return new(WorksheetImpl).WithDispatch(dispatch)
 }
 
 func (wb *WorkbookImpl) WorksheetNamed(name string) Worksheet {
@@ -54,9 +59,8 @@ func (wb *WorkbookImpl) WorksheetNamed(name string) Worksheet {
 		}
 	}()
 
-	namedWorksheet := new(WorksheetImpl)
-	namedWorksheet.dispatch = wb.getProperty("Worksheets", name)
-	return namedWorksheet
+	dispatch := wb.getProperty("Worksheets", name)
+	return new(WorksheetImpl).WithDispatch(dispatch)
 }
 
 func (wb *WorkbookImpl) Save() {
@@ -67,8 +71,9 @@ func (wb *WorkbookImpl) SaveAs(newFileName string) {
 	wb.call("SaveAs", newFileName)
 }
 
-func (wb *WorkbookImpl) Close() {
-	wb.call("Close")
+func (wb *WorkbookImpl) Close(parameters ...interface{}) {
+	wb.call("Close", parameters...)
+	wb.Release()
 }
 
 func (wb *WorkbookImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
@@ -77,4 +82,8 @@ func (wb *WorkbookImpl) getProperty(propertyName string, parameters ...interface
 
 func (wb *WorkbookImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {
 	return callMethod(wb.dispatch, methodName, parameters...)
+}
+
+func (wb *WorkbookImpl) SetProperty(propertyName string, propertyValue interface{}) {
+	setProperty(wb.dispatch, propertyName, propertyValue)
 }

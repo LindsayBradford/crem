@@ -8,6 +8,10 @@ import (
 	"github.com/go-ole/go-ole"
 )
 
+const dontUpdateLinks = false
+const openReadOnly = false
+const dontSaveChanges = false
+
 type Workbooks interface {
 	Add() (workbook Workbook)
 	Open(filePath string) (workbook Workbook)
@@ -17,7 +21,12 @@ type Workbooks interface {
 }
 
 type WorkbooksImpl struct {
-	dispatch *ole.IDispatch
+	oleWrapper
+}
+
+func (books *WorkbooksImpl) WithDispatch(dispatch *ole.IDispatch) *WorkbooksImpl {
+	books.dispatch = dispatch
+	return books
 }
 
 func (books *WorkbooksImpl) Add() (workbook Workbook) {
@@ -28,9 +37,8 @@ func (books *WorkbooksImpl) Add() (workbook Workbook) {
 		}
 	}()
 
-	newWorkbook := new(WorkbookImpl)
-	newWorkbook.dispatch = books.call("Add")
-	return newWorkbook
+	bookDispatch := books.call("Add")
+	return new(WorkbookImpl).WithDispatch(bookDispatch)
 }
 
 func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
@@ -41,23 +49,16 @@ func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
 		}
 	}()
 
-	newWorkbook := new(WorkbookImpl)
-	const dontUpdateLinks = false
-	const openReadOnly = false
-	newWorkbook.dispatch = books.call("Open", filePath, dontUpdateLinks, openReadOnly)
-	return newWorkbook
+	bookDispatch := books.call("Open", filePath, dontUpdateLinks, openReadOnly)
+	return new(WorkbookImpl).WithDispatch(bookDispatch)
 }
 
 func (books *WorkbooksImpl) Close() {
-	books.call("Close", false)
+	books.call("Close", dontSaveChanges)
 }
 
 func (books *WorkbooksImpl) Count() uint {
 	return (uint)(getPropertyValue(books.dispatch, "Count"))
-}
-
-func (books *WorkbooksImpl) Release() {
-	books.dispatch.Release()
 }
 
 func (books *WorkbooksImpl) call(methodName string, parameters ...interface{}) *ole.IDispatch {

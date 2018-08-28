@@ -13,10 +13,16 @@ type Worksheets interface {
 	Add() (worksheet Worksheet)
 	Count() uint
 	Item(index uint) Worksheet
+	Release()
 }
 
 type WorksheetsImpl struct {
 	dispatch *ole.IDispatch
+}
+
+func (sheets *WorksheetsImpl) WithDispatch(dispatch *ole.IDispatch) *WorksheetsImpl {
+	sheets.dispatch = dispatch
+	return sheets
 }
 
 func (sheets *WorksheetsImpl) Add() (worksheet Worksheet) {
@@ -28,9 +34,8 @@ func (sheets *WorksheetsImpl) Add() (worksheet Worksheet) {
 		}
 	}()
 
-	newWorksheet := new(WorksheetImpl)
-	newWorksheet.dispatch = sheets.call("Add")
-	return newWorksheet
+	dispatch := sheets.call("Add")
+	return new(WorksheetImpl).WithDispatch(dispatch)
 }
 
 func (sheets *WorksheetsImpl) Count() uint {
@@ -38,9 +43,12 @@ func (sheets *WorksheetsImpl) Count() uint {
 }
 
 func (sheets *WorksheetsImpl) Item(index uint) Worksheet {
-	worksheetAtIndex := new(WorksheetImpl)
-	worksheetAtIndex.dispatch = sheets.getProperty("Item", index)
-	return worksheetAtIndex
+	dispatch := sheets.getProperty("Item", index)
+	return new(WorksheetImpl).WithDispatch(dispatch)
+}
+
+func (sheets *WorksheetsImpl) Release() {
+	sheets.dispatch.Release()
 }
 
 func (sheets *WorksheetsImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
