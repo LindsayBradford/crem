@@ -27,96 +27,112 @@ type ScenarioRunner struct {
 	operationType string
 	runNumber     uint64
 	concurrently  bool
+	tearDown      func()
 
 	startTime  Time
 	finishTime Time
 }
 
-func (ao *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRunner {
-	ao.runNumber = 1
-	ao.concurrently = false
-	ao.name = "Default Scenario"
+func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRunner {
+	runner.runNumber = 1
+	runner.concurrently = false
+	runner.name = "Default Scenario"
 
-	ao.logHandler = annealer.LogHandler()
-	ao.annealer = annealer
+	runner.logHandler = annealer.LogHandler()
+	runner.annealer = annealer
 
-	return ao
+	return runner
 }
 
-func (ao *ScenarioRunner) WithName(name string) *ScenarioRunner {
+func (runner *ScenarioRunner) WithName(name string) *ScenarioRunner {
 	if name == "" {
-		return ao
+		return runner
 	}
-	ao.name = name
-	return ao
+	runner.name = name
+	return runner
 }
 
-func (ao *ScenarioRunner) WithRunNumber(runNumber uint64) *ScenarioRunner {
+func (runner *ScenarioRunner) WithRunNumber(runNumber uint64) *ScenarioRunner {
 	if runNumber == 0 {
-		return ao
+		return runner
 	}
-	ao.runNumber = runNumber
-	return ao
+	runner.runNumber = runNumber
+	return runner
 }
 
-func (ao *ScenarioRunner) Concurrently(concurrently bool) *ScenarioRunner {
-	ao.concurrently = concurrently
-	return ao
+func (runner *ScenarioRunner) WithTearDownFunction(tearDown func()) *ScenarioRunner {
+	if tearDown != nil {
+		runner.tearDown = tearDown
+	} else {
+		runner.tearDown = defaultTeadDown
+	}
+	return runner
 }
 
-func (ao *ScenarioRunner) Run() error {
-	ao.logScenarioStartMessage()
-	ao.startTime = Now()
+func defaultTeadDown() {
+	// deliberately does nothing
+}
+
+func (runner *ScenarioRunner) Concurrently(concurrently bool) *ScenarioRunner {
+	runner.concurrently = concurrently
+	return runner
+}
+
+func (runner *ScenarioRunner) Run() error {
+	runner.logScenarioStartMessage()
+	runner.startTime = Now()
 
 	var runError error
-	if ao.concurrently {
-		runError = ao.runConcurrently()
+	if runner.concurrently {
+		runError = runner.runConcurrently()
 	} else {
-		runError = ao.runSequentially()
+		runError = runner.runSequentially()
 	}
 
-	ao.finishTime = Now()
-	ao.logHandler.Info("Finished running scenario \"" + ao.name + "\"")
+	runner.finishTime = Now()
+	runner.logHandler.Info("Finished running scenario \"" + runner.name + "\"")
 
-	ao.logHandler.Info(ao.generateElapsedTimeString())
+	runner.logHandler.Info(runner.generateElapsedTimeString())
+
+	runner.tearDown()
 
 	return runError
 }
 
-func (ao *ScenarioRunner) LogHandler() handlers.LogHandler {
-	return ao.logHandler
+func (runner *ScenarioRunner) LogHandler() handlers.LogHandler {
+	return runner.logHandler
 }
 
-func (ao *ScenarioRunner) logScenarioStartMessage() {
+func (runner *ScenarioRunner) logScenarioStartMessage() {
 	var runTypeText string
-	if ao.concurrently {
+	if runner.concurrently {
 		runTypeText = "concurrently"
 	} else {
 		runTypeText = "sequentially"
 	}
 
-	message := fmt.Sprintf("Scenario \"%s\": configured for %d run(s), executed %s", ao.name, ao.runNumber, runTypeText)
-	ao.logHandler.Info(message)
+	message := fmt.Sprintf("Scenario \"%s\": configured for %d run(s), executed %s", runner.name, runner.runNumber, runTypeText)
+	runner.logHandler.Info(message)
 }
 
-func (ao *ScenarioRunner) generateElapsedTimeString() string {
-	return fmt.Sprintf("Total elapsed time of scenario = [%v]", ao.ElapsedTime())
+func (runner *ScenarioRunner) generateElapsedTimeString() string {
+	return fmt.Sprintf("Total elapsed time of scenario = [%v]", runner.ElapsedTime())
 }
 
-func (ao *ScenarioRunner) ElapsedTime() Duration {
-	return ao.finishTime.Sub(ao.startTime)
+func (runner *ScenarioRunner) ElapsedTime() Duration {
+	return runner.finishTime.Sub(runner.startTime)
 }
 
-func (ao *ScenarioRunner) runConcurrently() error {
+func (runner *ScenarioRunner) runConcurrently() error {
 	var wg sync.WaitGroup
 
 	runThenDone := func(runNumber uint64) {
-		ao.run(runNumber)
+		runner.run(runNumber)
 		wg.Done()
 	}
 
-	wg.Add(int(ao.runNumber))
-	for runNumber := uint64(1); runNumber <= ao.runNumber; runNumber++ {
+	wg.Add(int(runner.runNumber))
+	for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
 		go runThenDone(runNumber)
 	}
 	wg.Wait()
@@ -124,40 +140,40 @@ func (ao *ScenarioRunner) runConcurrently() error {
 	return nil
 }
 
-func (ao *ScenarioRunner) runSequentially() error {
-	for runNumber := uint64(1); runNumber <= ao.runNumber; runNumber++ {
-		ao.run(runNumber)
+func (runner *ScenarioRunner) runSequentially() error {
+	for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
+		runner.run(runNumber)
 	}
 	return nil
 }
 
-func (ao *ScenarioRunner) run(runNumber uint64) {
-	annealerCopy := ao.annealer.Clone()
+func (runner *ScenarioRunner) run(runNumber uint64) {
+	annealerCopy := runner.annealer.Clone()
 
-	annealerCopy.SetId(ao.generateCloneId(runNumber))
+	annealerCopy.SetId(runner.generateCloneId(runNumber))
 
-	ao.logRunStartMessage(runNumber)
+	runner.logRunStartMessage(runNumber)
 	annealerCopy.Anneal()
-	ao.logRunFinishedMessage(runNumber)
+	runner.logRunFinishedMessage(runNumber)
 }
 
-func (ao *ScenarioRunner) generateCloneId(runNumber uint64) string {
-	if ao.runNumber > 1 {
-		return fmt.Sprintf("%s (%d/%d)", ao.name, runNumber, ao.runNumber)
+func (runner *ScenarioRunner) generateCloneId(runNumber uint64) string {
+	if runner.runNumber > 1 {
+		return fmt.Sprintf("%s (%d/%d)", runner.name, runNumber, runner.runNumber)
 	} else {
-		return ao.name
+		return runner.name
 	}
 }
 
-func (ao *ScenarioRunner) logRunStartMessage(runNumber uint64) {
-	if ao.runNumber > 1 {
-		ao.logHandler.Info(ao.generateCloneId(runNumber) + ": run started")
+func (runner *ScenarioRunner) logRunStartMessage(runNumber uint64) {
+	if runner.runNumber > 1 {
+		runner.logHandler.Info(runner.generateCloneId(runNumber) + ": run started")
 	}
 }
 
-func (ao *ScenarioRunner) logRunFinishedMessage(runNumber uint64) {
-	if ao.runNumber > 1 {
-		ao.logHandler.Info(ao.generateCloneId(runNumber) + ": run finished")
+func (runner *ScenarioRunner) logRunFinishedMessage(runNumber uint64) {
+	if runner.runNumber > 1 {
+		runner.logHandler.Info(runner.generateCloneId(runNumber) + ": run finished")
 	}
 }
 
@@ -201,13 +217,13 @@ func (runner *OleSafeScenarioRunner) LogHandler() handlers.LogHandler {
 }
 
 func (runner *OleSafeScenarioRunner) Run() error {
-	runner.LogHandler().Debug("Locking scenario runner goroutine to the OS thread and co-initialising OLE")
+	runner.LogHandler().Debug("Making scenario runner goroutine OLE thread-safe")
 	runtime.LockOSThread()
 	ole.CoInitialize(0)
 
 	defer ole.CoUninitialize()
 	defer runtime.UnlockOSThread()
-	defer runner.LogHandler().Debug("Unlocked scenario runner goroutine from the OS thread and Co-unitialised OLE")
+	defer runner.LogHandler().Debug("Released OLE thread-safe scenario runner goroutine resources")
 
 	return runner.base.Run()
 }

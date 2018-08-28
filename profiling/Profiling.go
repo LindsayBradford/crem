@@ -10,11 +10,6 @@ import (
 
 type ProfileableFunction func() error
 
-type OptionalProfilingFunctionPair struct {
-	UnProfiledFunction ProfileableFunction
-	ProfiledFunction   ProfileableFunction
-}
-
 // CpuProfileOfFunctionToFile establishes profiling based on what is passed as the cpuProfile
 // parameter. If an empty string, it's assumed profiling is not needed.  A non-empty
 // string is assumed to contain a path to a file in which profiling data is to be collated.

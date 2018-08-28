@@ -29,6 +29,7 @@ type SimpleExcelSolutionExplorer struct {
 
 	previousPlanningUnitChanged uint64
 	excelDataAdapter            *ExcelDataAdapter
+	oleWrapper                  func(f func())
 }
 
 type annealingTable struct {
@@ -121,58 +122,64 @@ type trackingData struct {
 	TotalCost               float64
 }
 
-func (explorer *SimpleExcelSolutionExplorer) Initialise() {
-	explorer.SingleObjectiveAnnealableExplorer.Initialise()
-	explorer.excelDataAdapter = new(ExcelDataAdapter)
-	explorer.excelDataAdapter.Initialise()
+func (e *SimpleExcelSolutionExplorer) Initialise() {
+	e.SingleObjectiveAnnealableExplorer.Initialise()
+	e.excelDataAdapter = new(ExcelDataAdapter).
+		Initialise().
+		WithOleFunctionWrapper(e.oleWrapper)
 
-	explorer.excelDataAdapter.initialiseDataSource(explorer.dataSourcePath)
-	explorer.LogHandler().Info("Opening Excel workbook [" + explorer.dataSourcePath + "] as data source")
+	e.excelDataAdapter.initialiseDataSource(e.dataSourcePath)
+	e.LogHandler().Info("Opening Excel workbook [" + e.dataSourcePath + "] as data source")
 
-	explorer.LogHandler().Debug("Retrieving annealing data from workbook")
-	explorer.annealingData = explorer.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
+	e.LogHandler().Debug("Retrieving annealing data from workbook")
+	e.annealingData = e.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
 
-	currentPenalty := explorer.deriveTotalPenalty()
-	currentCost := explorer.deriveFeatureCost()
+	currentPenalty := e.deriveTotalPenalty()
+	currentCost := e.deriveFeatureCost()
 
-	explorer.SetObjectiveValue(currentCost*0.8 + currentPenalty)
+	e.SetObjectiveValue(currentCost*0.8 + currentPenalty)
 
-	explorer.LogHandler().Debug("Clearing tracking data from workbook")
-	explorer.trackingData = explorer.excelDataAdapter.initialiseTrackingTable()
+	e.LogHandler().Debug("Clearing tracking data from workbook")
+	e.trackingData = e.excelDataAdapter.initialiseTrackingTable()
 
-	explorer.LogHandler().Info("Data retrieved from workbook [" + explorer.dataSourcePath + "]")
+	e.LogHandler().Info("Data retrieved from workbook [" + e.dataSourcePath + "]")
 }
 
-func (explorer *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
-	explorer.penalty = penalty
-	return explorer
+func (e *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
+	e.penalty = penalty
+	return e
 }
 
-func (explorer *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string) *SimpleExcelSolutionExplorer {
-	explorer.dataSourcePath = inputFilePath
-	return explorer
+func (e *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string) *SimpleExcelSolutionExplorer {
+	e.dataSourcePath = inputFilePath
+	return e
 }
 
-func (explorer *SimpleExcelSolutionExplorer) TearDown() {
-	explorer.SingleObjectiveAnnealableExplorer.TearDown()
-	explorer.saveDataToWorkbookAndClose()
-	explorer.excelDataAdapter.destroyExcelHandler()
+func (e *SimpleExcelSolutionExplorer) WithOleFunctionWrapper(wrapper func(f func())) *SimpleExcelSolutionExplorer {
+	e.oleWrapper = wrapper
+	return e
 }
 
-func (explorer *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
-	newFileName := toSafeFileName(explorer.ScenarioId())
+func (e *SimpleExcelSolutionExplorer) TearDown() {
+	e.SingleObjectiveAnnealableExplorer.TearDown()
+	e.saveDataToWorkbookAndClose()
+	e.excelDataAdapter.destroyExcelHandler()
+}
 
-	originalFilePath := filepath.Dir(explorer.excelDataAdapter.absoluteFilePath)
+func (e *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
+	newFileName := toSafeFileName(e.ScenarioId())
+
+	originalFilePath := filepath.Dir(e.excelDataAdapter.absoluteFilePath)
 	outputPath := filepath.Join(originalFilePath, newFileName)
 
-	explorer.LogHandler().Info("Storing data to workbook [" + outputPath + "]")
-	explorer.excelDataAdapter.storeAnnealingTableToWorkbook(explorer.annealingData)
-	explorer.excelDataAdapter.storeTrackingTableToWorkbook(explorer.trackingData)
+	e.LogHandler().Info("Storing data to workbook [" + outputPath + "]")
+	e.excelDataAdapter.storeAnnealingTableToWorkbook(e.annealingData)
+	e.excelDataAdapter.storeTrackingTableToWorkbook(e.trackingData)
 
-	explorer.LogHandler().Debug("Saving workbook [" + outputPath + "]")
-	explorer.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
+	e.LogHandler().Debug("Saving workbook [" + outputPath + "]")
+	e.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
 
-	explorer.LogHandler().Debug("Workbook [" + outputPath + "] closed")
+	e.LogHandler().Debug("Workbook [" + outputPath + "] closed")
 }
 
 func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
@@ -184,37 +191,37 @@ func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
 	return response
 }
 
-func (explorer *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
-	explorer.temperature = temperature
-	explorer.makeRandomChange(temperature)
-	explorer.DecideOnWhetherToAcceptChange(temperature)
+func (e *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
+	e.temperature = temperature
+	e.makeRandomChange(temperature)
+	e.DecideOnWhetherToAcceptChange(temperature)
 }
 
-func (explorer *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
-	previousPenalty := explorer.deriveTotalPenalty()
-	previousCost := explorer.deriveFeatureCost()
+func (e *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
+	previousPenalty := e.deriveTotalPenalty()
+	previousCost := e.deriveFeatureCost()
 
-	explorer.previousPlanningUnitChanged = explorer.annealingData.ToggleRandomPlanningUnit()
+	e.previousPlanningUnitChanged = e.annealingData.ToggleRandomPlanningUnit()
 
-	currentPenalty := explorer.deriveTotalPenalty()
-	currentCost := explorer.deriveFeatureCost()
+	currentPenalty := e.deriveTotalPenalty()
+	currentCost := e.deriveFeatureCost()
 
 	changeInObjectiveValue := (currentCost-previousCost)*0.8 + (currentPenalty - previousPenalty)
 
-	explorer.SetChangeInObjectiveValue(changeInObjectiveValue)
-	explorer.SetObjectiveValue(explorer.ObjectiveValue() + explorer.ChangeInObjectiveValue())
+	e.SetChangeInObjectiveValue(changeInObjectiveValue)
+	e.SetObjectiveValue(e.ObjectiveValue() + e.ChangeInObjectiveValue())
 }
 
-func (explorer *SimpleExcelSolutionExplorer) deriveTotalPenalty() float64 {
+func (e *SimpleExcelSolutionExplorer) deriveTotalPenalty() float64 {
 	totalPenalty := float64(0)
-	for index := 0; index < len(explorer.annealingData.rows); index++ {
-		totalPenalty += float64(explorer.annealingData.rows[index].PlanningUnitStatus) * explorer.annealingData.rows[index].Cost
+	for index := 0; index < len(e.annealingData.rows); index++ {
+		totalPenalty += float64(e.annealingData.rows[index].PlanningUnitStatus) * e.annealingData.rows[index].Cost
 	}
-	return math.Max(0, explorer.penalty-totalPenalty)
+	return math.Max(0, e.penalty-totalPenalty)
 }
 
-func (explorer *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {
-	dataToCost := explorer.annealingData
+func (e *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {
+	dataToCost := e.annealingData
 	totalFeatureCost := float64(0)
 	for index := 0; index < len(dataToCost.rows); index++ {
 		totalFeatureCost +=
@@ -223,28 +230,28 @@ func (explorer *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {
 	return totalFeatureCost
 }
 
-func (explorer *SimpleExcelSolutionExplorer) AcceptLastChange() {
-	explorer.SingleObjectiveAnnealableExplorer.AcceptLastChange()
-	explorer.addTrackerData()
+func (e *SimpleExcelSolutionExplorer) AcceptLastChange() {
+	e.SingleObjectiveAnnealableExplorer.AcceptLastChange()
+	e.addTrackerData()
 }
 
-func (explorer *SimpleExcelSolutionExplorer) addTrackerData() {
+func (e *SimpleExcelSolutionExplorer) addTrackerData() {
 	newRow := new(trackingData)
 
-	newRow.ObjectiveFunctionChange = explorer.ChangeInObjectiveValue()
-	newRow.Temperature = explorer.temperature
-	newRow.ChangeIsDesirable = explorer.ChangeIsDesirable()
-	newRow.ChangeAccepted = explorer.ChangeAccepted()
-	newRow.AcceptanceProbability = explorer.AcceptanceProbability()
-	newRow.InFirst50 = explorer.deriveSmallPUs()
-	newRow.InSecond50 = explorer.deriveLargePUs()
-	newRow.TotalCost = explorer.deriveFeatureCost() / 3
+	newRow.ObjectiveFunctionChange = e.ChangeInObjectiveValue()
+	newRow.Temperature = e.temperature
+	newRow.ChangeIsDesirable = e.ChangeIsDesirable()
+	newRow.ChangeAccepted = e.ChangeAccepted()
+	newRow.AcceptanceProbability = e.AcceptanceProbability()
+	newRow.InFirst50 = e.deriveSmallPUs()
+	newRow.InSecond50 = e.deriveLargePUs()
+	newRow.TotalCost = e.deriveFeatureCost() / 3
 
-	explorer.trackingData.rows = append(explorer.trackingData.rows, *newRow)
+	e.trackingData.rows = append(e.trackingData.rows, *newRow)
 }
 
-func (explorer *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
-	dataToTraverse := explorer.annealingData
+func (e *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
+	dataToTraverse := e.annealingData
 	totalSmallPUs := uint64(0)
 	var index = 0
 	for index = 0; index < len(dataToTraverse.rows)/2; index++ {
@@ -253,8 +260,8 @@ func (explorer *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
 	return totalSmallPUs
 }
 
-func (explorer *SimpleExcelSolutionExplorer) deriveLargePUs() uint64 {
-	dataToTraverse := explorer.annealingData
+func (e *SimpleExcelSolutionExplorer) deriveLargePUs() uint64 {
+	dataToTraverse := e.annealingData
 	totalLargePUs := uint64(0)
 	var index = 0
 	for index = len(dataToTraverse.rows) / 2; index < len(dataToTraverse.rows); index++ {
@@ -263,20 +270,20 @@ func (explorer *SimpleExcelSolutionExplorer) deriveLargePUs() uint64 {
 	return totalLargePUs
 }
 
-func (explorer *SimpleExcelSolutionExplorer) RevertLastChange() {
-	explorer.annealingData.TogglePlanningUnitStatusAtIndex(explorer.previousPlanningUnitChanged)
-	explorer.SetObjectiveValue(explorer.ObjectiveValue() - explorer.ChangeInObjectiveValue())
-	explorer.SetChangeInObjectiveValue(0)
-	explorer.addTrackerData()
-	explorer.SingleObjectiveAnnealableExplorer.RevertLastChange()
+func (e *SimpleExcelSolutionExplorer) RevertLastChange() {
+	e.annealingData.TogglePlanningUnitStatusAtIndex(e.previousPlanningUnitChanged)
+	e.SetObjectiveValue(e.ObjectiveValue() - e.ChangeInObjectiveValue())
+	e.SetChangeInObjectiveValue(0)
+	e.addTrackerData()
+	e.SingleObjectiveAnnealableExplorer.RevertLastChange()
 }
 
-func (explorer *SimpleExcelSolutionExplorer) WithName(name string) *SimpleExcelSolutionExplorer {
-	explorer.SingleObjectiveAnnealableExplorer.SetName(name)
-	return explorer
+func (e *SimpleExcelSolutionExplorer) WithName(name string) *SimpleExcelSolutionExplorer {
+	e.SingleObjectiveAnnealableExplorer.SetName(name)
+	return e
 }
 
-func (explorer *SimpleExcelSolutionExplorer) Clone() Explorer {
-	clone := *explorer
+func (e *SimpleExcelSolutionExplorer) Clone() Explorer {
+	clone := *e
 	return &clone
 }

@@ -28,7 +28,6 @@ func ParseArguments() *Arguments {
 
 type Arguments struct {
 	Version    bool
-	CpuProfile string
 	ConfigFile string
 }
 

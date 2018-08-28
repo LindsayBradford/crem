@@ -1,7 +1,7 @@
 ScenarioName = "Example Simple Excel Annealer"
-RunNumber = 5
-RunConcurrently = true
-CpuProfilePath = "testdata/cpuProfileData.dat"
+RunNumber = 2
+RunConcurrently = false
+#CpuProfilePath = "testdata/cpuProfileData.dat"
 
 [[Loggers]]
 [Loggers.LogLevelDestinations]

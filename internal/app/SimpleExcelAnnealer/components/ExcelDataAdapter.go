@@ -20,9 +20,10 @@ type ExcelDataAdapter struct {
 	excelHandler     *excel.ExcelHandler
 	workbook         excel.Workbook
 	absoluteFilePath string
+	oleWrapper       func(f func())
 }
 
-func (eda *ExcelDataAdapter) Initialise() {
+func (eda *ExcelDataAdapter) Initialise() *ExcelDataAdapter {
 	defer func() {
 		if r := recover(); r != nil {
 			eda.excelHandler.Destroy()
@@ -31,6 +32,13 @@ func (eda *ExcelDataAdapter) Initialise() {
 	}()
 
 	eda.excelHandler = excel.InitialiseHandler()
+
+	return eda
+}
+
+func (eda *ExcelDataAdapter) WithOleFunctionWrapper(wrapper func(f func())) *ExcelDataAdapter {
+	eda.oleWrapper = wrapper
+	return eda
 }
 
 func (eda *ExcelDataAdapter) initialiseDataSource(filePath string) {
@@ -43,27 +51,34 @@ func (eda *ExcelDataAdapter) initialiseDataSource(filePath string) {
 		}
 	}()
 
-	eda.workbook = eda.excelHandler.Workbooks().Open(eda.absoluteFilePath)
+	eda.oleWrapper(func() {
+		eda.workbook = eda.excelHandler.Workbooks().Open(eda.absoluteFilePath)
+	})
 }
 
 func (eda *ExcelDataAdapter) destroyExcelHandler() {
-	eda.excelHandler.Destroy()
+	eda.oleWrapper(func() {
+		eda.excelHandler.Destroy()
+	})
 }
 
 func (eda *ExcelDataAdapter) retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 	table = new(annealingTable)
-	worksheet := eda.workbook.WorksheetNamed(data)
 
-	const headerRowCount = uint(1)
-	worksheetRowCount := worksheet.UsedRange().Rows().Count()
-	table.rows = make([]annealingData, worksheetRowCount-headerRowCount)
+	eda.oleWrapper(func() {
+		worksheet := eda.workbook.WorksheetNamed(data)
 
-	for index := 0; index < len(table.rows); index++ {
-		rowOffset := uint(2 + index)
-		table.rows[index].Cost = worksheet.Cells(rowOffset, 2).Value().(float64)
-		table.rows[index].Feature = worksheet.Cells(rowOffset, 3).Value().(float64)
-		table.rows[index].PlanningUnitStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
-	}
+		const headerRowCount = uint(1)
+		worksheetRowCount := worksheet.UsedRange().Rows().Count()
+		table.rows = make([]annealingData, worksheetRowCount-headerRowCount)
+
+		for index := 0; index < len(table.rows); index++ {
+			rowOffset := uint(2 + index)
+			table.rows[index].Cost = worksheet.Cells(rowOffset, 2).Value().(float64)
+			table.rows[index].Feature = worksheet.Cells(rowOffset, 3).Value().(float64)
+			table.rows[index].PlanningUnitStatus = (InclusionStatus)(worksheet.Cells(rowOffset, 6).Value().(float64))
+		}
+	})
 
 	randomiseInitialSolutionSet(table)
 	return
@@ -81,11 +96,13 @@ func generateRandomInOutValue() InclusionStatus {
 }
 
 func (eda *ExcelDataAdapter) storeAnnealingTableToWorkbook(table *annealingTable) {
-	worksheet := eda.workbook.WorksheetNamed(data)
-	for index := 0; index < len(table.rows); index++ {
-		worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PlanningUnitStatus))
-	}
-	worksheet.UsedRange().Columns().AutoFit()
+	eda.oleWrapper(func() {
+		worksheet := eda.workbook.WorksheetNamed(data)
+		for index := 0; index < len(table.rows); index++ {
+			worksheet.Cells(2+uint(index), 5).SetValue(uint64(table.rows[index].PlanningUnitStatus))
+		}
+		worksheet.UsedRange().Columns().AutoFit()
+	})
 }
 
 func (eda *ExcelDataAdapter) initialiseTrackingTable() *trackingTable {
@@ -110,21 +127,27 @@ func createNewTrackingTable() *trackingTable {
 }
 
 func (eda *ExcelDataAdapter) clearTrackingDataFromWorkbook() {
-	worksheet := eda.workbook.WorksheetNamed(tracker)
-	worksheet.UsedRange().Clear()
+	eda.oleWrapper(func() {
+		worksheet := eda.workbook.WorksheetNamed(tracker)
+		worksheet.UsedRange().Clear()
+	})
 }
 
 func (eda *ExcelDataAdapter) storeTrackingTableToWorkbook(table *trackingTable) {
-	defer func() {
-		if r := recover(); r != nil {
-			eda.excelHandler.Destroy()
-			panic(errors.New("failed storing data to excel data-source [" + eda.absoluteFilePath + "]"))
-		}
-	}()
+	eda.oleWrapper(func() {
 
-	worksheet := eda.workbook.WorksheetNamed(tracker)
-	storeTrackingTableToWorksheet(table, worksheet)
-	worksheet.UsedRange().Columns().AutoFit()
+		defer func() {
+			if r := recover(); r != nil {
+				eda.excelHandler.Destroy()
+				panic(errors.New("failed storing data to excel data-source [" + eda.absoluteFilePath + "]"))
+			}
+		}()
+
+		worksheet := eda.workbook.WorksheetNamed(tracker)
+		storeTrackingTableToWorksheet(table, worksheet)
+		worksheet.UsedRange().Columns().AutoFit()
+
+	})
 }
 
 func storeTrackingTableToWorksheet(table *trackingTable, worksheet excel.Worksheet) {
@@ -199,18 +222,18 @@ func deleteTempCsvFile(tempFileName string) {
 	defer os.Remove(tempFileName)
 }
 
-func (eda *ExcelDataAdapter) saveWorkbookAs(filePath string) {
-	eda.workbook.SaveAs(filePath)
-}
-
 func (eda *ExcelDataAdapter) saveAndCloseWorkbookAs(filePath string) {
-	defer func() {
-		if r := recover(); r != nil {
-			eda.excelHandler.Destroy()
-			panic(errors.New("failed saving data to Excel data-source [" + filePath + "]"))
-		}
-	}()
+	eda.oleWrapper(func() {
 
-	eda.saveWorkbookAs(filePath)
-	eda.workbook.Close()
+		defer func() {
+			if r := recover(); r != nil {
+				eda.excelHandler.Destroy()
+				panic(errors.New("failed saving data to Excel data-source [" + filePath + "]"))
+			}
+		}()
+
+		eda.workbook.SaveAs(filePath)
+		eda.workbook.Close()
+
+	})
 }
