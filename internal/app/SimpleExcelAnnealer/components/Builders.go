@@ -31,7 +31,7 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig, wrapper func(f func()
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
 		WithTearDownFunction(tearDown).
-		Concurrently(scenarioConfig.RunConcurrently)
+		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	runner = new(annealing.OleSafeScenarioRunner).ThatLocks(runner)
 

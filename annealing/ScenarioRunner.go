@@ -34,7 +34,7 @@ type ScenarioRunner struct {
 
 func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRunner {
 	runner.runNumber = 1
-	runner.maxConcurrentRuns = 0
+	runner.maxConcurrentRuns = 1 // Sequential by default
 	runner.name = "Default Scenario"
 	runner.tearDown = defaultTeardDown
 
@@ -73,12 +73,8 @@ func defaultTeardDown() {
 	// deliberately does nothing
 }
 
-func (runner *ScenarioRunner) Concurrently(concurrently bool) *ScenarioRunner {
-	if concurrently {
-		runner.maxConcurrentRuns = 5
-	} else {
-		runner.maxConcurrentRuns = 1
-	}
+func (runner *ScenarioRunner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *ScenarioRunner {
+	runner.maxConcurrentRuns = maxConcurrentRuns
 	return runner
 }
 

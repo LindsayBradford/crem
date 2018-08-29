@@ -27,10 +27,10 @@ func Retrieve(configFilePath string) (*CRMConfig, error) {
 type CRMConfig struct {
 	FilePath string
 
-	ScenarioName    string
-	RunNumber       uint64
-	RunConcurrently bool
-	CpuProfilePath  string
+	ScenarioName               string
+	RunNumber                  uint64
+	MaximumConcurrentRunNumber uint64
+	CpuProfilePath             string
 
 	Annealer           AnnealingConfig
 	Loggers            []LoggerConfig
