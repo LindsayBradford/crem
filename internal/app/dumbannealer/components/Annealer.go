@@ -25,7 +25,7 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableSce
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
-		Concurrently(scenarioConfig.RunConcurrently)
+		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	if scenarioConfig.CpuProfilePath != "" {
 		return new(annealing.ProfilableScenarioRunner).
