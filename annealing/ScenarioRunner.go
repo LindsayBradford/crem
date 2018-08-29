@@ -74,6 +74,9 @@ func defaultTeardDown() {
 }
 
 func (runner *ScenarioRunner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *ScenarioRunner {
+	if maxConcurrentRuns == 0 {
+		return runner
+	}
 	runner.maxConcurrentRuns = maxConcurrentRuns
 	return runner
 }

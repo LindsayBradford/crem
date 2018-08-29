@@ -1,6 +1,6 @@
 ScenarioName = "Example Simple Excel Annealer"
 RunNumber = 2
-RunConcurrently = false
+MaximumConcurrentRunNumber = 2
 #CpuProfilePath = "testdata/cpuProfileData.dat"
 
 [[Loggers]]
