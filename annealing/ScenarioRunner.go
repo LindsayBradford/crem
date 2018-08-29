@@ -22,11 +22,11 @@ type ScenarioRunner struct {
 	annealer   shared.Annealer
 	logHandler handlers.LogHandler
 
-	name          string
-	operationType string
-	runNumber     uint64
-	concurrently  bool
-	tearDown      func()
+	name              string
+	operationType     string
+	runNumber         uint64
+	maxConcurrentRuns uint64
+	tearDown          func()
 
 	startTime  Time
 	finishTime Time
@@ -34,7 +34,7 @@ type ScenarioRunner struct {
 
 func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRunner {
 	runner.runNumber = 1
-	runner.concurrently = false
+	runner.maxConcurrentRuns = 0
 	runner.name = "Default Scenario"
 	runner.tearDown = defaultTeardDown
 
@@ -74,7 +74,11 @@ func defaultTeardDown() {
 }
 
 func (runner *ScenarioRunner) Concurrently(concurrently bool) *ScenarioRunner {
-	runner.concurrently = concurrently
+	if concurrently {
+		runner.maxConcurrentRuns = 5
+	} else {
+		runner.maxConcurrentRuns = 1
+	}
 	return runner
 }
 
@@ -82,12 +86,7 @@ func (runner *ScenarioRunner) Run() error {
 	runner.logScenarioStartMessage()
 	runner.startTime = Now()
 
-	var runError error
-	if runner.concurrently {
-		runError = runner.runConcurrently()
-	} else {
-		runError = runner.runSequentially()
-	}
+	runError := runner.runScenario()
 
 	runner.finishTime = Now()
 	runner.logHandler.Info("Finished running scenario \"" + runner.name + "\"")
@@ -105,13 +104,13 @@ func (runner *ScenarioRunner) LogHandler() handlers.LogHandler {
 
 func (runner *ScenarioRunner) logScenarioStartMessage() {
 	var runTypeText string
-	if runner.concurrently {
-		runTypeText = "concurrently"
+	if runner.maxConcurrentRuns > 1 {
+		runTypeText = fmt.Sprintf("executing a maximum of %d runs concurrently.", runner.maxConcurrentRuns)
 	} else {
-		runTypeText = "sequentially"
+		runTypeText = "executing runs sequentially"
 	}
 
-	message := fmt.Sprintf("Scenario \"%s\": configured for %d run(s), executed %s", runner.name, runner.runNumber, runTypeText)
+	message := fmt.Sprintf("Scenario \"%s\": configured for %d run(s), %s", runner.name, runner.runNumber, runTypeText)
 	runner.logHandler.Info(message)
 }
 
@@ -123,11 +122,10 @@ func (runner *ScenarioRunner) ElapsedTime() Duration {
 	return runner.finishTime.Sub(runner.startTime)
 }
 
-func (runner *ScenarioRunner) runConcurrently() error {
+func (runner *ScenarioRunner) runScenario() error {
 	var wg sync.WaitGroup
 
-	maxConcurrentRuns := 5
-	guard := make(chan struct{}, maxConcurrentRuns)
+	guard := make(chan struct{}, runner.maxConcurrentRuns)
 
 	runOneThenDone := func(runNumber uint64) {
 		runner.run(runNumber)
@@ -142,23 +140,6 @@ func (runner *ScenarioRunner) runConcurrently() error {
 		go runOneThenDone(runNumber)
 	}
 
-	wg.Wait()
-
-	return nil
-}
-
-func (runner *ScenarioRunner) runSequentially() error {
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	runAllThenDone := func() {
-		for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
-			runner.run(runNumber)
-		}
-		wg.Done()
-	}
-
-	go runAllThenDone()
 	wg.Wait()
 
 	return nil
