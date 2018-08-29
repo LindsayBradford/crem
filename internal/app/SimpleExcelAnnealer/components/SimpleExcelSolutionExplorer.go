@@ -194,7 +194,7 @@ func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
 func (e *SimpleExcelSolutionExplorer) TryRandomChange(temperature float64) {
 	e.temperature = temperature
 	e.makeRandomChange(temperature)
-	e.DecideOnWhetherToAcceptChange(temperature)
+	e.DecideOnWhetherToAcceptChange(temperature, e.AcceptLastChange, e.RevertLastChange)
 }
 
 func (e *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {

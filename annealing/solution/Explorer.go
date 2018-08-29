@@ -28,7 +28,7 @@ type Explorer interface {
 	SetAcceptanceProbability(probability float64)
 
 	ChangeIsDesirable() bool
-	DecideOnWhetherToAcceptChange(annealingTemperature float64)
+	DecideOnWhetherToAcceptChange(annealingTemperature float64, acceptFunction func(), rejectFunction func())
 	AcceptLastChange()
 	ChangeAccepted() bool
 	RevertLastChange()

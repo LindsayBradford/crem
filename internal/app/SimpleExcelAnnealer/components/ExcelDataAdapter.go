@@ -136,6 +136,7 @@ func createNewTrackingTable() *trackingTable {
 func (eda *ExcelDataAdapter) clearTrackingDataFromWorkbook() {
 	eda.oleWrapper(func() {
 		worksheet := eda.workbook.WorksheetNamed(tracker)
+		defer worksheet.Release()
 		excel.ClearUsedRange(worksheet)
 	})
 }

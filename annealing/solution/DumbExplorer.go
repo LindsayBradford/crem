@@ -25,7 +25,7 @@ func (dse *DumbExplorer) TearDown() {
 
 func (dse *DumbExplorer) TryRandomChange(temperature float64) {
 	dse.makeRandomChange()
-	dse.DecideOnWhetherToAcceptChange(temperature)
+	dse.DecideOnWhetherToAcceptChange(temperature, dse.AcceptLastChange, dse.RevertLastChange)
 }
 
 func (dse *DumbExplorer) makeRandomChange() {

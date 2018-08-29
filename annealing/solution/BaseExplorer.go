@@ -104,7 +104,8 @@ func (explorer *BaseExplorer) SetAcceptanceProbability(probability float64) {
 	explorer.acceptanceProbability = probability
 }
 
-func (explorer *BaseExplorer) DecideOnWhetherToAcceptChange(annealingTemperature float64) {}
+func (explorer *BaseExplorer) DecideOnWhetherToAcceptChange(annealingTemperature float64, acceptFunction func(), rejectFunction func()) {
+}
 
 // newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
 // (which by default returns a random number in the range [0,1).
