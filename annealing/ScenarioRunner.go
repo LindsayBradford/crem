@@ -36,7 +36,7 @@ func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRun
 	runner.runNumber = 1
 	runner.concurrently = false
 	runner.name = "Default Scenario"
-	runner.tearDown = defaultTeadDown
+	runner.tearDown = defaultTeardDown
 
 	runner.logHandler = annealer.LogHandler()
 	runner.annealer = annealer
@@ -64,12 +64,12 @@ func (runner *ScenarioRunner) WithTearDownFunction(tearDown func()) *ScenarioRun
 	if tearDown != nil {
 		runner.tearDown = tearDown
 	} else {
-		runner.tearDown = defaultTeadDown
+		runner.tearDown = defaultTeardDown
 	}
 	return runner
 }
 
-func defaultTeadDown() {
+func defaultTeardDown() {
 	// deliberately does nothing
 }
 
@@ -126,15 +126,22 @@ func (runner *ScenarioRunner) ElapsedTime() Duration {
 func (runner *ScenarioRunner) runConcurrently() error {
 	var wg sync.WaitGroup
 
-	runThenDone := func(runNumber uint64) {
+	maxConcurrentRuns := 5
+	guard := make(chan struct{}, maxConcurrentRuns)
+
+	runOneThenDone := func(runNumber uint64) {
 		runner.run(runNumber)
+		<-guard
 		wg.Done()
 	}
 
 	wg.Add(int(runner.runNumber))
+
 	for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
-		go runThenDone(runNumber)
+		guard <- struct{}{}
+		go runOneThenDone(runNumber)
 	}
+
 	wg.Wait()
 
 	return nil
@@ -142,16 +149,16 @@ func (runner *ScenarioRunner) runConcurrently() error {
 
 func (runner *ScenarioRunner) runSequentially() error {
 	var wg sync.WaitGroup
+	wg.Add(1)
 
-	runThenDone := func() {
+	runAllThenDone := func() {
 		for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
 			runner.run(runNumber)
 		}
 		wg.Done()
 	}
 
-	wg.Add(1)
-	go runThenDone()
+	go runAllThenDone()
 	wg.Wait()
 
 	return nil
