@@ -52,7 +52,9 @@ func (eda *ExcelDataAdapter) initialiseDataSource(filePath string) {
 	}()
 
 	eda.oleWrapper(func() {
-		eda.workbook = eda.excelHandler.Workbooks().Open(eda.absoluteFilePath)
+		workbooks := eda.excelHandler.Workbooks()
+		defer workbooks.Release()
+		eda.workbook = workbooks.Open(eda.absoluteFilePath)
 	})
 }
 
@@ -230,7 +232,7 @@ func deleteTempCsvFile(tempFileName string) {
 	defer os.Remove(tempFileName)
 }
 
-func (eda *ExcelDataAdapter) saveWorkbookAs(filePath string) {
+func (eda *ExcelDataAdapter) saveAndCloseWorkbookAs(filePath string) {
 	eda.oleWrapper(func() {
 
 		defer func() {
