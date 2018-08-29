@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crm/annealing/shared"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
+	"github.com/go-ole/go-ole"
 )
 
 type CallableScenarioRunner interface {
@@ -140,9 +141,19 @@ func (runner *ScenarioRunner) runConcurrently() error {
 }
 
 func (runner *ScenarioRunner) runSequentially() error {
-	for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
-		runner.run(runNumber)
+	var wg sync.WaitGroup
+
+	runThenDone := func() {
+		for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
+			runner.run(runNumber)
+		}
+		wg.Done()
 	}
+
+	wg.Add(1)
+	go runThenDone()
+	wg.Wait()
+
 	return nil
 }
 
@@ -217,9 +228,12 @@ func (runner *OleSafeScenarioRunner) LogHandler() handlers.LogHandler {
 
 func (runner *OleSafeScenarioRunner) Run() error {
 	runner.LogHandler().Debug("Making scenario runner goroutine OLE thread-safe")
-	// ole.CoInitialize(0)
-	//
-	// defer ole.CoUninitialize()
+
+	if err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED); err != nil {
+		return err
+	}
+
+	defer ole.CoUninitialize()
 	defer runner.LogHandler().Debug("Released OLE thread-safe scenario runner goroutine resources")
 
 	return runner.base.Run()

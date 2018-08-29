@@ -17,7 +17,7 @@ const tracker = "Tracker"
 const data = "Data"
 
 type ExcelDataAdapter struct {
-	excelHandler     *excel.Handler
+	excelHandler     excel.Handler
 	workbook         excel.Workbook
 	absoluteFilePath string
 	oleWrapper       func(f func())
@@ -26,12 +26,11 @@ type ExcelDataAdapter struct {
 func (eda *ExcelDataAdapter) Initialise() *ExcelDataAdapter {
 	defer func() {
 		if r := recover(); r != nil {
-			eda.excelHandler.Destroy()
 			panic(errors.New("Failed initialising via Excel data-source"))
 		}
 	}()
 
-	eda.excelHandler = new(excel.Handler).Initialise()
+	eda.excelHandler.Initialise()
 
 	return eda
 }

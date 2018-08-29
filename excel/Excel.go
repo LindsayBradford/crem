@@ -42,10 +42,6 @@ func (handler *Handler) Initialise() *Handler {
 		}
 	}()
 
-	if err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED); err != nil {
-		panic(err)
-	}
-
 	appObject, err := oleutil.CreateObject("Excel.Application")
 	if err != nil {
 		panic(err)
@@ -71,7 +67,6 @@ func (handler *Handler) setPropertiesForSilentOperation() {
 
 func (handler *Handler) Destroy() {
 	handler.excel.Release()
-	ole.CoUninitialize()
 }
 
 func (handler *Handler) Workbooks() Workbooks {

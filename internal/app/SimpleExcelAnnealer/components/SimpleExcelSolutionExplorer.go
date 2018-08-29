@@ -28,7 +28,7 @@ type SimpleExcelSolutionExplorer struct {
 	temperature float64
 
 	previousPlanningUnitChanged uint64
-	excelDataAdapter            *ExcelDataAdapter
+	excelDataAdapter            ExcelDataAdapter
 	oleWrapper                  func(f func())
 }
 
@@ -124,9 +124,7 @@ type trackingData struct {
 
 func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.SingleObjectiveAnnealableExplorer.Initialise()
-	e.excelDataAdapter = new(ExcelDataAdapter).
-		Initialise().
-		WithOleFunctionWrapper(e.oleWrapper)
+	e.excelDataAdapter.Initialise().WithOleFunctionWrapper(e.oleWrapper)
 
 	e.excelDataAdapter.initialiseDataSource(e.dataSourcePath)
 	e.LogHandler().Info("Opening Excel workbook [" + e.dataSourcePath + "] as data source")
