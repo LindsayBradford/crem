@@ -127,9 +127,9 @@ func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.excelDataAdapter.Initialise().WithOleFunctionWrapper(e.oleWrapper)
 
 	e.excelDataAdapter.initialiseDataSource(e.dataSourcePath)
-	e.LogHandler().Info("Opening Excel workbook [" + e.dataSourcePath + "] as data source")
+	e.LogHandler().Info(e.ScenarioId() + ": Opening Excel workbook [" + e.dataSourcePath + "] as data source")
 
-	e.LogHandler().Debug("Retrieving annealing data from workbook")
+	e.LogHandler().Debug(e.ScenarioId() + ": Retrieving annealing data from workbook")
 	e.annealingData = e.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
 
 	currentPenalty := e.deriveTotalPenalty()
@@ -137,10 +137,10 @@ func (e *SimpleExcelSolutionExplorer) Initialise() {
 
 	e.SetObjectiveValue(currentCost*0.8 + currentPenalty)
 
-	e.LogHandler().Debug("Clearing tracking data from workbook")
+	e.LogHandler().Debug(e.ScenarioId() + ": Clearing tracking data from workbook")
 	e.trackingData = e.excelDataAdapter.initialiseTrackingTable()
 
-	e.LogHandler().Info("Data retrieved from workbook [" + e.dataSourcePath + "]")
+	e.LogHandler().Info(e.ScenarioId() + ": Data retrieved from workbook [" + e.dataSourcePath + "]")
 }
 
 func (e *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
@@ -170,20 +170,18 @@ func (e *SimpleExcelSolutionExplorer) saveDataToWorkbookAndClose() {
 	originalFilePath := filepath.Dir(e.excelDataAdapter.absoluteFilePath)
 	outputPath := filepath.Join(originalFilePath, newFileName)
 
-	e.LogHandler().Info("Storing data to workbook [" + outputPath + "]")
+	e.LogHandler().Info(e.ScenarioId() + ": Storing data to workbook [" + outputPath + "]")
 	e.excelDataAdapter.storeAnnealingTableToWorkbook(e.annealingData)
 	e.excelDataAdapter.storeTrackingTableToWorkbook(e.trackingData)
 
-	e.LogHandler().Debug("Saving workbook [" + outputPath + "]")
+	e.LogHandler().Debug(e.ScenarioId() + ": Saving workbook [" + outputPath + "]")
 	e.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
 
-	e.LogHandler().Debug("Workbook [" + outputPath + "] closed")
+	e.LogHandler().Debug(e.ScenarioId() + ": Workbook [" + outputPath + "] closed")
 }
 
 func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
 	response = strings.Replace(possiblyUnsafeFilePath, " ", "", -1)
-	// response = strings.Replace(response, "(", "_", -1)
-	// response = strings.Replace(response, ")", "_", -1)
 	response = strings.Replace(response, "/", "_of_", -1)
 	response = response + ".xls"
 	return response

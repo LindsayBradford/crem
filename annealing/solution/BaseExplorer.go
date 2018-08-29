@@ -24,12 +24,12 @@ type BaseExplorer struct {
 }
 
 func (explorer *BaseExplorer) Initialise() {
-	explorer.logHandler.Debug("Initialising Solution Explorer")
+	explorer.logHandler.Debug(explorer.scenarioId + ": Initialising Solution Explorer")
 	explorer.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
 }
 
 func (explorer *BaseExplorer) TearDown() {
-	explorer.logHandler.Debug("Triggering tear-down of Solution Explorer")
+	explorer.logHandler.Debug(explorer.scenarioId + ": Triggering tear-down of Solution Explorer")
 }
 
 func (explorer *BaseExplorer) RandomNumberGenerator() *rand.Rand {
