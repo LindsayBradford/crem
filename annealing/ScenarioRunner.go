@@ -36,7 +36,7 @@ func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRun
 	runner.runNumber = 1
 	runner.maxConcurrentRuns = 1 // Sequential by default
 	runner.name = "Default Scenario"
-	runner.tearDown = defaultTeardDown
+	runner.tearDown = defaultTearDown
 
 	runner.logHandler = annealer.LogHandler()
 	runner.annealer = annealer
@@ -64,12 +64,12 @@ func (runner *ScenarioRunner) WithTearDownFunction(tearDown func()) *ScenarioRun
 	if tearDown != nil {
 		runner.tearDown = tearDown
 	} else {
-		runner.tearDown = defaultTeardDown
+		runner.tearDown = defaultTearDown
 	}
 	return runner
 }
 
-func defaultTeardDown() {
+func defaultTearDown() {
 	// deliberately does nothing
 }
 

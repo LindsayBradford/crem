@@ -1,37 +1,48 @@
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// (c) 2018 Australian Rivers Institute.
 package main
 
 import (
 	"os"
 
+	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/dumbannealer/components"
+	"github.com/pkg/errors"
 )
 
 var (
-	args = commandline.ParseArguments()
+	logger = components.BuildLogHandler()
 )
 
 func main() {
-	configuration, retrieveError := config.Retrieve(args.ConfigFile)
+	args := commandline.ParseArguments()
+	RunFromConfigFile(args.ConfigFile)
+}
 
+func RunFromConfigFile(configFile string) {
+	configuration := retrieveConfiguration(configFile)
+	scenarioRunner := components.BuildScenarioRunner(configuration)
+	runScenario(scenarioRunner)
+	flushStreams()
+}
+
+func retrieveConfiguration(configFile string) *config.CRMConfig {
+	configuration, retrieveError := config.Retrieve(configFile)
 	if retrieveError != nil {
-		commandline.Exit(retrieveError)
+		wrappingError := errors.Wrap(retrieveError, "retrieving dumb annealer configuration")
+		panic(wrappingError)
 	}
-
-	logger := components.BuildLogHandler()
 
 	logger.Info("Configuring with [" + configuration.FilePath + "]")
-	scenarioRunner := components.BuildScenarioRunner(configuration)
+	return configuration
+}
 
-	runError := scenarioRunner.Run()
-
-	if runError != nil {
-		commandline.Exit(runError)
+func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
+	if runError := scenarioRunner.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running dumb annealer scenario")
+		panic(wrappingError)
 	}
-
-	defer flushStreams()
 }
 
 func flushStreams() {
