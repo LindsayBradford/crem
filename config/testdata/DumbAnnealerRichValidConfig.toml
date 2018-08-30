@@ -32,7 +32,7 @@ NumberOfIterations = 200 # 200
 Type = "AttributeObserver"
 Logger = "MachineAudienceLogger"
 IterationFilter = "EveryElapsedSeconds" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations" (default)
-NumberOfSeconds = 1
+SecondsBetweenEvents = 1
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)

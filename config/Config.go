@@ -16,9 +16,13 @@ const VERSION = "0.1.1"
 
 func Retrieve(configFilePath string) (*CRMConfig, error) {
 	var conf CRMConfig
-	_, decodeErr := toml.DecodeFile(configFilePath, &conf)
+	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
 	if decodeErr != nil {
 		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
+	}
+	if len(metaData.Undecoded()) > 0 {
+		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
+		return nil, errors.New(errorMsg)
 	}
 	conf.FilePath = configFilePath
 	return &conf, nil
