@@ -17,7 +17,7 @@ func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
 	context := testContext{
 		name:       "Single run of Dumb annealer",
 		t:          t,
-		configFile: "testData/DumbAnnealerTestConfig-OneRun.toml",
+		configFile: "testdata/DumbAnnealerTestConfig-OneRun.toml",
 	}
 
 	verifyDumbAnnealerRunsAgainstContext(context)
@@ -27,7 +27,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 	context := testContext{
 		name:       "Three sequential runs of Dumb annealer",
 		t:          t,
-		configFile: "testData/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
 	}
 
 	verifyDumbAnnealerRunsAgainstContext(context)
@@ -37,7 +37,7 @@ func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
 	context := testContext{
 		name:       "Three concurrent runs of Dumb annealer",
 		t:          t,
-		configFile: "testData/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
 	}
 
 	verifyDumbAnnealerRunsAgainstContext(context)

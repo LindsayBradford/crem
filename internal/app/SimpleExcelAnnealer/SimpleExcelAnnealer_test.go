@@ -19,7 +19,7 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 	context := testContext{
 		name:       "Single run of Simple Excel Annealer",
 		t:          t,
-		configFile: "testData/SimpleExcelAnnealerTestConfig-OneRun.toml",
+		configFile: "testdata/SimpleExcelAnnealerTestConfig-OneRun.toml",
 	}
 
 	verifyAnnealerRunsAgainstContext(context)
