@@ -1,4 +1,4 @@
-ScenarioName = "Example Dumb Annealer"
+ScenarioName = "Test Dumb Annealer - Three sequential runs"
 RunNumber = 3
 
 [[AnnealingObservers]]

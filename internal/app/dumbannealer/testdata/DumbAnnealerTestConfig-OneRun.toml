@@ -1,4 +1,4 @@
-ScenarioName = "Example Dumb Annealer"
+ScenarioName = "Test Dumb Annealer - One run"
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)

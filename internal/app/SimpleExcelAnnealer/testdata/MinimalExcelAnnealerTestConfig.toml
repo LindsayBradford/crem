@@ -1,4 +1,4 @@
-Title = "Example Minimal-Config Simple Excel Annealer"
+ScenarioName = "Test Minimal-Config Simple Excel Annealer"
 
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
