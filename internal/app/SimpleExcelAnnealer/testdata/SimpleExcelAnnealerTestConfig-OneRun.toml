@@ -1,0 +1,24 @@
+ScenarioName = "Test Simple Excel Annealer - One Run"
+RunNumber = 1
+
+[[Loggers]]
+[Loggers.LogLevelDestinations]
+Debugging = "StandardOutput"
+
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 200 # 200
+
+[[SolutionExplorers]]
+Type = "SimpleExcelSolutionExplorer"
+Name = "DoraTheExplorer"
+InputFile = "testdata/SimpleExcelAnnealerTestFixture.xls"
+Penalty = 100.0 # 100.0
+
+[Annealer]
+Type = "ElapsedTimeTracking"  # "OSThreadLocked" | "ElapsedTimeTracking" (default) | "Simple"
+StartingTemperature = 50.0 #50
+CoolingFactor =  0.995  # 0.995
+MaximumIterations = 2_000 # 2000
+SolutionExplorer = "DoraTheExplorer"

@@ -15,13 +15,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func init() {
-	// Arrange that main.main runs on main thread.
-	runtime.LockOSThread()
-}
-
 var (
-	args                = commandline.ParseArguments()
 	defaultLogHandler   handlers.LogHandler
 	oleFunctionsChannel = make(chan func())
 	oleFunctionHandler  = func() {
@@ -46,20 +40,46 @@ func closeOleFunctionChannel() {
 }
 
 func main() {
-	scenarioConfig := retrieveConfig()
+	args := commandline.ParseArguments()
+	RunFromConfigFile(args.ConfigFile)
+}
 
+func RunFromConfigFile(configFile string) {
+	runtime.LockOSThread()
+	scenarioConfig := retrieveConfig(configFile)
+	scenarioRunner := buildScenarioOffConfig(scenarioConfig)
+	runScenario(scenarioRunner)
+}
+
+func retrieveConfig(configFile string) *config.CRMConfig {
+	configuration, retrieveError := config.Retrieve(configFile)
+
+	if retrieveError != nil {
+		wrappingError := errors.Wrap(retrieveError, "retrieving simple excel annealer configuration")
+		panic(wrappingError)
+	}
+
+	return configuration
+}
+
+func buildScenarioOffConfig(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
+	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, doOleFunction, closeOleFunctionChannel)
+	defaultLogHandler = annealerLogHandler
+	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")
+	return scenarioRunner
+}
+
+func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
 	defer func() {
 		if r := recover(); r != nil {
 			recoveryError, ok := r.(error)
 			if ok {
-				wrappedError := errors.Wrap(recoveryError, "main")
+				wrappedError := errors.Wrap(recoveryError, "running simple excel annealer scenario")
 				defaultLogHandler.Error(wrappedError)
-				commandline.Exit(1)
+				panic(wrappedError)
 			}
 		}
 	}()
-
-	scenarioRunner := buildScenarioOffConfig(scenarioConfig)
 
 	defaultLogHandler.Debug("starting scenario runner")
 	go scenarioRunner.Run()
@@ -67,21 +87,7 @@ func main() {
 	defaultLogHandler.Debug("starting ole function polling")
 	oleFunctionHandler()
 
-	defer flushStreams()
-}
-
-func buildScenarioOffConfig(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
-	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, doOleFunction, closeOleFunctionChannel)
-	defaultLogHandler = annealerLogHandler
-	return scenarioRunner
-}
-
-func retrieveConfig() *config.CRMConfig {
-	configuration, retrieveError := config.Retrieve(args.ConfigFile)
-	if retrieveError != nil {
-		commandline.Exit(retrieveError)
-	}
-	return configuration
+	flushStreams()
 }
 
 func flushStreams() {
