@@ -21,14 +21,16 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableSce
 		os.Exit(1)
 	}
 
-	runner := new(annealing.ScenarioRunner).
+	var runner annealing.CallableScenarioRunner
+
+	runner = new(annealing.ScenarioRunner).
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	if scenarioConfig.CpuProfilePath != "" {
-		return new(annealing.ProfilableScenarioRunner).
+		runner = new(annealing.ProfilableScenarioRunner).
 			ThatProfiles(runner).
 			ToFile(scenarioConfig.CpuProfilePath)
 	}

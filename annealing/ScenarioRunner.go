@@ -8,9 +8,9 @@ import (
 	. "time"
 
 	"github.com/LindsayBradford/crm/annealing/shared"
+	"github.com/LindsayBradford/crm/excel"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/profiling"
-	"github.com/go-ole/go-ole"
 )
 
 type CallableScenarioRunner interface {
@@ -45,26 +45,22 @@ func (runner *ScenarioRunner) ForAnnealer(annealer shared.Annealer) *ScenarioRun
 }
 
 func (runner *ScenarioRunner) WithName(name string) *ScenarioRunner {
-	if name == "" {
-		return runner
+	if name != "" {
+		runner.name = name
 	}
-	runner.name = name
 	return runner
 }
 
 func (runner *ScenarioRunner) WithRunNumber(runNumber uint64) *ScenarioRunner {
-	if runNumber == 0 {
-		return runner
+	if runNumber > 0 {
+		runner.runNumber = runNumber
 	}
-	runner.runNumber = runNumber
 	return runner
 }
 
 func (runner *ScenarioRunner) WithTearDownFunction(tearDown func()) *ScenarioRunner {
 	if tearDown != nil {
 		runner.tearDown = tearDown
-	} else {
-		runner.tearDown = defaultTearDown
 	}
 	return runner
 }
@@ -74,10 +70,9 @@ func defaultTearDown() {
 }
 
 func (runner *ScenarioRunner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *ScenarioRunner {
-	if maxConcurrentRuns == 0 {
-		return runner
+	if maxConcurrentRuns > 0 {
+		runner.maxConcurrentRuns = maxConcurrentRuns
 	}
-	runner.maxConcurrentRuns = maxConcurrentRuns
 	return runner
 }
 
@@ -122,24 +117,24 @@ func (runner *ScenarioRunner) ElapsedTime() Duration {
 }
 
 func (runner *ScenarioRunner) runScenario() error {
-	var wg sync.WaitGroup
+	var runWaitGroup sync.WaitGroup
 
-	guard := make(chan struct{}, runner.maxConcurrentRuns)
+	concurrentRunGuard := make(chan struct{}, runner.maxConcurrentRuns)
 
-	runOneThenDone := func(runNumber uint64) {
+	doRun := func(runNumber uint64) {
 		runner.run(runNumber)
-		<-guard
-		wg.Done()
+		<-concurrentRunGuard
+		runWaitGroup.Done()
 	}
 
-	wg.Add(int(runner.runNumber))
+	runWaitGroup.Add(int(runner.runNumber))
 
 	for runNumber := uint64(1); runNumber <= runner.runNumber; runNumber++ {
-		guard <- struct{}{}
-		go runOneThenDone(runNumber)
+		concurrentRunGuard <- struct{}{}
+		go doRun(runNumber)
 	}
 
-	wg.Wait()
+	runWaitGroup.Wait()
 
 	return nil
 }
@@ -200,28 +195,28 @@ func (runner *ProfilableScenarioRunner) Run() error {
 	return profiling.CpuProfileOfFunctionToFile(runner.base.Run, runner.profilePath)
 }
 
-type OleSafeScenarioRunner struct {
+type SpreadsheetSafeScenarioRunner struct {
 	base CallableScenarioRunner
 }
 
-func (runner *OleSafeScenarioRunner) ThatLocks(base CallableScenarioRunner) *OleSafeScenarioRunner {
+func (runner *SpreadsheetSafeScenarioRunner) ThatLocks(base CallableScenarioRunner) *SpreadsheetSafeScenarioRunner {
 	runner.base = base
 	return runner
 }
 
-func (runner *OleSafeScenarioRunner) LogHandler() handlers.LogHandler {
+func (runner *SpreadsheetSafeScenarioRunner) LogHandler() handlers.LogHandler {
 	return runner.base.LogHandler()
 }
 
-func (runner *OleSafeScenarioRunner) Run() error {
-	runner.LogHandler().Debug("Making scenario runner goroutine OLE thread-safe")
+func (runner *SpreadsheetSafeScenarioRunner) Run() error {
+	runner.LogHandler().Debug("Making scenario runner spreadsheet interaction safe")
 
-	if err := ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED); err != nil {
+	if err := excel.EnableSpreadsheetSafeties(); err != nil {
 		return err
 	}
 
-	defer ole.CoUninitialize()
-	defer runner.LogHandler().Debug("Released OLE thread-safe scenario runner goroutine resources")
+	defer excel.DisableSpreadsheetSafeties()
+	defer runner.LogHandler().Debug("Released scenario runner spreadsheet interaction safeties")
 
 	return runner.base.Run()
 }

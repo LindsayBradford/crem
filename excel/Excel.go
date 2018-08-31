@@ -9,6 +9,14 @@ import (
 	"github.com/go-ole/go-ole/oleutil"
 )
 
+func EnableSpreadsheetSafeties() error {
+	return ole.CoInitializeEx(0, ole.COINIT_MULTITHREADED)
+}
+
+func DisableSpreadsheetSafeties() {
+	ole.CoUninitialize()
+}
+
 type oleWrapper struct {
 	dispatch *ole.IDispatch
 }

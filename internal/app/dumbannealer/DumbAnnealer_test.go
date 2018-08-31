@@ -27,7 +27,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 	context := testContext{
 		name:       "Three sequential runs of Dumb annealer",
 		t:          t,
-		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
 	}
 
 	verifyDumbAnnealerRunsAgainstContext(context)

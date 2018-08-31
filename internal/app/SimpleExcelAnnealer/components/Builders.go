@@ -33,7 +33,7 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig, wrapper func(f func()
 		WithTearDownFunction(tearDown).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
-	runner = new(annealing.OleSafeScenarioRunner).ThatLocks(runner)
+	runner = new(annealing.SpreadsheetSafeScenarioRunner).ThatLocks(runner)
 
 	if scenarioConfig.CpuProfilePath != "" {
 		profilableRunner := new(annealing.ProfilableScenarioRunner).
