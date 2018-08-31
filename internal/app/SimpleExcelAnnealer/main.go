@@ -1,6 +1,6 @@
 // +build windows
 
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// (c) 2018 Australian Rivers Institute.
 package main
 
 import (
@@ -16,26 +16,31 @@ import (
 )
 
 var (
-	defaultLogHandler   handlers.LogHandler
-	oleFunctionsChannel = make(chan func())
-	oleFunctionHandler  = func() {
-		for oleFunction := range oleFunctionsChannel {
-			oleFunction()
-		}
-	}
+	defaultLogHandler handlers.LogHandler
+	mainThreadChannel = make(chan func())
 )
 
-func doOleFunction(f func()) {
+func init() {
+	runtime.LockOSThread() // ensure main goroutine is locked to OS thread for proper callOnMainThread behaviour.
+}
+
+func mainThreadFunctionHandler() {
+	for function := range mainThreadChannel {
+		function()
+	}
+}
+
+func callOnMainThread(function func()) {
 	done := make(chan bool, 1)
-	oleFunctionsChannel <- func() {
-		f()
+	mainThreadChannel <- func() {
+		function()
 		done <- true
 	}
 	<-done
 }
 
-func closeOleFunctionChannel() {
-	close(oleFunctionsChannel)
+func closeMainThreadChannel() {
+	close(mainThreadChannel)
 	runtime.UnlockOSThread()
 }
 
@@ -45,7 +50,6 @@ func main() {
 }
 
 func RunFromConfigFile(configFile string) {
-	runtime.LockOSThread()
 	scenarioConfig := retrieveConfig(configFile)
 	scenarioRunner := buildScenarioOffConfig(scenarioConfig)
 	runScenario(scenarioRunner)
@@ -63,7 +67,7 @@ func retrieveConfig(configFile string) *config.CRMConfig {
 }
 
 func buildScenarioOffConfig(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
-	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, doOleFunction, closeOleFunctionChannel)
+	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, callOnMainThread, closeMainThreadChannel)
 	defaultLogHandler = annealerLogHandler
 	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")
 	return scenarioRunner
@@ -85,7 +89,7 @@ func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
 	go scenarioRunner.Run()
 
 	defaultLogHandler.Debug("starting ole function polling")
-	oleFunctionHandler()
+	mainThreadFunctionHandler()
 
 	flushStreams()
 }
