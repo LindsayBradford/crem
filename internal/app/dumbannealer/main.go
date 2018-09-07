@@ -28,7 +28,7 @@ func RunFromConfigFile(configFile string) {
 }
 
 func retrieveConfiguration(configFile string) *config.CRMConfig {
-	configuration, retrieveError := config.Retrieve(configFile)
+	configuration, retrieveError := config.RetrieveCrm(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving dumb annealer configuration")
 		panic(wrappingError)

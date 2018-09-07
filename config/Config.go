@@ -11,10 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Version number of the Catchment Resilience Modelling tool
-const VERSION = "0.1.1"
+const ShortApplicationName = "CatchmentResilienceModeller"
+const LongApplicationName = "Catchment Resilience Modeller"
+const Version = "v1"
 
-func Retrieve(configFilePath string) (*CRMConfig, error) {
+func RetrieveCrm(configFilePath string) (*CRMConfig, error) {
 	var conf CRMConfig
 	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
 	if decodeErr != nil {
@@ -28,8 +29,12 @@ func Retrieve(configFilePath string) (*CRMConfig, error) {
 	return &conf, nil
 }
 
-type CRMConfig struct {
+type BaseConfig struct {
 	FilePath string
+}
+
+type CRMConfig struct {
+	BaseConfig
 
 	ScenarioName               string
 	RunNumber                  uint64
@@ -270,4 +275,25 @@ func listToString(list ...string) string {
 		needsComma = true
 	}
 	return builder.String()
+}
+
+type HttpServerConfig struct {
+	BaseConfig
+
+	AdminPort uint64
+	ApiPort   uint64
+}
+
+func RetrieveHttpServer(configFilePath string) (*HttpServerConfig, error) {
+	var conf HttpServerConfig
+	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
+	if decodeErr != nil {
+		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
+	}
+	if len(metaData.Undecoded()) > 0 {
+		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
+		return nil, errors.New(errorMsg)
+	}
+	conf.FilePath = configFilePath
+	return &conf, nil
 }

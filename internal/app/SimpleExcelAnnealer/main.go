@@ -56,7 +56,7 @@ func RunFromConfigFile(configFile string) {
 }
 
 func retrieveConfig(configFile string) *config.CRMConfig {
-	configuration, retrieveError := config.Retrieve(configFile)
+	configuration, retrieveError := config.RetrieveCrm(configFile)
 
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving simple excel annealer configuration")

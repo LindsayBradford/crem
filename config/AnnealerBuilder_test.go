@@ -15,7 +15,7 @@ import (
 func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerMinimalValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerMinimalValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -60,7 +60,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/NullAnnealerMinimalValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/NullAnnealerMinimalValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -105,7 +105,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidAnnealerTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidAnnealerTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -116,7 +116,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidEventNotifierConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidEventNotifierConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidEventNotifierConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -127,7 +127,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidEventNotifierConfig(t *testing.T) {
 func TestAnnealerBuilder_MissingSolutionExplorerTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerMissingSolutionExplorerTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerMissingSolutionExplorerTypeConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -146,7 +146,7 @@ func TestAnnealerBuilder_MissingSolutionExplorerTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerMismatchedSolutionExplorerNamesConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerMismatchedSolutionExplorerNamesConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -165,7 +165,7 @@ func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerNoSolutionExplorerConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerNoSolutionExplorerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerNoSolutionExplorerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -184,7 +184,7 @@ func TestAnnealerBuilder_DumbAnnealerNoSolutionExplorerConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealingObserversTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidAnnealingObserversTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidAnnealingObserversTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -195,7 +195,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidAnnealingObserversTypeConfig(t *test
 func TestAnnealerBuilder_DumbAnnealerInvalidIterationFilterConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidIterationFilterConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidIterationFilterConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -206,7 +206,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidIterationFilterConfig(t *testing.T) 
 func TestAnnealerBuilder_InvalidAnnealingObserversLoggerConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidAnnealingObserversLoggerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidAnnealingObserversLoggerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -225,7 +225,7 @@ func TestAnnealerBuilder_InvalidAnnealingObserversLoggerConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidLoggersTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidLoggersTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidLoggersTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -236,7 +236,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLoggersTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidLoggersFormatterConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidLoggersFormatterConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidLoggersFormatterConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -247,7 +247,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLoggersFormatterConfig(t *testing.T)
 func TestAnnealerBuilder_DumbAnnealerInvalidLogLevelDestinationConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerInvalidLogLevelDestinationConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerInvalidLogLevelDestinationConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -266,7 +266,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLogLevelDestinationConfig(t *testing
 func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/DumbAnnealerRichValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/DumbAnnealerRichValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -336,7 +336,7 @@ func (tre *TestRegistereableExplorer) WithName(name string) *TestRegistereableEx
 func TestAnnealerBuilder_NullAnnealerWithCustomExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := Retrieve("testdata/NullAnnealerWithCustomExplorerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCrm("testdata/NullAnnealerWithCustomExplorerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder).RegisteringExplorer(

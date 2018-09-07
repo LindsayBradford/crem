@@ -120,7 +120,7 @@ func usageMessage() {
 // version number as defined in the utility's configuration.
 
 func GetVersionString() string {
-	return fmt.Sprintf("%s v%s (%s)", justExecutableName(), config.VERSION, runtime.Version())
+	return fmt.Sprintf("%s %s (%s)", justExecutableName(), config.Version, runtime.Version())
 }
 
 func justExecutableName() string {
