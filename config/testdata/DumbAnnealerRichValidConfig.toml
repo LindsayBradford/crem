@@ -1,6 +1,10 @@
 ScenarioName = "Example Rich Valid Configuration"
 RunNumber = 2
 MaximumConcurrentRunNumber = 2
+[UserDetail]
+PreRrequisites = "Here's a pre-requisite discussion"
+Outcomes = "Here's an outcome discussion"
+Ramdomness = "Here's some ramdonmess"
 
 [[Loggers]]
 Name = "HumanAudienceLogger"

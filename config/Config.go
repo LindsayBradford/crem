@@ -37,6 +37,7 @@ type CRMConfig struct {
 	BaseConfig
 
 	ScenarioName               string
+	UserDetail                 map[string]string
 	RunNumber                  uint64
 	MaximumConcurrentRunNumber uint64
 	CpuProfilePath             string
