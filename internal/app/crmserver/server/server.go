@@ -11,6 +11,7 @@ import (
 
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/logging/handlers"
+	"golang.org/x/net/context"
 )
 
 type Status struct {
@@ -60,26 +61,44 @@ func (s *RestServer) WithStatus(status Status) *RestServer {
 func (s *RestServer) Start() {
 	s.setStatus("CONFIGURING")
 
-	serverAdminAddress := fmt.Sprintf(":%d", s.configuration.AdminPort)
-	s.Logger.Debug("Starting Admin server listening on address [" + serverAdminAddress + "]")
+	var adminServer *http.Server
+	var apiServer *http.Server
+
+	doneChannel := make(chan bool)
 
 	go func() {
-		if err := http.ListenAndServe(serverAdminAddress, s.adminMux); err != nil {
+		s.adminMux.SetDoneChannel(doneChannel)
+
+		serverAdminAddress := fmt.Sprintf(":%d", s.configuration.AdminPort)
+		s.Logger.Debug("Starting Admin server listening on address [" + serverAdminAddress + "]")
+
+		adminServer = &http.Server{Addr: serverAdminAddress, Handler: s.adminMux}
+
+		if err := adminServer.ListenAndServe(); err != nil {
 			s.setStatus("DEAD")
 			log.Fatal("ListenAndServe: ", err)
 		}
 	}()
 
-	serverApiAddress := fmt.Sprintf(":%d", s.configuration.ApiPort)
+	go func() {
+		serverApiAddress := fmt.Sprintf(":%d", s.configuration.ApiPort)
+		s.Logger.Debug("Starting API server listening on address [" + serverApiAddress + "]")
+		apiServer = &http.Server{Addr: serverApiAddress, Handler: s.apiMux}
 
-	s.Logger.Debug("Starting API server listening on address [" + serverApiAddress + "]")
+		if err := apiServer.ListenAndServe(); err != nil {
+			s.setStatus("DEAD")
+			log.Fatal("ListenAndServe: ", err)
+		}
+	}()
 
 	s.setStatus("RUNNING")
 
-	if err := http.ListenAndServe(serverApiAddress, s.apiMux); err != nil {
-		s.setStatus("DEAD")
-		log.Fatal("ListenAndServe: ", err)
-	}
+	<-doneChannel
+
+	apiServer.Shutdown(context.Background())
+	adminServer.Shutdown(context.Background())
+
+	s.Logger.Warn("Shutting down")
 }
 
 func (s *RestServer) setStatus(statusMessage string) {
