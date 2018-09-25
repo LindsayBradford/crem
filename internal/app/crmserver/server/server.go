@@ -64,17 +64,14 @@ func (s *RestServer) Start() {
 	var adminServer *http.Server
 	var apiServer *http.Server
 
-	doneChannel := make(chan bool)
-
 	go func() {
-		s.adminMux.SetDoneChannel(doneChannel)
 
 		serverAdminAddress := fmt.Sprintf(":%d", s.configuration.AdminPort)
 		s.Logger.Debug("Starting Admin server listening on address [" + serverAdminAddress + "]")
 
 		adminServer = &http.Server{Addr: serverAdminAddress, Handler: s.adminMux}
 
-		if err := adminServer.ListenAndServe(); err != nil {
+		if err := adminServer.ListenAndServe(); err != http.ErrServerClosed {
 			s.setStatus("DEAD")
 			log.Fatal("ListenAndServe: ", err)
 		}
@@ -85,15 +82,16 @@ func (s *RestServer) Start() {
 		s.Logger.Debug("Starting API server listening on address [" + serverApiAddress + "]")
 		apiServer = &http.Server{Addr: serverApiAddress, Handler: s.apiMux}
 
-		if err := apiServer.ListenAndServe(); err != nil {
+		if err := apiServer.ListenAndServe(); err != http.ErrServerClosed {
 			s.setStatus("DEAD")
 			log.Fatal("ListenAndServe: ", err)
 		}
+
 	}()
 
 	s.setStatus("RUNNING")
 
-	<-doneChannel
+	s.adminMux.WaitOnShutdown()
 
 	apiServer.Shutdown(context.Background())
 	adminServer.Shutdown(context.Background())

@@ -19,6 +19,7 @@ type AdminMux struct {
 func (am *AdminMux) Initialise() *AdminMux {
 	am.RestMux.Initialise()
 
+	am.doneChannel = make(chan bool)
 	am.handlerMap["/status"] = am.statusHandler
 	am.handlerMap["/shutdown"] = am.shutdownHandler
 
@@ -36,8 +37,8 @@ func (am *AdminMux) setStatus(statusMessage string) {
 	am.UpdateStatusTime()
 }
 
-func (am *AdminMux) SetDoneChannel(channel chan bool) {
-	am.doneChannel = channel
+func (am *AdminMux) WaitOnShutdown() {
+	<-am.doneChannel
 }
 
 func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
