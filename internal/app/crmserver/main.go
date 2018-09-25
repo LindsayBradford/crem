@@ -75,7 +75,7 @@ func retrieveConfiguration(configFile string) *config.HttpServerConfig {
 }
 
 func (cs *CrmServer) establishHttpDelegates() {
-	cs.Logger.Debug("Registering API delegates for server URL patterns")
+	cs.Logger.Debug("Registering API handlers")
 	cs.AddApiMapping("/", rootPathHandler)
 }
 

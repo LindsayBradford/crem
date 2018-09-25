@@ -6,20 +6,11 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/logging/handlers"
-	"golang.org/x/net/context"
 )
-
-type Status struct {
-	Name    string
-	Version string
-	Message string
-	Time    string
-}
 
 type Response struct {
 	ResponseCode int
@@ -33,6 +24,10 @@ type RestServer struct {
 
 	configuration *config.HttpServerConfig
 	Logger        handlers.LogHandler
+}
+
+type StartableMux interface {
+	Start(portAddress string)
 }
 
 func (s *RestServer) Initialise() *RestServer {
@@ -59,48 +54,31 @@ func (s *RestServer) WithStatus(status Status) *RestServer {
 }
 
 func (s *RestServer) Start() {
-	s.setStatus("CONFIGURING")
-
-	var adminServer *http.Server
-	var apiServer *http.Server
-
 	go func() {
-
-		serverAdminAddress := fmt.Sprintf(":%d", s.configuration.AdminPort)
-		s.Logger.Debug("Starting Admin server listening on address [" + serverAdminAddress + "]")
-
-		adminServer = &http.Server{Addr: serverAdminAddress, Handler: s.adminMux}
-
-		if err := adminServer.ListenAndServe(); err != http.ErrServerClosed {
-			s.setStatus("DEAD")
-			log.Fatal("ListenAndServe: ", err)
-		}
+		startMuxOnPort(s.adminMux, s.configuration.AdminPort)
 	}()
 
 	go func() {
-		serverApiAddress := fmt.Sprintf(":%d", s.configuration.ApiPort)
-		s.Logger.Debug("Starting API server listening on address [" + serverApiAddress + "]")
-		apiServer = &http.Server{Addr: serverApiAddress, Handler: s.apiMux}
-
-		if err := apiServer.ListenAndServe(); err != http.ErrServerClosed {
-			s.setStatus("DEAD")
-			log.Fatal("ListenAndServe: ", err)
-		}
-
+		startMuxOnPort(s.apiMux, s.configuration.ApiPort)
 	}()
 
-	s.setStatus("RUNNING")
-
-	s.adminMux.WaitOnShutdown()
-
-	apiServer.Shutdown(context.Background())
-	adminServer.Shutdown(context.Background())
-
-	s.Logger.Warn("Shutting down")
+	s.adminMux.WaitForShutdownSignal()
+	s.shutdown()
 }
 
-func (s *RestServer) setStatus(statusMessage string) {
-	s.adminMux.setStatus(statusMessage)
+func startMuxOnPort(mux StartableMux, portNumber uint64) {
+	portAddress := toPortAddress(portNumber)
+	mux.Start(portAddress)
+}
+
+func toPortAddress(portNumber uint64) string {
+	return fmt.Sprintf(":%d", portNumber)
+}
+
+func (s *RestServer) shutdown() {
+	s.apiMux.Shutdown()
+	s.adminMux.Shutdown()
+	s.Logger.Info("Shutdown complete")
 }
 
 func (s *RestServer) AddApiMapping(address string, handlerFunction http.HandlerFunc) {

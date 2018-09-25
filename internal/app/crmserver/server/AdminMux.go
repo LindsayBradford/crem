@@ -7,7 +7,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+
+	"golang.org/x/net/context"
 )
+
+type Status struct {
+	Name    string
+	Version string
+	Message string
+	Time    string
+}
 
 type AdminMux struct {
 	RestMux
@@ -32,12 +43,27 @@ func (am *AdminMux) WithType(muxType string) *AdminMux {
 }
 
 func (am *AdminMux) setStatus(statusMessage string) {
-	am.Logger.Debug("Changed server Status to [" + statusMessage + "]")
+	am.Logger.Info("Changed server Status to [" + statusMessage + "]")
 	am.Status.Message = statusMessage
 	am.UpdateStatusTime()
 }
 
-func (am *AdminMux) WaitOnShutdown() {
+func (am *AdminMux) Start(address string) {
+	am.setStatus("RUNNING")
+	am.RestMux.Start(address)
+}
+
+func (am *AdminMux) WaitForShutdownSignal() {
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt, os.Kill)
+		<-sigint
+
+		am.Logger.Warn("Received Operating System Interrupt/Kill signal -- triggering graceful shutdown")
+
+		close(am.doneChannel)
+	}()
+
 	<-am.doneChannel
 }
 
@@ -83,4 +109,9 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 
 func (am *AdminMux) UpdateStatusTime() {
 	am.Status.Time = FormattedTimestamp()
+}
+
+func (am *AdminMux) Shutdown() {
+	am.server.Shutdown(context.Background())
+	am.setStatus("DEAD")
 }

@@ -8,11 +8,14 @@ import (
 	"net/http"
 
 	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/pkg/errors"
+	"golang.org/x/net/context"
 )
 
 type RestMux struct {
 	http.ServeMux
 	muxType string
+	server  http.Server
 
 	handlerMap HandlerFunctionMap
 	Logger     handlers.LogHandler
@@ -78,4 +81,19 @@ func (rm *RestMux) logResponseError(r *http.Request, responseMsg string) {
 	rm.Logger.Warn(
 		"Request method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
 			"] Responding with [" + responseMsg + "] error.")
+}
+
+func (rm *RestMux) Start(address string) {
+	rm.Logger.Debug("Starting [" + rm.muxType + "] server on address [" + address + "]")
+
+	rm.server = http.Server{Addr: address, Handler: rm}
+
+	if err := rm.server.ListenAndServe(); err != http.ErrServerClosed {
+		wrappedErr := errors.Wrap(err, "ListenAndServe")
+		rm.Logger.Error(wrappedErr)
+	}
+}
+
+func (rm *RestMux) Shutdown() {
+	rm.server.Shutdown(context.Background())
 }
