@@ -1,5 +1,7 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
+// Copyright (c) 2018 Australian Rivers Institute.
+
 package main
 
 import (
@@ -50,7 +52,7 @@ func verifyDumbAnnealerRunsAgainstContext(context testContext) {
 	g := NewGomegaWithT(context.t)
 
 	simulatedMainCall := func() {
-		RunFromConfigFile(context.configFile)
+		RunScenarioFromConfigFile(context.configFile)
 	}
 
 	g.Expect(simulatedMainCall).To(Not(Panic()), context.name+" should not panic")

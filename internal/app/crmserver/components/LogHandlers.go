@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
 package components

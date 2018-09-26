@@ -46,7 +46,7 @@ func closeMainThreadChannel() {
 
 func main() {
 	args := commandline.ParseArguments()
-	RunFromConfigFile(args.ConfigFile)
+	RunFromConfigFile(args.ScenarioFile)
 }
 
 func RunFromConfigFile(configFile string) {

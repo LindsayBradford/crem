@@ -27,8 +27,9 @@ func ParseArguments() *Arguments {
 }
 
 type Arguments struct {
-	Version    bool
-	ConfigFile string
+	Version          bool
+	ScenarioFile     string
+	ServerConfigFile string
 }
 
 // THe define sets up the relevant command-line
@@ -37,10 +38,17 @@ type Arguments struct {
 func (args *Arguments) define() {
 
 	flag.StringVar(
-		&args.ConfigFile,
-		"ConfigFile",
+		&args.ScenarioFile,
+		"ScenarioFile",
 		"",
-		"file dictating run-time behaviour",
+		"file dictating scenario run-time behaviour",
+	)
+
+	flag.StringVar(
+		&args.ServerConfigFile,
+		"ServerConfigFile",
+		"",
+		"file dictating HTTP server runtime behaviour",
 	)
 
 	flag.BoolVar(
@@ -61,11 +69,6 @@ func (args *Arguments) define() {
 
 func (args *Arguments) process() {
 
-	if args.ConfigFile == "" {
-		usageMessage()
-		Exit(0)
-	}
-
 	if args.Version == true {
 		fmt.Println(
 			GetVersionString(),
@@ -73,16 +76,24 @@ func (args *Arguments) process() {
 		Exit(0)
 	}
 
-	if args.ConfigFile != "" {
-		pathInfo, err := os.Stat(args.ConfigFile)
-		if os.IsNotExist(err) {
-			exitError := errors.Errorf("config file specified [%s] does not exist", args.ConfigFile)
-			Exit(exitError)
-		}
-		if pathInfo.Mode().IsDir() {
-			exitError := errors.Errorf("config file specified [%s] is a directory, not a file", args.ConfigFile)
-			Exit(exitError)
-		}
+	if args.ScenarioFile != "" {
+		validateFilePath(args.ScenarioFile)
+	}
+
+	if args.ServerConfigFile != "" {
+		validateFilePath(args.ServerConfigFile)
+	}
+}
+
+func validateFilePath(filePath string) {
+	pathInfo, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		exitError := errors.Errorf("file specified [%s] does not exist", filePath)
+		Exit(exitError)
+	}
+	if pathInfo.Mode().IsDir() {
+		exitError := errors.Errorf("file specified [%s] is a directory, not a file", filePath)
+		Exit(exitError)
 	}
 }
 
@@ -107,12 +118,23 @@ func Exit(exitValue interface{}) {
 
 func usageMessage() {
 	fmt.Printf("Help for %s\n", GetVersionString())
-	fmt.Println("  --Help                        Prints this help message.")
-	fmt.Println("  --Version                     Prints the version number of this utility.")
-	fmt.Println("  --ConfigFile  <FilePath>      File that configures the applications run-time behaviour.")
+	fmt.Println("  --Help                         Prints this help message.")
+	fmt.Println("  --Version                      Prints the version number of this utility.")
+	fmt.Println("  --ScenarioFile  <FilePath>     File describing a scenario to run and its  run-time behaviour.")
+	fmt.Println("  --ServerConfigFile <FilePath>  File describing how the application is to run as a web server.")
 	fmt.Println()
-	fmt.Println("General usage takes the form:")
-	fmt.Printf("  %s --ConfigFile <FilePath>\n", justExecutableName())
+	fmt.Println("Web-server usage takes the form:")
+	fmt.Printf("  %s [--ServerConfigFile <FilePath>]\n", justExecutableName())
+	fmt.Println()
+	fmt.Println("  If no server config fle is specified, configuration will first attempt to load from the relative")
+	fmt.Println("  path \"./config/server.toml\". If no such path exists, a web-server will start with default values")
+	fmt.Println("  for all entries in a server config file. ")
+	fmt.Println()
+	fmt.Println("Running a single scenario takes the form:")
+	fmt.Printf("  %s --ScenarioFile <FilePath>\n", justExecutableName())
+	fmt.Println()
+	fmt.Println("If a scenario file is specified, the application runs the scenario instead of a web server.")
+
 	Exit(0)
 }
 

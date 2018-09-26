@@ -5,11 +5,13 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
+	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/commandline"
 	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
 	"github.com/LindsayBradford/crm/internal/app/crmserver/server"
-	"github.com/LindsayBradford/crm/internal/app/dumbannealer/components"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/pkg/errors"
 )
@@ -39,7 +41,7 @@ func (cs *CrmServer) WithStatus(status server.Status) *CrmServer {
 }
 
 var (
-	logger = components.BuildLogHandler() //TODO: picked up wrong logger -- fix
+	logger = components.BuildLogHandler()
 
 	crmServer = new(CrmServer).
 			Initialise().
@@ -49,13 +51,51 @@ var (
 
 func main() {
 	args := commandline.ParseArguments()
-	RunFromConfigFile(args.ConfigFile)
+	if shouldRunScenario(args) {
+		RunScenarioFromConfigFile(args.ScenarioFile)
+	} else {
+		RunServerFromConfigFile(args.ServerConfigFile)
+	}
 }
 
-func RunFromConfigFile(configFile string) {
+func shouldRunScenario(args *commandline.Arguments) bool {
+	return args.ScenarioFile != ""
+}
+
+func RunScenarioFromConfigFile(configFile string) {
+	configuration := retrieveScenarioConfiguration(configFile)
+	scenarioRunner := components.BuildScenarioRunner(configuration)
+	runScenario(scenarioRunner)
+	flushStreams()
+}
+
+func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {
+	configuration, retrieveError := config.RetrieveCrm(configFile)
+	if retrieveError != nil {
+		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
+		panic(wrappingError)
+	}
+
+	logger.Info("Configuring with [" + configuration.FilePath + "]")
+	return configuration
+}
+
+func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
+	if runError := scenarioRunner.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running dumb annealer scenario")
+		panic(wrappingError)
+	}
+}
+
+func flushStreams() {
+	os.Stdout.Sync()
+	os.Stderr.Sync()
+}
+
+func RunServerFromConfigFile(configFile string) {
 	logger.Info(nameAndVersionString() + " -- Started")
 
-	configuration := retrieveConfiguration(configFile)
+	configuration := retrieveServerConfiguration(configFile)
 	crmServer.
 		WithConfig(configuration).
 		establishHttpDelegates()
@@ -63,7 +103,7 @@ func RunFromConfigFile(configFile string) {
 	crmServer.Start()
 }
 
-func retrieveConfiguration(configFile string) *config.HttpServerConfig {
+func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
 	configuration, retrieveError := config.RetrieveHttpServer(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving server configuration")

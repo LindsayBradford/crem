@@ -5,6 +5,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/LindsayBradford/crm/strings"
@@ -14,6 +15,8 @@ import (
 const ShortApplicationName = "CatchmentResilienceModeller"
 const LongApplicationName = "Catchment Resilience Modeller"
 const Version = "v1"
+
+const defaultServerConfigPath = "config/server.toml"
 
 func RetrieveCrm(configFilePath string) (*CRMConfig, error) {
 	var conf CRMConfig
@@ -286,8 +289,31 @@ type HttpServerConfig struct {
 }
 
 func RetrieveHttpServer(configFilePath string) (*HttpServerConfig, error) {
+	if configFilePath == "" {
+		configFilePath = defaultServerConfigPath
+		if defaultServerConfigFileNotSupplied() {
+			return embeddedDefaultHttpServerConfig()
+		}
+	}
+
+	return retrieveHttpServerFromFile(configFilePath)
+}
+
+func defaultServerConfigFileNotSupplied() bool {
+	_, err := os.Stat(defaultServerConfigPath)
+	return os.IsNotExist(err)
+}
+
+func embeddedDefaultHttpServerConfig() (*HttpServerConfig, error) {
+	config := HttpServerConfig{ApiPort: 2020, AdminPort: 2021}
+	config.FilePath = "<default server configuration>"
+	return &config, nil
+}
+
+func retrieveHttpServerFromFile(configFilePath string) (*HttpServerConfig, error) {
 	var conf HttpServerConfig
 	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
+
 	if decodeErr != nil {
 		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
 	}
