@@ -17,9 +17,16 @@ var (
 
 func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
+	establishScenarioLogger(configuration)
+
 	scenarioRunner := BuildScenarioRunner(configuration)
 	runScenario(scenarioRunner)
 	flushStreams()
+}
+
+func establishScenarioLogger(configuration *config.CRMConfig) {
+	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
+	ScenarioLogger = loggers[0]
 }
 
 func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {

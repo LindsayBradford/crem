@@ -43,7 +43,7 @@ func (rm *RestMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (rm *RestMux) logRequestReceipt(r *http.Request) {
-	rm.Logger.Debug(
+	rm.Logger.Info(
 		"[" + rm.muxType + "] Received request method [" + r.Method +
 			"] for request [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
 }

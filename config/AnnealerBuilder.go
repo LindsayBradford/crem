@@ -17,7 +17,7 @@ type AnnealerBuilder struct {
 	errors *errors.CompositeError
 
 	baseBuilder      annealing.AnnealerBuilder
-	loggersBuilder   logHandlersBuilder
+	loggersBuilder   LogHandlersBuilder
 	observersBuilder annealingObserversBuilder
 	explorersBuilder solutionExplorerBuilder
 

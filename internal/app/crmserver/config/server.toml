@@ -1,2 +1,7 @@
 ApiPort = 3030
 AdminPort = 3031
+
+[[Loggers]]
+Name = "DefaultServerLogger"
+[Loggers.LogLevelDestinations]
+Debugging = "StandardError"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"

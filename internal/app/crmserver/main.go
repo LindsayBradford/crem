@@ -8,18 +8,6 @@ import (
 )
 
 func main() {
-	buildSharedLogger()
-	decideBetweenScenarioAndServer()
-}
-
-func buildSharedLogger() {
-	logger := components.BuildLogHandler()
-
-	components.ScenarioLogger = logger
-	components.ServerLogger = logger
-}
-
-func decideBetweenScenarioAndServer() {
 	args := commandline.ParseArguments()
 	if shouldRunScenario(args) {
 		components.RunScenarioFromConfigFile(args.ScenarioFile)
@@ -27,7 +15,6 @@ func decideBetweenScenarioAndServer() {
 		components.RunServerFromConfigFile(args.ServerConfigFile)
 	}
 }
-
 func shouldRunScenario(args *commandline.Arguments) bool {
 	return args.ScenarioFile != ""
 }

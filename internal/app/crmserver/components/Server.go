@@ -46,6 +46,10 @@ func (cs *CrmServer) WithStatus(status server.Status) *CrmServer {
 }
 
 func RunServerFromConfigFile(configFile string) {
+
+	configuration := retrieveServerConfiguration(configFile)
+	establishServerLogger(configuration)
+
 	crmServer := new(CrmServer).
 		Initialise().
 		WithLogger(ServerLogger).
@@ -53,12 +57,16 @@ func RunServerFromConfigFile(configFile string) {
 
 	ServerLogger.Info(nameAndVersionString() + " -- Started")
 
-	configuration := retrieveServerConfiguration(configFile)
 	crmServer.
 		WithConfig(configuration).
 		establishApiHandlers()
 
 	crmServer.Start()
+}
+
+func establishServerLogger(configuration *config.HttpServerConfig) {
+	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
+	ServerLogger = loggers[0]
 }
 
 func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {

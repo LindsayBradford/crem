@@ -18,23 +18,23 @@ var (
 	baseBuilder = new(handlers.LogHandlerBuilder)
 )
 
-type logHandlersBuilder struct {
+type LogHandlersBuilder struct {
 	errors *CompositeError
 	config []LoggerConfig
 }
 
-func (builder *logHandlersBuilder) initialise() *logHandlersBuilder {
+func (builder *LogHandlersBuilder) initialise() *LogHandlersBuilder {
 	builder.errors = new(CompositeError)
 	return builder
 }
 
-func (builder *logHandlersBuilder) WithConfig(loggingConfig []LoggerConfig) *logHandlersBuilder {
+func (builder *LogHandlersBuilder) WithConfig(loggingConfig []LoggerConfig) *LogHandlersBuilder {
 	builder.initialise()
 	builder.config = loggingConfig
 	return builder
 }
 
-func (builder *logHandlersBuilder) Build() ([]handlers.LogHandler, error) {
+func (builder *LogHandlersBuilder) Build() ([]handlers.LogHandler, error) {
 
 	handlerList := make([]handlers.LogHandler, 0)
 	handlerList = append(handlerList, builder.buildDefaultLogHandler()) // system-supplied default logger JIC config sux
@@ -53,14 +53,14 @@ func (builder *logHandlersBuilder) Build() ([]handlers.LogHandler, error) {
 	}
 }
 
-func (builder *logHandlersBuilder) makeFirstConfigSuppliedLoggerTheDefault(handlerList []handlers.LogHandler) []handlers.LogHandler {
+func (builder *LogHandlersBuilder) makeFirstConfigSuppliedLoggerTheDefault(handlerList []handlers.LogHandler) []handlers.LogHandler {
 	if len(builder.config) > 0 && builder.errors.Size() == 0 {
 		return handlerList[1:]
 	}
 	return handlerList
 }
 
-func (builder *logHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handlers.LogHandler {
+func (builder *LogHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handlers.LogHandler {
 	newLogger, newLogError := builder.deriveLogHandler(currConfig)
 	if newLogError != nil {
 		builder.errors.Add(newLogError)
@@ -70,7 +70,7 @@ func (builder *logHandlersBuilder) newHandlerFor(currConfig LoggerConfig) handle
 	return newLogger
 }
 
-func (builder *logHandlersBuilder) buildDefaultLogHandler() handlers.LogHandler {
+func (builder *LogHandlersBuilder) buildDefaultLogHandler() handlers.LogHandler {
 	defaultLogger, defaultLogError := baseBuilder.ForDefaultLogHandler().Build()
 	if defaultLogError != nil {
 		builder.errors.Add(
@@ -87,13 +87,13 @@ func ensureSupportForAnnealerLogLevel(handler handlers.LogHandler) {
 	}
 }
 
-func (builder *logHandlersBuilder) deriveLogHandler(currConfig LoggerConfig) (handlers.LogHandler, error) {
+func (builder *LogHandlersBuilder) deriveLogHandler(currConfig LoggerConfig) (handlers.LogHandler, error) {
 	builder.deriveBaseLogHandler(currConfig)
 	builder.deriveConfiguredLogLevelDestinations(currConfig)
 	return baseBuilder.Build()
 }
 
-func (builder *logHandlersBuilder) deriveBaseLogHandler(currConfig LoggerConfig) {
+func (builder *LogHandlersBuilder) deriveBaseLogHandler(currConfig LoggerConfig) {
 	switch currConfig.Type {
 	case NativeLibrary, UnspecifiedLoggerType:
 		baseBuilder.
@@ -110,20 +110,20 @@ func (builder *logHandlersBuilder) deriveBaseLogHandler(currConfig LoggerConfig)
 	}
 }
 
-func (builder *logHandlersBuilder) deriveConfiguredLogLevelDestinations(currConfig LoggerConfig) {
+func (builder *LogHandlersBuilder) deriveConfiguredLogLevelDestinations(currConfig LoggerConfig) {
 	for configLogLevel, configDestination := range currConfig.LogLevelDestinations {
 		logLevel, destination := builder.deriveLogLevelAndDestination(configLogLevel, configDestination)
 		baseBuilder.WithLogLevelDestination(logLevel, destination)
 	}
 }
 
-func (builder *logHandlersBuilder) deriveLogLevelAndDestination(configLogLevel string, configDestination string) (shared.LogLevel, shared.LogDestination) {
+func (builder *LogHandlersBuilder) deriveLogLevelAndDestination(configLogLevel string, configDestination string) (shared.LogLevel, shared.LogDestination) {
 	logLevel := builder.deriveLogLevel(configLogLevel)
 	destination := builder.deriveDestination(configDestination, configLogLevel)
 	return logLevel, destination
 }
 
-func (builder *logHandlersBuilder) deriveLogLevel(configLogLevel string) shared.LogLevel {
+func (builder *LogHandlersBuilder) deriveLogLevel(configLogLevel string) shared.LogLevel {
 	var derivedLogLevel shared.LogLevel
 	switch configLogLevel {
 	case "Debugging":
@@ -140,7 +140,7 @@ func (builder *logHandlersBuilder) deriveLogLevel(configLogLevel string) shared.
 	return derivedLogLevel
 }
 
-func (builder *logHandlersBuilder) deriveDestination(configDestination string, configLogLevel string) shared.LogDestination {
+func (builder *LogHandlersBuilder) deriveDestination(configDestination string, configLogLevel string) shared.LogDestination {
 	var derivedDestination shared.LogDestination
 	switch configDestination {
 	case "StandardOutput":

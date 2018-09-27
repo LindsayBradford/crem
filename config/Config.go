@@ -286,6 +286,8 @@ type HttpServerConfig struct {
 
 	AdminPort uint64
 	ApiPort   uint64
+
+	Loggers []LoggerConfig
 }
 
 func RetrieveHttpServer(configFilePath string) (*HttpServerConfig, error) {
