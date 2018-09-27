@@ -46,21 +46,17 @@ func (cs *CrmServer) WithStatus(status server.Status) *CrmServer {
 }
 
 func RunServerFromConfigFile(configFile string) {
-
 	configuration := retrieveServerConfiguration(configFile)
 	establishServerLogger(configuration)
 
 	crmServer := new(CrmServer).
 		Initialise().
+		WithConfig(configuration).
 		WithLogger(ServerLogger).
+		WithCustomApiHandlers().
 		WithStatus(crmServerStatus)
 
-	ServerLogger.Info(nameAndVersionString() + " -- Started")
-
-	crmServer.
-		WithConfig(configuration).
-		establishApiHandlers()
-
+	ServerLogger.Info(nameAndVersionString() + " -- Starting")
 	crmServer.Start()
 }
 
@@ -80,9 +76,11 @@ func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
 	return configuration
 }
 
-func (cs *CrmServer) establishApiHandlers() {
-	cs.Logger.Debug("Registering API handlers")
+func (cs *CrmServer) WithCustomApiHandlers() *CrmServer {
+	cs.Logger.Debug(nameAndVersionString() + "-- Registering API handlers")
 	cs.AddApiMapping("/", rootPathHandler)
+
+	return cs
 }
 
 func rootPathHandler(w http.ResponseWriter, r *http.Request) {

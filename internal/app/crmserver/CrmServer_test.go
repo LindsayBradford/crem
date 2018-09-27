@@ -3,9 +3,10 @@
 package main
 
 import (
+	"testing"
+
 	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
 	. "github.com/onsi/gomega"
-	"testing"
 )
 
 type testContext struct {
