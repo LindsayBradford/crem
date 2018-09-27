@@ -1,10 +1,9 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 package main
 
 import (
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
 	. "github.com/onsi/gomega"
 	"testing"
 )
@@ -52,7 +51,7 @@ func verifyDumbAnnealerRunsAgainstContext(context testContext) {
 	g := NewGomegaWithT(context.t)
 
 	simulatedMainCall := func() {
-		RunScenarioFromConfigFile(context.configFile)
+		components.RunScenarioFromConfigFile(context.configFile)
 	}
 
 	g.Expect(simulatedMainCall).To(Not(Panic()), context.name+" should not panic")

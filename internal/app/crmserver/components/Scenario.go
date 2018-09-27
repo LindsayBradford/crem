@@ -1,19 +1,23 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package main
+package components
 
 import (
 	"os"
 
 	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
+	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/pkg/errors"
+)
+
+var (
+	ScenarioLogger handlers.LogHandler = handlers.DefaultNullLogHandler
 )
 
 func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
-	scenarioRunner := components.BuildScenarioRunner(configuration)
+	scenarioRunner := BuildScenarioRunner(configuration)
 	runScenario(scenarioRunner)
 	flushStreams()
 }
@@ -25,7 +29,7 @@ func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {
 		panic(wrappingError)
 	}
 
-	logger.Info("Configuring with [" + configuration.FilePath + "]")
+	ScenarioLogger.Info("Configuring with [" + configuration.FilePath + "]")
 	return configuration
 }
 
