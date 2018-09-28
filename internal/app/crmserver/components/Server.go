@@ -3,10 +3,9 @@
 package components
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components/api"
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components/scenario"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/LindsayBradford/crm/server"
 	"github.com/pkg/errors"
@@ -56,12 +55,13 @@ func RunServerFromConfigFile(configFile string) {
 		WithLogger(ServerLogger).
 		WithStatus(crmServerStatus)
 
-	ServerLogger.Info(nameAndVersionString() + " -- Starting")
+	ServerLogger.Info(server.NameAndVersionString() + " -- Starting")
+	scenario.LogHandler = ServerLogger
 	crmServer.Start()
 }
 
-func buildCrmApuMix() *CrmApiMux {
-	newMux := new(CrmApiMux).Initialise().WithType("API)")
+func buildCrmApuMix() *api.CrmApiMux {
+	newMux := new(api.CrmApiMux).Initialise().WithType("API)")
 	return newMux
 }
 
@@ -79,26 +79,4 @@ func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
 
 	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
 	return configuration
-}
-
-type CrmApiMux struct {
-	server.ApiMux
-}
-
-func (cam *CrmApiMux) Initialise() *CrmApiMux {
-	cam.ApiMux.Initialise()
-	return cam
-}
-
-func (cam *CrmApiMux) WithType(muxType string) *CrmApiMux {
-	cam.ApiMux.WithType(muxType)
-	return cam
-}
-
-func (cam *CrmApiMux) rootPathHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, nameAndVersionString())
-}
-
-func nameAndVersionString() string {
-	return fmt.Sprintf("%s, version %s", config.LongApplicationName, config.Version)
 }

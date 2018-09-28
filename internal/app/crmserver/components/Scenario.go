@@ -3,10 +3,8 @@
 package components
 
 import (
-	"os"
-
-	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components/scenario"
 	"github.com/LindsayBradford/crm/logging/handlers"
 	"github.com/pkg/errors"
 )
@@ -18,10 +16,7 @@ var (
 func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
 	establishScenarioLogger(configuration)
-
-	scenarioRunner := BuildScenarioRunner(configuration)
-	runScenario(scenarioRunner)
-	flushStreams()
+	scenario.RunScenarioFromConfig(configuration)
 }
 
 func establishScenarioLogger(configuration *config.CRMConfig) {
@@ -30,7 +25,7 @@ func establishScenarioLogger(configuration *config.CRMConfig) {
 }
 
 func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {
-	configuration, retrieveError := config.RetrieveCrm(configFile)
+	configuration, retrieveError := config.RetrieveCrmFromFile(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		panic(wrappingError)
@@ -38,16 +33,4 @@ func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {
 
 	ScenarioLogger.Info("Configuring with [" + configuration.FilePath + "]")
 	return configuration
-}
-
-func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
-	if runError := scenarioRunner.Run(); runError != nil {
-		wrappingError := errors.Wrap(runError, "running dumb annealer scenario")
-		panic(wrappingError)
-	}
-}
-
-func flushStreams() {
-	os.Stdout.Sync()
-	os.Stderr.Sync()
 }

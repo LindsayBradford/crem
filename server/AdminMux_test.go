@@ -103,7 +103,7 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 func buildMuxUnderTest() *AdminMux {
 	muxUnderTest := new(AdminMux).Initialise()
-	muxUnderTest.Logger = handlers.DefaultNullLogHandler
+	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
 	return muxUnderTest
 }
 
@@ -112,7 +112,7 @@ func getResponseFor(context RequestContext) *http.Response {
 	w := httptest.NewRecorder()
 
 	muxUnderTest := new(AdminMux).Initialise()
-	muxUnderTest.Logger = handlers.DefaultNullLogHandler
+	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
 
 	context.handler(w, req)
 

@@ -18,7 +18,7 @@ const Version = "v1"
 
 const defaultServerConfigPath = "config/server.toml"
 
-func RetrieveCrm(configFilePath string) (*CRMConfig, error) {
+func RetrieveCrmFromFile(configFilePath string) (*CRMConfig, error) {
 	var conf CRMConfig
 	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
 	if decodeErr != nil {
@@ -29,6 +29,20 @@ func RetrieveCrm(configFilePath string) (*CRMConfig, error) {
 		return nil, errors.New(errorMsg)
 	}
 	conf.FilePath = configFilePath
+	return &conf, nil
+}
+
+func RetrieveCrmFromString(tomlString string) (*CRMConfig, error) {
+	var conf CRMConfig
+	metaData, decodeErr := toml.Decode(tomlString, &conf)
+	if decodeErr != nil {
+		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
+	}
+	if len(metaData.Undecoded()) > 0 {
+		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
+		return nil, errors.New(errorMsg)
+	}
+	conf.FilePath = "<unspecified>"
 	return &conf, nil
 }
 

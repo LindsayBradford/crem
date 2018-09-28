@@ -1,26 +1,34 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
-package components
+package scenario
 
 import (
 	"os"
 
 	"github.com/LindsayBradford/crm/annealing"
 	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/pkg/errors"
 )
 
+var (
+	LogHandler handlers.LogHandler
+)
+
+func RunScenarioFromConfig(crmConfig *config.CRMConfig) {
+	scenarioRunner := BuildScenarioRunner(crmConfig)
+	runScenario(scenarioRunner)
+	flushStreams()
+}
+
 func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
-	newAnnealer, logHandler, buildError :=
+	newAnnealer, _, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
 			Build()
 
 	if buildError != nil {
-		logHandler.Error(buildError)
-		logHandler.Error("Exiting program due to failed Annealer build")
-		os.Exit(1)
+		LogHandler.Error(buildError)
 	}
 
 	var runner annealing.CallableScenarioRunner
@@ -31,11 +39,17 @@ func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableSce
 		WithRunNumber(scenarioConfig.RunNumber).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
-	if scenarioConfig.CpuProfilePath != "" {
-		runner = new(annealing.ProfilableScenarioRunner).
-			ThatProfiles(runner).
-			ToFile(scenarioConfig.CpuProfilePath)
-	}
-
 	return runner
+}
+
+func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
+	if runError := scenarioRunner.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running scenario")
+		LogHandler.Error(wrappingError)
+	}
+}
+
+func flushStreams() {
+	os.Stdout.Sync()
+	os.Stderr.Sync()
 }
