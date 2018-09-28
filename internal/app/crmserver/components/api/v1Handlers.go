@@ -24,18 +24,22 @@ func (cam *CrmApiMux) v1PostScenario(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	scenarioConfig, retrieveError := config.RetrieveCrmFromString(requestBodyToString(r))
+	scenarioText := requestBodyToString(r)
+
+	scenarioConfig, retrieveError := config.RetrieveCrmFromString(scenarioText)
 
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		cam.Logger().Warn(wrappingError)
 	}
 
+	sendTextOnResponseBody(scenarioText, w)
+
 	scenario.RunScenarioFromConfig(scenarioConfig)
 }
 
-func echoRequestBodyOnResponse(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, requestBodyToString(r))
+func sendTextOnResponseBody(text string, w http.ResponseWriter) {
+	fmt.Fprintf(w, text)
 }
 
 func requestBodyToString(r *http.Request) string {
