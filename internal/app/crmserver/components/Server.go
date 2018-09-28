@@ -52,12 +52,17 @@ func RunServerFromConfigFile(configFile string) {
 	crmServer := new(CrmServer).
 		Initialise().
 		WithConfig(configuration).
+		WithApiMux(buildCrmApuMix()).
 		WithLogger(ServerLogger).
-		WithCustomApiHandlers().
 		WithStatus(crmServerStatus)
 
 	ServerLogger.Info(nameAndVersionString() + " -- Starting")
 	crmServer.Start()
+}
+
+func buildCrmApuMix() *CrmApiMux {
+	newMux := new(CrmApiMux).Initialise().WithType("API)")
+	return newMux
 }
 
 func establishServerLogger(configuration *config.HttpServerConfig) {
@@ -76,14 +81,21 @@ func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
 	return configuration
 }
 
-func (cs *CrmServer) WithCustomApiHandlers() *CrmServer {
-	cs.Logger.Debug(nameAndVersionString() + "-- Registering API handlers")
-	cs.AddApiMapping("/", rootPathHandler)
-
-	return cs
+type CrmApiMux struct {
+	server.ApiMux
 }
 
-func rootPathHandler(w http.ResponseWriter, r *http.Request) {
+func (cam *CrmApiMux) Initialise() *CrmApiMux {
+	cam.ApiMux.Initialise()
+	return cam
+}
+
+func (cam *CrmApiMux) WithType(muxType string) *CrmApiMux {
+	cam.ApiMux.WithType(muxType)
+	return cam
+}
+
+func (cam *CrmApiMux) rootPathHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, nameAndVersionString())
 }
 

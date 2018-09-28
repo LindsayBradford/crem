@@ -21,14 +21,14 @@ type Status struct {
 }
 
 type AdminMux struct {
-	RestMux
+	BaseMux
 	Status Status
 
 	doneChannel chan bool
 }
 
 func (am *AdminMux) Initialise() *AdminMux {
-	am.RestMux.Initialise()
+	am.BaseMux.Initialise()
 
 	am.doneChannel = make(chan bool)
 	am.handlerMap["/status"] = am.statusHandler
@@ -38,19 +38,19 @@ func (am *AdminMux) Initialise() *AdminMux {
 }
 
 func (am *AdminMux) WithType(muxType string) *AdminMux {
-	am.RestMux.WithType(muxType)
+	am.BaseMux.WithType(muxType)
 	return am
 }
 
 func (am *AdminMux) setStatus(statusMessage string) {
-	am.Logger.Info("Changed server Status to [" + statusMessage + "]")
+	am.logger.Info("Changed server Status to [" + statusMessage + "]")
 	am.Status.Message = statusMessage
 	am.UpdateStatusTime()
 }
 
 func (am *AdminMux) Start(address string) {
 	am.setStatus("RUNNING")
-	am.RestMux.Start(address)
+	am.BaseMux.Start(address)
 }
 
 func (am *AdminMux) WaitForShutdownSignal() {
@@ -59,7 +59,7 @@ func (am *AdminMux) WaitForShutdownSignal() {
 		signal.Notify(sigint, os.Interrupt, os.Kill)
 		<-sigint
 
-		am.Logger.Warn("Received Operating System Interrupt/Kill signal -- triggering graceful shutdown")
+		am.logger.Warn("Received Operating System Interrupt/Kill signal -- triggering graceful shutdown")
 
 		close(am.doneChannel)
 	}()
@@ -73,12 +73,12 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	am.Logger.Debug("Responding with status [" + am.Status.Message + "]")
+	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
 	am.UpdateStatusTime()
 
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {
-		am.Logger.Error(encodeError)
+		am.logger.Error(encodeError)
 	}
 
 	fmt.Fprintf(w, string(statusJson))
@@ -91,12 +91,12 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	am.Status.Message = "SHUTTING_DOWN"
-	am.Logger.Debug("Responding with status [" + am.Status.Message + "]")
+	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
 	am.UpdateStatusTime()
 
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {
-		am.Logger.Error(encodeError)
+		am.logger.Error(encodeError)
 	}
 
 	bufferedWriter := bufio.NewWriter(w)

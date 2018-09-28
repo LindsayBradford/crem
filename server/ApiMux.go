@@ -3,15 +3,15 @@
 package server
 
 type ApiMux struct {
-	RestMux
+	BaseMux
 }
 
 func (am *ApiMux) Initialise() *ApiMux {
-	am.RestMux.Initialise()
+	am.BaseMux.Initialise()
 	return am
 }
 
 func (am *ApiMux) WithType(muxType string) *ApiMux {
-	am.RestMux.WithType(muxType)
+	am.BaseMux.WithType(muxType)
 	return am
 }

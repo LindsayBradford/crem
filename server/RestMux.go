@@ -12,28 +12,48 @@ import (
 	"golang.org/x/net/context"
 )
 
-type RestMux struct {
+type RestMux interface {
+	Start(portAddress string)
+	Shutdown()
+
+	SetLogger(handler handlers.LogHandler)
+	AddHandler(address string, handler http.HandlerFunc)
+}
+
+type BaseMux struct {
 	http.ServeMux
 	muxType string
 	server  http.Server
 
 	handlerMap HandlerFunctionMap
-	Logger     handlers.LogHandler
+	logger     handlers.LogHandler
 }
 
 type HandlerFunctionMap map[string]http.HandlerFunc
 
-func (rm *RestMux) Initialise() *RestMux {
+func (rm *BaseMux) Initialise() *BaseMux {
 	rm.handlerMap = make(HandlerFunctionMap)
 	return rm
 }
 
-func (rm *RestMux) WithType(muxType string) *RestMux {
+func (rm *BaseMux) WithType(muxType string) *BaseMux {
 	rm.muxType = muxType
 	return rm
 }
 
-func (rm *RestMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (rm *BaseMux) SetLogger(logger handlers.LogHandler) {
+	rm.logger = logger
+}
+
+func (rm *BaseMux) Logger() handlers.LogHandler {
+	return rm.logger
+}
+
+func (rm *BaseMux) AddHandler(address string, handler http.HandlerFunc) {
+	rm.handlerMap[address] = handler
+}
+
+func (rm *BaseMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	rm.logRequestReceipt(r)
 	if handlerFunction, handlerFound := rm.handlerFor(r); handlerFound {
 		handlerFunction(w, r)
@@ -42,26 +62,26 @@ func (rm *RestMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (rm *RestMux) logRequestReceipt(r *http.Request) {
-	rm.Logger.Info(
+func (rm *BaseMux) logRequestReceipt(r *http.Request) {
+	rm.logger.Info(
 		"[" + rm.muxType + "] Received request method [" + r.Method +
 			"] for request [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
 }
 
-func (rm *RestMux) handlerFor(r *http.Request) (handlerFunction http.HandlerFunc, found bool) {
+func (rm *BaseMux) handlerFor(r *http.Request) (handlerFunction http.HandlerFunc, found bool) {
 	handlerFunction, found = rm.handlerMap[r.URL.String()]
 	return
 }
 
-func (rm *RestMux) ServeNotFoundError(w http.ResponseWriter, r *http.Request) {
+func (rm *BaseMux) ServeNotFoundError(w http.ResponseWriter, r *http.Request) {
 	rm.ServeError(http.StatusNotFound, "Resource not found", w, r)
 }
 
-func (rm *RestMux) ServeMethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
+func (rm *BaseMux) ServeMethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
 	rm.ServeError(http.StatusMethodNotAllowed, "Method not allowed", w, r)
 }
 
-func (rm *RestMux) ServeError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
+func (rm *BaseMux) ServeError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
 	response := Response{ResponseCode: responseCode, Message: responseMsg}
 	response.Time = FormattedTimestamp()
 
@@ -69,7 +89,7 @@ func (rm *RestMux) ServeError(responseCode int, responseMsg string, w http.Respo
 
 	statusJson, encodeError := json.MarshalIndent(response, "", "  ")
 	if encodeError != nil {
-		rm.Logger.Error(encodeError)
+		rm.logger.Error(encodeError)
 	}
 
 	rm.logResponseError(r, responseMsg)
@@ -77,23 +97,23 @@ func (rm *RestMux) ServeError(responseCode int, responseMsg string, w http.Respo
 	fmt.Fprintf(w, string(statusJson))
 }
 
-func (rm *RestMux) logResponseError(r *http.Request, responseMsg string) {
-	rm.Logger.Warn(
+func (rm *BaseMux) logResponseError(r *http.Request, responseMsg string) {
+	rm.logger.Warn(
 		"Request method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
 			"] Responding with [" + responseMsg + "] error.")
 }
 
-func (rm *RestMux) Start(address string) {
-	rm.Logger.Debug("Starting [" + rm.muxType + "] server on address [" + address + "]")
+func (rm *BaseMux) Start(address string) {
+	rm.logger.Debug("Starting [" + rm.muxType + "] server on address [" + address + "]")
 
 	rm.server = http.Server{Addr: address, Handler: rm}
 
 	if err := rm.server.ListenAndServe(); err != http.ErrServerClosed {
 		wrappedErr := errors.Wrap(err, "ListenAndServe")
-		rm.Logger.Error(wrappedErr)
+		rm.logger.Error(wrappedErr)
 	}
 }
 
-func (rm *RestMux) Shutdown() {
+func (rm *BaseMux) Shutdown() {
 	rm.server.Shutdown(context.Background())
 }

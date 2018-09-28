@@ -20,26 +20,27 @@ type Response struct {
 
 type RestServer struct {
 	adminMux *AdminMux
-	apiMux   *ApiMux
+	apiMux   RestMux
 
 	configuration *config.HttpServerConfig
 	Logger        handlers.LogHandler
 }
 
-type StartableMux interface {
-	Start(portAddress string)
-}
-
 func (s *RestServer) Initialise() *RestServer {
 	s.adminMux = new(AdminMux).Initialise().WithType("Admin")
-	s.apiMux = new(ApiMux).Initialise().WithType("API")
+	return s
+}
+
+func (s *RestServer) WithApiMux(apiMux RestMux) *RestServer {
+	s.adminMux = new(AdminMux).Initialise().WithType("Admin")
+	s.apiMux = apiMux
 	return s
 }
 
 func (s *RestServer) WithLogger(logger handlers.LogHandler) *RestServer {
 	s.Logger = logger
-	s.adminMux.Logger = logger
-	s.apiMux.Logger = logger
+	s.adminMux.SetLogger(logger)
+	s.apiMux.SetLogger(logger)
 	return s
 }
 
@@ -66,7 +67,7 @@ func (s *RestServer) Start() {
 	s.shutdown()
 }
 
-func startMuxOnPort(mux StartableMux, portNumber uint64) {
+func startMuxOnPort(mux RestMux, portNumber uint64) {
 	portAddress := toPortAddress(portNumber)
 	mux.Start(portAddress)
 }
@@ -82,5 +83,5 @@ func (s *RestServer) shutdown() {
 }
 
 func (s *RestServer) AddApiMapping(address string, handlerFunction http.HandlerFunc) {
-	s.apiMux.handlerMap[address] = handlerFunction
+	s.apiMux.AddHandler(address, handlerFunction)
 }
