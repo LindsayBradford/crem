@@ -13,14 +13,25 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (cam *CrmApiMux) v1PostScenario(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		cam.ServeMethodNotAllowedError(w, r)
-		return
-	}
+type Job struct {
+	ScenarioConfig *config.CRMConfig
+	status         string
+}
 
+func (cam *CrmApiMux) v1HandleJobs(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		cam.viPostJob(w, r)
+	case http.MethodGet:
+		cam.v1GetJobs(w, r)
+	default:
+		cam.MethodNotAllowedError(w, r)
+	}
+}
+
+func (cam *CrmApiMux) viPostJob(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get("Content-type") != server.TomlMimeType {
-		cam.ServeMethodNotAllowedError(w, r)
+		cam.MethodNotAllowedError(w, r)
 		return
 	}
 
@@ -45,4 +56,9 @@ func sendTextOnResponseBody(text string, w http.ResponseWriter) {
 func requestBodyToString(r *http.Request) string {
 	responseBodyBytes, _ := ioutil.ReadAll(r.Body)
 	return string(responseBodyBytes)
+}
+
+func (cam *CrmApiMux) v1GetJobs(w http.ResponseWriter, r *http.Request) {
+	scenarioText := requestBodyToString(r)
+	sendTextOnResponseBody(scenarioText, w)
 }

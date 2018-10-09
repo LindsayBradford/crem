@@ -17,9 +17,19 @@ type CrmApiMux struct {
 	server.ApiMux
 }
 
+type ScenarioJob struct {
+	jobId          string
+	status         string
+	ScenarioConfig *config.CRMConfig
+}
+
+type ScenarioJobQueue struct {
+	jobs []ScenarioJob
+}
+
 func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	cam.ApiMux.Initialise()
-	cam.AddHandler(apiPath+v1Path+"/scenarios", cam.v1PostScenario)
+	cam.AddHandler(apiPath+v1Path+"/jobs", cam.v1HandleJobs)
 	return cam
 }
 

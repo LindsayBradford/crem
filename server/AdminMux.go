@@ -69,7 +69,7 @@ func (am *AdminMux) WaitForShutdownSignal() {
 
 func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		am.ServeMethodNotAllowedError(w, r)
+		am.MethodNotAllowedError(w, r)
 		return
 	}
 
@@ -86,7 +86,7 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 
 func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		am.ServeMethodNotAllowedError(w, r)
+		am.MethodNotAllowedError(w, r)
 		return
 	}
 

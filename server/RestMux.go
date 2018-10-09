@@ -58,7 +58,7 @@ func (rm *BaseMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if handlerFunction, handlerFound := rm.handlerFor(r); handlerFound {
 		handlerFunction(w, r)
 	} else {
-		rm.ServeNotFoundError(w, r)
+		rm.NotFoundError(w, r)
 	}
 }
 
@@ -73,15 +73,15 @@ func (rm *BaseMux) handlerFor(r *http.Request) (handlerFunction http.HandlerFunc
 	return
 }
 
-func (rm *BaseMux) ServeNotFoundError(w http.ResponseWriter, r *http.Request) {
-	rm.ServeError(http.StatusNotFound, "Resource not found", w, r)
+func (rm *BaseMux) NotFoundError(w http.ResponseWriter, r *http.Request) {
+	rm.RespondWithError(http.StatusNotFound, "Resource not found", w, r)
 }
 
-func (rm *BaseMux) ServeMethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
-	rm.ServeError(http.StatusMethodNotAllowed, "Method not allowed", w, r)
+func (rm *BaseMux) MethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
+	rm.RespondWithError(http.StatusMethodNotAllowed, "Method not allowed", w, r)
 }
 
-func (rm *BaseMux) ServeError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
+func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
 	response := Response{ResponseCode: responseCode, Message: responseMsg}
 	response.Time = FormattedTimestamp()
 
