@@ -3,10 +3,7 @@
 package server
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -18,12 +15,6 @@ type testContext struct {
 	name       string
 	t          *testing.T
 	configFile string
-}
-
-type RequestContext struct {
-	method    string
-	targetUrl string
-	handler   http.HandlerFunc
 }
 
 func TestValidStatusRequest_OkResponse(t *testing.T) {
@@ -46,11 +37,6 @@ func TestInvalidStatusRequest_MethodNotAllowedResponse(t *testing.T) {
 	verifyResponseToInvalidStatusRequest(context)
 }
 
-type ResponseContainer struct {
-	statusCode int
-	jsonBody   map[string]interface{}
-}
-
 func verifyResponseToValidStatusRequest(context testContext) {
 	g := NewGomegaWithT(context.t)
 
@@ -62,13 +48,13 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	bogusTime := "some bogus time"
 	muxUnderTest.Status = Status{Name: expectedName, Version: expectedVersion, Message: expectedMessage, Time: bogusTime}
 
-	requestContext := RequestContext{
+	requestContext := HttpTestRequestContext{
 		method:    "GET",
 		targetUrl: "http://dummyUrl/status",
 		handler:   muxUnderTest.statusHandler,
 	}
 
-	responseContainer := parseResponse(getResponseFor(requestContext))
+	responseContainer := requestContext.BuildJsonResponse()
 
 	g.Expect(responseContainer.statusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
 	g.Expect(responseContainer.jsonBody["Name"]).To(Equal(expectedName), context.name+" should return expected status name")
@@ -83,13 +69,13 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := RequestContext{
+	requestContext := HttpTestRequestContext{
 		method:    "POST",
 		targetUrl: "http://dummyUrl/status",
 		handler:   muxUnderTest.statusHandler,
 	}
 
-	responseContainer := parseResponse(getResponseFor(requestContext))
+	responseContainer := requestContext.BuildJsonResponse()
 
 	expectedResponseCode := http.StatusMethodNotAllowed
 	g.Expect(responseContainer.statusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
@@ -107,31 +93,7 @@ func buildMuxUnderTest() *AdminMux {
 	return muxUnderTest
 }
 
-func getResponseFor(context RequestContext) *http.Response {
-	req := httptest.NewRequest(context.method, context.targetUrl, nil)
-	w := httptest.NewRecorder()
-
-	muxUnderTest := new(AdminMux).Initialise()
-	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
-
-	context.handler(w, req)
-
-	return w.Result()
-}
-
-func parseResponse(response *http.Response) *ResponseContainer {
-	container := new(ResponseContainer)
-	container.statusCode = response.StatusCode
-
-	responseBodyBytes, _ := ioutil.ReadAll(response.Body)
-
-	container.jsonBody = make(map[string]interface{})
-	json.Unmarshal(responseBodyBytes, &container.jsonBody)
-
-	return container
-}
-
-func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer *ResponseContainer) {
+func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer JsonResponseContainer) {
 	responseTimeString, ok := responseContainer.jsonBody["Time"].(string)
 	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
 
@@ -156,15 +118,15 @@ func verifyResponseToValidShutdownRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := RequestContext{
+	requestContext := HttpTestRequestContext{
 		method:    "POST",
 		targetUrl: "http://dummyUrl/shutdown",
 		handler:   muxUnderTest.shutdownHandler,
 	}
 
-	var responseContainer *ResponseContainer
+	var responseContainer JsonResponseContainer
 	go func() {
-		responseContainer = parseResponse(getResponseFor(requestContext))
+		responseContainer = requestContext.BuildJsonResponse()
 	}()
 
 	waitFinished := true
@@ -194,14 +156,13 @@ func verifyResponseToInvalidShutdownRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := RequestContext{
+	requestContext := HttpTestRequestContext{
 		method:    "GET",
 		targetUrl: "http://dummyUrl/shutdown",
 		handler:   muxUnderTest.shutdownHandler,
 	}
 
-	var responseContainer *ResponseContainer
-	responseContainer = parseResponse(getResponseFor(requestContext))
+	responseContainer := requestContext.BuildJsonResponse()
 
 	expectedResponseCode := http.StatusMethodNotAllowed
 	g.Expect(responseContainer.statusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
