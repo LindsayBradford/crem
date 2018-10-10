@@ -18,7 +18,7 @@ type Job struct {
 	status         string
 }
 
-func (cam *CrmApiMux) v1HandleJobs(w http.ResponseWriter, r *http.Request) {
+func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		cam.viPostJob(w, r)
@@ -30,7 +30,7 @@ func (cam *CrmApiMux) v1HandleJobs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cam *CrmApiMux) viPostJob(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("Content-type") != server.TomlMimeType {
+	if r.Header.Get(server.ContentTypeHeaderKey) != server.TomlMimeType {
 		cam.MethodNotAllowedError(w, r)
 		return
 	}
@@ -42,6 +42,8 @@ func (cam *CrmApiMux) viPostJob(w http.ResponseWriter, r *http.Request) {
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		cam.Logger().Warn(wrappingError)
+		cam.InternalServerError(w, r)
+		return
 	}
 
 	sendTextOnResponseBody(scenarioText, w)

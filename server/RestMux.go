@@ -64,7 +64,7 @@ func (rm *BaseMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (rm *BaseMux) logRequestReceipt(r *http.Request) {
 	rm.logger.Info(
-		"[" + rm.muxType + "] Received request method [" + r.Method +
+		"[" + rm.muxType + "] Received request Method [" + r.Method +
 			"] for request [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
 }
 
@@ -79,6 +79,10 @@ func (rm *BaseMux) NotFoundError(w http.ResponseWriter, r *http.Request) {
 
 func (rm *BaseMux) MethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
 	rm.RespondWithError(http.StatusMethodNotAllowed, "Method not allowed", w, r)
+}
+
+func (rm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request) {
+	rm.RespondWithError(http.StatusInternalServerError, "Internal Server Error", w, r)
 }
 
 func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
@@ -99,7 +103,7 @@ func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 
 func (rm *BaseMux) logResponseError(r *http.Request, responseMsg string) {
 	rm.logger.Warn(
-		"Request method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
+		"Request Method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
 			"] Responding with [" + responseMsg + "] error.")
 }
 

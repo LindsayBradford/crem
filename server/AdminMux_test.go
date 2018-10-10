@@ -49,17 +49,17 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	muxUnderTest.Status = Status{Name: expectedName, Version: expectedVersion, Message: expectedMessage, Time: bogusTime}
 
 	requestContext := HttpTestRequestContext{
-		method:    "GET",
-		targetUrl: "http://dummyUrl/status",
-		handler:   muxUnderTest.statusHandler,
+		Method:    "GET",
+		TargetUrl: "http://dummyUrl/status",
+		Handler:   muxUnderTest.statusHandler,
 	}
 
 	responseContainer := requestContext.BuildJsonResponse()
 
-	g.Expect(responseContainer.statusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
-	g.Expect(responseContainer.jsonBody["Name"]).To(Equal(expectedName), context.name+" should return expected status name")
-	g.Expect(responseContainer.jsonBody["Version"]).To(Equal(expectedVersion), context.name+" should return expected status version")
-	g.Expect(responseContainer.jsonBody["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
+	g.Expect(responseContainer.JsonMap["Name"]).To(Equal(expectedName), context.name+" should return expected status name")
+	g.Expect(responseContainer.JsonMap["Version"]).To(Equal(expectedVersion), context.name+" should return expected status version")
+	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
@@ -70,19 +70,19 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 	muxUnderTest := buildMuxUnderTest()
 
 	requestContext := HttpTestRequestContext{
-		method:    "POST",
-		targetUrl: "http://dummyUrl/status",
-		handler:   muxUnderTest.statusHandler,
+		Method:    "POST",
+		TargetUrl: "http://dummyUrl/status",
+		Handler:   muxUnderTest.statusHandler,
 	}
 
 	responseContainer := requestContext.BuildJsonResponse()
 
 	expectedResponseCode := http.StatusMethodNotAllowed
-	g.Expect(responseContainer.statusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
-	g.Expect(responseContainer.jsonBody["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
+	g.Expect(responseContainer.JsonMap["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
 
 	expectedMessage := "Method not allowed"
-	g.Expect(responseContainer.jsonBody["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
@@ -94,7 +94,7 @@ func buildMuxUnderTest() *AdminMux {
 }
 
 func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer JsonResponseContainer) {
-	responseTimeString, ok := responseContainer.jsonBody["Time"].(string)
+	responseTimeString, ok := responseContainer.JsonMap["Time"].(string)
 	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
 
 	responseTime, parseErr := time.Parse(time.RFC3339Nano, responseTimeString)
@@ -119,9 +119,9 @@ func verifyResponseToValidShutdownRequest(context testContext) {
 	muxUnderTest := buildMuxUnderTest()
 
 	requestContext := HttpTestRequestContext{
-		method:    "POST",
-		targetUrl: "http://dummyUrl/shutdown",
-		handler:   muxUnderTest.shutdownHandler,
+		Method:    "POST",
+		TargetUrl: "http://dummyUrl/shutdown",
+		Handler:   muxUnderTest.shutdownHandler,
 	}
 
 	var responseContainer JsonResponseContainer
@@ -136,7 +136,7 @@ func verifyResponseToValidShutdownRequest(context testContext) {
 	}()
 
 	g.Eventually(waitFunc).Should(Equal(waitFinished), context.name+" should finish Wait function")
-	g.Expect(responseContainer.statusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
@@ -157,19 +157,19 @@ func verifyResponseToInvalidShutdownRequest(context testContext) {
 	muxUnderTest := buildMuxUnderTest()
 
 	requestContext := HttpTestRequestContext{
-		method:    "GET",
-		targetUrl: "http://dummyUrl/shutdown",
-		handler:   muxUnderTest.shutdownHandler,
+		Method:    "GET",
+		TargetUrl: "http://dummyUrl/shutdown",
+		Handler:   muxUnderTest.shutdownHandler,
 	}
 
 	responseContainer := requestContext.BuildJsonResponse()
 
 	expectedResponseCode := http.StatusMethodNotAllowed
-	g.Expect(responseContainer.statusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
-	g.Expect(responseContainer.jsonBody["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
+	g.Expect(responseContainer.JsonMap["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
 
 	expectedMessage := "Method not allowed"
-	g.Expect(responseContainer.jsonBody["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }

@@ -29,7 +29,7 @@ type ScenarioJobQueue struct {
 
 func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	cam.ApiMux.Initialise()
-	cam.AddHandler(apiPath+v1Path+"/jobs", cam.v1HandleJobs)
+	cam.AddHandler(apiPath+v1Path+"/jobs", cam.V1HandleJobs)
 	return cam
 }
 

@@ -9,6 +9,8 @@ import (
 	"github.com/LindsayBradford/crm/config"
 )
 
+const ContentTypeHeaderKey = "Content-Type"
+
 const TomlMimeType = "application/toml"
 
 func FormattedTimestamp() string {

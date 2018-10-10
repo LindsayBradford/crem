@@ -3,9 +3,14 @@
 package main
 
 import (
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
+	"github.com/LindsayBradford/crm/internal/app/crmserver/components/api"
+	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crm/server"
 	. "github.com/onsi/gomega"
 )
 
@@ -56,4 +61,80 @@ func verifyDumbAnnealerRunsAgainstContext(context testContext) {
 	}
 
 	g.Expect(simulatedMainCall).To(Not(Panic()), context.name+" should not panic")
+}
+
+func TestValidJobsGetRequest_OkResponse(t *testing.T) {
+	context := testContext{
+		name:       "GET /jobs request returns 200 response",
+		t:          t,
+		configFile: "testdata/server.toml",
+	}
+
+	verifyResponseToValidJobsGetRequest(context)
+}
+
+func verifyResponseToValidJobsGetRequest(context testContext) {
+
+	g := NewGomegaWithT(context.t)
+
+	muxUnderTest := buildMuxUnderTest()
+
+	requestContext := server.HttpTestRequestContext{
+		Method:    "GET",
+		TargetUrl: "http://dummyUrl/api/v1/jobs",
+		Handler:   muxUnderTest.V1HandleJobs,
+	}
+
+	responseContainer := requestContext.BuildJsonResponse()
+
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
+
+	// verifyResponseTimeIsAboutNow(g, responseContainer)
+}
+
+func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
+	context := testContext{
+		name:       "POST /jobs request of invalid scenario returns 500 response",
+		t:          t,
+		configFile: "testdata/server.toml",
+	}
+
+	verifyInternalServerErrorResponseToInvalidJobsPostRequest(context)
+}
+
+func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testContext) {
+
+	g := NewGomegaWithT(context.t)
+
+	muxUnderTest := buildMuxUnderTest()
+
+	requestContext := server.HttpTestRequestContext{
+		Method:      "POST",
+		TargetUrl:   "http://dummyUrl/api/v1/jobs",
+		ContentType: server.TomlMimeType,
+		RequestBody: "invalidScenarioText: isInvalid",
+		Handler:     muxUnderTest.V1HandleJobs,
+	}
+
+	responseContainer := requestContext.BuildJsonResponse()
+
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusInternalServerError), context.name+" should return 500 status")
+
+	verifyResponseTimeIsAboutNow(g, responseContainer)
+}
+
+func buildMuxUnderTest() *api.CrmApiMux {
+	muxUnderTest := new(api.CrmApiMux).Initialise()
+	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
+	return muxUnderTest
+}
+
+func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer server.JsonResponseContainer) {
+	responseTimeString, ok := responseContainer.JsonMap["Time"].(string)
+	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
+
+	responseTime, parseErr := time.Parse(time.RFC3339Nano, responseTimeString)
+	g.Expect(parseErr).To(BeNil(), " should return a RFC3339Nano encoded string of time")
+
+	g.Expect(responseTime).To(BeTemporally("~", time.Now(), time.Millisecond*5), " should return status time of about now")
 }
