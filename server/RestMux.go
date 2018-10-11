@@ -81,8 +81,12 @@ func (rm *BaseMux) MethodNotAllowedError(w http.ResponseWriter, r *http.Request)
 	rm.RespondWithError(http.StatusMethodNotAllowed, "Method not allowed", w, r)
 }
 
-func (rm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request) {
-	rm.RespondWithError(http.StatusInternalServerError, "Internal Server Error", w, r)
+func (rm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request, errorDetail error) {
+	finalErrorString := "Internal Server Error"
+	if errorDetail != nil {
+		finalErrorString = fmt.Sprintf("%s: %v", finalErrorString, errorDetail)
+	}
+	rm.RespondWithError(http.StatusInternalServerError, finalErrorString, w, r)
 }
 
 func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
@@ -104,7 +108,7 @@ func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 func (rm *BaseMux) logResponseError(r *http.Request, responseMsg string) {
 	rm.logger.Warn(
 		"Request Method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
-			"] Responding with [" + responseMsg + "] error.")
+			"]. Responding with [" + responseMsg + "] error.")
 }
 
 func (rm *BaseMux) Start(address string) {

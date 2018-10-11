@@ -21,7 +21,7 @@ type Job struct {
 func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
-		cam.viPostJob(w, r)
+		cam.v1PostJob(w, r)
 	case http.MethodGet:
 		cam.v1GetJobs(w, r)
 	default:
@@ -29,7 +29,7 @@ func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (cam *CrmApiMux) viPostJob(w http.ResponseWriter, r *http.Request) {
+func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 	if r.Header.Get(server.ContentTypeHeaderKey) != server.TomlMimeType {
 		cam.MethodNotAllowedError(w, r)
 		return
@@ -42,7 +42,7 @@ func (cam *CrmApiMux) viPostJob(w http.ResponseWriter, r *http.Request) {
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		cam.Logger().Warn(wrappingError)
-		cam.InternalServerError(w, r)
+		cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
 		return
 	}
 
