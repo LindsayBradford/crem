@@ -125,7 +125,7 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 
 func buildMuxUnderTest() *api.CrmApiMux {
 	muxUnderTest := new(api.CrmApiMux).Initialise()
-	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
+	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
 	return muxUnderTest
 }
 

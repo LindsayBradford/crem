@@ -89,7 +89,7 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 func buildMuxUnderTest() *AdminMux {
 	muxUnderTest := new(AdminMux).Initialise()
-	muxUnderTest.SetLogger(handlers.DefaultNullLogHandler)
+	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
 	return muxUnderTest
 }
 
