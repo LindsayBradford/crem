@@ -79,6 +79,7 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 	am.UpdateStatusTime()
 
 	setResponseContentType(w, JsonMimeType)
+	am.SetResponseCacheMaxAge(w)
 
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {
@@ -99,6 +100,7 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 	am.UpdateStatusTime()
 
 	setResponseContentType(w, JsonMimeType)
+	am.SetResponseCacheMaxAge(w)
 
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {

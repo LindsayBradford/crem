@@ -18,12 +18,18 @@ type RestMux interface {
 
 	SetLogger(handler handlers.LogHandler)
 	AddHandler(address string, handler http.HandlerFunc)
+
+	SetCacheMaxAge(maxAge uint64)
+	CacheMaxAge() uint64
 }
+
+const defaultCacheMaxAgeInSeconds = 10
 
 type BaseMux struct {
 	http.ServeMux
-	muxType string
-	server  http.Server
+	muxType              string
+	server               http.Server
+	cacheMaxAgeInSeconds uint64
 
 	handlerMap HandlerFunctionMap
 	logger     handlers.LogHandler
@@ -33,6 +39,7 @@ type HandlerFunctionMap map[string]http.HandlerFunc
 
 func (rm *BaseMux) Initialise() *BaseMux {
 	rm.handlerMap = make(HandlerFunctionMap)
+	rm.SetCacheMaxAge(defaultCacheMaxAgeInSeconds)
 	return rm
 }
 
@@ -41,8 +48,23 @@ func (rm *BaseMux) WithType(muxType string) *BaseMux {
 	return rm
 }
 
+func (rm *BaseMux) WithCacheMaxAge(maxAgeInSeconds uint64) *BaseMux {
+	if maxAgeInSeconds != 0 {
+		rm.cacheMaxAgeInSeconds = maxAgeInSeconds
+	}
+	return rm
+}
+
 func (rm *BaseMux) SetLogger(logger handlers.LogHandler) {
 	rm.logger = logger
+}
+
+func (rm *BaseMux) SetCacheMaxAge(maxAgeInSeconds uint64) {
+	rm.cacheMaxAgeInSeconds = maxAgeInSeconds
+}
+
+func (rm *BaseMux) CacheMaxAge() uint64 {
+	return rm.cacheMaxAgeInSeconds
 }
 
 func (rm *BaseMux) Logger() handlers.LogHandler {
@@ -107,6 +129,11 @@ func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 
 func setResponseContentType(w http.ResponseWriter, contentType string) {
 	w.Header().Set(ContentTypeHeaderKey, contentType)
+}
+
+func (rm *BaseMux) SetResponseCacheMaxAge(w http.ResponseWriter) {
+	maxAgeAsString := fmt.Sprintf("max-age=%d", rm.cacheMaxAgeInSeconds)
+	w.Header().Set(CacheControlHeaderKey, maxAgeAsString)
 }
 
 func (rm *BaseMux) logResponseError(r *http.Request, responseMsg string) {

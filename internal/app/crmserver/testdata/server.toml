@@ -1,5 +1,6 @@
 ApiPort = 9090
 AdminPort = 9091
+CacheMaximumAgeInSeconds = 5
 
 [[Loggers]]
 Name = "DefaultServerLogger"

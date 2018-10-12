@@ -10,6 +10,7 @@ import (
 )
 
 const ContentTypeHeaderKey = "Content-Type"
+const CacheControlHeaderKey = "Cache-Control"
 
 const TomlMimeType = "application/toml"
 const JsonMimeType = "application/json"

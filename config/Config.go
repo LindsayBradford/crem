@@ -298,8 +298,9 @@ func listToString(list ...string) string {
 type HttpServerConfig struct {
 	BaseConfig
 
-	AdminPort uint64
-	ApiPort   uint64
+	AdminPort                uint64
+	ApiPort                  uint64
+	CacheMaximumAgeInSeconds uint64
 
 	Loggers []LoggerConfig
 }

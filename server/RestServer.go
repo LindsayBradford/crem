@@ -25,6 +25,11 @@ type RestServer struct {
 	Logger        handlers.LogHandler
 }
 
+func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestServer {
+	s.configuration = configuration
+	return s
+}
+
 func (s *RestServer) Initialise() *RestServer {
 	s.adminMux = new(AdminMux).Initialise()
 	return s
@@ -44,11 +49,6 @@ func (s *RestServer) WithLogger(logger handlers.LogHandler) *RestServer {
 	return s
 }
 
-func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestServer {
-	s.configuration = configuration
-	return s
-}
-
 func (s *RestServer) WithStatus(status ServiceStatus) *RestServer {
 	s.adminMux.Status = status
 	return s
@@ -56,10 +56,12 @@ func (s *RestServer) WithStatus(status ServiceStatus) *RestServer {
 
 func (s *RestServer) Start() {
 	go func() {
+		s.adminMux.WithCacheMaxAge(s.configuration.CacheMaximumAgeInSeconds)
 		startMuxOnPort(s.adminMux, s.configuration.AdminPort)
 	}()
 
 	go func() {
+		s.adminMux.WithCacheMaxAge(s.configuration.CacheMaximumAgeInSeconds)
 		startMuxOnPort(s.apiMux, s.configuration.ApiPort)
 	}()
 
