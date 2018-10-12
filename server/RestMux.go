@@ -93,6 +93,7 @@ func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 	response := Response{ResponseCode: responseCode, Message: responseMsg}
 	response.Time = FormattedTimestamp()
 
+	setResponseContentType(w, JsonMimeType)
 	w.WriteHeader(responseCode)
 
 	statusJson, encodeError := json.MarshalIndent(response, "", "  ")
@@ -103,6 +104,10 @@ func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 	rm.logResponseError(r, responseMsg)
 
 	fmt.Fprintf(w, string(statusJson))
+}
+
+func setResponseContentType(w http.ResponseWriter, contentType string) {
+	w.Header().Set(ContentTypeHeaderKey, contentType)
 }
 
 func (rm *BaseMux) logResponseError(r *http.Request, responseMsg string) {

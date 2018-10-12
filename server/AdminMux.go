@@ -20,6 +20,8 @@ type Status struct {
 	Time    string
 }
 
+const AdminMuxType = "ADMIN"
+
 type AdminMux struct {
 	BaseMux
 	Status Status
@@ -28,7 +30,7 @@ type AdminMux struct {
 }
 
 func (am *AdminMux) Initialise() *AdminMux {
-	am.BaseMux.Initialise()
+	am.BaseMux.Initialise().WithType(AdminMuxType)
 
 	am.doneChannel = make(chan bool)
 	am.handlerMap["/status"] = am.statusHandler
@@ -76,6 +78,8 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
 	am.UpdateStatusTime()
 
+	setResponseContentType(w, JsonMimeType)
+
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {
 		am.logger.Error(encodeError)
@@ -93,6 +97,8 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 	am.Status.Message = "SHUTTING_DOWN"
 	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
 	am.UpdateStatusTime()
+
+	setResponseContentType(w, JsonMimeType)
 
 	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
 	if encodeError != nil {

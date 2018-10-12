@@ -27,13 +27,14 @@ type RestServer struct {
 }
 
 func (s *RestServer) Initialise() *RestServer {
-	s.adminMux = new(AdminMux).Initialise().WithType("Admin")
+	s.adminMux = new(AdminMux).Initialise()
 	return s
 }
 
 func (s *RestServer) WithApiMux(apiMux RestMux) *RestServer {
-	s.adminMux = new(AdminMux).Initialise().WithType("Admin")
+	s.adminMux = new(AdminMux).Initialise()
 	s.apiMux = apiMux
+	s.apiMux.AddHandler("/", s.adminMux.statusHandler)
 	return s
 }
 

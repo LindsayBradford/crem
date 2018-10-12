@@ -51,7 +51,7 @@ func RunServerFromConfigFile(configFile string) {
 	crmServer := new(CrmServer).
 		Initialise().
 		WithConfig(configuration).
-		WithApiMux(buildCrmApuMix()).
+		WithApiMux(buildCrmApuMux()).
 		WithLogger(ServerLogger).
 		WithStatus(crmServerStatus)
 
@@ -60,9 +60,8 @@ func RunServerFromConfigFile(configFile string) {
 	crmServer.Start()
 }
 
-func buildCrmApuMix() *api.CrmApiMux {
-	newMux := new(api.CrmApiMux).Initialise().WithType("API)")
-	return newMux
+func buildCrmApuMux() *api.CrmApiMux {
+	return new(api.CrmApiMux).Initialise()
 }
 
 func establishServerLogger(configuration *config.HttpServerConfig) {

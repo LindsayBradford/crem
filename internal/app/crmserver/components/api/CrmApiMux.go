@@ -3,15 +3,11 @@
 package api
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/server"
 )
 
-const apiPath = "/api"
-const v1Path = "/v1"
+const jobsPath = "/jobs"
 
 type CrmApiMux struct {
 	server.ApiMux
@@ -29,19 +25,15 @@ type ScenarioJobQueue struct {
 
 func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	cam.ApiMux.Initialise()
-	cam.AddHandler(apiPath+v1Path+"/jobs", cam.V1HandleJobs)
+	cam.AddHandler(baseApiPath()+jobsPath, cam.V1HandleJobs)
 	return cam
+}
+
+func baseApiPath() string {
+	return server.ApiPath + server.V1Path
 }
 
 func (cam *CrmApiMux) WithType(muxType string) *CrmApiMux {
 	cam.ApiMux.WithType(muxType)
 	return cam
-}
-
-func (cam *CrmApiMux) rootPathHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, nameAndVersionString())
-}
-
-func nameAndVersionString() string {
-	return fmt.Sprintf("%s, version %s", config.LongApplicationName, config.Version)
 }

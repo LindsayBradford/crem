@@ -12,6 +12,7 @@ import (
 const ContentTypeHeaderKey = "Content-Type"
 
 const TomlMimeType = "application/toml"
+const JsonMimeType = "application/json"
 
 func FormattedTimestamp() string {
 	return fmt.Sprintf("%v", time.Now().Format(time.RFC3339Nano))

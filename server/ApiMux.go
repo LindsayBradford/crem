@@ -2,16 +2,16 @@
 
 package server
 
+const ApiMuxType = "API"
+
+const ApiPath = "/api"
+const V1Path = "/v1"
+
 type ApiMux struct {
 	BaseMux
 }
 
 func (am *ApiMux) Initialise() *ApiMux {
-	am.BaseMux.Initialise()
-	return am
-}
-
-func (am *ApiMux) WithType(muxType string) *ApiMux {
-	am.BaseMux.WithType(muxType)
+	am.BaseMux.Initialise().WithType(ApiMuxType)
 	return am
 }

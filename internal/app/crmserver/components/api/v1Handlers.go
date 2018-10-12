@@ -46,6 +46,8 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
+
 	sendTextOnResponseBody(scenarioText, w)
 
 	scenario.RunScenarioFromConfig(scenarioConfig)
