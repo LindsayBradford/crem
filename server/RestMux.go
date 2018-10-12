@@ -90,8 +90,7 @@ func (rm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request, e
 }
 
 func (rm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
-	response := Response{ResponseCode: responseCode, Message: responseMsg}
-	response.Time = FormattedTimestamp()
+	response := ErrorResponse{ErrorMessage: responseMsg, Time: FormattedTimestamp()}
 
 	setResponseContentType(w, JsonMimeType)
 	w.WriteHeader(responseCode)

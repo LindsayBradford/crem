@@ -14,10 +14,10 @@ import (
 var (
 	ServerLogger handlers.LogHandler = handlers.DefaultNullLogHandler
 
-	crmServerStatus = server.Status{
-		Name:    config.ShortApplicationName,
-		Version: config.Version,
-		Status:  "DEAD"}
+	crmServerStatus = server.ServiceStatus{
+		ServiceName: config.ShortApplicationName,
+		Version:     config.Version,
+		Status:      "DEAD"}
 )
 
 type CrmServer struct {
@@ -39,7 +39,7 @@ func (cs *CrmServer) WithLogger(logger handlers.LogHandler) *CrmServer {
 	return cs
 }
 
-func (cs *CrmServer) WithStatus(status server.Status) *CrmServer {
+func (cs *CrmServer) WithStatus(status server.ServiceStatus) *CrmServer {
 	cs.RestServer.WithStatus(status)
 	return cs
 }

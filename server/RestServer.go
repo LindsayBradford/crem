@@ -12,9 +12,8 @@ import (
 	"github.com/LindsayBradford/crm/logging/handlers"
 )
 
-type Response struct {
-	ResponseCode int
-	Message      string
+type ErrorResponse struct {
+	ErrorMessage string
 	Time         string
 }
 
@@ -50,7 +49,7 @@ func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestSer
 	return s
 }
 
-func (s *RestServer) WithStatus(status Status) *RestServer {
+func (s *RestServer) WithStatus(status ServiceStatus) *RestServer {
 	s.adminMux.Status = status
 	return s
 }

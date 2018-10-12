@@ -46,7 +46,7 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	expectedName := "Some bogus name"
 	expectedVersion := "some bogus version"
 	bogusTime := "some bogus time"
-	muxUnderTest.Status = Status{Name: expectedName, Version: expectedVersion, Status: expectedMessage, Time: bogusTime}
+	muxUnderTest.Status = ServiceStatus{ServiceName: expectedName, Version: expectedVersion, Status: expectedMessage, Time: bogusTime}
 
 	requestContext := HttpTestRequestContext{
 		Method:    "GET",
@@ -57,7 +57,7 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	responseContainer := requestContext.BuildJsonResponse()
 
 	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
-	g.Expect(responseContainer.JsonMap["Name"]).To(Equal(expectedName), context.name+" should return expected status name")
+	g.Expect(responseContainer.JsonMap["ServiceName"]).To(Equal(expectedName), context.name+" should return expected status name")
 	g.Expect(responseContainer.JsonMap["Version"]).To(Equal(expectedVersion), context.name+" should return expected status version")
 	g.Expect(responseContainer.JsonMap["Status"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
@@ -79,10 +79,8 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 	expectedResponseCode := http.StatusMethodNotAllowed
 	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
-	g.Expect(responseContainer.JsonMap["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
-
 	expectedMessage := "Method not allowed"
-	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.JsonMap["ErrorMessage"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
@@ -166,10 +164,8 @@ func verifyResponseToInvalidShutdownRequest(context testContext) {
 
 	expectedResponseCode := http.StatusMethodNotAllowed
 	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", expectedResponseCode), context.name+" should return Method not Allowed status")
-	g.Expect(responseContainer.JsonMap["ResponseCode"]).To(BeNumerically("==", expectedResponseCode), context.name+" should return expected status code")
-
 	expectedMessage := "Method not allowed"
-	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.JsonMap["ErrorMessage"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }

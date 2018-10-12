@@ -13,18 +13,18 @@ import (
 	"golang.org/x/net/context"
 )
 
-type Status struct {
-	Name    string
-	Version string
-	Status  string
-	Time    string
+type ServiceStatus struct {
+	ServiceName string
+	Version     string
+	Status      string
+	Time        string
 }
 
 const AdminMuxType = "ADMIN"
 
 type AdminMux struct {
 	BaseMux
-	Status Status
+	Status ServiceStatus
 
 	doneChannel chan bool
 }
