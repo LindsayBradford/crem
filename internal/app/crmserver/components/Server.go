@@ -17,7 +17,7 @@ var (
 	crmServerStatus = server.Status{
 		Name:    config.ShortApplicationName,
 		Version: config.Version,
-		Message: "DEAD"}
+		Status:  "DEAD"}
 )
 
 type CrmServer struct {

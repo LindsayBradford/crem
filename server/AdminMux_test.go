@@ -46,7 +46,7 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	expectedName := "Some bogus name"
 	expectedVersion := "some bogus version"
 	bogusTime := "some bogus time"
-	muxUnderTest.Status = Status{Name: expectedName, Version: expectedVersion, Message: expectedMessage, Time: bogusTime}
+	muxUnderTest.Status = Status{Name: expectedName, Version: expectedVersion, Status: expectedMessage, Time: bogusTime}
 
 	requestContext := HttpTestRequestContext{
 		Method:    "GET",
@@ -59,7 +59,7 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
 	g.Expect(responseContainer.JsonMap["Name"]).To(Equal(expectedName), context.name+" should return expected status name")
 	g.Expect(responseContainer.JsonMap["Version"]).To(Equal(expectedVersion), context.name+" should return expected status version")
-	g.Expect(responseContainer.JsonMap["Message"]).To(Equal(expectedMessage), context.name+" should return expected status message")
+	g.Expect(responseContainer.JsonMap["Status"]).To(Equal(expectedMessage), context.name+" should return expected status message")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }

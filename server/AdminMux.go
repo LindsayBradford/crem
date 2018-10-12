@@ -16,7 +16,7 @@ import (
 type Status struct {
 	Name    string
 	Version string
-	Message string
+	Status  string
 	Time    string
 }
 
@@ -46,7 +46,7 @@ func (am *AdminMux) WithType(muxType string) *AdminMux {
 
 func (am *AdminMux) setStatus(statusMessage string) {
 	am.logger.Info("Changed server Status to [" + statusMessage + "]")
-	am.Status.Message = statusMessage
+	am.Status.Status = statusMessage
 	am.UpdateStatusTime()
 }
 
@@ -75,7 +75,7 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
+	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
 	am.UpdateStatusTime()
 
 	setResponseContentType(w, JsonMimeType)
@@ -94,8 +94,8 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	am.Status.Message = "SHUTTING_DOWN"
-	am.logger.Debug("Responding with status [" + am.Status.Message + "]")
+	am.Status.Status = "SHUTTING_DOWN"
+	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
 	am.UpdateStatusTime()
 
 	setResponseContentType(w, JsonMimeType)

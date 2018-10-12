@@ -32,8 +32,3 @@ func (cam *CrmApiMux) Initialise() *CrmApiMux {
 func baseApiPath() string {
 	return server.ApiPath + server.V1Path
 }
-
-func (cam *CrmApiMux) WithType(muxType string) *CrmApiMux {
-	cam.ApiMux.WithType(muxType)
-	return cam
-}
