@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const defaultLogerIndex = 0
+
 var (
 	ServerLogger handlers.LogHandler = handlers.DefaultNullLogHandler
 
@@ -19,6 +21,52 @@ var (
 		Version:     config.Version,
 		Status:      "DEAD"}
 )
+
+func RunServerFromConfigFile(configFile string) {
+	server := buildServerFromFrom(configFile)
+	start(server)
+}
+
+func buildServerFromFrom(configFile string) *server.RestServer {
+	serverConfig := retrieveServerConfiguration(configFile)
+	buildLoggerFrom(serverConfig)
+	return buildCrmServerFrom(serverConfig)
+}
+
+func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
+	configuration, retrieveError := config.RetrieveHttpServer(configFile)
+	if retrieveError != nil {
+		wrappingError := errors.Wrap(retrieveError, "retrieving server configuration")
+		panic(wrappingError)
+	}
+
+	return configuration
+}
+
+func buildLoggerFrom(configuration *config.HttpServerConfig) {
+	establishServerLogger(configuration)
+	scenario.LogHandler = ServerLogger
+}
+
+func establishServerLogger(configuration *config.HttpServerConfig) {
+	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
+	ServerLogger = loggers[defaultLogerIndex]
+	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
+}
+
+func buildCrmServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
+	return new(CrmServer).
+		Initialise().
+		WithConfig(serverConfig).
+		WithApiMux(buildCrmApuMux()).
+		WithLogger(ServerLogger).
+		WithStatus(crmServerStatus)
+}
+
+func start(crmServer *server.RestServer) {
+	ServerLogger.Info(server.NameAndVersionString() + " -- Starting")
+	crmServer.Start()
+}
 
 type CrmServer struct {
 	server.RestServer
@@ -44,38 +92,6 @@ func (cs *CrmServer) WithStatus(status server.ServiceStatus) *CrmServer {
 	return cs
 }
 
-func RunServerFromConfigFile(configFile string) {
-	configuration := retrieveServerConfiguration(configFile)
-	establishServerLogger(configuration)
-
-	crmServer := new(CrmServer).
-		Initialise().
-		WithConfig(configuration).
-		WithApiMux(buildCrmApuMux()).
-		WithLogger(ServerLogger).
-		WithStatus(crmServerStatus)
-
-	ServerLogger.Info(server.NameAndVersionString() + " -- Starting")
-	scenario.LogHandler = ServerLogger
-	crmServer.Start()
-}
-
 func buildCrmApuMux() *api.CrmApiMux {
 	return new(api.CrmApiMux).Initialise()
-}
-
-func establishServerLogger(configuration *config.HttpServerConfig) {
-	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
-	ServerLogger = loggers[0]
-}
-
-func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
-	configuration, retrieveError := config.RetrieveHttpServer(configFile)
-	if retrieveError != nil {
-		wrappingError := errors.Wrap(retrieveError, "retrieving server configuration")
-		panic(wrappingError)
-	}
-
-	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
-	return configuration
 }

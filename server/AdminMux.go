@@ -3,13 +3,11 @@
 package server
 
 import (
-	"bufio"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
@@ -75,18 +73,21 @@ func (am *AdminMux) statusHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
 	am.UpdateStatusTime()
+	restResponse := new(RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(am.cacheMaxAgeInSeconds).
+		WithJsonContent(am.Status)
 
-	setResponseContentType(w, JsonMimeType)
-	am.SetResponseCacheMaxAge(w)
+	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
+	writeError := restResponse.Write()
 
-	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
-	if encodeError != nil {
-		am.logger.Error(encodeError)
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "status handler")
+		am.logger.Error(wrappingError)
 	}
-
-	fmt.Fprintf(w, string(statusJson))
 }
 
 func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
@@ -96,21 +97,22 @@ func (am *AdminMux) shutdownHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	am.Status.Status = "SHUTTING_DOWN"
-	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
 	am.UpdateStatusTime()
 
-	setResponseContentType(w, JsonMimeType)
-	am.SetResponseCacheMaxAge(w)
+	restResponse := new(RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(am.cacheMaxAgeInSeconds).
+		WithJsonContent(am.Status)
 
-	statusJson, encodeError := json.MarshalIndent(am.Status, "", "  ")
-	if encodeError != nil {
-		am.logger.Error(encodeError)
+	am.logger.Debug("Responding with status [" + am.Status.Status + "]")
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "shutdown handler")
+		am.logger.Error(wrappingError)
 	}
-
-	bufferedWriter := bufio.NewWriter(w)
-
-	fmt.Fprintf(bufferedWriter, string(statusJson))
-	bufferedWriter.Flush()
 
 	am.doneChannel <- true
 }
