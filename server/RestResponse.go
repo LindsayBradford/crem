@@ -42,6 +42,11 @@ func (rrc *RestResponse) WithCacheControlMaxAge(cacheMaxAgeInSeconds uint64) *Re
 	return rrc
 }
 
+func (rrc *RestResponse) WithCacheControlPublic() *RestResponse {
+	rrc.CacheControl = "public"
+	return rrc
+}
+
 func (rrc *RestResponse) WithContentType(contentType string) *RestResponse {
 	rrc.ContentType = contentType
 	return rrc
@@ -56,6 +61,15 @@ func (rrc *RestResponse) WithJsonContent(content interface{}) *RestResponse {
 		rrc.errors.Add(wrappingError)
 	} else {
 		rrc.Content = string(contentAsJsonBytes)
+	}
+	return rrc
+}
+
+func (rrc *RestResponse) WithTomlContent(content interface{}) *RestResponse {
+	rrc.WithContentType(TomlMimeType)
+	contentAsString, ok := content.(string)
+	if ok {
+		rrc.Content = contentAsString
 	}
 	return rrc
 }

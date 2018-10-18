@@ -36,7 +36,7 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent)
 	explorer := wrapSolutionExplorer(event.Annealer.SolutionExplorer())
 
 	var builder strings.FluentBuilder
-	builder.Add("Id [", event.Annealer.Id(), "], ", "Event [", event.EventType.String(), "]: ")
+	builder.Add("JobId [", event.Annealer.Id(), "], ", "Event [", event.EventType.String(), "]: ")
 
 	switch event.EventType {
 	case StartedAnnealing:

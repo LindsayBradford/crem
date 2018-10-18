@@ -3,20 +3,15 @@
 package api
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/LindsayBradford/crm/config"
 	"github.com/LindsayBradford/crm/internal/app/crmserver/components/scenario"
 	"github.com/LindsayBradford/crm/server"
 	"github.com/pkg/errors"
 )
-
-type Job struct {
-	ScenarioConfig *config.CRMConfig
-	status         string
-}
 
 func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -37,6 +32,13 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 
 	scenarioText := requestBodyToString(r)
 
+	newJob := new(Job).Initialise()
+	newJob.HiddenAttributes["ScenarioConfig"] = scenarioText
+
+	cam.jobs.Enqueue(*newJob)
+	cam.AddHandler(baseApiPath()+jobsPath+"/"+newJob.JobId, cam.v1GetJob)
+	cam.AddHandler(baseApiPath()+jobsPath+"/"+newJob.JobId+"/scenario", cam.v1GetJobScenario)
+
 	scenarioConfig, retrieveError := config.RetrieveCrmFromString(scenarioText)
 
 	if retrieveError != nil {
@@ -46,15 +48,29 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	cam.Logger().Info("New Job [" + newJob.JobId + "] received with scenario name [" + scenarioConfig.ScenarioName + "].")
 
-	sendTextOnResponseBody(scenarioText, w)
+	// scenarioJson, _ := json.Marshal(scenarioConfig)
+	// cam.Logger().Debug("Job [" + newJob.JobId + "] scenario config: ["+ string(scenarioJson) + "].")
+
+	restResponse := new(server.RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusCreated).
+		WithCacheControlMaxAge(cam.CacheMaxAge()).
+		WithJsonContent(newJob)
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "create job")
+		cam.Logger().Error(wrappingError)
+	}
 
 	scenario.RunScenarioFromConfig(scenarioConfig)
-}
 
-func sendTextOnResponseBody(text string, w http.ResponseWriter) {
-	fmt.Fprintf(w, text)
+	newJob.Attributes["Status"] = "COMPLETED"
+	newJob.Attributes["CompletedTime"] = server.FormattedTimestamp()
 }
 
 func requestBodyToString(r *http.Request) string {
@@ -63,6 +79,77 @@ func requestBodyToString(r *http.Request) string {
 }
 
 func (cam *CrmApiMux) v1GetJobs(w http.ResponseWriter, r *http.Request) {
-	scenarioText := requestBodyToString(r)
-	sendTextOnResponseBody(scenarioText, w)
+	restResponse := new(server.RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(cam.CacheMaxAge()).
+		WithJsonContent(cam.jobs)
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "get jobs")
+		cam.Logger().Error(wrappingError)
+	}
+}
+
+func (cam *CrmApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		cam.MethodNotAllowedError(w, r)
+		return
+	}
+
+	desiredId := getJobIdFromRequestUrl(r)
+	jobToReturn := cam.jobs.JobWithId(desiredId)
+
+	restResponse := new(server.RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(cam.CacheMaxAge()).
+		WithJsonContent(jobToReturn)
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "get job")
+		cam.Logger().Error(wrappingError)
+	}
+}
+
+func getJobIdFromRequestUrl(r *http.Request) string {
+	splitURL := strings.Split(r.URL.Path, server.UrlPathSeparator)
+	desiredId := splitURL[len(splitURL)-1]
+	return desiredId
+}
+
+func (cam *CrmApiMux) v1GetJobScenario(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		cam.MethodNotAllowedError(w, r)
+		return
+	}
+
+	desiredId := getJobIdFromScenarioRequestUrl(r)
+	desiredJob := cam.jobs.JobWithId(desiredId)
+
+	restResponse := new(server.RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlPublic().
+		WithTomlContent(desiredJob.HiddenAttributes["ScenarioConfig"])
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "get job scenario")
+		cam.Logger().Error(wrappingError)
+	}
+}
+
+func getJobIdFromScenarioRequestUrl(r *http.Request) string {
+	splitURL := strings.Split(r.URL.Path, server.UrlPathSeparator)
+	desiredId := splitURL[len(splitURL)-2]
+	return desiredId
 }

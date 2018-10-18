@@ -129,15 +129,6 @@ func (bm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 	}
 }
 
-func setResponseContentType(w http.ResponseWriter, contentType string) {
-	w.Header().Set(ContentTypeHeaderKey, contentType)
-}
-
-func (bm *BaseMux) SetResponseCacheMaxAge(w http.ResponseWriter) {
-	maxAgeAsString := fmt.Sprintf("max-age=%d", bm.cacheMaxAgeInSeconds)
-	w.Header().Set(CacheControlHeaderKey, maxAgeAsString)
-}
-
 func (bm *BaseMux) logResponseError(r *http.Request, responseMsg string) {
 	bm.logger.Warn(
 		"Request Method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
