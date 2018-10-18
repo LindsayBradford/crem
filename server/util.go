@@ -4,6 +4,7 @@ package server
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/LindsayBradford/crm/config"
@@ -11,6 +12,7 @@ import (
 
 const ContentTypeHeaderKey = "Content-Type"
 const CacheControlHeaderKey = "Cache-Control"
+const UrlPathSeparator = "/"
 
 const TomlMimeType = "application/toml"
 const JsonMimeType = "application/json"
@@ -23,4 +25,8 @@ func FormattedTimestamp() string {
 
 func NameAndVersionString() string {
 	return fmt.Sprintf("%s, version %s", config.LongApplicationName, config.Version)
+}
+
+func SendTextOnResponseBody(text string, w http.ResponseWriter) {
+	fmt.Fprintf(w, text)
 }
