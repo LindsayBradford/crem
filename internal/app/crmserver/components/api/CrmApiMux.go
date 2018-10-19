@@ -7,7 +7,10 @@ import (
 	"github.com/nu7hatch/gouuid"
 )
 
-const jobsPath = "/jobs"
+const jobsPath = "jobs"
+
+const creationTimeKey = "CreationTime"
+const statusKey = "Status"
 
 type CrmApiMux struct {
 	server.ApiMux
@@ -18,7 +21,7 @@ type CrmApiMux struct {
 func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	cam.ApiMux.Initialise()
 	cam.jobs = new(JobQueue).Initialise()
-	cam.AddHandler(baseApiPath()+jobsPath, cam.V1HandleJobs)
+	cam.AddHandler(BuildApiPath(jobsPath), cam.V1HandleJobs)
 	return cam
 }
 
@@ -40,8 +43,8 @@ func (jq *JobQueue) Enqueue(newJob Job) {
 }
 
 func (jq *JobQueue) Dequeue() Job {
-	dequeuedJob, updatedQueue := jq.Jobs[len(jq.Jobs)-1], jq.Jobs[:len(jq.Jobs)-1]
-	jq.Jobs = updatedQueue
+	dequeuedJob, queueSansJob := jq.Jobs[len(jq.Jobs)-1], jq.Jobs[:len(jq.Jobs)-1]
+	jq.Jobs = queueSansJob
 	return dequeuedJob
 }
 
@@ -62,14 +65,34 @@ type Job struct {
 	HiddenAttributes map[string]interface{} `json:"-"`
 }
 
-func (ji *Job) Initialise() *Job {
+func (j *Job) Initialise() *Job {
+	j.createNewJobID()
+	j.makeAttributeMaps()
+	j.recordCreationAttributes()
+	return j
+}
+
+func (j *Job) createNewJobID() {
 	newId, _ := uuid.NewV4()
-	ji.JobId = newId.String()
+	j.JobId = newId.String()
+}
 
-	ji.Attributes = make(map[string]interface{}, 0)
-	ji.HiddenAttributes = make(map[string]interface{}, 0)
+func (j *Job) makeAttributeMaps() {
+	j.Attributes = make(map[string]interface{}, 0)
+	j.HiddenAttributes = make(map[string]interface{}, 0)
+}
 
-	ji.Attributes["CreationTime"] = server.FormattedTimestamp()
-	ji.Attributes["Status"] = "CREATED"
-	return ji
+func (j *Job) recordCreationAttributes() {
+	j.Attributes[creationTimeKey] = server.FormattedTimestamp()
+	j.Attributes[statusKey] = "CREATED"
+}
+
+func BuildApiPath(pathElements ...string) string {
+	builtPath := baseApiPath()
+
+	for _, element := range pathElements {
+		builtPath = builtPath + server.UrlPathSeparator + element
+	}
+
+	return builtPath
 }

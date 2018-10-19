@@ -13,6 +13,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+const scenarioConfigKey = "ScenarioConfig"
+const completedTimeKey = "CompletedTime"
+
+const scenarioPath = "scenario"
+
 func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -33,11 +38,11 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 	scenarioText := requestBodyToString(r)
 
 	newJob := new(Job).Initialise()
-	newJob.HiddenAttributes["ScenarioConfig"] = scenarioText
+	newJob.HiddenAttributes[scenarioConfigKey] = scenarioText
 
 	cam.jobs.Enqueue(*newJob)
-	cam.AddHandler(baseApiPath()+jobsPath+"/"+newJob.JobId, cam.v1GetJob)
-	cam.AddHandler(baseApiPath()+jobsPath+"/"+newJob.JobId+"/scenario", cam.v1GetJobScenario)
+	cam.AddHandler(BuildApiPath(jobsPath, newJob.JobId), cam.v1GetJob)
+	cam.AddHandler(BuildApiPath(jobsPath, newJob.JobId, scenarioPath), cam.v1GetJobScenario)
 
 	scenarioConfig, retrieveError := config.RetrieveCrmFromString(scenarioText)
 
@@ -48,10 +53,7 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cam.Logger().Info("New Job [" + newJob.JobId + "] received with scenario name [" + scenarioConfig.ScenarioName + "].")
-
-	// scenarioJson, _ := json.Marshal(scenarioConfig)
-	// cam.Logger().Debug("Job [" + newJob.JobId + "] scenario config: ["+ string(scenarioJson) + "].")
+	cam.Logger().Info("Received new job [" + newJob.JobId + "] with scenario name [" + scenarioConfig.ScenarioName + "].")
 
 	restResponse := new(server.RestResponse).
 		Initialise().
@@ -60,17 +62,16 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 		WithCacheControlMaxAge(cam.CacheMaxAge()).
 		WithJsonContent(newJob)
 
-	writeError := restResponse.Write()
+	cam.writeResponse(restResponse, "create job")
 
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "create job")
-		cam.Logger().Error(wrappingError)
-	}
+	// TODO: Push the actual running of the scenario to a concurrent channel.
+
+	cam.Logger().Info("Running Job [" + newJob.JobId + "].")
 
 	scenario.RunScenarioFromConfig(scenarioConfig)
 
-	newJob.Attributes["Status"] = "COMPLETED"
-	newJob.Attributes["CompletedTime"] = server.FormattedTimestamp()
+	newJob.Attributes[statusKey] = "COMPLETED"
+	newJob.Attributes[completedTimeKey] = server.FormattedTimestamp()
 }
 
 func requestBodyToString(r *http.Request) string {
@@ -86,36 +87,29 @@ func (cam *CrmApiMux) v1GetJobs(w http.ResponseWriter, r *http.Request) {
 		WithCacheControlMaxAge(cam.CacheMaxAge()).
 		WithJsonContent(cam.jobs)
 
-	writeError := restResponse.Write()
-
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "get jobs")
-		cam.Logger().Error(wrappingError)
-	}
+	cam.writeResponse(restResponse, "get jobs")
 }
 
 func (cam *CrmApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		cam.MethodNotAllowedError(w, r)
+	if cam.expectedMethodNotSupplied(http.MethodGet, w, r) {
 		return
 	}
 
-	desiredId := getJobIdFromRequestUrl(r)
-	jobToReturn := cam.jobs.JobWithId(desiredId)
+	job := cam.deriveJobFromGetJobRequest(r)
 
 	restResponse := new(server.RestResponse).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(cam.CacheMaxAge()).
-		WithJsonContent(jobToReturn)
+		WithJsonContent(job)
 
-	writeError := restResponse.Write()
+	cam.writeResponse(restResponse, "get job")
+}
 
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "get job")
-		cam.Logger().Error(wrappingError)
-	}
+func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) Job {
+	desiredId := getJobIdFromRequestUrl(r)
+	return cam.jobs.JobWithId(desiredId)
 }
 
 func getJobIdFromRequestUrl(r *http.Request) string {
@@ -125,27 +119,45 @@ func getJobIdFromRequestUrl(r *http.Request) string {
 }
 
 func (cam *CrmApiMux) v1GetJobScenario(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		cam.MethodNotAllowedError(w, r)
+	if cam.expectedMethodNotSupplied(http.MethodGet, w, r) {
 		return
 	}
 
-	desiredId := getJobIdFromScenarioRequestUrl(r)
-	desiredJob := cam.jobs.JobWithId(desiredId)
+	job := cam.deriveJobFromGetJobScenarioRequest(r)
 
 	restResponse := new(server.RestResponse).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlPublic().
-		WithTomlContent(desiredJob.HiddenAttributes["ScenarioConfig"])
+		WithTomlContent(scenarioOf(job))
 
-	writeError := restResponse.Write()
+	cam.writeResponse(restResponse, "get job scenario")
+}
 
+func scenarioOf(job Job) interface{} {
+	return job.HiddenAttributes[scenarioConfigKey]
+}
+
+func (cam *CrmApiMux) expectedMethodNotSupplied(expectedHttpMethod string, w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != expectedHttpMethod {
+		cam.MethodNotAllowedError(w, r)
+		return true
+	}
+	return false
+}
+
+func (cam *CrmApiMux) writeResponse(response *server.RestResponse, context string) {
+	writeError := response.Write()
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "get job scenario")
+		wrappingError := errors.Wrap(writeError, context)
 		cam.Logger().Error(wrappingError)
 	}
+}
+
+func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) Job {
+	desiredId := getJobIdFromScenarioRequestUrl(r)
+	return cam.jobs.JobWithId(desiredId)
 }
 
 func getJobIdFromScenarioRequestUrl(r *http.Request) string {
