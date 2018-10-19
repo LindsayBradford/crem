@@ -110,6 +110,14 @@ func (bm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request, e
 	bm.RespondWithError(http.StatusInternalServerError, finalErrorString, w, r)
 }
 
+func (bm *BaseMux) ServiceUnavailableError(w http.ResponseWriter, r *http.Request, errorDetail error) {
+	finalErrorString := "Service Unavailable Error"
+	if errorDetail != nil {
+		finalErrorString = fmt.Sprintf("%s: %v", finalErrorString, errorDetail)
+	}
+	bm.RespondWithError(http.StatusServiceUnavailable, finalErrorString, w, r)
+}
+
 func (bm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
 	bm.logResponseError(r, responseMsg)
 
