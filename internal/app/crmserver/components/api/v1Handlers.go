@@ -31,50 +31,82 @@ func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get(server.ContentTypeHeaderKey) != server.TomlMimeType {
-		cam.MethodNotAllowedError(w, r)
+	if cam.requestContentTypeWasNotToml(r, w) {
 		return
 	}
 
-	scenarioText := requestBodyToString(r)
+	newJob := cam.createJobFromRequest(r)
 
+	if cam.scenarioTextSuppliedIsInvalid(newJob, w, r) || bool(cam.jobEnqueueFailed(newJob, w, r)) {
+		return
+	}
+
+	cam.writeJobAsResponse(newJob, w)
+	cam.allowJobQueries(newJob)
+}
+
+func (cam *CrmApiMux) createJobFromRequest(r *http.Request) *Job {
 	newJob := new(Job).Initialise()
-	newJob.HiddenAttributes[scenarioConfigTextKey] = scenarioText
+	newJob.HiddenAttributes[scenarioConfigTextKey] = requestBodyToString(r)
+	return newJob
+}
 
+func (cam *CrmApiMux) requestContentTypeWasNotToml(r *http.Request, w http.ResponseWriter) bool {
+	if r.Header.Get(server.ContentTypeHeaderKey) != server.TomlMimeType {
+		cam.MethodNotAllowedError(w, r)
+		return true
+	}
+	return false
+}
+
+func (cam *CrmApiMux) scenarioTextSuppliedIsInvalid(job *Job, w http.ResponseWriter, r *http.Request) bool {
+	scenarioText := job.HiddenAttributes[scenarioConfigTextKey].(string)
 	scenarioConfig, retrieveError := config.RetrieveCrmFromString(scenarioText)
 
 	if retrieveError != nil {
-		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
-		cam.Logger().Warn(wrappingError)
-		newJob.Attributes[statusKey] = "INVALID"
-		cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
-		return
+		cam.handleScenarioConfigRetrieveError(retrieveError, job, w, r)
+		return true
 	}
 
-	newJob.HiddenAttributes[scenarioConfigStructKey] = scenarioConfig
+	cam.Logger().Info("Received new job [" + job.JobId + "] with scenario name [" + scenarioConfig.ScenarioName + "].")
+	job.HiddenAttributes[scenarioConfigStructKey] = scenarioConfig
+	return false
+}
 
-	if cam.jobs.Enqueue(*newJob) == enqueueFailed {
+func (cam *CrmApiMux) handleScenarioConfigRetrieveError(retrieveError error, job *Job, w http.ResponseWriter, r *http.Request) {
+	wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
+	cam.Logger().Warn(wrappingError)
+	job.Attributes[statusKey] = "INVALID"
+	cam.jobs.AddToHistory(job)
+	cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
+	cam.allowJobQueries(job)
+}
+
+func (cam *CrmApiMux) allowJobQueries(job *Job) {
+	cam.AddHandler(BuildApiPath(jobsPath, job.JobId), cam.v1GetJob)
+	cam.AddHandler(BuildApiPath(jobsPath, job.JobId, scenarioPath), cam.v1GetJobScenario)
+}
+
+func (cam *CrmApiMux) jobEnqueueFailed(job *Job, w http.ResponseWriter, r *http.Request) JobEnqueuedStatus {
+	enqueuedStatus := cam.jobs.Enqueue(job)
+	if enqueuedStatus == JobEnqueueFailed {
 		enqueueFailedError := errors.New("job queue full")
 		cam.ServiceUnavailableError(w, r, enqueueFailedError)
-		return
 	}
+	return !enqueuedStatus
+}
 
-	cam.Logger().Info("Received new job [" + newJob.JobId + "] with scenario name [" + scenarioConfig.ScenarioName + "].")
-
+func (cam *CrmApiMux) writeJobAsResponse(newJob *Job, w http.ResponseWriter) {
 	restResponse := new(server.RestResponse).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(http.StatusCreated).
 		WithCacheControlMaxAge(cam.CacheMaxAge()).
 		WithJsonContent(newJob)
-
 	cam.writeResponse(restResponse, "create job")
 }
 
-func (cam *CrmApiMux) DoJob(job Job) {
-	cam.AddHandler(BuildApiPath(jobsPath, job.JobId), cam.v1GetJob)
-	cam.AddHandler(BuildApiPath(jobsPath, job.JobId, scenarioPath), cam.v1GetJobScenario)
-
+func (cam *CrmApiMux) DoJob(job *Job) {
 	scenarioConfig, ok := job.HiddenAttributes[scenarioConfigStructKey].(*config.CRMConfig)
 	if !ok {
 		cam.Logger().Error("Unexpected error in retrieving CRMConfig from job hidden attributes")
@@ -113,18 +145,10 @@ func (cam *CrmApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	job := cam.deriveJobFromGetJobRequest(r)
-
-	restResponse := new(server.RestResponse).
-		Initialise().
-		WithWriter(w).
-		WithResponseCode(http.StatusOK).
-		WithCacheControlMaxAge(cam.CacheMaxAge()).
-		WithJsonContent(job)
-
-	cam.writeResponse(restResponse, "get job")
+	cam.writeJobAsResponse(job, w)
 }
 
-func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) Job {
+func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) *Job {
 	desiredId := getJobIdFromRequestUrl(r)
 	return cam.jobs.JobWithId(desiredId)
 }
@@ -152,7 +176,7 @@ func (cam *CrmApiMux) v1GetJobScenario(w http.ResponseWriter, r *http.Request) {
 	cam.writeResponse(restResponse, "get job scenario")
 }
 
-func scenarioOf(job Job) interface{} {
+func scenarioOf(job *Job) interface{} {
 	return job.HiddenAttributes[scenarioConfigTextKey]
 }
 
@@ -172,7 +196,7 @@ func (cam *CrmApiMux) writeResponse(response *server.RestResponse, context strin
 	}
 }
 
-func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) Job {
+func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *Job {
 	desiredId := getJobIdFromScenarioRequestUrl(r)
 	return cam.jobs.JobWithId(desiredId)
 }
