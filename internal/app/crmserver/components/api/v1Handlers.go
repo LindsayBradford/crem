@@ -77,7 +77,7 @@ func (cam *CrmApiMux) handleScenarioConfigRetrieveError(retrieveError error, job
 	wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 	cam.Logger().Warn(wrappingError)
 	job.Attributes[statusKey] = "INVALID"
-	cam.jobs.AddToHistory(job)
+	cam.AddToHistory(job)
 	cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
 	cam.allowJobQueries(job)
 }
@@ -88,6 +88,7 @@ func (cam *CrmApiMux) allowJobQueries(job *Job) {
 }
 
 func (cam *CrmApiMux) jobEnqueueFailed(job *Job, w http.ResponseWriter, r *http.Request) JobEnqueuedStatus {
+	cam.AddToHistory(job)
 	enqueuedStatus := cam.jobs.Enqueue(job)
 	if enqueuedStatus == JobEnqueueFailed {
 		enqueueFailedError := errors.New("job queue full")
@@ -134,7 +135,7 @@ func (cam *CrmApiMux) v1GetJobs(w http.ResponseWriter, r *http.Request) {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(cam.CacheMaxAge()).
-		WithJsonContent(cam.jobs)
+		WithJsonContent(cam.JobHistory)
 
 	cam.writeResponse(restResponse, "get jobs")
 }
@@ -150,7 +151,7 @@ func (cam *CrmApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
 
 func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) *Job {
 	desiredId := getJobIdFromRequestUrl(r)
-	return cam.jobs.JobWithId(desiredId)
+	return cam.JobWithId(desiredId)
 }
 
 func getJobIdFromRequestUrl(r *http.Request) string {
@@ -198,7 +199,7 @@ func (cam *CrmApiMux) writeResponse(response *server.RestResponse, context strin
 
 func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *Job {
 	desiredId := getJobIdFromScenarioRequestUrl(r)
-	return cam.jobs.JobWithId(desiredId)
+	return cam.JobWithId(desiredId)
 }
 
 func getJobIdFromScenarioRequestUrl(r *http.Request) string {

@@ -12,16 +12,18 @@ const jobsPath = "jobs"
 const creationTimeKey = "CreationTime"
 const statusKey = "Status"
 
-const defaultQueueLength = 1
+const defaultQueueLength = 1 // TODO: Make this configurable.
 
 type CrmApiMux struct {
 	server.ApiMux
 
-	jobs *CrmApiJobQueue
+	jobs       *CrmApiJobQueue
+	JobHistory []*Job
 }
 
 func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	cam.ApiMux.Initialise()
+	cam.JobHistory = make([]*Job, 0)
 	cam.jobs = new(CrmApiJobQueue).Initialise()
 	cam.jobs.JobFunction = cam.DoJob
 
@@ -30,6 +32,22 @@ func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	go cam.jobs.Start()
 
 	return cam
+}
+
+func (cam *CrmApiMux) AddToHistory(newJob *Job) {
+	cam.JobHistory = append([]*Job{newJob}, cam.JobHistory...) // for reverse chronological ordering
+
+}
+
+func (cam *CrmApiMux) JobWithId(id string) *Job {
+	var matchingJob *Job
+	for _, job := range cam.JobHistory {
+		if job.JobId == id {
+			matchingJob = job
+		}
+	}
+
+	return matchingJob
 }
 
 func BuildApiPath(pathElements ...string) string {
@@ -46,14 +64,12 @@ func baseApiPath() string {
 	return server.ApiPath + server.V1Path
 }
 
-type JobQueue struct {
-	JobHistory  []*Job
+type JobQueue struct { // TODO: Split this out into its own separate generic Go file.
 	Jobs        chan *Job      `json:"-"`
 	JobFunction func(job *Job) `json:"-"`
 }
 
 func (jq *JobQueue) Initialise() *JobQueue {
-	jq.JobHistory = make([]*Job, 0)
 	jq.Jobs = make(chan *Job, defaultQueueLength)
 	return jq
 }
@@ -64,7 +80,6 @@ const JobEnqueueSucceeded JobEnqueuedStatus = true
 const JobEnqueueFailed JobEnqueuedStatus = false
 
 func (jq *JobQueue) Enqueue(newJob *Job) JobEnqueuedStatus {
-	jq.AddToHistory(newJob)
 	select {
 	case jq.Jobs <- newJob:
 		return JobEnqueueSucceeded
@@ -73,27 +88,11 @@ func (jq *JobQueue) Enqueue(newJob *Job) JobEnqueuedStatus {
 	}
 }
 
-func (jq *JobQueue) AddToHistory(newJob *Job) {
-	jq.JobHistory = append([]*Job{newJob}, jq.JobHistory...) // for reverse chronological ordering
-
-}
-
 func (jq *JobQueue) Start() {
 	for {
 		job := <-jq.Jobs
 		jq.JobFunction(job)
 	}
-}
-
-func (jq *JobQueue) JobWithId(id string) *Job {
-	var matchingJob *Job
-	for _, job := range jq.JobHistory {
-		if job.JobId == id {
-			matchingJob = job
-		}
-	}
-
-	return matchingJob
 }
 
 type Job struct {
@@ -124,7 +123,7 @@ func (j *Job) recordCreationAttributes() {
 	j.Attributes[statusKey] = "CREATED"
 }
 
-type CrmApiJobQueue struct {
+type CrmApiJobQueue struct { // TODO: Put convenience methods around this to make it easier to use for CrmApi.
 	JobQueue
 }
 
