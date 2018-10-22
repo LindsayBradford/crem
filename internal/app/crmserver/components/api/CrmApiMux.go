@@ -28,6 +28,11 @@ func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	return cam
 }
 
+func (cam *CrmApiMux) WithJobQueueLength(length uint64) *CrmApiMux {
+	cam.jobs.WithQueueLength(length)
+	return cam
+}
+
 func (cam *CrmApiMux) AddToHistory(newJob *server.Job) {
 	cam.JobHistory = append([]*server.Job{newJob}, cam.JobHistory...) // for reverse chronological ordering
 }
@@ -65,5 +70,10 @@ type CrmApiJobQueue struct {
 
 func (q *CrmApiJobQueue) Initialise() *CrmApiJobQueue {
 	q.JobQueue.Initialise()
+	return q
+}
+
+func (q *CrmApiJobQueue) WithQueueLength(length uint64) *CrmApiJobQueue {
+	q.JobQueue.WithQueueLength(length)
 	return q
 }

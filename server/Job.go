@@ -9,7 +9,8 @@ const completionTimeKey = "CompletedTime"
 
 const statusKey = "Status"
 
-const defaultQueueLength = 1 // TODO: Make this configurable.
+const defaultQueueLength = 1
+const unspecifiedQueueLength = 0
 
 type JobQueue struct {
 	Jobs        chan *Job      `json:"-"`
@@ -18,6 +19,13 @@ type JobQueue struct {
 
 func (jq *JobQueue) Initialise() *JobQueue {
 	jq.Jobs = make(chan *Job, defaultQueueLength)
+	return jq
+}
+
+func (jq *JobQueue) WithQueueLength(length uint64) *JobQueue {
+	if length > unspecifiedQueueLength {
+		jq.Jobs = make(chan *Job, length)
+	}
 	return jq
 }
 

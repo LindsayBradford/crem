@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const defaultLogerIndex = 0
+const defaultLoggerIndex = 0
 
 var (
 	ServerLogger handlers.LogHandler = handlers.DefaultNullLogHandler
@@ -23,8 +23,8 @@ var (
 )
 
 func RunServerFromConfigFile(configFile string) {
-	server := buildServerFromFrom(configFile)
-	start(server)
+	configuredServer := buildServerFromFrom(configFile)
+	start(configuredServer)
 }
 
 func buildServerFromFrom(configFile string) *server.RestServer {
@@ -50,7 +50,7 @@ func buildLoggerFrom(configuration *config.HttpServerConfig) {
 
 func establishServerLogger(configuration *config.HttpServerConfig) {
 	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
-	ServerLogger = loggers[defaultLogerIndex]
+	ServerLogger = loggers[defaultLoggerIndex]
 	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
 }
 
@@ -58,7 +58,7 @@ func buildCrmServerFrom(serverConfig *config.HttpServerConfig) *server.RestServe
 	return new(CrmServer).
 		Initialise().
 		WithConfig(serverConfig).
-		WithApiMux(buildCrmApuMux()).
+		WithApiMux(buildCrmApuMux(serverConfig)).
 		WithLogger(ServerLogger).
 		WithStatus(crmServerStatus)
 }
@@ -92,6 +92,8 @@ func (cs *CrmServer) WithStatus(status server.ServiceStatus) *CrmServer {
 	return cs
 }
 
-func buildCrmApuMux() *api.CrmApiMux {
-	return new(api.CrmApiMux).Initialise()
+func buildCrmApuMux(serverConfig *config.HttpServerConfig) *api.CrmApiMux {
+	return new(api.CrmApiMux).
+		Initialise().
+		WithJobQueueLength(serverConfig.JobQueueLength)
 }

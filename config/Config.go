@@ -301,6 +301,7 @@ type HttpServerConfig struct {
 	AdminPort                uint64
 	ApiPort                  uint64
 	CacheMaximumAgeInSeconds uint64
+	JobQueueLength           uint64
 
 	Loggers []LoggerConfig
 }
