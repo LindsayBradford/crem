@@ -55,9 +55,10 @@ type JobStatus JobAttributeKey
 type JobAttributeKey string
 
 const (
-	JobCreated   JobStatus = "CREATED"
-	JobCompleted JobStatus = "COMPLETED"
-	JobInvalid   JobStatus = "INVALID"
+	JobUnspecified JobStatus = "UNSPECIFIED"
+	JobCreated     JobStatus = "CREATED"
+	JobCompleted   JobStatus = "COMPLETED"
+	JobInvalid     JobStatus = "INVALID"
 )
 
 type Job struct {
@@ -90,6 +91,14 @@ func (j *Job) recordCreationAttributes() {
 
 func (j *Job) SetStatus(status JobStatus) {
 	j.Attributes[statusKey] = status
+}
+
+func (j *Job) Status() JobStatus {
+	status, ok := j.Attributes[statusKey].(JobStatus)
+	if ok {
+		return status
+	}
+	return JobUnspecified
 }
 
 func (j *Job) recordCreationTime() {

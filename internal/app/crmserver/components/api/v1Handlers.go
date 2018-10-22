@@ -24,6 +24,8 @@ func (cam *CrmApiMux) V1HandleJobs(w http.ResponseWriter, r *http.Request) {
 		cam.v1PostJob(w, r)
 	case http.MethodGet:
 		cam.v1GetJobs(w, r)
+	case http.MethodDelete:
+		cam.v1DeleteJobs(w, r)
 	default:
 		cam.MethodNotAllowedError(w, r)
 	}
@@ -206,4 +208,42 @@ func getJobIdFromScenarioRequestUrl(r *http.Request) string {
 	splitURL := strings.Split(r.URL.Path, server.UrlPathSeparator)
 	desiredId := splitURL[len(splitURL)-2]
 	return desiredId
+}
+
+func (cam *CrmApiMux) v1DeleteJobs(w http.ResponseWriter, r *http.Request) {
+	deletedJobs := cam.deleteProcessedJobs()
+
+	cam.Logger().Info("Deleting all processed jobs.")
+
+	restResponse := new(server.RestResponse).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(cam.CacheMaxAge()).
+		WithJsonContent(deletedJobs)
+
+	cam.writeResponse(restResponse, "delete jobs")
+}
+
+func (cam *CrmApiMux) deleteProcessedJobs() []*server.Job {
+	processedJobs := make([]*server.Job, 0)
+	unprocessedJobs := make([]*server.Job, 0)
+
+	for _, job := range cam.JobHistory {
+		if isProcessed(job) {
+			processedJobs = append(processedJobs, job)
+		} else {
+			unprocessedJobs = append(unprocessedJobs, job)
+		}
+	}
+
+	cam.JobHistory = unprocessedJobs
+	return processedJobs
+}
+
+func isProcessed(job *server.Job) bool {
+	if job.Status() == server.JobCompleted || job.Status() == server.JobInvalid {
+		return true
+	}
+	return false
 }
