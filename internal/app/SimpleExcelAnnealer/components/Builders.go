@@ -5,13 +5,13 @@ package components
 import (
 	"os"
 
-	"github.com/LindsayBradford/crm/annealing"
-	"github.com/LindsayBradford/crm/annealing/solution"
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/logging/handlers"
 )
 
-func BuildScenarioRunner(scenarioConfig *config.CRMConfig, wrapper func(f func()), tearDown func()) (annealing.CallableScenarioRunner, handlers.LogHandler) {
+func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (annealing.CallableScenarioRunner, handlers.LogHandler) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).

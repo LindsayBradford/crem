@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components/api"
-	"github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/server"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components/api"
+	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/server"
 	. "github.com/onsi/gomega"
 )
 
@@ -123,8 +123,8 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
 
-func buildMuxUnderTest() *api.CrmApiMux {
-	muxUnderTest := new(api.CrmApiMux).Initialise()
+func buildMuxUnderTest() *api.CremApiMux {
+	muxUnderTest := new(api.CremApiMux).Initialise()
 	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
 	return muxUnderTest
 }

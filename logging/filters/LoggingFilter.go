@@ -3,7 +3,7 @@
 // modulators package supplies a number of logging modulators for managing the chattiness of loggers.
 package filters
 
-import . "github.com/LindsayBradford/crm/annealing/shared"
+import . "github.com/LindsayBradford/crem/annealing/shared"
 
 // LoggingFilter describes an interface to object that decides on how logging should be filtered
 // (reduced in volume of entries logged).

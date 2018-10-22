@@ -3,11 +3,11 @@
 package components
 
 import (
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components/api"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components/scenario"
-	"github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/server"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components/api"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
+	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/server"
 	"github.com/pkg/errors"
 )
 
@@ -16,7 +16,7 @@ const defaultLoggerIndex = 0
 var (
 	ServerLogger handlers.LogHandler = handlers.DefaultNullLogHandler
 
-	crmServerStatus = server.ServiceStatus{
+	cremServerStatus = server.ServiceStatus{
 		ServiceName: config.ShortApplicationName,
 		Version:     config.Version,
 		Status:      "DEAD"}
@@ -30,7 +30,7 @@ func RunServerFromConfigFile(configFile string) {
 func buildServerFromFrom(configFile string) *server.RestServer {
 	serverConfig := retrieveServerConfiguration(configFile)
 	buildLoggerFrom(serverConfig)
-	return buildCrmServerFrom(serverConfig)
+	return buildCremServerFrom(serverConfig)
 }
 
 func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
@@ -54,46 +54,46 @@ func establishServerLogger(configuration *config.HttpServerConfig) {
 	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
 }
 
-func buildCrmServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
-	return new(CrmServer).
+func buildCremServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
+	return new(CremServer).
 		Initialise().
 		WithConfig(serverConfig).
-		WithApiMux(buildCrmApuMux(serverConfig)).
+		WithApiMux(buildCremApuMux(serverConfig)).
 		WithLogger(ServerLogger).
-		WithStatus(crmServerStatus)
+		WithStatus(cremServerStatus)
 }
 
-func start(crmServer *server.RestServer) {
+func start(cremServer *server.RestServer) {
 	ServerLogger.Info(server.NameAndVersionString() + " -- Starting")
-	crmServer.Start()
+	cremServer.Start()
 }
 
-type CrmServer struct {
+type CremServer struct {
 	server.RestServer
 }
 
-func (cs *CrmServer) Initialise() *CrmServer {
+func (cs *CremServer) Initialise() *CremServer {
 	cs.RestServer.Initialise()
 	return cs
 }
 
-func (cs *CrmServer) WithConfig(configuration *config.HttpServerConfig) *CrmServer {
+func (cs *CremServer) WithConfig(configuration *config.HttpServerConfig) *CremServer {
 	cs.RestServer.WithConfig(configuration)
 	return cs
 }
 
-func (cs *CrmServer) WithLogger(logger handlers.LogHandler) *CrmServer {
+func (cs *CremServer) WithLogger(logger handlers.LogHandler) *CremServer {
 	cs.RestServer.WithLogger(logger)
 	return cs
 }
 
-func (cs *CrmServer) WithStatus(status server.ServiceStatus) *CrmServer {
+func (cs *CremServer) WithStatus(status server.ServiceStatus) *CremServer {
 	cs.RestServer.WithStatus(status)
 	return cs
 }
 
-func buildCrmApuMux(serverConfig *config.HttpServerConfig) *api.CrmApiMux {
-	return new(api.CrmApiMux).
+func buildCremApuMux(serverConfig *config.HttpServerConfig) *api.CremApiMux {
+	return new(api.CremApiMux).
 		Initialise().
 		WithJobQueueLength(serverConfig.JobQueueLength)
 }

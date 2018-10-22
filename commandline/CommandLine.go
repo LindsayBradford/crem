@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crem/config"
 	"github.com/pkg/errors"
 )
 

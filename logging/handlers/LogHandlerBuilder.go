@@ -3,16 +3,16 @@
 package handlers
 
 import (
-	crmerrors "github.com/LindsayBradford/crm/errors"
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	. "github.com/LindsayBradford/crm/logging/shared"
+	cremerrors "github.com/LindsayBradford/crem/errors"
+	. "github.com/LindsayBradford/crem/logging/formatters"
+	. "github.com/LindsayBradford/crem/logging/shared"
 )
 
 // LogHandlerBuilder is a fluent constructor of a LogHandler, allowing the caller to specify various formatters and
 // log-level destinations to best suit their needs.
 type LogHandlerBuilder struct {
 	logHandler  LogHandler
-	buildErrors *crmerrors.CompositeError
+	buildErrors *cremerrors.CompositeError
 }
 
 func (builder *LogHandlerBuilder) ForDefaultLogHandler() *LogHandlerBuilder {
@@ -25,7 +25,7 @@ func (builder *LogHandlerBuilder) ForDefaultLogHandler() *LogHandlerBuilder {
 // ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
 // LogHandler
 func (builder *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilder {
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
+	builder.buildErrors = cremerrors.NewComposite("Failed to build valid LogHandler")
 
 	newHandler := new(NativeLibraryLogHandler)
 
@@ -41,7 +41,7 @@ func (builder *LogHandlerBuilder) ForNativeLibraryLogHandler() *LogHandlerBuilde
 // ForNativeLibraryLogHandler instructs LogHandlerBuilder to use the native built-in go library wrapper as its
 // LogHandler
 func (builder *LogHandlerBuilder) ForBareBonesLogHandler() *LogHandlerBuilder {
-	builder.buildErrors = crmerrors.NewComposite("Failed to build valid LogHandler")
+	builder.buildErrors = cremerrors.NewComposite("Failed to build valid LogHandler")
 
 	newHandler := new(BareBonesLogHandler)
 

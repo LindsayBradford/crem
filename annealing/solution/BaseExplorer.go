@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/pkg/errors"
 )
 

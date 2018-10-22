@@ -3,9 +3,9 @@
 package components
 
 import (
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components/scenario"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/pkg/errors"
 )
 
@@ -19,13 +19,13 @@ func RunScenarioFromConfigFile(configFile string) {
 	scenario.RunScenarioFromConfig(configuration)
 }
 
-func establishScenarioLogger(configuration *config.CRMConfig) {
+func establishScenarioLogger(configuration *config.CREMConfig) {
 	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
 	ScenarioLogger = loggers[0]
 }
 
-func retrieveScenarioConfiguration(configFile string) *config.CRMConfig {
-	configuration, retrieveError := config.RetrieveCrmFromFile(configFile)
+func retrieveScenarioConfiguration(configFile string) *config.CREMConfig {
+	configuration, retrieveError := config.RetrieveCremFromFile(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		panic(wrappingError)

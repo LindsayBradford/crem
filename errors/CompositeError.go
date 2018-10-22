@@ -3,7 +3,7 @@
 // Package errors offers an extension of functionality to the default golang errors package.
 package errors
 
-import "github.com/LindsayBradford/crm/strings"
+import "github.com/LindsayBradford/crem/strings"
 
 // CompositeError offers a convenience wrapper to a number of related error instances.
 // It allows a number of errors to be collected together and delivered  as if they were one error, along with the

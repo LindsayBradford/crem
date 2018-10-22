@@ -3,8 +3,8 @@
 package main
 
 import (
-	"github.com/LindsayBradford/crm/commandline"
-	"github.com/LindsayBradford/crm/internal/app/crmserver/components"
+	"github.com/LindsayBradford/crem/commandline"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
 )
 
 func main() {

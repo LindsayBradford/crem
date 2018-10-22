@@ -4,7 +4,7 @@ package annealing
 
 import (
 	. "fmt"
-	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing/shared"
 	. "time"
 )
 

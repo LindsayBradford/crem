@@ -6,11 +6,11 @@ import (
 	"errors"
 	"time"
 
-	"github.com/LindsayBradford/crm/annealing/logging"
-	observers "github.com/LindsayBradford/crm/annealing/shared"
-	. "github.com/LindsayBradford/crm/errors"
-	"github.com/LindsayBradford/crm/logging/filters"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing/logging"
+	observers "github.com/LindsayBradford/crem/annealing/shared"
+	. "github.com/LindsayBradford/crem/errors"
+	"github.com/LindsayBradford/crem/logging/filters"
+	"github.com/LindsayBradford/crem/logging/handlers"
 )
 
 type annealingObserversBuilder struct {
@@ -25,10 +25,10 @@ func (builder *annealingObserversBuilder) initialise() *annealingObserversBuilde
 	return builder
 }
 
-func (builder *annealingObserversBuilder) WithConfig(crmConfig *CRMConfig) *annealingObserversBuilder {
+func (builder *annealingObserversBuilder) WithConfig(cremConfig *CREMConfig) *annealingObserversBuilder {
 	builder.initialise()
-	builder.config = crmConfig.AnnealingObservers
-	builder.maximumIterations = crmConfig.Annealer.MaximumIterations
+	builder.config = cremConfig.AnnealingObservers
+	builder.maximumIterations = cremConfig.Annealer.MaximumIterations
 	return builder
 }
 

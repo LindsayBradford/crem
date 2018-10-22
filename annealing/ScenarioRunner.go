@@ -7,10 +7,10 @@ import (
 	"sync"
 	. "time"
 
-	"github.com/LindsayBradford/crm/annealing/shared"
-	"github.com/LindsayBradford/crm/excel"
-	"github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/profiling"
+	"github.com/LindsayBradford/crem/annealing/shared"
+	"github.com/LindsayBradford/crem/excel"
+	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/profiling"
 )
 
 type CallableScenarioRunner interface {

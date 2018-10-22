@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/LindsayBradford/crm/config"
+	"github.com/LindsayBradford/crem/config"
 )
 
 const ContentTypeHeaderKey = "Content-Type"

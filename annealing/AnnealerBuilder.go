@@ -2,15 +2,15 @@
 package annealing
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/shared"
-	. "github.com/LindsayBradford/crm/annealing/solution"
-	crmerrors "github.com/LindsayBradford/crm/errors"
-	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crem/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing/solution"
+	cremerrors "github.com/LindsayBradford/crem/errors"
+	. "github.com/LindsayBradford/crem/logging/handlers"
 )
 
 type AnnealerBuilder struct {
 	annealer    Annealer
-	buildErrors *crmerrors.CompositeError
+	buildErrors *cremerrors.CompositeError
 }
 
 func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
@@ -25,7 +25,7 @@ func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder 
 	builder.annealer = annealer
 	builder.annealer.Initialise()
 	if builder.buildErrors == nil {
-		builder.buildErrors = crmerrors.NewComposite("Failed to build valid annealer")
+		builder.buildErrors = cremerrors.NewComposite("Failed to build valid annealer")
 	}
 	return builder
 }
@@ -105,7 +105,7 @@ func (builder *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *A
 	return builder
 }
 
-func (builder *AnnealerBuilder) Build() (Annealer, *crmerrors.CompositeError) {
+func (builder *AnnealerBuilder) Build() (Annealer, *cremerrors.CompositeError) {
 	annealerBeingBuilt := builder.annealer
 	buildErrors := builder.buildErrors
 	if buildErrors.Size() == 0 {

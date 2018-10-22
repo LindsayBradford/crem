@@ -1,4 +1,4 @@
-The Catchment Resilience Modeller (CRM) BSD 3 clause "New" or "Revised" licence terms:
+The Catchment Resilience Exploration Modeller (CREM) BSD 3 clause "New" or "Revised" licence terms:
 
 Copyright (c) 2018, Australia Rivers Institute - Griffith University. All rights reserved.
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -9,7 +9,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 
-In addition, the Catchment Resilience Modeller (CRM) software contains underlying openly licensed software listed below:
+In addition, the Catchment Resilience Exploration Modeller (CREM) software contains underlying openly licensed software listed below:
 
 A.  The following software licensed under an MIT licence (the MIT licence is pasted below this list):
 

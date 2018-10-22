@@ -3,22 +3,22 @@
 package api
 
 import (
-	"github.com/LindsayBradford/crm/server"
+	"github.com/LindsayBradford/crem/server"
 )
 
 const jobsPath = "jobs"
 
-type CrmApiMux struct {
+type CremApiMux struct {
 	server.ApiMux
 
-	jobs       *CrmApiJobQueue
+	jobs       *CremApiJobQueue
 	JobHistory []*server.Job
 }
 
-func (cam *CrmApiMux) Initialise() *CrmApiMux {
+func (cam *CremApiMux) Initialise() *CremApiMux {
 	cam.ApiMux.Initialise()
 	cam.JobHistory = make([]*server.Job, 0)
-	cam.jobs = new(CrmApiJobQueue).Initialise()
+	cam.jobs = new(CremApiJobQueue).Initialise()
 	cam.jobs.JobFunction = cam.DoJob
 
 	cam.AddHandler(BuildApiPath(jobsPath), cam.V1HandleJobs)
@@ -28,16 +28,16 @@ func (cam *CrmApiMux) Initialise() *CrmApiMux {
 	return cam
 }
 
-func (cam *CrmApiMux) WithJobQueueLength(length uint64) *CrmApiMux {
+func (cam *CremApiMux) WithJobQueueLength(length uint64) *CremApiMux {
 	cam.jobs.WithQueueLength(length)
 	return cam
 }
 
-func (cam *CrmApiMux) AddToHistory(newJob *server.Job) {
+func (cam *CremApiMux) AddToHistory(newJob *server.Job) {
 	cam.JobHistory = append([]*server.Job{newJob}, cam.JobHistory...) // for reverse chronological ordering
 }
 
-func (cam *CrmApiMux) JobWithId(id string) *server.Job {
+func (cam *CremApiMux) JobWithId(id string) *server.Job {
 	idSupplied := server.JobId(id)
 
 	var matchingJob *server.Job
@@ -64,16 +64,16 @@ func baseApiPath() string {
 	return server.ApiPath + server.V1Path
 }
 
-type CrmApiJobQueue struct {
+type CremApiJobQueue struct {
 	server.JobQueue
 }
 
-func (q *CrmApiJobQueue) Initialise() *CrmApiJobQueue {
+func (q *CremApiJobQueue) Initialise() *CremApiJobQueue {
 	q.JobQueue.Initialise()
 	return q
 }
 
-func (q *CrmApiJobQueue) WithQueueLength(length uint64) *CrmApiJobQueue {
+func (q *CremApiJobQueue) WithQueueLength(length uint64) *CremApiJobQueue {
 	q.JobQueue.WithQueueLength(length)
 	return q
 }

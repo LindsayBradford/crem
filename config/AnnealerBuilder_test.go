@@ -5,17 +5,17 @@ package config
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crm/annealing"
-	"github.com/LindsayBradford/crm/annealing/logging"
-	"github.com/LindsayBradford/crm/annealing/shared"
-	"github.com/LindsayBradford/crm/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/logging"
+	"github.com/LindsayBradford/crem/annealing/shared"
+	"github.com/LindsayBradford/crem/annealing/solution"
 	. "github.com/onsi/gomega"
 )
 
 func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerMinimalValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerMinimalValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -60,7 +60,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/NullAnnealerMinimalValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/NullAnnealerMinimalValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -105,7 +105,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidAnnealerTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidAnnealerTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -116,7 +116,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidEventNotifierConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidEventNotifierConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidEventNotifierConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -127,7 +127,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidEventNotifierConfig(t *testing.T) {
 func TestAnnealerBuilder_MissingSolutionExplorerTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerMissingSolutionExplorerTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerMissingSolutionExplorerTypeConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -146,7 +146,7 @@ func TestAnnealerBuilder_MissingSolutionExplorerTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerMismatchedSolutionExplorerNamesConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerMismatchedSolutionExplorerNamesConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -165,7 +165,7 @@ func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerNoSolutionExplorerConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerNoSolutionExplorerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerNoSolutionExplorerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -184,7 +184,7 @@ func TestAnnealerBuilder_DumbAnnealerNoSolutionExplorerConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealingObserversTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidAnnealingObserversTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidAnnealingObserversTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -195,7 +195,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidAnnealingObserversTypeConfig(t *test
 func TestAnnealerBuilder_DumbAnnealerInvalidIterationFilterConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidIterationFilterConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidIterationFilterConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -206,7 +206,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidIterationFilterConfig(t *testing.T) 
 func TestAnnealerBuilder_InvalidAnnealingObserversLoggerConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidAnnealingObserversLoggerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidAnnealingObserversLoggerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -225,7 +225,7 @@ func TestAnnealerBuilder_InvalidAnnealingObserversLoggerConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidLoggersTypeConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidLoggersTypeConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidLoggersTypeConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -236,7 +236,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLoggersTypeConfig(t *testing.T) {
 func TestAnnealerBuilder_DumbAnnealerInvalidLoggersFormatterConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidLoggersFormatterConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidLoggersFormatterConfig.toml")
 	g.Expect(retrieveError).To(Not(BeNil()), "Config retrieval should not have failed.")
 	g.Expect(configUnderTest).To(BeNil(), "Config retrieves should have been nil.")
 
@@ -247,7 +247,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLoggersFormatterConfig(t *testing.T)
 func TestAnnealerBuilder_DumbAnnealerInvalidLogLevelDestinationConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerInvalidLogLevelDestinationConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerInvalidLogLevelDestinationConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -266,7 +266,7 @@ func TestAnnealerBuilder_DumbAnnealerInvalidLogLevelDestinationConfig(t *testing
 func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/DumbAnnealerRichValidConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerRichValidConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder)
@@ -336,7 +336,7 @@ func (tre *TestRegistereableExplorer) WithName(name string) *TestRegistereableEx
 func TestAnnealerBuilder_NullAnnealerWithCustomExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	configUnderTest, retrieveError := RetrieveCrmFromFile("testdata/NullAnnealerWithCustomExplorerConfig.toml")
+	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/NullAnnealerWithCustomExplorerConfig.toml")
 	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
 
 	builderUnderTest := new(AnnealerBuilder).RegisteringExplorer(

@@ -3,8 +3,8 @@
 package handlers
 
 import (
-	"github.com/LindsayBradford/crm/logging/formatters"
-	"github.com/LindsayBradford/crm/logging/shared"
+	"github.com/LindsayBradford/crem/logging/formatters"
+	"github.com/LindsayBradford/crem/logging/shared"
 )
 
 var DefaultTestingLogHandler = buildTestingLogHandler()

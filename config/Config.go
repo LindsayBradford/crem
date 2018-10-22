@@ -8,18 +8,18 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/LindsayBradford/crm/strings"
+	"github.com/LindsayBradford/crem/strings"
 	"github.com/pkg/errors"
 )
 
-const ShortApplicationName = "CatchmentResilienceModeller"
-const LongApplicationName = "Catchment Resilience Modeller"
+const ShortApplicationName = "CatchmentResilienceExplorationModeller"
+const LongApplicationName = "Catchment Resilience Exploration Modeller"
 const Version = "v1"
 
 const defaultServerConfigPath = "config/server.toml"
 
-func RetrieveCrmFromFile(configFilePath string) (*CRMConfig, error) {
-	var conf CRMConfig
+func RetrieveCremFromFile(configFilePath string) (*CREMConfig, error) {
+	var conf CREMConfig
 	metaData, decodeErr := toml.DecodeFile(configFilePath, &conf)
 	if decodeErr != nil {
 		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
@@ -32,8 +32,8 @@ func RetrieveCrmFromFile(configFilePath string) (*CRMConfig, error) {
 	return &conf, nil
 }
 
-func RetrieveCrmFromString(tomlString string) (*CRMConfig, error) {
-	var conf CRMConfig
+func RetrieveCremFromString(tomlString string) (*CREMConfig, error) {
+	var conf CREMConfig
 	metaData, decodeErr := toml.Decode(tomlString, &conf)
 	if decodeErr != nil {
 		return nil, errors.Wrap(decodeErr, "failed retrieving config from file")
@@ -50,7 +50,7 @@ type BaseConfig struct {
 	FilePath string
 }
 
-type CRMConfig struct {
+type CREMConfig struct {
 	BaseConfig
 
 	ScenarioName               string

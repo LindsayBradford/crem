@@ -5,8 +5,8 @@
 package handlers
 
 import (
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	. "github.com/LindsayBradford/crm/logging/shared"
+	. "github.com/LindsayBradford/crem/logging/formatters"
+	. "github.com/LindsayBradford/crem/logging/shared"
 )
 
 // LogHandler defines an interface for the handling of logging. It sets out methods for logging at the various supported

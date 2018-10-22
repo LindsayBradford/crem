@@ -3,7 +3,7 @@
 package solution
 
 import (
-	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crem/logging/handlers"
 	"math/rand"
 )
 

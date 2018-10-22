@@ -5,9 +5,9 @@ package annealing
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crm/annealing/shared"
-	"github.com/LindsayBradford/crm/annealing/solution"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing/shared"
+	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	. "github.com/onsi/gomega"
 )
 import "testing"

@@ -5,8 +5,8 @@ package config
 import (
 	"errors"
 
-	"github.com/LindsayBradford/crm/annealing/solution"
-	. "github.com/LindsayBradford/crm/errors"
+	"github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/errors"
 )
 
 type solutionExplorerBuilder struct {
@@ -47,9 +47,9 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	)
 }
 
-func (builder *solutionExplorerBuilder) WithConfig(crmConfig *CRMConfig) *solutionExplorerBuilder {
+func (builder *solutionExplorerBuilder) WithConfig(cremConfig *CREMConfig) *solutionExplorerBuilder {
 	builder.initialise()
-	builder.config = crmConfig.SolutionExplorers
+	builder.config = cremConfig.SolutionExplorers
 	return builder
 }
 

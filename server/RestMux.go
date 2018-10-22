@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )

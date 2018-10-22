@@ -2,7 +2,7 @@
 
 package filters
 
-import . "github.com/LindsayBradford/crm/annealing/shared"
+import . "github.com/LindsayBradford/crem/annealing/shared"
 
 // IterationCountLoggingFilter modulates FinishedIteration Annealing Event instances at a rate of 1 every modulo
 // events. StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.

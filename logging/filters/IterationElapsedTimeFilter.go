@@ -3,7 +3,7 @@
 package filters
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing/shared"
 	"time"
 )
 

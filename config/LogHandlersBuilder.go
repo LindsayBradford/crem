@@ -4,11 +4,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/LindsayBradford/crm/annealing/logging"
-	. "github.com/LindsayBradford/crm/errors"
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	"github.com/LindsayBradford/crm/logging/handlers"
-	"github.com/LindsayBradford/crm/logging/shared"
+	"github.com/LindsayBradford/crem/annealing/logging"
+	. "github.com/LindsayBradford/crem/errors"
+	. "github.com/LindsayBradford/crem/logging/formatters"
+	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/shared"
 	"github.com/pkg/errors"
 )
 

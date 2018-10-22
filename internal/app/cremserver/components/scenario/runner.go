@@ -5,9 +5,9 @@ package scenario
 import (
 	"os"
 
-	"github.com/LindsayBradford/crm/annealing"
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/pkg/errors"
 )
 
@@ -15,13 +15,13 @@ var (
 	LogHandler handlers.LogHandler
 )
 
-func RunScenarioFromConfig(crmConfig *config.CRMConfig) {
-	scenarioRunner := BuildScenarioRunner(crmConfig)
+func RunScenarioFromConfig(cremConfig *config.CREMConfig) {
+	scenarioRunner := BuildScenarioRunner(cremConfig)
 	runScenario(scenarioRunner)
 	flushStreams()
 }
 
-func BuildScenarioRunner(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
+func BuildScenarioRunner(scenarioConfig *config.CREMConfig) annealing.CallableScenarioRunner {
 	newAnnealer, _, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).

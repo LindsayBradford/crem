@@ -1,7 +1,7 @@
-# Catchment Resilience Modeller
+# Catchment Resilience Exploration Modeller
 
-[![Build Status](https://travis-ci.com/LindsayBradford/crm.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crm)
-[![GoDoc](https://godoc.org/github.com/LindsayBradford/crm?status.svg)](https://godoc.org/github.com/LindsayBradford/crm)
+[![Build Status](https://travis-ci.com/LindsayBradford/crem.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crem)
+[![GoDoc](https://godoc.org/github.com/LindsayBradford/crem?status.svg)](https://godoc.org/github.com/LindsayBradford/crem)
 
 ## Release 0.1 - 04/06/2018
 
@@ -9,9 +9,9 @@ TBD: <Add blurb>
 
 #### Overview:
 
-The heart of the Catchment Resilience Modeller is a highly configurable [simulated annealer]( https://en.wikipedia.org/wiki/Simulated_annealing). 
+The heart of the Catchment Resilience Exploration Modeller is a highly configurable [simulated annealer]( https://en.wikipedia.org/wiki/Simulated_annealing). 
 A number of simpler annealing applications that exercise the code-base from a testing perspective can be found in the 
-[/internal/app](https://github.com/LindsayBradford/crm/tree/master/internal/app) directory. The easiest place to start is with the [dumb annealer](https://github.com/LindsayBradford/crm/blob/master/internal/app/dumbannealer/main.go). 
+[/internal/app](https://github.com/LindsayBradford/crem/tree/master/internal/app) directory. The easiest place to start is with the [dumb annealer](https://github.com/LindsayBradford/crem/blob/master/internal/app/dumbannealer/main.go). 
 
 Below is a very brief introduction to each testing annealer:
 - DumbAnnealer: 
@@ -20,14 +20,14 @@ Below is a very brief introduction to each testing annealer:
    - The solution space is essentially stateless. 
 - SimpleExcelAnnealer:
   - Its primary purpose is to exercise a relatively trivial annealing example with a solution-space that is retrieved 
-    and stored to [an excel spreadsheet](https://github.com/LindsayBradford/crm/blob/master/internal/app/SimpleExcelAnnealer/testdata/SimpleExcelAnnealerTestFixture.xls). 
+    and stored to [an excel spreadsheet](https://github.com/LindsayBradford/crem/blob/master/internal/app/SimpleExcelAnnealer/testdata/SimpleExcelAnnealerTestFixture.xls). 
   - The algorithm itself started in an excel macro spreadsheet, was converted to VB.NET and has been cut across to 
     golang. This annealer is also used to profile and benchmark the core annealing algorithm across languages. 
     
 The Annealers are configure via [TOML](https://github.com/toml-lang/toml) files that can be found in their respective /testdata directories. 
 There is currently no documentation describing the structure of config files. However, a test config file 
-covering a rich set of features [can be found here](https://github.com/LindsayBradford/crm/blob/master/config/testdata/DumbAnnealerRichValidConfig.toml). 
-Configuration operates on a 'convention over configuration' basis, allowing [far smaller configurations](https://github.com/LindsayBradford/crm/blob/master/config/testdata/NullAnnealerMinimalValidConfig.toml).
+covering a rich set of features [can be found here](https://github.com/LindsayBradford/crem/blob/master/config/testdata/DumbAnnealerRichValidConfig.toml). 
+Configuration operates on a 'convention over configuration' basis, allowing [far smaller configurations](https://github.com/LindsayBradford/crem/blob/master/config/testdata/NullAnnealerMinimalValidConfig.toml).
 
 #### General Usage Notes:
 
@@ -44,7 +44,7 @@ Configuration operates on a 'convention over configuration' basis, allowing [far
 
 #### Copyright:
 
-The Catchment Resilience Modeller (CRM) software is licensed under a BSD 3-clause "New" or "Revised" licence,
+The Catchment Resilience Exploration Modeller (CREM) software is licensed under a BSD 3-clause "New" or "Revised" licence,
 detailed in [LICENCE.md](LICENCE.md).
 
 #### Dependencies:
@@ -52,3 +52,4 @@ detailed in [LICENCE.md](LICENCE.md).
 - [Gomega](https://github.com/onsi/gomega)  For a Fluent-API based approach to test assertions
 - [go-ole](https://github.com/go-ole/go-ole) For I/O via Excel files
 - [pkg/errors](https://github.com/pkg/errors) For error wrapping
+- [nu7hatch/gouuid](https://github.com//nu7hatch/gouuid) For UUID generation

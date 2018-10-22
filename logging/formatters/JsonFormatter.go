@@ -3,8 +3,8 @@
 package formatters
 
 import (
-	. "github.com/LindsayBradford/crm/logging/shared"
-	"github.com/LindsayBradford/crm/strings"
+	. "github.com/LindsayBradford/crem/logging/shared"
+	"github.com/LindsayBradford/crem/strings"
 )
 
 // JsonFormatter formats a LogAttributes array into an equivalent JSON encoding.

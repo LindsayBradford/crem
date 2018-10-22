@@ -7,11 +7,11 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/LindsayBradford/crm/annealing"
-	"github.com/LindsayBradford/crm/commandline"
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/internal/app/SimpleExcelAnnealer/components"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/commandline"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
+	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/pkg/errors"
 )
 
@@ -55,8 +55,8 @@ func RunFromConfigFile(configFile string) {
 	runScenario(scenarioRunner)
 }
 
-func retrieveConfig(configFile string) *config.CRMConfig {
-	configuration, retrieveError := config.RetrieveCrmFromFile(configFile)
+func retrieveConfig(configFile string) *config.CREMConfig {
+	configuration, retrieveError := config.RetrieveCremFromFile(configFile)
 
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving simple excel annealer configuration")
@@ -66,7 +66,7 @@ func retrieveConfig(configFile string) *config.CRMConfig {
 	return configuration
 }
 
-func buildScenarioOffConfig(scenarioConfig *config.CRMConfig) annealing.CallableScenarioRunner {
+func buildScenarioOffConfig(scenarioConfig *config.CREMConfig) annealing.CallableScenarioRunner {
 	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, callOnMainThread, closeMainThreadChannel)
 	defaultLogHandler = annealerLogHandler
 	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")

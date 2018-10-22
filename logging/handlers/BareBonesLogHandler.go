@@ -6,9 +6,9 @@ import (
 	"io"
 	"time"
 
-	. "github.com/LindsayBradford/crm/logging/formatters"
-	. "github.com/LindsayBradford/crm/logging/shared"
-	"github.com/LindsayBradford/crm/strings"
+	. "github.com/LindsayBradford/crem/logging/formatters"
+	. "github.com/LindsayBradford/crem/logging/shared"
+	"github.com/LindsayBradford/crem/strings"
 )
 
 // value is here for the purposes of documentation only. It is a stand-in

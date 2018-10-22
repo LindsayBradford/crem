@@ -2,8 +2,8 @@
 package shared
 
 import (
-	. "github.com/LindsayBradford/crm/annealing/solution"
-	. "github.com/LindsayBradford/crm/logging/handlers"
+	. "github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/logging/handlers"
 )
 
 type Annealer interface {

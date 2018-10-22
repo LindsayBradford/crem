@@ -3,7 +3,7 @@
 // Package formatters defines logging formatters that take LogAttributes and convert them into logging-ready strings.
 package formatters
 
-import . "github.com/LindsayBradford/crm/logging/shared"
+import . "github.com/LindsayBradford/crem/logging/shared"
 
 // LogFormatter describes an interface for the formatting of LogAttributes into some logging-ready string.
 // Instances of LogHandler are expected to delegate any formatting of the supplied attributes to a LogFormatter.

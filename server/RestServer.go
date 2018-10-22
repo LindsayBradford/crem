@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/LindsayBradford/crm/config"
-	"github.com/LindsayBradford/crm/logging/handlers"
+	"github.com/LindsayBradford/crem/config"
+	"github.com/LindsayBradford/crem/logging/handlers"
 )
 
 type ErrorResponse struct {
