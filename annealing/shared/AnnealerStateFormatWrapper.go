@@ -36,7 +36,7 @@ func (wrapper *AnnealerFormatWrapper) Wrap(annealer Annealer) {
 }
 
 func (wrapper *AnnealerFormatWrapper) Id() string {
-	return wrapper.applyFormatting("JobId", wrapper.AnnealerToFormat.Id())
+	return wrapper.applyFormatting("Id", wrapper.AnnealerToFormat.Id())
 }
 
 func (wrapper *AnnealerFormatWrapper) Temperature() string {

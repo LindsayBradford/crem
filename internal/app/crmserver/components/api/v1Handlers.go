@@ -15,7 +15,6 @@ import (
 
 const scenarioConfigTextKey = "ScenarioConfigText"
 const scenarioConfigStructKey = "ScenarioConfigStruct"
-const completedTimeKey = "CompletedTime"
 
 const scenarioPath = "scenario"
 
@@ -45,8 +44,8 @@ func (cam *CrmApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 	cam.allowJobQueries(newJob)
 }
 
-func (cam *CrmApiMux) createJobFromRequest(r *http.Request) *Job {
-	newJob := new(Job).Initialise()
+func (cam *CrmApiMux) createJobFromRequest(r *http.Request) *server.Job {
+	newJob := new(server.Job).Initialise()
 	newJob.HiddenAttributes[scenarioConfigTextKey] = requestBodyToString(r)
 	return newJob
 }
@@ -59,7 +58,7 @@ func (cam *CrmApiMux) requestContentTypeWasNotToml(r *http.Request, w http.Respo
 	return false
 }
 
-func (cam *CrmApiMux) scenarioTextSuppliedIsInvalid(job *Job, w http.ResponseWriter, r *http.Request) bool {
+func (cam *CrmApiMux) scenarioTextSuppliedIsInvalid(job *server.Job, w http.ResponseWriter, r *http.Request) bool {
 	scenarioText := job.HiddenAttributes[scenarioConfigTextKey].(string)
 	scenarioConfig, retrieveError := config.RetrieveCrmFromString(scenarioText)
 
@@ -68,36 +67,36 @@ func (cam *CrmApiMux) scenarioTextSuppliedIsInvalid(job *Job, w http.ResponseWri
 		return true
 	}
 
-	cam.Logger().Info("Received new job [" + job.JobId + "] with scenario name [" + scenarioConfig.ScenarioName + "].")
+	cam.Logger().Info("Received new job [" + string(job.Id) + "] with scenario name [" + scenarioConfig.ScenarioName + "].")
 	job.HiddenAttributes[scenarioConfigStructKey] = scenarioConfig
 	return false
 }
 
-func (cam *CrmApiMux) handleScenarioConfigRetrieveError(retrieveError error, job *Job, w http.ResponseWriter, r *http.Request) {
+func (cam *CrmApiMux) handleScenarioConfigRetrieveError(retrieveError error, job *server.Job, w http.ResponseWriter, r *http.Request) {
 	wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 	cam.Logger().Warn(wrappingError)
-	job.Attributes[statusKey] = "INVALID"
+	job.SetStatus(server.JobInvalid)
 	cam.AddToHistory(job)
 	cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
 	cam.allowJobQueries(job)
 }
 
-func (cam *CrmApiMux) allowJobQueries(job *Job) {
-	cam.AddHandler(BuildApiPath(jobsPath, job.JobId), cam.v1GetJob)
-	cam.AddHandler(BuildApiPath(jobsPath, job.JobId, scenarioPath), cam.v1GetJobScenario)
+func (cam *CrmApiMux) allowJobQueries(job *server.Job) {
+	cam.AddHandler(BuildApiPath(jobsPath, string(job.Id)), cam.v1GetJob)
+	cam.AddHandler(BuildApiPath(jobsPath, string(job.Id), scenarioPath), cam.v1GetJobScenario)
 }
 
-func (cam *CrmApiMux) jobEnqueueFailed(job *Job, w http.ResponseWriter, r *http.Request) JobEnqueuedStatus {
+func (cam *CrmApiMux) jobEnqueueFailed(job *server.Job, w http.ResponseWriter, r *http.Request) server.JobEnqueuedStatus {
 	cam.AddToHistory(job)
 	enqueuedStatus := cam.jobs.Enqueue(job)
-	if enqueuedStatus == JobEnqueueFailed {
+	if enqueuedStatus == server.JobEnqueueFailed {
 		enqueueFailedError := errors.New("job queue full")
 		cam.ServiceUnavailableError(w, r, enqueueFailedError)
 	}
 	return !enqueuedStatus
 }
 
-func (cam *CrmApiMux) writeJobAsResponse(newJob *Job, w http.ResponseWriter) {
+func (cam *CrmApiMux) writeJobAsResponse(newJob *server.Job, w http.ResponseWriter) {
 	restResponse := new(server.RestResponse).
 		Initialise().
 		WithWriter(w).
@@ -107,19 +106,20 @@ func (cam *CrmApiMux) writeJobAsResponse(newJob *Job, w http.ResponseWriter) {
 	cam.writeResponse(restResponse, "create job")
 }
 
-func (cam *CrmApiMux) DoJob(job *Job) {
+func (cam *CrmApiMux) DoJob(job *server.Job) {
 	scenarioConfig, ok := job.HiddenAttributes[scenarioConfigStructKey].(*config.CRMConfig)
 	if !ok {
 		cam.Logger().Error("Unexpected error in retrieving CRMConfig from job hidden attributes")
 		return
 	}
 
-	cam.Logger().Info("Running Job [" + job.JobId + "].")
+	cam.Logger().Info("Running Job [" + string(job.Id) + "].")
 
 	scenario.RunScenarioFromConfig(scenarioConfig)
 
-	job.Attributes[statusKey] = "COMPLETED"
-	job.Attributes[completedTimeKey] = server.FormattedTimestamp()
+	job.SetStatus(server.JobCompleted)
+
+	job.RecordCompletionTime()
 
 	delete(job.HiddenAttributes, scenarioConfigStructKey)
 }
@@ -149,7 +149,7 @@ func (cam *CrmApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
 	cam.writeJobAsResponse(job, w)
 }
 
-func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) *Job {
+func (cam *CrmApiMux) deriveJobFromGetJobRequest(r *http.Request) *server.Job {
 	desiredId := getJobIdFromRequestUrl(r)
 	return cam.JobWithId(desiredId)
 }
@@ -177,7 +177,7 @@ func (cam *CrmApiMux) v1GetJobScenario(w http.ResponseWriter, r *http.Request) {
 	cam.writeResponse(restResponse, "get job scenario")
 }
 
-func scenarioOf(job *Job) interface{} {
+func scenarioOf(job *server.Job) interface{} {
 	return job.HiddenAttributes[scenarioConfigTextKey]
 }
 
@@ -197,7 +197,7 @@ func (cam *CrmApiMux) writeResponse(response *server.RestResponse, context strin
 	}
 }
 
-func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *Job {
+func (cam *CrmApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *server.Job {
 	desiredId := getJobIdFromScenarioRequestUrl(r)
 	return cam.JobWithId(desiredId)
 }
