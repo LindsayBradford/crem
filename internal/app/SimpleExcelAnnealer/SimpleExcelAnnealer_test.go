@@ -9,6 +9,10 @@ import (
 	"testing"
 )
 
+const baseTestFilePath = "testdata/SimpleExcelAnnealerTestConfig-OneRun"
+const configFileUnderTest = baseTestFilePath + ".toml"
+const excelFileUnderTest = baseTestFilePath + ".xls"
+
 type testContext struct {
 	name       string
 	t          *testing.T
@@ -19,11 +23,11 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 	context := testContext{
 		name:       "Single run of Simple Excel Annealer",
 		t:          t,
-		configFile: "testdata/SimpleExcelAnnealerTestConfig-OneRun.toml",
+		configFile: configFileUnderTest,
 	}
 
 	verifyAnnealerRunsAgainstContext(context)
-	os.Remove("testdata/TestSimpleExcelAnnealer-OneRun.xls")
+	os.Remove(excelFileUnderTest)
 }
 
 func verifyAnnealerRunsAgainstContext(context testContext) {

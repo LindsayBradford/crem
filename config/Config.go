@@ -103,7 +103,6 @@ type AnnealerType struct {
 
 var (
 	UnspecifiedAnnealerType = AnnealerType{""}
-	OSThreadLocked          = AnnealerType{"OSThreadLocked"}
 	ElapsedTimeTracking     = AnnealerType{"ElapsedTimeTracking"}
 	Simple                  = AnnealerType{"Simple"}
 )
@@ -112,7 +111,7 @@ func (at *AnnealerType) UnmarshalText(text []byte) error {
 	context := unmarshalContext{
 		configKey: "Annealer.Type",
 		validValues: []string{
-			OSThreadLocked.value, ElapsedTimeTracking.value, Simple.value,
+			ElapsedTimeTracking.value, Simple.value,
 		},
 		textToValidate: string(text),
 		assignmentFunction: func() {
@@ -253,10 +252,10 @@ func (filter *IterationFilter) UnmarshalText(text []byte) error {
 }
 
 type SolutionExplorerConfig struct {
-	Type      string
-	Name      string
-	Penalty   float64
-	InputFile string
+	Type       string
+	Name       string
+	Penalty    float64
+	InputFiles map[string]string
 }
 
 func processUnmarshalContext(context unmarshalContext) error {
