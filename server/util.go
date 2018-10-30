@@ -17,7 +17,7 @@ const UrlPathSeparator = "/"
 const TomlMimeType = "application/toml"
 const JsonMimeType = "application/json"
 
-const DefaultResposneContentType = JsonMimeType
+const DefaultResponseContentType = JsonMimeType
 
 func FormattedTimestamp() string {
 	return fmt.Sprintf("%v", time.Now().Format(time.RFC3339Nano))

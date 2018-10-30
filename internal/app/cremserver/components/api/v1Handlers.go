@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
 	"github.com/LindsayBradford/crem/server"
+	"github.com/LindsayBradford/crem/server/job"
 	"github.com/pkg/errors"
 )
 
@@ -46,8 +47,8 @@ func (cam *CremApiMux) v1PostJob(w http.ResponseWriter, r *http.Request) {
 	cam.allowJobQueries(newJob)
 }
 
-func (cam *CremApiMux) createJobFromRequest(r *http.Request) *server.Job {
-	newJob := new(server.Job).Initialise()
+func (cam *CremApiMux) createJobFromRequest(r *http.Request) *job.Job {
+	newJob := new(job.Job).Initialise()
 	newJob.HiddenAttributes[scenarioConfigTextKey] = requestBodyToString(r)
 	return newJob
 }
@@ -60,7 +61,7 @@ func (cam *CremApiMux) requestContentTypeWasNotToml(r *http.Request, w http.Resp
 	return false
 }
 
-func (cam *CremApiMux) scenarioTextSuppliedIsInvalid(job *server.Job, w http.ResponseWriter, r *http.Request) bool {
+func (cam *CremApiMux) scenarioTextSuppliedIsInvalid(job *job.Job, w http.ResponseWriter, r *http.Request) bool {
 	scenarioText := job.HiddenAttributes[scenarioConfigTextKey].(string)
 	scenarioConfig, retrieveError := config.RetrieveCremFromString(scenarioText)
 
@@ -74,31 +75,31 @@ func (cam *CremApiMux) scenarioTextSuppliedIsInvalid(job *server.Job, w http.Res
 	return false
 }
 
-func (cam *CremApiMux) handleScenarioConfigRetrieveError(retrieveError error, job *server.Job, w http.ResponseWriter, r *http.Request) {
+func (cam *CremApiMux) handleScenarioConfigRetrieveError(retrieveError error, jobInError *job.Job, w http.ResponseWriter, r *http.Request) {
 	wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 	cam.Logger().Warn(wrappingError)
-	job.SetStatus(server.JobInvalid)
-	cam.AddToHistory(job)
+	jobInError.SetStatus(job.Invalid)
+	cam.AddToHistory(jobInError)
 	cam.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
-	cam.allowJobQueries(job)
+	cam.allowJobQueries(jobInError)
 }
 
-func (cam *CremApiMux) allowJobQueries(job *server.Job) {
+func (cam *CremApiMux) allowJobQueries(job *job.Job) {
 	cam.AddHandler(BuildApiPath(jobsPath, string(job.Id)), cam.v1GetJob)
 	cam.AddHandler(BuildApiPath(jobsPath, string(job.Id), scenarioPath), cam.v1GetJobScenario)
 }
 
-func (cam *CremApiMux) jobEnqueueFailed(job *server.Job, w http.ResponseWriter, r *http.Request) server.JobEnqueuedStatus {
-	cam.AddToHistory(job)
-	enqueuedStatus := cam.jobs.Enqueue(job)
-	if enqueuedStatus == server.JobEnqueueFailed {
-		enqueueFailedError := errors.New("job queue full")
+func (cam *CremApiMux) jobEnqueueFailed(jobToEnqueue *job.Job, w http.ResponseWriter, r *http.Request) job.EnqueuedStatus {
+	cam.AddToHistory(jobToEnqueue)
+	enqueuedStatus := cam.jobs.Enqueue(jobToEnqueue)
+	if enqueuedStatus == job.EnqueueFailed {
+		enqueueFailedError := errors.New("jobToEnqueue queue full")
 		cam.ServiceUnavailableError(w, r, enqueueFailedError)
 	}
 	return !enqueuedStatus
 }
 
-func (cam *CremApiMux) writeJobAsResponse(newJob *server.Job, w http.ResponseWriter) {
+func (cam *CremApiMux) writeJobAsResponse(newJob *job.Job, w http.ResponseWriter) {
 	restResponse := new(server.RestResponse).
 		Initialise().
 		WithWriter(w).
@@ -108,22 +109,22 @@ func (cam *CremApiMux) writeJobAsResponse(newJob *server.Job, w http.ResponseWri
 	cam.writeResponse(restResponse, "create job")
 }
 
-func (cam *CremApiMux) DoJob(job *server.Job) {
-	scenarioConfig, ok := job.HiddenAttributes[scenarioConfigStructKey].(*config.CREMConfig)
+func (cam *CremApiMux) DoJob(jobToDo *job.Job) {
+	scenarioConfig, ok := jobToDo.HiddenAttributes[scenarioConfigStructKey].(*config.CREMConfig)
 	if !ok {
-		cam.Logger().Error("Unexpected error in retrieving CREMConfig from job hidden attributes")
+		cam.Logger().Error("Unexpected error in retrieving CREMConfig from jobToDo hidden attributes")
 		return
 	}
 
-	cam.Logger().Info("Running Job [" + string(job.Id) + "].")
+	cam.Logger().Info("Running Job [" + string(jobToDo.Id) + "].")
 
 	scenario.RunScenarioFromConfig(scenarioConfig)
 
-	job.SetStatus(server.JobCompleted)
+	jobToDo.SetStatus(job.Completed)
 
-	job.RecordCompletionTime()
+	jobToDo.RecordCompletionTime()
 
-	delete(job.HiddenAttributes, scenarioConfigStructKey)
+	delete(jobToDo.HiddenAttributes, scenarioConfigStructKey)
 }
 
 func requestBodyToString(r *http.Request) string {
@@ -151,7 +152,7 @@ func (cam *CremApiMux) v1GetJob(w http.ResponseWriter, r *http.Request) {
 	cam.writeJobAsResponse(job, w)
 }
 
-func (cam *CremApiMux) deriveJobFromGetJobRequest(r *http.Request) *server.Job {
+func (cam *CremApiMux) deriveJobFromGetJobRequest(r *http.Request) *job.Job {
 	desiredId := getJobIdFromRequestUrl(r)
 	return cam.JobWithId(desiredId)
 }
@@ -179,7 +180,7 @@ func (cam *CremApiMux) v1GetJobScenario(w http.ResponseWriter, r *http.Request) 
 	cam.writeResponse(restResponse, "get job scenario")
 }
 
-func scenarioOf(job *server.Job) interface{} {
+func scenarioOf(job *job.Job) interface{} {
 	return job.HiddenAttributes[scenarioConfigTextKey]
 }
 
@@ -199,7 +200,7 @@ func (cam *CremApiMux) writeResponse(response *server.RestResponse, context stri
 	}
 }
 
-func (cam *CremApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *server.Job {
+func (cam *CremApiMux) deriveJobFromGetJobScenarioRequest(r *http.Request) *job.Job {
 	desiredId := getJobIdFromScenarioRequestUrl(r)
 	return cam.JobWithId(desiredId)
 }
@@ -225,12 +226,12 @@ func (cam *CremApiMux) v1DeleteJobs(w http.ResponseWriter, r *http.Request) {
 	cam.writeResponse(restResponse, "delete jobs")
 }
 
-func (cam *CremApiMux) deleteProcessedJobs() []*server.Job {
-	processedJobs := make([]*server.Job, 0)
-	unprocessedJobs := make([]*server.Job, 0)
+func (cam *CremApiMux) deleteProcessedJobs() []*job.Job {
+	processedJobs := make([]*job.Job, 0)
+	unprocessedJobs := make([]*job.Job, 0)
 
 	for _, job := range cam.JobHistory {
-		if isProcessed(job) {
+		if job.IsProcessed() {
 			processedJobs = append(processedJobs, job)
 		} else {
 			unprocessedJobs = append(unprocessedJobs, job)
@@ -239,11 +240,4 @@ func (cam *CremApiMux) deleteProcessedJobs() []*server.Job {
 
 	cam.JobHistory = unprocessedJobs
 	return processedJobs
-}
-
-func isProcessed(job *server.Job) bool {
-	if job.Status() == server.JobCompleted || job.Status() == server.JobInvalid {
-		return true
-	}
-	return false
 }

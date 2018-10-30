@@ -23,7 +23,7 @@ type RestResponse struct {
 
 func (rrc *RestResponse) Initialise() *RestResponse {
 	rrc.errors = new(errors.CompositeError)
-	rrc.WithContentType(DefaultResposneContentType)
+	rrc.WithContentType(DefaultResponseContentType)
 	return rrc
 }
 
