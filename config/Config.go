@@ -255,6 +255,7 @@ type SolutionExplorerConfig struct {
 	Type       string
 	Name       string
 	Penalty    float64
+	Parameters map[string]interface{}
 	InputFiles map[string]string
 }
 

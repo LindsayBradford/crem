@@ -3,9 +3,10 @@ ScenarioName = "Minimal Excel Annealer Test Config"
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-Penalty = 100.0 # 100.0
 [SolutionExplorers.InputFiles]
 ExcelDataSource = "testdata/SimpleExcelAnnealerTestFixture.xls"
+[SolutionExplorers.Parameters]
+Penalty = 100.5 # 100.0
 
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"

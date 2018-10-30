@@ -11,6 +11,8 @@ import (
 	"github.com/LindsayBradford/crem/logging/handlers"
 )
 
+const defaultPenalty = 1
+
 func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (annealing.CallableScenarioRunner, handlers.LogHandler) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
@@ -50,8 +52,12 @@ func buildSimpleExcelExplorerRegistration(wrapper func(f func())) config.Explore
 	return config.ExplorerRegistration{
 		ExplorerType: "SimpleExcelSolutionExplorer",
 		ConfigFunction: func(config config.SolutionExplorerConfig) solution.Explorer {
+			penalty, ok := config.Parameters["Penalty"].(float64)
+			if !ok {
+				penalty = defaultPenalty
+			}
 			return new(SimpleExcelSolutionExplorer).
-				WithPenalty(config.Penalty).
+				WithPenalty(penalty).
 				WithName(config.Name).
 				WithInputFile(config.InputFiles["ExcelDataSource"]).
 				WithOleFunctionWrapper(wrapper)
