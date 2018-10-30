@@ -17,7 +17,7 @@ type Mux interface {
 	Shutdown()
 
 	SetLogger(handler handlers.LogHandler)
-	AddHandler(address string, handler http.HandlerFunc)
+	AddHandler(address string, handler HandlerFunc)
 
 	SetCacheMaxAge(maxAge uint64)
 	CacheMaxAge() uint64
@@ -25,7 +25,7 @@ type Mux interface {
 
 const DefaultCacheMaxAgeInSeconds = 10
 
-type BaseMux struct {
+type MuxImpl struct {
 	http.ServeMux
 	muxType              string
 	server               http.Server
@@ -35,96 +35,96 @@ type BaseMux struct {
 	logger     handlers.LogHandler
 }
 
-type HandlerFunctionMap map[string]http.HandlerFunc
+type HandlerFunctionMap map[string]HandlerFunc
 
-func (bm *BaseMux) Initialise() *BaseMux {
-	bm.HandlerMap = make(HandlerFunctionMap)
-	bm.SetCacheMaxAge(DefaultCacheMaxAgeInSeconds)
-	return bm
+func (mi *MuxImpl) Initialise() *MuxImpl {
+	mi.HandlerMap = make(HandlerFunctionMap)
+	mi.SetCacheMaxAge(DefaultCacheMaxAgeInSeconds)
+	return mi
 }
 
-func (bm *BaseMux) WithType(muxType string) *BaseMux {
-	bm.muxType = muxType
-	return bm
+func (mi *MuxImpl) WithType(muxType string) *MuxImpl {
+	mi.muxType = muxType
+	return mi
 }
 
-func (bm *BaseMux) WithCacheMaxAge(maxAgeInSeconds uint64) *BaseMux {
+func (mi *MuxImpl) WithCacheMaxAge(maxAgeInSeconds uint64) *MuxImpl {
 	if maxAgeInSeconds != 0 {
-		bm.cacheMaxAgeInSeconds = maxAgeInSeconds
+		mi.cacheMaxAgeInSeconds = maxAgeInSeconds
 	}
-	return bm
+	return mi
 }
 
-func (bm *BaseMux) SetLogger(logger handlers.LogHandler) {
-	bm.logger = logger
+func (mi *MuxImpl) SetLogger(logger handlers.LogHandler) {
+	mi.logger = logger
 }
 
-func (bm *BaseMux) SetCacheMaxAge(maxAgeInSeconds uint64) {
-	bm.cacheMaxAgeInSeconds = maxAgeInSeconds
+func (mi *MuxImpl) SetCacheMaxAge(maxAgeInSeconds uint64) {
+	mi.cacheMaxAgeInSeconds = maxAgeInSeconds
 }
 
-func (bm *BaseMux) CacheMaxAge() uint64 {
-	return bm.cacheMaxAgeInSeconds
+func (mi *MuxImpl) CacheMaxAge() uint64 {
+	return mi.cacheMaxAgeInSeconds
 }
 
-func (bm *BaseMux) Logger() handlers.LogHandler {
-	return bm.logger
+func (mi *MuxImpl) Logger() handlers.LogHandler {
+	return mi.logger
 }
 
-func (bm *BaseMux) Server() *http.Server {
-	return &bm.server
+func (mi *MuxImpl) Server() *http.Server {
+	return &mi.server
 }
 
-func (bm *BaseMux) AddHandler(address string, handler http.HandlerFunc) {
-	bm.HandlerMap[address] = handler
+func (mi *MuxImpl) AddHandler(address string, handler HandlerFunc) {
+	mi.HandlerMap[address] = handler
 }
 
-func (bm *BaseMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	bm.logRequestReceipt(r)
-	if handlerFunction, handlerFound := bm.handlerFor(r); handlerFound {
+func (mi *MuxImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	mi.logRequestReceipt(r)
+	if handlerFunction, handlerFound := mi.handlerFor(r); handlerFound {
 		handlerFunction(w, r)
 	} else {
-		bm.NotFoundError(w, r)
+		mi.NotFoundError(w, r)
 	}
 }
 
-func (bm *BaseMux) logRequestReceipt(r *http.Request) {
-	bm.logger.Info(
-		"[" + bm.muxType + "] Received request Method [" + r.Method +
+func (mi *MuxImpl) logRequestReceipt(r *http.Request) {
+	mi.logger.Info(
+		"[" + mi.muxType + "] Received request Method [" + r.Method +
 			"] for request [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
 }
 
-func (bm *BaseMux) handlerFor(r *http.Request) (handlerFunction http.HandlerFunc, found bool) {
-	handlerFunction, found = bm.HandlerMap[r.URL.String()]
+func (mi *MuxImpl) handlerFor(r *http.Request) (handlerFunction HandlerFunc, found bool) {
+	handlerFunction, found = mi.HandlerMap[r.URL.String()]
 	return
 }
 
-func (bm *BaseMux) NotFoundError(w http.ResponseWriter, r *http.Request) {
-	bm.RespondWithError(http.StatusNotFound, "HTTP Resource not found", w, r)
+func (mi *MuxImpl) NotFoundError(w http.ResponseWriter, r *http.Request) {
+	mi.RespondWithError(http.StatusNotFound, "HTTP Resource not found", w, r)
 }
 
-func (bm *BaseMux) MethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
-	bm.RespondWithError(http.StatusMethodNotAllowed, "HTTP Method not allowed", w, r)
+func (mi *MuxImpl) MethodNotAllowedError(w http.ResponseWriter, r *http.Request) {
+	mi.RespondWithError(http.StatusMethodNotAllowed, "HTTP Method not allowed", w, r)
 }
 
-func (bm *BaseMux) InternalServerError(w http.ResponseWriter, r *http.Request, errorDetail error) {
+func (mi *MuxImpl) InternalServerError(w http.ResponseWriter, r *http.Request, errorDetail error) {
 	finalErrorString := "Internal Server Error"
 	if errorDetail != nil {
 		finalErrorString = fmt.Sprintf("%s: %v", finalErrorString, errorDetail)
 	}
-	bm.RespondWithError(http.StatusInternalServerError, finalErrorString, w, r)
+	mi.RespondWithError(http.StatusInternalServerError, finalErrorString, w, r)
 }
 
-func (bm *BaseMux) ServiceUnavailableError(w http.ResponseWriter, r *http.Request, errorDetail error) {
+func (mi *MuxImpl) ServiceUnavailableError(w http.ResponseWriter, r *http.Request, errorDetail error) {
 	finalErrorString := "Service Unavailable Error"
 	if errorDetail != nil {
 		finalErrorString = fmt.Sprintf("%s: %v", finalErrorString, errorDetail)
 	}
-	bm.RespondWithError(http.StatusServiceUnavailable, finalErrorString, w, r)
+	mi.RespondWithError(http.StatusServiceUnavailable, finalErrorString, w, r)
 }
 
-func (bm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
-	bm.logResponseError(r, responseMsg)
+func (mi *MuxImpl) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
+	mi.logResponseError(r, responseMsg)
 
 	restResponse := new(Response).
 		Initialise().
@@ -138,27 +138,27 @@ func (bm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http
 
 	if writeError != nil {
 		wrappingError := errors.Wrap(writeError, "responding with error")
-		bm.logger.Error(wrappingError)
+		mi.logger.Error(wrappingError)
 	}
 }
 
-func (bm *BaseMux) logResponseError(r *http.Request, responseMsg string) {
-	bm.logger.Warn(
+func (mi *MuxImpl) logResponseError(r *http.Request, responseMsg string) {
+	mi.logger.Warn(
 		"Request Method [" + r.Method + "] for request [" + r.URL.Path + "] from [" + r.RemoteAddr +
 			"]. Responding with [" + responseMsg + "] error.")
 }
 
-func (bm *BaseMux) Start(address string) {
-	bm.logger.Debug("Starting [" + bm.muxType + "] server on address [" + address + "]")
+func (mi *MuxImpl) Start(address string) {
+	mi.logger.Debug("Starting [" + mi.muxType + "] server on address [" + address + "]")
 
-	bm.server = http.Server{Addr: address, Handler: bm}
+	mi.server = http.Server{Addr: address, Handler: mi}
 
-	if err := bm.server.ListenAndServe(); err != http.ErrServerClosed {
+	if err := mi.server.ListenAndServe(); err != http.ErrServerClosed {
 		wrappedErr := errors.Wrap(err, "ListenAndServe")
-		bm.logger.Error(wrappedErr)
+		mi.logger.Error(wrappedErr)
 	}
 }
 
-func (bm *BaseMux) Shutdown() {
-	bm.server.Shutdown(context.Background())
+func (mi *MuxImpl) Shutdown() {
+	mi.server.Shutdown(context.Background())
 }

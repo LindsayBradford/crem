@@ -1,7 +1,5 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 package rest
 
 import (
@@ -20,6 +18,8 @@ const TomlMimeType = "application/toml"
 const JsonMimeType = "application/json"
 
 const DefaultResponseContentType = JsonMimeType
+
+type HandlerFunc http.HandlerFunc
 
 func FormattedTimestamp() string {
 	return fmt.Sprintf("%v", time.Now().Format(time.RFC3339Nano))

@@ -22,14 +22,14 @@ type ServiceStatus struct {
 const muxType = "ADMIN"
 
 type Mux struct {
-	rest.BaseMux
+	rest.MuxImpl
 	Status ServiceStatus
 
 	doneChannel chan bool
 }
 
 func (m *Mux) Initialise() *Mux {
-	m.BaseMux.Initialise().WithType(muxType)
+	m.MuxImpl.Initialise().WithType(muxType)
 
 	m.doneChannel = make(chan bool)
 	m.HandlerMap["/status"] = m.StatusHandler
@@ -39,7 +39,7 @@ func (m *Mux) Initialise() *Mux {
 }
 
 func (m *Mux) WithType(muxType string) *Mux {
-	m.BaseMux.WithType(muxType)
+	m.MuxImpl.WithType(muxType)
 	return m
 }
 
@@ -51,7 +51,7 @@ func (m *Mux) setStatus(statusMessage string) {
 
 func (m *Mux) Start(address string) {
 	m.setStatus("RUNNING")
-	m.BaseMux.Start(address)
+	m.MuxImpl.Start(address)
 }
 
 func (m *Mux) WaitForShutdownSignal() {

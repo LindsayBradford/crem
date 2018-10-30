@@ -6,7 +6,6 @@ package server
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/logging/handlers"
@@ -81,6 +80,6 @@ func (s *RestServer) shutdown() {
 	s.Logger.Info("Shutdown complete")
 }
 
-func (s *RestServer) AddApiMapping(address string, handlerFunction http.HandlerFunc) {
+func (s *RestServer) AddApiMapping(address string, handlerFunction rest.HandlerFunc) {
 	s.apiMux.AddHandler(address, handlerFunction)
 }

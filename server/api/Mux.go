@@ -12,10 +12,10 @@ const BasePath = "/api"
 const V1Path = "/v1"
 
 type Mux struct {
-	rest.BaseMux
+	rest.MuxImpl
 }
 
 func (m *Mux) Initialise() *Mux {
-	m.BaseMux.Initialise().WithType(muxType)
+	m.MuxImpl.Initialise().WithType(muxType)
 	return m
 }
