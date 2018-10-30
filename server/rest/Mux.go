@@ -1,17 +1,18 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package server
+package rest
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/LindsayBradford/crem/logging/handlers"
+
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
 
-type RestMux interface {
+type Mux interface {
 	Start(portAddress string)
 	Shutdown()
 
@@ -30,14 +31,14 @@ type BaseMux struct {
 	server               http.Server
 	cacheMaxAgeInSeconds uint64
 
-	handlerMap HandlerFunctionMap
+	HandlerMap HandlerFunctionMap
 	logger     handlers.LogHandler
 }
 
 type HandlerFunctionMap map[string]http.HandlerFunc
 
 func (bm *BaseMux) Initialise() *BaseMux {
-	bm.handlerMap = make(HandlerFunctionMap)
+	bm.HandlerMap = make(HandlerFunctionMap)
 	bm.SetCacheMaxAge(DefaultCacheMaxAgeInSeconds)
 	return bm
 }
@@ -70,8 +71,12 @@ func (bm *BaseMux) Logger() handlers.LogHandler {
 	return bm.logger
 }
 
+func (bm *BaseMux) Server() *http.Server {
+	return &bm.server
+}
+
 func (bm *BaseMux) AddHandler(address string, handler http.HandlerFunc) {
-	bm.handlerMap[address] = handler
+	bm.HandlerMap[address] = handler
 }
 
 func (bm *BaseMux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +95,7 @@ func (bm *BaseMux) logRequestReceipt(r *http.Request) {
 }
 
 func (bm *BaseMux) handlerFor(r *http.Request) (handlerFunction http.HandlerFunc, found bool) {
-	handlerFunction, found = bm.handlerMap[r.URL.String()]
+	handlerFunction, found = bm.HandlerMap[r.URL.String()]
 	return
 }
 
@@ -121,7 +126,7 @@ func (bm *BaseMux) ServiceUnavailableError(w http.ResponseWriter, r *http.Reques
 func (bm *BaseMux) RespondWithError(responseCode int, responseMsg string, w http.ResponseWriter, r *http.Request) {
 	bm.logResponseError(r, responseMsg)
 
-	restResponse := new(RestResponse).
+	restResponse := new(Response).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(responseCode).

@@ -10,16 +10,13 @@ import (
 
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/server/admin"
+	"github.com/LindsayBradford/crem/server/rest"
 )
 
-type ErrorResponse struct {
-	ErrorMessage string
-	Time         string
-}
-
 type RestServer struct {
-	adminMux *AdminMux
-	apiMux   RestMux
+	adminMux *admin.Mux
+	apiMux   rest.Mux
 
 	configuration *config.HttpServerConfig
 	Logger        handlers.LogHandler
@@ -31,14 +28,14 @@ func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestSer
 }
 
 func (s *RestServer) Initialise() *RestServer {
-	s.adminMux = new(AdminMux).Initialise()
+	s.adminMux = new(admin.Mux).Initialise()
 	return s
 }
 
-func (s *RestServer) WithApiMux(apiMux RestMux) *RestServer {
-	s.adminMux = new(AdminMux).Initialise()
+func (s *RestServer) WithApiMux(apiMux rest.Mux) *RestServer {
+	s.adminMux = new(admin.Mux).Initialise()
 	s.apiMux = apiMux
-	s.apiMux.AddHandler("/", s.adminMux.statusHandler)
+	s.apiMux.AddHandler("/", s.adminMux.StatusHandler)
 	return s
 }
 
@@ -49,7 +46,7 @@ func (s *RestServer) WithLogger(logger handlers.LogHandler) *RestServer {
 	return s
 }
 
-func (s *RestServer) WithStatus(status ServiceStatus) *RestServer {
+func (s *RestServer) WithStatus(status admin.ServiceStatus) *RestServer {
 	s.adminMux.Status = status
 	return s
 }
@@ -69,7 +66,7 @@ func (s *RestServer) Start() {
 	s.shutdown()
 }
 
-func startMuxOnPort(mux RestMux, portNumber uint64) {
+func startMuxOnPort(mux rest.Mux, portNumber uint64) {
 	portAddress := toPortAddress(portNumber)
 	mux.Start(portAddress)
 }

@@ -10,7 +10,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/api"
 	"github.com/LindsayBradford/crem/logging/handlers"
-	"github.com/LindsayBradford/crem/server"
+	"github.com/LindsayBradford/crem/server/rest"
+	"github.com/LindsayBradford/crem/server/test"
 	. "github.com/onsi/gomega"
 )
 
@@ -79,7 +80,7 @@ func verifyResponseToValidJobsGetRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := server.HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:    "GET",
 		TargetUrl: "http://dummyUrl/api/v1/jobs",
 		Handler:   muxUnderTest.V1HandleJobs,
@@ -108,10 +109,10 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := server.HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:      "POST",
 		TargetUrl:   "http://dummyUrl/api/v1/jobs",
-		ContentType: server.TomlMimeType,
+		ContentType: rest.TomlMimeType,
 		RequestBody: "invalidScenarioText: isInvalid",
 		Handler:     muxUnderTest.V1HandleJobs,
 	}
@@ -123,13 +124,13 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
 
-func buildMuxUnderTest() *api.CremApiMux {
-	muxUnderTest := new(api.CremApiMux).Initialise()
+func buildMuxUnderTest() *api.Mux {
+	muxUnderTest := new(api.Mux).Initialise()
 	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
 	return muxUnderTest
 }
 
-func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer server.JsonResponseContainer) {
+func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer test.JsonResponseContainer) {
 	responseTimeString, ok := responseContainer.JsonMap["Time"].(string)
 	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
 

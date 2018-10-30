@@ -3,8 +3,8 @@
 package job
 
 import (
-	"github.com/LindsayBradford/crem/server"
 	"github.com/LindsayBradford/crem/server/job/uuid"
+	"github.com/LindsayBradford/crem/server/rest"
 )
 
 const creationTimeKey = "CreationTime"
@@ -78,5 +78,5 @@ func (j *Job) RecordCompletionTime() {
 }
 
 func (j *Job) RecordTimeForAttribute(key AttributeKey) {
-	j.Attributes[key] = server.FormattedTimestamp()
+	j.Attributes[key] = rest.FormattedTimestamp()
 }

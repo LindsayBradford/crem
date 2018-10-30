@@ -8,6 +8,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
 	"github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/LindsayBradford/crem/server"
+	"github.com/LindsayBradford/crem/server/admin"
+	"github.com/LindsayBradford/crem/server/rest"
 	"github.com/pkg/errors"
 )
 
@@ -16,21 +18,21 @@ const defaultLoggerIndex = 0
 var (
 	ServerLogger handlers.LogHandler = handlers.DefaultNullLogHandler
 
-	cremServerStatus = server.ServiceStatus{
+	cremServerStatus = admin.ServiceStatus{
 		ServiceName: config.ShortApplicationName,
 		Version:     config.Version,
 		Status:      "DEAD"}
 )
 
 func RunServerFromConfigFile(configFile string) {
-	configuredServer := buildServerFromFrom(configFile)
+	configuredServer := buildServerFromConfigFile(configFile)
 	start(configuredServer)
 }
 
-func buildServerFromFrom(configFile string) *server.RestServer {
+func buildServerFromConfigFile(configFile string) *server.RestServer {
 	serverConfig := retrieveServerConfiguration(configFile)
 	buildLoggerFrom(serverConfig)
-	return buildCremServerFrom(serverConfig)
+	return buildServerFrom(serverConfig)
 }
 
 func retrieveServerConfiguration(configFile string) *config.HttpServerConfig {
@@ -54,17 +56,17 @@ func establishServerLogger(configuration *config.HttpServerConfig) {
 	ServerLogger.Info("Configuring with [" + configuration.FilePath + "]")
 }
 
-func buildCremServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
+func buildServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
 	return new(CremServer).
 		Initialise().
 		WithConfig(serverConfig).
-		WithApiMux(buildCremApuMux(serverConfig)).
+		WithApiMux(buildApiMux(serverConfig)).
 		WithLogger(ServerLogger).
 		WithStatus(cremServerStatus)
 }
 
 func start(cremServer *server.RestServer) {
-	ServerLogger.Info(server.NameAndVersionString() + " -- Starting")
+	ServerLogger.Info(rest.NameAndVersionString() + " -- Starting")
 	cremServer.Start()
 }
 
@@ -87,13 +89,13 @@ func (cs *CremServer) WithLogger(logger handlers.LogHandler) *CremServer {
 	return cs
 }
 
-func (cs *CremServer) WithStatus(status server.ServiceStatus) *CremServer {
+func (cs *CremServer) WithStatus(status admin.ServiceStatus) *CremServer {
 	cs.RestServer.WithStatus(status)
 	return cs
 }
 
-func buildCremApuMux(serverConfig *config.HttpServerConfig) *api.CremApiMux {
-	return new(api.CremApiMux).
+func buildApiMux(serverConfig *config.HttpServerConfig) *api.Mux {
+	return new(api.Mux).
 		Initialise().
 		WithJobQueueLength(serverConfig.JobQueueLength)
 }

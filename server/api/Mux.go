@@ -2,7 +2,9 @@
 
 package api
 
-import "github.com/LindsayBradford/crem/server"
+import (
+	"github.com/LindsayBradford/crem/server/rest"
+)
 
 const muxType = "API"
 
@@ -10,7 +12,7 @@ const BasePath = "/api"
 const V1Path = "/v1"
 
 type Mux struct {
-	server.BaseMux
+	rest.BaseMux
 }
 
 func (m *Mux) Initialise() *Mux {

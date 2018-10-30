@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package server
+package test
 
 import (
 	"encoding/json"
@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
+
+	"github.com/LindsayBradford/crem/server/rest"
 )
 
 type HttpTestRequestContext struct {
@@ -45,7 +47,7 @@ func (context *HttpTestRequestContext) newRequest() *http.Request {
 	request := httptest.NewRequest(context.Method, context.TargetUrl, bodyReader)
 
 	if context.ContentType != "" {
-		request.Header.Add(ContentTypeHeaderKey, context.ContentType)
+		request.Header.Add(rest.ContentTypeHeaderKey, context.ContentType)
 	}
 
 	return request

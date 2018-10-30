@@ -1,6 +1,8 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package server
+// Copyright (c) 2018 Australian Rivers Institute.
+
+package admin
 
 import (
 	"net/http"
@@ -8,6 +10,7 @@ import (
 	"time"
 
 	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/server/test"
 	. "github.com/onsi/gomega"
 )
 
@@ -48,10 +51,10 @@ func verifyResponseToValidStatusRequest(context testContext) {
 	bogusTime := "some bogus time"
 	muxUnderTest.Status = ServiceStatus{ServiceName: expectedName, Version: expectedVersion, Status: expectedMessage, Time: bogusTime}
 
-	requestContext := HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:    "GET",
 		TargetUrl: "http://dummyUrl/status",
-		Handler:   muxUnderTest.statusHandler,
+		Handler:   muxUnderTest.StatusHandler,
 	}
 
 	responseContainer := requestContext.BuildJsonResponse()
@@ -69,10 +72,10 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:    "POST",
 		TargetUrl: "http://dummyUrl/status",
-		Handler:   muxUnderTest.statusHandler,
+		Handler:   muxUnderTest.StatusHandler,
 	}
 
 	responseContainer := requestContext.BuildJsonResponse()
@@ -85,13 +88,13 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
 
-func buildMuxUnderTest() *AdminMux {
-	muxUnderTest := new(AdminMux).Initialise()
+func buildMuxUnderTest() *Mux {
+	muxUnderTest := new(Mux).Initialise()
 	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
 	return muxUnderTest
 }
 
-func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer JsonResponseContainer) {
+func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer test.JsonResponseContainer) {
 	responseTimeString, ok := responseContainer.JsonMap["Time"].(string)
 	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
 
@@ -116,13 +119,13 @@ func verifyResponseToValidShutdownRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:    "POST",
 		TargetUrl: "http://dummyUrl/shutdown",
 		Handler:   muxUnderTest.shutdownHandler,
 	}
 
-	var responseContainer JsonResponseContainer
+	var responseContainer test.JsonResponseContainer
 	go func() {
 		responseContainer = requestContext.BuildJsonResponse()
 	}()
@@ -154,7 +157,7 @@ func verifyResponseToInvalidShutdownRequest(context testContext) {
 
 	muxUnderTest := buildMuxUnderTest()
 
-	requestContext := HttpTestRequestContext{
+	requestContext := test.HttpTestRequestContext{
 		Method:    "GET",
 		TargetUrl: "http://dummyUrl/shutdown",
 		Handler:   muxUnderTest.shutdownHandler,

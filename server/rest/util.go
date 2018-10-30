@@ -1,6 +1,8 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package server
+// Copyright (c) 2018 Australian Rivers Institute.
+
+package rest
 
 import (
 	"fmt"
