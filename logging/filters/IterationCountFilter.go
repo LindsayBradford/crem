@@ -2,7 +2,7 @@
 
 package filters
 
-import . "github.com/LindsayBradford/crem/annealing/shared"
+import . "github.com/LindsayBradford/crem/annealing"
 
 // IterationCountLoggingFilter modulates FinishedIteration Annealing Event instances at a rate of 1 every modulo
 // events. StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
@@ -16,10 +16,10 @@ func (m *IterationCountLoggingFilter) WithModulo(modulo uint64) *IterationCountL
 	return m
 }
 
-// ShouldFilter modulates only FinishedIteration AnnealingEvent instances, and fully filters out all StartedIteration
+// ShouldFilter modulates only FinishedIteration Event instances, and fully filters out all StartedIteration
 // events. Every modulo FinishedIteration events received, one is allowed through to the LogHandler.
 // The very first and very last FinishedIteration events are exceptions, and are also not filtered.
-func (m *IterationCountLoggingFilter) ShouldFilter(event AnnealingEvent) bool {
+func (m *IterationCountLoggingFilter) ShouldFilter(event Event) bool {
 	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
 		return false
 	}

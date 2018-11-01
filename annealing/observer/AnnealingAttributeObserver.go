@@ -1,18 +1,18 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package logging
+package observer
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing"
 	. "github.com/LindsayBradford/crem/logging/filters"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 	. "github.com/LindsayBradford/crem/logging/shared"
 )
 
 // AnnealingAttributeObserver produces a relevant set of LogAttributes to match any AnnealingEvents received
-// and passes those events to its LogHandler for whatever logging is appropriate.
+// and passes those events to its LogHandler for whatever observer is appropriate.
 type AnnealingAttributeObserver struct {
-	AnnealingLogger
+	AnnealingObserver
 }
 
 func (aao *AnnealingAttributeObserver) WithLogHandler(handler LogHandler) *AnnealingAttributeObserver {
@@ -25,9 +25,9 @@ func (aao *AnnealingAttributeObserver) WithFilter(Filter LoggingFilter) *Anneali
 	return aao
 }
 
-// ObserveAnnealingEvent captures and converts AnnealingEvent instances into a LogAttributes instance that
+// ObserveAnnealingEvent captures and converts Event instances into a LogAttributes instance that
 // captures key attributes associated with the event, and passes them to the LogHandler for processing.
-func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event AnnealingEvent) {
+func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event Event) {
 	if aao.logHandler.BeingDiscarded(AnnealerLogLevel) || aao.filter.ShouldFilter(event) {
 		return
 	}

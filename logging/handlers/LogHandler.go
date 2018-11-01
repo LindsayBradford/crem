@@ -9,8 +9,8 @@ import (
 	. "github.com/LindsayBradford/crem/logging/shared"
 )
 
-// LogHandler defines an interface for the handling of logging. It sets out methods for logging at the various supported
-// LogLevels of either a free-form string (traditional), or LogAttributes (for machine-friendly logging). It delegates
+// LogHandler defines an interface for the handling of observer. It sets out methods for observer at the various supported
+// LogLevels of either a free-form string (traditional), or LogAttributes (for machine-friendly observer). It delegates
 // formatting to a LogFormatter, and resolution of log destination streams to LogLevelDestinations.
 type LogHandler interface {
 	Name() string

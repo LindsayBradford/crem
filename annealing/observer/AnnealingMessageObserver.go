@@ -1,18 +1,18 @@
 // (c) 2018 Australian Rivers Institute.
 
-package logging
+package observer
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing"
 	. "github.com/LindsayBradford/crem/logging/filters"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 	"github.com/LindsayBradford/crem/strings"
 )
 
 // AnnealingMessageObserver produces a stream of human-friendly, free-form text log entries from any observed
-// AnnealingEvent instances received.
+// Event instances received.
 type AnnealingMessageObserver struct {
-	AnnealingLogger
+	AnnealingObserver
 }
 
 func (amo *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *AnnealingMessageObserver {
@@ -25,9 +25,9 @@ func (amo *AnnealingMessageObserver) WithFilter(modulator LoggingFilter) *Anneal
 	return amo
 }
 
-// ObserveAnnealingEvent captures and converts AnnealingEvent instances into free-form text strings that it
+// ObserveAnnealingEvent captures and converts Event instances into free-form text strings that it
 // then passes onto its relevant LogHandler as an Info call.
-func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event AnnealingEvent) {
+func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event Event) {
 	if amo.logHandler.BeingDiscarded(AnnealerLogLevel) || amo.filter.ShouldFilter(event) {
 		return
 	}

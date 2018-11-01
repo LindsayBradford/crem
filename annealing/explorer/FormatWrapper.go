@@ -1,12 +1,12 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package solution
+package explorer
 
 import (
 	"fmt"
 )
 
-type ExplorerFormatWrapper struct {
+type FormatWrapper struct {
 	StateToFormat AnnealableExplorer
 	MethodFormats map[string]string
 }
@@ -15,7 +15,7 @@ const defaultFloat64Format = "%f"
 const defaultBoolFormat = "%y"
 const defaultPercentFormat = "%f"
 
-func (wrapper *ExplorerFormatWrapper) Initialise() *ExplorerFormatWrapper {
+func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 	wrapper.MethodFormats = map[string]string{
 		"ObjectiveValue":         defaultFloat64Format,
 		"ChangeInObjectiveValue": defaultFloat64Format,
@@ -26,36 +26,36 @@ func (wrapper *ExplorerFormatWrapper) Initialise() *ExplorerFormatWrapper {
 	return wrapper
 }
 
-func (wrapper *ExplorerFormatWrapper) Wrapping(explorer Explorer) *ExplorerFormatWrapper {
+func (wrapper *FormatWrapper) Wrapping(explorer Explorer) *FormatWrapper {
 	wrapper.Wrap(explorer)
 	return wrapper
 }
 
-func (wrapper *ExplorerFormatWrapper) Wrap(explorer Explorer) {
+func (wrapper *FormatWrapper) Wrap(explorer Explorer) {
 	wrapper.StateToFormat = explorer
 }
 
-func (wrapper *ExplorerFormatWrapper) ObjectiveValue() string {
+func (wrapper *FormatWrapper) ObjectiveValue() string {
 	return wrapper.applyFormatting("ObjectiveValue", wrapper.StateToFormat.ObjectiveValue())
 }
 
-func (wrapper *ExplorerFormatWrapper) ChangeInObjectiveValue() string {
+func (wrapper *FormatWrapper) ChangeInObjectiveValue() string {
 	return wrapper.applyFormatting("ChangeInObjectiveValue", wrapper.StateToFormat.ChangeInObjectiveValue())
 }
 
-func (wrapper *ExplorerFormatWrapper) ChangeIsDesirable() string {
+func (wrapper *FormatWrapper) ChangeIsDesirable() string {
 	return wrapper.applyFormatting("ChangeIsDesirable", wrapper.StateToFormat.ChangeIsDesirable())
 }
 
-func (wrapper *ExplorerFormatWrapper) ChangeAccepted() string {
+func (wrapper *FormatWrapper) ChangeAccepted() string {
 	return wrapper.applyFormatting("ChangeAccepted", wrapper.StateToFormat.ChangeAccepted())
 }
 
-func (wrapper *ExplorerFormatWrapper) AcceptanceProbability() string {
+func (wrapper *FormatWrapper) AcceptanceProbability() string {
 	return wrapper.applyFormatting("AcceptanceProbability", wrapper.StateToFormat.AcceptanceProbability())
 }
 
-func (wrapper *ExplorerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+func (wrapper *FormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
 	formatToApply := wrapper.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

@@ -1,12 +1,16 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package annealing
+package annealers
 
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/annealing/shared"
-	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/logging/handlers"
 	. "github.com/onsi/gomega"
 )
@@ -14,7 +18,7 @@ import "testing"
 
 type dummyObserver struct{}
 
-func (*dummyObserver) ObserveAnnealingEvent(event shared.AnnealingEvent) {}
+func (*dummyObserver) ObserveAnnealingEvent(event annealing.Event) {}
 
 func TestBuild_OverridingDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -23,10 +27,10 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	const expectedCoolingFactor float64 = 0.5
 	const expectedIterations uint64 = 5000
 	expectedLogHandler := new(handlers.BareBonesLogHandler)
-	expectedSolutionExplorer := new(solution.DumbExplorer)
-	expectedObservers := []shared.AnnealingObserver{new(dummyObserver)}
+	expectedSolutionExplorer := new(explorer.DumbExplorer)
+	expectedObservers := []annealing.Observer{new(dummyObserver)}
 
-	builder := new(AnnealerBuilder)
+	builder := new(Builder)
 
 	annealer, _ := builder.
 		SimpleAnnealer().
@@ -73,11 +77,11 @@ func TestBuild_BadInputs(t *testing.T) {
 	const badTemperature float64 = -1
 	const badCoolingFactor float64 = 1.0000001
 	badLogHandler := handlers.LogHandler(nil)
-	badExplorer := solution.Explorer(nil)
+	badExplorer := explorer.Explorer(nil)
 
 	expectedErrors := 5
 
-	builder := new(AnnealerBuilder)
+	builder := new(Builder)
 
 	annealer, err := builder.
 		SimpleAnnealer().
@@ -102,11 +106,11 @@ func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {
 
 	expectedObjectiveValue := float64(10)
 
-	expectedSolutionExplorer := new(solution.DumbExplorer)
+	expectedSolutionExplorer := new(explorer.DumbExplorer)
 	expectedSolutionExplorer.SetObjectiveValue(expectedObjectiveValue)
 	expectedSolutionExplorer.SetScenarioId("Simple Annealer")
 
-	builder := new(AnnealerBuilder)
+	builder := new(Builder)
 
 	annealer, err := builder.
 		SimpleAnnealer().

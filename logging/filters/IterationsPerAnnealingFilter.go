@@ -4,7 +4,7 @@
 
 package filters
 
-import . "github.com/LindsayBradford/crem/annealing/shared"
+import . "github.com/LindsayBradford/crem/annealing"
 
 // PercentileOfIterationsPerAnnealingFilter filters FinishedIteration Annealing Event instances at a rate of 1 every
 // percentile number of iterations received. . StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
@@ -44,10 +44,10 @@ func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 	}
 }
 
-// ShouldFilter filters only FinishedIteration AnnealingEvent instances, and fully filters out all StartedIteration
+// ShouldFilter filters only FinishedIteration Event instances, and fully filters out all StartedIteration
 // events. Every FinishedIteration events received on the specified percentile boundary, one event is allowed through
 // to the LogHandler.
-func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event AnnealingEvent) bool {
+func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event Event) bool {
 	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
 		return false
 	}

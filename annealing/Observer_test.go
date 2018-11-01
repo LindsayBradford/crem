@@ -1,6 +1,6 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package shared
+package annealing
 
 import (
 	"testing"

@@ -1,11 +1,16 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package shared
+package annealers
 
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/logging/handlers"
 	. "github.com/onsi/gomega"
 )
@@ -37,7 +42,7 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with NullLogHandler")
 
 	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(solution.NULL_EXPLORER),
+		annealer.SolutionExplorer()).To(Equal(explorer.NULL_EXPLORER),
 		"Annealer should have built with Null Solution Explorer")
 
 	g.Expect(
@@ -73,7 +78,7 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	explorerErr := annealer.SetSolutionExplorer(nil)
 
 	g.Expect(explorerErr).To(Not(BeNil()))
-	g.Expect(annealer.SolutionExplorer()).To(Equal(solution.NULL_EXPLORER),
+	g.Expect(annealer.SolutionExplorer()).To(Equal(explorer.NULL_EXPLORER),
 		"Annealer should have ignored crap Solution Explorer set attempt")
 
 	observersErr := annealer.AddObserver(nil)
@@ -136,7 +141,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[AnnealingEventType]uint64)
+	countingObserver.eventCounts = make(map[annealing.EventType]uint64)
 
 	observerError = annealer.AddObserver(countingObserver)
 
@@ -146,16 +151,16 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	annealer.Anneal()
 
-	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[annealing.StartedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[FinishedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[annealing.FinishedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[annealing.StartedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[annealing.FinishedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
@@ -165,7 +170,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	notifier := new(ConcurrentAnnealingEventNotifier)
+	notifier := new(annealing.ConcurrentAnnealingEventNotifier)
 	annealer.SetEventNotifier(notifier)
 	g.Expect(annealer.eventNotifier).To(Equal(notifier),
 		"Annealer should use the event notifier assigned to it")
@@ -182,7 +187,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[AnnealingEventType]uint64)
+	countingObserver.eventCounts = make(map[annealing.EventType]uint64)
 
 	observerError = annealer.AddObserver(countingObserver)
 
@@ -196,25 +201,25 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	g.Eventually(
 		func() uint64 {
-			return countingObserver.eventCounts[FinishedAnnealing]
+			return countingObserver.eventCounts[annealing.FinishedAnnealing]
 		}).Should(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[StartedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[annealing.StartedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[StartedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[annealing.StartedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[FinishedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[annealing.FinishedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
 type CountingObserver struct {
-	eventCounts map[AnnealingEventType]uint64
+	eventCounts map[annealing.EventType]uint64
 }
 
-func (co *CountingObserver) ObserveAnnealingEvent(event AnnealingEvent) {
+func (co *CountingObserver) ObserveAnnealingEvent(event annealing.Event) {
 	co.eventCounts[event.EventType] += 1
 }
 
@@ -245,7 +250,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 }
 
 type TryCountingSolutionExplorer struct {
-	solution.NullExplorer
+	explorer.NullExplorer
 	changesTried uint64
 }
 

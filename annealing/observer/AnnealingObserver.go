@@ -1,12 +1,13 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// logging package contains AnnealingObserver implementations  that capture annealing events and log them to various
+// observer package contains Observer implementations  that capture annealing events and log them to various
 // destinations in potentially very different formats (as dictated by handlers passed to a logger at build-time)
-package logging
+package observer
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/shared"
-	. "github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/annealing"
+	. "github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/wrapper"
 	. "github.com/LindsayBradford/crem/logging/filters"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 	. "github.com/LindsayBradford/crem/logging/shared"
@@ -14,30 +15,30 @@ import (
 
 const AnnealerLogLevel LogLevel = "Annealer"
 
-// AnnealingLogger is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
+// AnnealingObserver is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
 // drops any AnnealingEvents received.
-type AnnealingLogger struct {
+type AnnealingObserver struct {
 	logHandler LogHandler
 	filter     LoggingFilter
 }
 
-// Allows for the receipt of AnnealingEvent instances, but deliberately takes no action in logging those events.
-func (l *AnnealingLogger) ObserveAnnealingEvent(event AnnealingEvent) {}
+// Allows for the receipt of Event instances, but deliberately takes no action in observer those events.
+func (l *AnnealingObserver) ObserveAnnealingEvent(event Event) {}
 
-func wrapAnnealer(eventAnnealer Annealer) *AnnealerFormatWrapper {
+func wrapAnnealer(eventAnnealer Annealer) *wrapper.FormatWrapper {
 	wrapper := newAnnealerWrapper()
 	wrapper.Wrap(eventAnnealer)
 	return wrapper
 }
 
-func wrapSolutionExplorer(explorer Explorer) *ExplorerFormatWrapper {
+func wrapSolutionExplorer(explorer Explorer) *FormatWrapper {
 	wrapper := newSolutionExplorerWrapper()
 	wrapper.Wrap(explorer)
 	return wrapper
 }
 
-func newAnnealerWrapper() *AnnealerFormatWrapper {
-	wrapper := AnnealerFormatWrapper{
+func newAnnealerWrapper() *wrapper.FormatWrapper {
+	wrapper := wrapper.FormatWrapper{
 		MethodFormats: map[string]string{
 			"Temperature":      "%0.4f",
 			"CoolingFactor":    "%0.3f",
@@ -48,8 +49,8 @@ func newAnnealerWrapper() *AnnealerFormatWrapper {
 	return &wrapper
 }
 
-func newSolutionExplorerWrapper() *ExplorerFormatWrapper {
-	wrapper := ExplorerFormatWrapper{
+func newSolutionExplorerWrapper() *FormatWrapper {
+	wrapper := FormatWrapper{
 		MethodFormats: map[string]string{
 			"ObjectiveValue":         "%0.4f",
 			"ChangeInObjectiveValue": "%0.4f",

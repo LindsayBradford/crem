@@ -1,21 +1,21 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package shared
+package annealing
 
-type AnnealingObserver interface {
-	ObserveAnnealingEvent(event AnnealingEvent)
+type Observer interface {
+	ObserveAnnealingEvent(event Event)
 }
 
-type AnnealingEvent struct {
-	EventType AnnealingEventType
+type Event struct {
+	EventType EventType
 	Annealer  Annealer
 	Note      string
 }
 
-type AnnealingEventType int
+type EventType int
 
 const (
-	InvalidEvent AnnealingEventType = iota
+	InvalidEvent EventType = iota
 	StartedAnnealing
 	StartedIteration
 	FinishedIteration
@@ -23,7 +23,7 @@ const (
 	Note
 )
 
-func (eventType AnnealingEventType) String() string {
+func (eventType EventType) String() string {
 	labels := [...]string{
 		"InvalidEvent",
 		"StartedAnnealing",

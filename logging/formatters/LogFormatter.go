@@ -1,17 +1,17 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-// Package formatters defines logging formatters that take LogAttributes and convert them into logging-ready strings.
+// Package formatters defines observer formatters that take LogAttributes and convert them into observer-ready strings.
 package formatters
 
 import . "github.com/LindsayBradford/crem/logging/shared"
 
-// LogFormatter describes an interface for the formatting of LogAttributes into some logging-ready string.
+// LogFormatter describes an interface for the formatting of LogAttributes into some observer-ready string.
 // Instances of LogHandler are expected to delegate any formatting of the supplied attributes to a LogFormatter.
 type LogFormatter interface {
-	// Initialises any necessary solution the formatter requires prior to being used.
+	// Initialises any necessary explorer the formatter requires prior to being used.
 	Initialise()
 
-	// Format converts the supplied attributes into a representative 'logging ready' string.
+	// Format converts the supplied attributes into a representative 'observer ready' string.
 	Format(attributes LogAttributes) string
 }
 
@@ -20,7 +20,7 @@ const nullFormatMessage = "No formatter specified. Using the NullFormatter."
 
 // NullFormatter implements a 'null object' placeholder formatter that is supplied by default if one is not specified.
 // It returns a static message as per nullFormatMessage as a reminder that a proper formatter must be supplied
-// for the logging to do anything meaningful.
+// for the observer to do anything meaningful.
 type NullFormatter struct{}
 
 func (formatter *NullFormatter) Initialise() {}

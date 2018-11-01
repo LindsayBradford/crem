@@ -1,27 +1,28 @@
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package annealing
+// Copyright (c) 2018 Australian Rivers Institute.
+
+package annealers
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/shared"
-	. "github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing"
+	. "github.com/LindsayBradford/crem/annealing/explorer"
 	cremerrors "github.com/LindsayBradford/crem/errors"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 )
 
-type AnnealerBuilder struct {
-	annealer    Annealer
+type Builder struct {
+	annealer    annealing.Annealer
 	buildErrors *cremerrors.CompositeError
 }
 
-func (builder *AnnealerBuilder) ElapsedTimeTrackingAnnealer() *AnnealerBuilder {
+func (builder *Builder) ElapsedTimeTrackingAnnealer() *Builder {
 	return builder.forAnnealer(&ElapsedTimeTrackingAnnealer{})
 }
 
-func (builder *AnnealerBuilder) SimpleAnnealer() *AnnealerBuilder {
+func (builder *Builder) SimpleAnnealer() *Builder {
 	return builder.forAnnealer(&SimpleAnnealer{})
 }
 
-func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder {
+func (builder *Builder) forAnnealer(annealer annealing.Annealer) *Builder {
 	builder.annealer = annealer
 	builder.annealer.Initialise()
 	if builder.buildErrors == nil {
@@ -30,7 +31,7 @@ func (builder *AnnealerBuilder) forAnnealer(annealer Annealer) *AnnealerBuilder 
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithId(title string) *AnnealerBuilder {
+func (builder *Builder) WithId(title string) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if title != "" {
 		annealerBeingBuilt.SetId(title)
@@ -38,7 +39,7 @@ func (builder *AnnealerBuilder) WithId(title string) *AnnealerBuilder {
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerBuilder {
+func (builder *Builder) WithLogHandler(logHandler LogHandler) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetLogHandler(logHandler); err != nil {
 		builder.buildErrors.Add(err)
@@ -46,7 +47,7 @@ func (builder *AnnealerBuilder) WithLogHandler(logHandler LogHandler) *AnnealerB
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *AnnealerBuilder {
+func (builder *Builder) WithStartingTemperature(temperature float64) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetTemperature(temperature); err != nil {
 		builder.buildErrors.Add(err)
@@ -54,7 +55,7 @@ func (builder *AnnealerBuilder) WithStartingTemperature(temperature float64) *An
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *AnnealerBuilder {
+func (builder *Builder) WithCoolingFactor(coolingFactor float64) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetCoolingFactor(coolingFactor); err != nil {
 		builder.buildErrors.Add(err)
@@ -62,7 +63,7 @@ func (builder *AnnealerBuilder) WithCoolingFactor(coolingFactor float64) *Anneal
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithSolutionExplorer(explorer Explorer) *AnnealerBuilder {
+func (builder *Builder) WithSolutionExplorer(explorer Explorer) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetSolutionExplorer(explorer); err != nil {
 		builder.buildErrors.Add(err)
@@ -70,7 +71,7 @@ func (builder *AnnealerBuilder) WithSolutionExplorer(explorer Explorer) *Anneale
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifier) *AnnealerBuilder {
+func (builder *Builder) WithEventNotifier(delegate annealing.EventNotifier) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetEventNotifier(delegate); err != nil {
 		builder.buildErrors.Add(err)
@@ -78,7 +79,7 @@ func (builder *AnnealerBuilder) WithEventNotifier(delegate AnnealingEventNotifie
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue float64) *AnnealerBuilder {
+func (builder *Builder) WithDumbSolutionExplorer(initialObjectiveValue float64) *Builder {
 	annealerBeingBuilt := builder.annealer
 	explorer := new(DumbExplorer)
 	explorer.SetObjectiveValue(initialObjectiveValue)
@@ -87,13 +88,13 @@ func (builder *AnnealerBuilder) WithDumbSolutionExplorer(initialObjectiveValue f
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithMaxIterations(iterations uint64) *AnnealerBuilder {
+func (builder *Builder) WithMaxIterations(iterations uint64) *Builder {
 	annealerBeingBuilt := builder.annealer
 	annealerBeingBuilt.SetMaxIterations(iterations)
 	return builder
 }
 
-func (builder *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *AnnealerBuilder {
+func (builder *Builder) WithObservers(observers ...annealing.Observer) *Builder {
 	annealerBeingBuilt := builder.annealer
 
 	for _, currObserver := range observers {
@@ -105,7 +106,7 @@ func (builder *AnnealerBuilder) WithObservers(observers ...AnnealingObserver) *A
 	return builder
 }
 
-func (builder *AnnealerBuilder) Build() (Annealer, *cremerrors.CompositeError) {
+func (builder *Builder) Build() (annealing.Annealer, *cremerrors.CompositeError) {
 	annealerBeingBuilt := builder.annealer
 	buildErrors := builder.buildErrors
 	if buildErrors.Size() == 0 {

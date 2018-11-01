@@ -1,14 +1,16 @@
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package annealing
+package annealers
 
-import . "github.com/onsi/gomega"
+import (
+	. "github.com/onsi/gomega"
+)
 import "testing"
 
 func TestAnneal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	builder := new(AnnealerBuilder)
+	builder := new(Builder)
 
 	annealer, _ := builder.
 		ElapsedTimeTrackingAnnealer().

@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/LindsayBradford/crem/annealing"
-	. "github.com/LindsayBradford/crem/annealing/shared"
-	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing/annealers"
+	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/errors"
 	"github.com/LindsayBradford/crem/logging/handlers"
 )
@@ -16,15 +16,15 @@ type AnnealerBuilder struct {
 	config *CREMConfig
 	errors *errors.CompositeError
 
-	baseBuilder      annealing.AnnealerBuilder
+	baseBuilder      annealers.Builder
 	loggersBuilder   LogHandlersBuilder
 	observersBuilder annealingObserversBuilder
 	explorersBuilder solutionExplorerBuilder
 
 	defaultLogHandler handlers.LogHandler
 	logHandlers       []handlers.LogHandler
-	observers         []AnnealingObserver
-	annealingExplorer solution.Explorer
+	observers         []annealing.Observer
+	annealingExplorer explorer.Explorer
 }
 
 type ExplorerRegistration struct {
@@ -50,9 +50,9 @@ func (builder *AnnealerBuilder) RegisteringExplorer(registration ExplorerRegistr
 	return builder
 }
 
-func (builder *AnnealerBuilder) Build() (Annealer, handlers.LogHandler, error) {
+func (builder *AnnealerBuilder) Build() (annealing.Annealer, handlers.LogHandler, error) {
 	builder.buildLogHandlers()
-	builder.defaultLogHandler.Debug("About to call AnnealerBuilder.Build() ")
+	builder.defaultLogHandler.Debug("About to call Builder.Build() ")
 
 	builder.buildObservers()
 	builder.buildSolutionExplorer()
@@ -71,7 +71,7 @@ func (builder *AnnealerBuilder) Build() (Annealer, handlers.LogHandler, error) {
 			WithObservers(builder.observers...).
 			Build()
 
-	builder.defaultLogHandler.Debug("Call to AnnealerBuilder.Build() finished")
+	builder.defaultLogHandler.Debug("Call to Builder.Build() finished")
 
 	if baseBuildError != nil {
 		newError := fmt.Errorf("failed to establish annealer from config: %s", baseBuildError.Error())
@@ -121,14 +121,14 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
-		newError := fmt.Errorf("failed to establish solution explorer from config: %s", buildErrors.Error())
+		newError := fmt.Errorf("failed to establish explorer explorer from config: %s", buildErrors.Error())
 		builder.errors.Add(newError)
 	}
 
 	builder.annealingExplorer = newExplorer
 }
 
-func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *annealing.AnnealerBuilder {
+func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *annealers.Builder {
 	switch annealerType {
 	case ElapsedTimeTracking, UnspecifiedAnnealerType:
 		return builder.baseBuilder.ElapsedTimeTrackingAnnealer()
@@ -139,13 +139,13 @@ func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *
 	}
 }
 
-func (builder *AnnealerBuilder) buildEventNotifier() AnnealingEventNotifier {
+func (builder *AnnealerBuilder) buildEventNotifier() annealing.EventNotifier {
 	eventNotifierType := builder.config.Annealer.EventNotifier
 	switch eventNotifierType {
 	case Sequential, UnspecifiedEventNotifierType:
-		return new(SynchronousAnnealingEventNotifier)
+		return new(annealing.SynchronousAnnealingEventNotifier)
 	case Concurrent:
-		return new(ConcurrentAnnealingEventNotifier)
+		return new(annealing.ConcurrentAnnealingEventNotifier)
 	default:
 		panic("Should not reach here")
 	}

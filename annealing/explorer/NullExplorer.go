@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package solution
+package explorer
 
 var NULL_EXPLORER = new(NullExplorer)
 

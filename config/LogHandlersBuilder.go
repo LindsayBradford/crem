@@ -4,7 +4,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/LindsayBradford/crem/annealing/logging"
+	"github.com/LindsayBradford/crem/annealing/observer"
 	. "github.com/LindsayBradford/crem/errors"
 	. "github.com/LindsayBradford/crem/logging/formatters"
 	"github.com/LindsayBradford/crem/logging/handlers"
@@ -82,8 +82,8 @@ func (builder *LogHandlersBuilder) buildDefaultLogHandler() handlers.LogHandler 
 }
 
 func ensureSupportForAnnealerLogLevel(handler handlers.LogHandler) {
-	if !handler.SupportsLogLevel(logging.AnnealerLogLevel) {
-		handler.Override(logging.AnnealerLogLevel, shared.STDOUT)
+	if !handler.SupportsLogLevel(observer.AnnealerLogLevel) {
+		handler.Override(observer.AnnealerLogLevel, shared.STDOUT)
 	}
 }
 

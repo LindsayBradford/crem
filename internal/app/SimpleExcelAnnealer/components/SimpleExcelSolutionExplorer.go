@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/annealing/explorer"
 )
 
 var (

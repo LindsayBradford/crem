@@ -3,11 +3,11 @@
 package filters
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/shared"
+	. "github.com/LindsayBradford/crem/annealing"
 	"time"
 )
 
-// IterationElapsedTimeFilter is a LoggingFilter that will not modulate any AnnealingEvent types
+// IterationElapsedTimeFilter is a LoggingFilter that will not modulate any Event types
 // except StartedIteration & FinishedIteration. It completely filters out all StartedIteration events, and modulates
 // FinishedIteration events at a rate of one event per every lapsed wait duration specified.
 // The very first very last events are exceptions, and are also not modulated.
@@ -16,16 +16,16 @@ type IterationElapsedTimeFilter struct {
 	lastTimeAllowed time.Time
 }
 
-// WithWait sets the wait duration between allowing FinishedIteration AnnealingEvent instances through to a LogHandler.
+// WithWait sets the wait duration between allowing FinishedIteration Event instances through to a LogHandler.
 func (m *IterationElapsedTimeFilter) WithWait(wait time.Duration) *IterationElapsedTimeFilter {
 	m.waitDuration = wait
 	return m
 }
 
-// ShouldFilter returns true for most FinishedIteration AnnealingEvent instances. Those allowed through to the logger
+// ShouldFilter returns true for most FinishedIteration Event instances. Those allowed through to the logger
 // are either 1) the very first or very last event, or 2) the closest FinishedIteration event to have
 // occurred after the wait duration has passed since the last previous event allowed through.
-func (m *IterationElapsedTimeFilter) ShouldFilter(event AnnealingEvent) bool {
+func (m *IterationElapsedTimeFilter) ShouldFilter(event Event) bool {
 	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
 		return false
 	}

@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package solution
+package explorer
 
 import (
 	"math"

@@ -1,8 +1,10 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-package shared
+package annealing
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/annealing/explorer"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 )
 
@@ -22,10 +24,10 @@ type Annealer interface {
 	SetMaxIterations(iterations uint64)
 	MaxIterations() uint64
 
-	SetEventNotifier(notifier AnnealingEventNotifier) error
-	AddObserver(observer AnnealingObserver) error
+	SetEventNotifier(notifier EventNotifier) error
+	AddObserver(observer Observer) error
 
-	Observers() []AnnealingObserver
+	Observers() []Observer
 
 	SetLogHandler(logger LogHandler) error
 	LogHandler() LogHandler

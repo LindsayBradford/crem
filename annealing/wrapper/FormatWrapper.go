@@ -1,13 +1,15 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package shared
+package wrapper
 
 import (
 	"fmt"
+
+	"github.com/LindsayBradford/crem/annealing"
 )
 
-type AnnealerFormatWrapper struct {
-	AnnealerToFormat Annealer
+type FormatWrapper struct {
+	AnnealerToFormat annealing.Annealer
 	MethodFormats    map[string]string
 }
 
@@ -15,7 +17,7 @@ const defaultStringFormat = "%s"
 const defaultFloat64Format = "%f"
 const defaultUintFormat = "%d"
 
-func (wrapper *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
+func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 	wrapper.MethodFormats = map[string]string{
 		"iD":               defaultStringFormat,
 		"Temperature":      defaultFloat64Format,
@@ -26,36 +28,36 @@ func (wrapper *AnnealerFormatWrapper) Initialise() *AnnealerFormatWrapper {
 	return wrapper
 }
 
-func (wrapper *AnnealerFormatWrapper) Wrapping(annealer Annealer) *AnnealerFormatWrapper {
+func (wrapper *FormatWrapper) Wrapping(annealer annealing.Annealer) *FormatWrapper {
 	wrapper.Wrap(annealer)
 	return wrapper
 }
 
-func (wrapper *AnnealerFormatWrapper) Wrap(annealer Annealer) {
+func (wrapper *FormatWrapper) Wrap(annealer annealing.Annealer) {
 	wrapper.AnnealerToFormat = annealer
 }
 
-func (wrapper *AnnealerFormatWrapper) Id() string {
+func (wrapper *FormatWrapper) Id() string {
 	return wrapper.applyFormatting("Id", wrapper.AnnealerToFormat.Id())
 }
 
-func (wrapper *AnnealerFormatWrapper) Temperature() string {
+func (wrapper *FormatWrapper) Temperature() string {
 	return wrapper.applyFormatting("Temperature", wrapper.AnnealerToFormat.Temperature())
 }
 
-func (wrapper *AnnealerFormatWrapper) CoolingFactor() string {
+func (wrapper *FormatWrapper) CoolingFactor() string {
 	return wrapper.applyFormatting("CoolingFactor", wrapper.AnnealerToFormat.CoolingFactor())
 }
 
-func (wrapper *AnnealerFormatWrapper) MaxIterations() string {
+func (wrapper *FormatWrapper) MaxIterations() string {
 	return wrapper.applyFormatting("MaxIterations", wrapper.AnnealerToFormat.MaxIterations())
 }
 
-func (wrapper *AnnealerFormatWrapper) CurrentIteration() string {
+func (wrapper *FormatWrapper) CurrentIteration() string {
 	return wrapper.applyFormatting("CurrentIteration", wrapper.AnnealerToFormat.CurrentIteration())
 }
 
-func (wrapper *AnnealerFormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+func (wrapper *FormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
 	formatToApply := wrapper.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

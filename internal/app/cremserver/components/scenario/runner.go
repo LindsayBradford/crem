@@ -5,9 +5,9 @@ package scenario
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/scenario"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ func RunScenarioFromConfig(cremConfig *config.CREMConfig) {
 	flushStreams()
 }
 
-func BuildScenarioRunner(scenarioConfig *config.CREMConfig) annealing.CallableScenarioRunner {
+func BuildScenarioRunner(scenarioConfig *config.CREMConfig) scenario.CallableRunner {
 	newAnnealer, _, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
@@ -31,9 +31,9 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) annealing.CallableSc
 		LogHandler.Error(buildError)
 	}
 
-	var runner annealing.CallableScenarioRunner
+	var runner scenario.CallableRunner
 
-	runner = new(annealing.ScenarioRunner).
+	runner = new(scenario.Runner).
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
@@ -42,7 +42,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) annealing.CallableSc
 	return runner
 }
 
-func runScenario(scenarioRunner annealing.CallableScenarioRunner) {
+func runScenario(scenarioRunner scenario.CallableRunner) {
 	if runError := scenarioRunner.Run(); runError != nil {
 		wrappingError := errors.Wrap(runError, "running scenario")
 		LogHandler.Error(wrappingError)

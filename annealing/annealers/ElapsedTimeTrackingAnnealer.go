@@ -1,18 +1,21 @@
+// Copyright (c) 2018 Australian Rivers Institute.
+
 // (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-package annealing
+package annealers
 
 import (
-	. "fmt"
-	. "github.com/LindsayBradford/crem/annealing/shared"
-	. "time"
+	"fmt"
+	"time"
+
+	"github.com/LindsayBradford/crem/annealing"
 )
 
 type ElapsedTimeTrackingAnnealer struct {
 	SimpleAnnealer
 
-	startTime  Time
-	finishTime Time
+	startTime  time.Time
+	finishTime time.Time
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) Initialise() {
@@ -21,22 +24,22 @@ func (annealer *ElapsedTimeTrackingAnnealer) Initialise() {
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
-	annealer.startTime = Now()
+	annealer.startTime = time.Now()
 	annealer.SimpleAnnealer.Anneal()
-	annealer.finishTime = Now()
+	annealer.finishTime = time.Now()
 
 	annealer.LogHandler().Info(annealer.generateElapsedTimeString())
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {
-	return Sprintf("%s: total elapsed time of annealing = [%v]", annealer.Id(), annealer.ElapsedTime())
+	return fmt.Sprintf("%s: total elapsed time of annealing = [%v]", annealer.Id(), annealer.ElapsedTime())
 }
 
-func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() Duration {
+func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() time.Duration {
 	return annealer.finishTime.Sub(annealer.startTime)
 }
 
-func (annealer *ElapsedTimeTrackingAnnealer) Clone() Annealer {
+func (annealer *ElapsedTimeTrackingAnnealer) Clone() annealing.Annealer {
 	clone := *annealer
 	explorerClone := annealer.SolutionExplorer().Clone()
 	clone.SetSolutionExplorer(explorerClone)

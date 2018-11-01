@@ -1,11 +1,12 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package shared
+package annealers
 
 import (
+	"github.com/LindsayBradford/crem/annealing"
 	"github.com/pkg/errors"
 
-	. "github.com/LindsayBradford/crem/annealing/solution"
+	. "github.com/LindsayBradford/crem/annealing/explorer"
 	. "github.com/LindsayBradford/crem/logging/handlers"
 )
 
@@ -15,7 +16,7 @@ type SimpleAnnealer struct {
 	coolingFactor    float64
 	maxIterations    uint64
 	currentIteration uint64
-	eventNotifier    AnnealingEventNotifier
+	eventNotifier    annealing.EventNotifier
 	solutionExplorer Explorer
 	logger           LogHandler
 }
@@ -26,7 +27,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.coolingFactor = 1
 	sa.maxIterations = 0
 	sa.currentIteration = 0
-	sa.eventNotifier = new(SynchronousAnnealingEventNotifier)
+	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
 	sa.solutionExplorer = NULL_EXPLORER
 	sa.logger = new(NullLogHandler)
 }
@@ -100,7 +101,7 @@ func (sa *SimpleAnnealer) LogHandler() LogHandler {
 	return sa.logger
 }
 
-func (sa *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) error {
+func (sa *SimpleAnnealer) SetEventNotifier(delegate annealing.EventNotifier) error {
 	if delegate == nil {
 		return errors.New("invalid attempt to set event notifier to nil value")
 	}
@@ -108,19 +109,19 @@ func (sa *SimpleAnnealer) SetEventNotifier(delegate AnnealingEventNotifier) erro
 	return nil
 }
 
-func (sa *SimpleAnnealer) AddObserver(observer AnnealingObserver) error {
+func (sa *SimpleAnnealer) AddObserver(observer annealing.Observer) error {
 	return sa.eventNotifier.AddObserver(observer)
 }
 
-func (sa *SimpleAnnealer) Observers() []AnnealingObserver {
+func (sa *SimpleAnnealer) Observers() []annealing.Observer {
 	return sa.eventNotifier.Observers()
 }
 
-func (sa *SimpleAnnealer) notifyObservers(eventType AnnealingEventType) {
+func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
 	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.Clone(), eventType)
 }
 
-func (sa *SimpleAnnealer) Clone() Annealer {
+func (sa *SimpleAnnealer) Clone() annealing.Annealer {
 	clone := *sa
 	explorerClone := sa.SolutionExplorer().Clone()
 	clone.SetSolutionExplorer(explorerClone)
@@ -159,20 +160,20 @@ func (sa *SimpleAnnealer) Anneal() {
 }
 
 func (sa *SimpleAnnealer) annealingStarted() {
-	sa.notifyObservers(StartedAnnealing)
+	sa.notifyObservers(annealing.StartedAnnealing)
 }
 
 func (sa *SimpleAnnealer) iterationStarted() {
 	sa.currentIteration++
-	sa.notifyObservers(StartedIteration)
+	sa.notifyObservers(annealing.StartedIteration)
 }
 
 func (sa *SimpleAnnealer) iterationFinished() {
-	sa.notifyObservers(FinishedIteration)
+	sa.notifyObservers(annealing.FinishedIteration)
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
-	sa.notifyObservers(FinishedAnnealing)
+	sa.notifyObservers(annealing.FinishedAnnealing)
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {

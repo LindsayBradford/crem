@@ -5,10 +5,9 @@ package config
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/annealing"
-	"github.com/LindsayBradford/crem/annealing/logging"
-	"github.com/LindsayBradford/crem/annealing/shared"
-	"github.com/LindsayBradford/crem/annealing/solution"
+	"github.com/LindsayBradford/crem/annealing/annealers"
+	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/observer"
 	. "github.com/onsi/gomega"
 )
 
@@ -26,7 +25,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(annealing.ElapsedTimeTrackingAnnealer)
+	dummyAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
@@ -50,7 +49,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.DumbExplorer)
+	dummyExplorer := new(explorer.DumbExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -71,7 +70,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(shared.SimpleAnnealer)
+	dummyAnnealer := new(annealers.SimpleAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
@@ -95,7 +94,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.NullExplorer)
+	dummyExplorer := new(explorer.NullExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -155,7 +154,7 @@ func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 		builderUnderTest.WithConfig(configUnderTest).Build()
 
 	g.Expect(buildError).To(Not(BeNil()), "Annealer build should have failed.")
-	g.Expect(buildError.Error()).To(ContainSubstring("configuration specifies a non-existent solution explorer"))
+	g.Expect(buildError.Error()).To(ContainSubstring("configuration specifies a non-existent explorer explorer"))
 	t.Logf("Annealer build error reported: %s", buildError)
 
 	g.Expect(annealerUnderTest).To(BeNil(), "Annealer build failure should have returned nil annealer.")
@@ -174,7 +173,7 @@ func TestAnnealerBuilder_DumbAnnealerNoSolutionExplorerConfig(t *testing.T) {
 		builderUnderTest.WithConfig(configUnderTest).Build()
 
 	g.Expect(buildError).To(Not(BeNil()), "Annealer build should have failed.")
-	g.Expect(buildError.Error()).To(ContainSubstring("configuration failed to specify any solution explorers"))
+	g.Expect(buildError.Error()).To(ContainSubstring("configuration failed to specify any explorer explorers"))
 	t.Logf("Annealer build error reported: %s", buildError)
 
 	g.Expect(annealerUnderTest).To(BeNil(), "Annealer build failure should have returned nil annealer.")
@@ -277,7 +276,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
 	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
 
-	dummyAnnealer := new(annealing.ElapsedTimeTrackingAnnealer)
+	dummyAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
 
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
@@ -301,7 +300,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(solution.DumbExplorer)
+	dummyExplorer := new(explorer.DumbExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -313,19 +312,19 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		len(actualObservers)).To(BeNumerically("==", 3),
 		"Annealer should have built with config supplied annealing observers")
 
-	dummyMessageObserver := new(logging.AnnealingMessageObserver)
+	dummyMessageObserver := new(observer.AnnealingMessageObserver)
 
 	g.Expect(actualObservers[0]).To(BeAssignableToTypeOf(dummyMessageObserver),
 		"Annealer should have built with config supplied annealing message observer")
 
-	dummyAttributeObserver := new(logging.AnnealingAttributeObserver)
+	dummyAttributeObserver := new(observer.AnnealingAttributeObserver)
 
 	g.Expect(actualObservers[1]).To(BeAssignableToTypeOf(dummyAttributeObserver),
 		"Annealer should have built with config supplied annealing attribute observer")
 }
 
 type TestRegistereableExplorer struct {
-	solution.BaseExplorer
+	explorer.BaseExplorer
 }
 
 func (tre *TestRegistereableExplorer) WithName(name string) *TestRegistereableExplorer {
@@ -342,7 +341,7 @@ func TestAnnealerBuilder_NullAnnealerWithCustomExplorer(t *testing.T) {
 	builderUnderTest := new(AnnealerBuilder).RegisteringExplorer(
 		ExplorerRegistration{
 			ExplorerType: "TestDefinedSolutionExplorer",
-			ConfigFunction: func(config SolutionExplorerConfig) solution.Explorer {
+			ConfigFunction: func(config SolutionExplorerConfig) explorer.Explorer {
 				return new(TestRegistereableExplorer).WithName(config.Name)
 			},
 		},
