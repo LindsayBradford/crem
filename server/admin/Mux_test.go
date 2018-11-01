@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/loggers"
 	"github.com/LindsayBradford/crem/server/test"
 	. "github.com/onsi/gomega"
 )
@@ -90,7 +90,7 @@ func verifyResponseToInvalidStatusRequest(context testContext) {
 
 func buildMuxUnderTest() *Mux {
 	muxUnderTest := new(Mux).Initialise()
-	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
+	muxUnderTest.SetLogger(loggers.DefaultTestingLogger)
 	return muxUnderTest
 }
 

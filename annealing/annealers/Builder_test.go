@@ -11,7 +11,8 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/explorer"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
+	"github.com/LindsayBradford/crem/logging/loggers"
 	. "github.com/onsi/gomega"
 )
 import "testing"
@@ -26,7 +27,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	const expectedTemperature float64 = 1000
 	const expectedCoolingFactor float64 = 0.5
 	const expectedIterations uint64 = 5000
-	expectedLogHandler := new(handlers.BareBonesLogHandler)
+	expectedLogHandler := new(loggers.BareBonesLogger)
 	expectedSolutionExplorer := new(explorer.DumbExplorer)
 	expectedObservers := []annealing.Observer{new(dummyObserver)}
 
@@ -60,7 +61,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 
 	g.Expect(
 		annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler),
-		"Annealer should have built with supplied LogHandler")
+		"Annealer should have built with supplied Logger")
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer),
@@ -76,7 +77,7 @@ func TestBuild_BadInputs(t *testing.T) {
 
 	const badTemperature float64 = -1
 	const badCoolingFactor float64 = 1.0000001
-	badLogHandler := handlers.LogHandler(nil)
+	badLogHandler := logging.Logger(nil)
 	badExplorer := explorer.Explorer(nil)
 
 	expectedErrors := 5

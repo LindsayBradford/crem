@@ -11,7 +11,7 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/explorer"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/loggers"
 	. "github.com/onsi/gomega"
 )
 
@@ -38,8 +38,8 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with current iteration of 0")
 
 	g.Expect(
-		annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
-		"Annealer should have built with NullLogHandler")
+		annealer.LogHandler()).To(Equal(loggers.DefaultNullLogLogger),
+		"Annealer should have built with NullLogger")
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(Equal(explorer.NULL_EXPLORER),
@@ -72,8 +72,8 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	logHandlerErr := annealer.SetLogHandler(nil)
 
 	g.Expect(logHandlerErr).To(Not(BeNil()))
-	g.Expect(annealer.LogHandler()).To(Equal(handlers.DefaultNullLogHandler),
-		"Annealer should have ignored crap LogHandler set attempt")
+	g.Expect(annealer.LogHandler()).To(Equal(loggers.DefaultNullLogLogger),
+		"Annealer should have ignored crap Logger set attempt")
 
 	explorerErr := annealer.SetSolutionExplorer(nil)
 
@@ -278,5 +278,5 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 }
 
 type DummyLogHandler struct {
-	handlers.NullLogHandler
+	loggers.NullLogger
 }

@@ -4,7 +4,7 @@ package components
 
 import (
 	"github.com/LindsayBradford/crem/config"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/server"
 	"github.com/LindsayBradford/crem/server/admin"
 )
@@ -23,7 +23,7 @@ func (s *Server) WithConfig(configuration *config.HttpServerConfig) *Server {
 	return s
 }
 
-func (s *Server) WithLogger(logger handlers.LogHandler) *Server {
+func (s *Server) WithLogger(logger logging.Logger) *Server {
 	s.RestServer.WithLogger(logger)
 	return s
 }

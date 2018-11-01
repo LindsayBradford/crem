@@ -4,7 +4,7 @@ package scenario
 
 import (
 	"github.com/LindsayBradford/crem/excel"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/scenario/profiling"
 )
 
@@ -23,7 +23,7 @@ func (runner *ProfilableRunner) ToFile(filePath string) *ProfilableRunner {
 	return runner
 }
 
-func (runner *ProfilableRunner) LogHandler() handlers.LogHandler {
+func (runner *ProfilableRunner) LogHandler() logging.Logger {
 	return runner.base.LogHandler()
 }
 
@@ -43,7 +43,7 @@ func (runner *SpreadsheetSafeScenarioRunner) ThatLocks(base CallableRunner) *Spr
 	return runner
 }
 
-func (runner *SpreadsheetSafeScenarioRunner) LogHandler() handlers.LogHandler {
+func (runner *SpreadsheetSafeScenarioRunner) LogHandler() logging.Logger {
 	return runner.base.LogHandler()
 }
 

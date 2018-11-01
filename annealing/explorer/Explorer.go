@@ -3,8 +3,9 @@
 package explorer
 
 import (
-	. "github.com/LindsayBradford/crem/logging/handlers"
 	"math/rand"
+
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type Explorer interface {
@@ -36,8 +37,8 @@ type Explorer interface {
 	SetRandomNumberGenerator(*rand.Rand)
 	RandomNumberGenerator() *rand.Rand
 
-	SetLogHandler(logger LogHandler) error
-	LogHandler() LogHandler
+	SetLogHandler(logger logging.Logger) error
+	LogHandler() logging.Logger
 
 	TearDown()
 }

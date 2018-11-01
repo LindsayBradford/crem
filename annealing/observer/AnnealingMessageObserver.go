@@ -3,9 +3,9 @@
 package observer
 
 import (
-	. "github.com/LindsayBradford/crem/annealing"
-	. "github.com/LindsayBradford/crem/logging/filters"
-	. "github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/observer/filters"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/strings"
 )
 
@@ -15,19 +15,19 @@ type AnnealingMessageObserver struct {
 	AnnealingObserver
 }
 
-func (amo *AnnealingMessageObserver) WithLogHandler(handler LogHandler) *AnnealingMessageObserver {
+func (amo *AnnealingMessageObserver) WithLogHandler(handler logging.Logger) *AnnealingMessageObserver {
 	amo.logHandler = handler
 	return amo
 }
 
-func (amo *AnnealingMessageObserver) WithFilter(modulator LoggingFilter) *AnnealingMessageObserver {
-	amo.filter = modulator
+func (amo *AnnealingMessageObserver) WithFilter(filter filters.Filter) *AnnealingMessageObserver {
+	amo.filter = filter
 	return amo
 }
 
 // ObserveAnnealingEvent captures and converts Event instances into free-form text strings that it
-// then passes onto its relevant LogHandler as an Info call.
-func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event Event) {
+// then passes onto its relevant Logger as an Info call.
+func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event annealing.Event) {
 	if amo.logHandler.BeingDiscarded(AnnealerLogLevel) || amo.filter.ShouldFilter(event) {
 		return
 	}
@@ -39,18 +39,18 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event Event) {
 	builder.Add("Id [", event.Annealer.Id(), "], ", "Event [", event.EventType.String(), "]: ")
 
 	switch event.EventType {
-	case StartedAnnealing:
+	case annealing.StartedAnnealing:
 		builder.
 			Add("Maximum Iterations [", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
-	case StartedIteration:
+	case annealing.StartedIteration:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "]")
-	case FinishedIteration:
+	case annealing.FinishedIteration:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
@@ -58,12 +58,12 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event Event) {
 			Add("Desirable? [", explorer.ChangeIsDesirable(), "], ").
 			Add("Acceptance Probability [", explorer.AcceptanceProbability(), "], ").
 			Add("Accepted? [", explorer.ChangeAccepted(), "]")
-	case FinishedAnnealing:
+	case annealing.FinishedAnnealing:
 		builder.
 			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "]")
-	case Note:
+	case annealing.Note:
 		builder.Add("[", event.Note, "]")
 	default:
 		// deliberately does nothing extra

@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/LindsayBradford/crem/config"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/server/admin"
 	"github.com/LindsayBradford/crem/server/rest"
 )
@@ -18,7 +18,7 @@ type RestServer struct {
 	apiMux   rest.Mux
 
 	configuration *config.HttpServerConfig
-	Logger        handlers.LogHandler
+	Logger        logging.Logger
 }
 
 func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestServer {
@@ -38,7 +38,7 @@ func (s *RestServer) WithApiMux(apiMux rest.Mux) *RestServer {
 	return s
 }
 
-func (s *RestServer) WithLogger(logger handlers.LogHandler) *RestServer {
+func (s *RestServer) WithLogger(logger logging.Logger) *RestServer {
 	s.Logger = logger
 	s.adminMux.SetLogger(logger)
 	s.apiMux.SetLogger(logger)

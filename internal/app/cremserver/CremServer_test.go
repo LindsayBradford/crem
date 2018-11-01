@@ -9,7 +9,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/api"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging/loggers"
 	"github.com/LindsayBradford/crem/server/rest"
 	"github.com/LindsayBradford/crem/server/test"
 	. "github.com/onsi/gomega"
@@ -126,7 +126,7 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 
 func buildMuxUnderTest() *api.Mux {
 	muxUnderTest := new(api.Mux).Initialise()
-	muxUnderTest.SetLogger(handlers.DefaultTestingLogHandler)
+	muxUnderTest.SetLogger(loggers.DefaultTestingLogger)
 	return muxUnderTest
 }
 

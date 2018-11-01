@@ -1,14 +1,14 @@
-// Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+// Copyright (c) 2018 Australian Rivers Institute.
 
-package shared
+package logging
 
 // LogAtLevel is a string identifier for a 'typical' set of log levels we might want to report against, ranging from
 // DEBUG at the least critical/most noisy of log levels, to ERROR as the most critical/least noisy.
-type LogLevel string
+type Level string
 
 const (
-	DEBUG LogLevel = "Debug"
-	INFO  LogLevel = "Info"
-	WARN  LogLevel = "Warn"
-	ERROR LogLevel = "Error"
+	DEBUG Level = "Debug"
+	INFO  Level = "Info"
+	WARN  Level = "Warn"
+	ERROR Level = "Error"
 )

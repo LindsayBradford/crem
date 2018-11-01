@@ -3,17 +3,17 @@
 package formatters
 
 import (
-	. "github.com/LindsayBradford/crem/logging/shared"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/strings"
 )
 
-// JsonFormatter formats a LogAttributes array into an equivalent JSON encoding.
+// JsonFormatter formats a Attributes array into an equivalent JSON encoding.
 // TODO: Supply example encoding.
 type JsonFormatter struct{}
 
 func (formatter *JsonFormatter) Initialise() {}
 
-func (formatter *JsonFormatter) Format(attributes LogAttributes) string {
+func (formatter *JsonFormatter) Format(attributes logging.Attributes) string {
 	var builder strings.FluentBuilder
 
 	builder.Add("{")

@@ -1,10 +1,8 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
-
 package filters
 
-import . "github.com/LindsayBradford/crem/annealing"
+import "github.com/LindsayBradford/crem/annealing"
 
 // PercentileOfIterationsPerAnnealingFilter filters FinishedIteration Annealing Event instances at a rate of 1 every
 // percentile number of iterations received. . StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
@@ -47,14 +45,14 @@ func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 // ShouldFilter filters only FinishedIteration Event instances, and fully filters out all StartedIteration
 // events. Every FinishedIteration events received on the specified percentile boundary, one event is allowed through
 // to the LogHandler.
-func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event Event) bool {
-	if event.EventType != StartedIteration && event.EventType != FinishedIteration {
+func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event annealing.Event) bool {
+	if event.EventType != annealing.StartedIteration && event.EventType != annealing.FinishedIteration {
 		return false
 	}
 
 	annealer := event.Annealer
 
-	if m.generatesEvents && event.EventType == FinishedIteration &&
+	if m.generatesEvents && event.EventType == annealing.FinishedIteration &&
 		annealer.CurrentIteration()%m.iterationModulo == 0 {
 		return false
 	}

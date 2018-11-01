@@ -8,15 +8,15 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/observer"
+	"github.com/LindsayBradford/crem/annealing/observer/filters"
 	. "github.com/LindsayBradford/crem/errors"
-	"github.com/LindsayBradford/crem/logging/filters"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type annealingObserversBuilder struct {
 	errors            *CompositeError
 	config            []AnnealingObserverConfig
-	handlers          []handlers.LogHandler
+	handlers          []logging.Logger
 	maximumIterations uint64
 }
 
@@ -32,7 +32,7 @@ func (builder *annealingObserversBuilder) WithConfig(cremConfig *CREMConfig) *an
 	return builder
 }
 
-func (builder *annealingObserversBuilder) WithLogHandlers(handlers []handlers.LogHandler) *annealingObserversBuilder {
+func (builder *annealingObserversBuilder) WithLogHandlers(handlers []logging.Logger) *annealingObserversBuilder {
 	builder.initialise()
 	builder.handlers = handlers
 	return builder
@@ -64,7 +64,7 @@ func (builder *annealingObserversBuilder) defaultFilter() *filters.PercentileOfI
 	return filter
 }
 
-func (builder *annealingObserversBuilder) defaultLogger() handlers.LogHandler {
+func (builder *annealingObserversBuilder) defaultLogger() logging.Logger {
 	return builder.handlers[defaultLoggerIndex]
 }
 
@@ -80,7 +80,7 @@ func (builder *annealingObserversBuilder) buildObservers() []annealing.Observer 
 	return observerList
 }
 
-func buildObserver(observerType AnnealingObserverType, logger handlers.LogHandler, filter filters.LoggingFilter) annealing.Observer {
+func buildObserver(observerType AnnealingObserverType, logger logging.Logger, filter filters.Filter) annealing.Observer {
 	var newObserver annealing.Observer
 	switch observerType {
 	case AttributeObserver:
@@ -97,7 +97,7 @@ func buildObserver(observerType AnnealingObserverType, logger handlers.LogHandle
 	return newObserver
 }
 
-func (builder *annealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) handlers.LogHandler {
+func (builder *annealingObserversBuilder) findLoggerNamedOrDefault(currConfig AnnealingObserverConfig) logging.Logger {
 	if currConfig.Logger == "" {
 		return builder.handlers[defaultLoggerIndex]
 	}
@@ -116,14 +116,14 @@ func (builder *annealingObserversBuilder) findLoggerNamedOrDefault(currConfig An
 	return nil
 }
 
-func (builder *annealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.LoggingFilter {
-	var filter filters.LoggingFilter
+func (builder *annealingObserversBuilder) buildFilter(currConfig AnnealingObserverConfig) filters.Filter {
+	var filter filters.Filter
 	switch currConfig.IterationFilter {
 	case UnspecifiedIterationFilter:
 		filter = builder.defaultFilter()
 	case EveryNumberOfIterations:
 		modulo := currConfig.NumberOfIterations
-		filter = new(filters.IterationCountLoggingFilter).WithModulo(modulo)
+		filter = new(filters.IterationCountFilter).WithModulo(modulo)
 	case EveryElapsedSeconds:
 		waitAsDuration := (time.Duration)(currConfig.SecondsBetweenEvents) * time.Second
 		filter = new(filters.IterationElapsedTimeFilter).WithWait(waitAsDuration)

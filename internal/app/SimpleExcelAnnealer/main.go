@@ -10,13 +10,13 @@ import (
 	"github.com/LindsayBradford/crem/commandline"
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/scenario"
 	"github.com/pkg/errors"
 )
 
 var (
-	defaultLogHandler handlers.LogHandler
+	defaultLogHandler logging.Logger
 	mainThreadChannel = make(chan func())
 )
 

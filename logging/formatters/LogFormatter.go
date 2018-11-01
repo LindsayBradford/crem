@@ -1,19 +1,9 @@
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-// Package formatters defines observer formatters that take LogAttributes and convert them into observer-ready strings.
+// Package formatters defines observer formatters that take Attributes and convert them into observer-ready strings.
 package formatters
 
-import . "github.com/LindsayBradford/crem/logging/shared"
-
-// LogFormatter describes an interface for the formatting of LogAttributes into some observer-ready string.
-// Instances of LogHandler are expected to delegate any formatting of the supplied attributes to a LogFormatter.
-type LogFormatter interface {
-	// Initialises any necessary explorer the formatter requires prior to being used.
-	Initialise()
-
-	// Format converts the supplied attributes into a representative 'observer ready' string.
-	Format(attributes LogAttributes) string
-}
+import "github.com/LindsayBradford/crem/logging"
 
 // nullFormatMessage is the message supplied if the NullFormatter is left as the Formatter of a LogHandler.
 const nullFormatMessage = "No formatter specified. Using the NullFormatter."
@@ -25,11 +15,11 @@ type NullFormatter struct{}
 
 func (formatter *NullFormatter) Initialise() {}
 
-func (formatter *NullFormatter) Format(attributes LogAttributes) string {
+func (formatter *NullFormatter) Format(attributes logging.Attributes) string {
 	return nullFormatMessage
 }
 
-// The default label for a LogAttributes entry that is used for storing free-form messages.
+// The default label for a Attributes entry that is used for storing free-form messages.
 const MessageNameLabel = "Message"
 
 const MessageErrorLabel = "Error"
@@ -41,7 +31,7 @@ type RawMessageFormatter struct{}
 
 func (formatter *RawMessageFormatter) Initialise() {}
 
-func (formatter *RawMessageFormatter) Format(attributes LogAttributes) string {
+func (formatter *RawMessageFormatter) Format(attributes logging.Attributes) string {
 	for _, attribute := range attributes {
 		if isSupportedName(attribute.Name) {
 			return attribute.Value.(string)

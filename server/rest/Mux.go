@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/LindsayBradford/crem/logging/handlers"
-
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
@@ -16,7 +15,7 @@ type Mux interface {
 	Start(portAddress string)
 	Shutdown()
 
-	SetLogger(handler handlers.LogHandler)
+	SetLogger(handler logging.Logger)
 	AddHandler(address string, handler HandlerFunc)
 
 	SetCacheMaxAge(maxAge uint64)
@@ -32,7 +31,7 @@ type MuxImpl struct {
 	cacheMaxAgeInSeconds uint64
 
 	HandlerMap HandlerFunctionMap
-	logger     handlers.LogHandler
+	logger     logging.Logger
 }
 
 type HandlerFunctionMap map[string]HandlerFunc
@@ -55,7 +54,7 @@ func (mi *MuxImpl) WithCacheMaxAge(maxAgeInSeconds uint64) *MuxImpl {
 	return mi
 }
 
-func (mi *MuxImpl) SetLogger(logger handlers.LogHandler) {
+func (mi *MuxImpl) SetLogger(logger logging.Logger) {
 	mi.logger = logger
 }
 
@@ -67,7 +66,7 @@ func (mi *MuxImpl) CacheMaxAge() uint64 {
 	return mi.cacheMaxAgeInSeconds
 }
 
-func (mi *MuxImpl) Logger() handlers.LogHandler {
+func (mi *MuxImpl) Logger() logging.Logger {
 	return mi.logger
 }
 

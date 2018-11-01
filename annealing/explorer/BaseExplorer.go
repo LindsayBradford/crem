@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +20,7 @@ type BaseExplorer struct {
 	changeAccepted         bool
 	acceptanceProbability  float64
 	randomNumberGenerator  *rand.Rand
-	logHandler             handlers.LogHandler
+	logHandler             logging.Logger
 }
 
 func (explorer *BaseExplorer) Initialise() {
@@ -66,11 +66,11 @@ func (explorer *BaseExplorer) WithScenarioId(id string) *BaseExplorer {
 	return explorer
 }
 
-func (explorer *BaseExplorer) LogHandler() handlers.LogHandler {
+func (explorer *BaseExplorer) LogHandler() logging.Logger {
 	return explorer.logHandler
 }
 
-func (explorer *BaseExplorer) SetLogHandler(logHandler handlers.LogHandler) error {
+func (explorer *BaseExplorer) SetLogHandler(logHandler logging.Logger) error {
 	if logHandler == nil {
 		return errors.New("invalid attempt to set log handler to nil value")
 	}

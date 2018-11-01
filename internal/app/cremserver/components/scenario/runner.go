@@ -6,13 +6,13 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/config"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/scenario"
 	"github.com/pkg/errors"
 )
 
 var (
-	LogHandler handlers.LogHandler
+	LogHandler logging.Logger
 )
 
 func RunScenarioFromConfig(cremConfig *config.CREMConfig) {

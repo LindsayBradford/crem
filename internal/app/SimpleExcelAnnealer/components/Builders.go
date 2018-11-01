@@ -7,13 +7,13 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/config"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/scenario"
 )
 
 const defaultPenalty = 1
 
-func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (scenario.CallableRunner, handlers.LogHandler) {
+func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (scenario.CallableRunner, logging.Logger) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).

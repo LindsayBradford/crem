@@ -1,37 +1,36 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
 // observer package contains Observer implementations  that capture annealing events and log them to various
-// destinations in potentially very different formats (as dictated by handlers passed to a logger at build-time)
+// destinations in potentially very different formats (as dictated by loggers passed to a logger at build-time)
 package observer
 
 import (
-	. "github.com/LindsayBradford/crem/annealing"
-	. "github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/annealing/wrapper"
-	. "github.com/LindsayBradford/crem/logging/filters"
-	. "github.com/LindsayBradford/crem/logging/handlers"
-	. "github.com/LindsayBradford/crem/logging/shared"
+	"github.com/LindsayBradford/crem/logging"
 )
 
-const AnnealerLogLevel LogLevel = "Annealer"
+const AnnealerLogLevel logging.Level = "Annealer"
 
 // AnnealingObserver is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
 // drops any AnnealingEvents received.
 type AnnealingObserver struct {
-	logHandler LogHandler
-	filter     LoggingFilter
+	logHandler logging.Logger
+	filter     filters.Filter
 }
 
 // Allows for the receipt of Event instances, but deliberately takes no action in observer those events.
-func (l *AnnealingObserver) ObserveAnnealingEvent(event Event) {}
+func (l *AnnealingObserver) ObserveAnnealingEvent(event annealing.Event) {}
 
-func wrapAnnealer(eventAnnealer Annealer) *wrapper.FormatWrapper {
+func wrapAnnealer(eventAnnealer annealing.Annealer) *wrapper.FormatWrapper {
 	wrapper := newAnnealerWrapper()
 	wrapper.Wrap(eventAnnealer)
 	return wrapper
 }
 
-func wrapSolutionExplorer(explorer Explorer) *FormatWrapper {
+func wrapSolutionExplorer(explorer explorer.Explorer) *explorer.FormatWrapper {
 	wrapper := newSolutionExplorerWrapper()
 	wrapper.Wrap(explorer)
 	return wrapper
@@ -49,8 +48,8 @@ func newAnnealerWrapper() *wrapper.FormatWrapper {
 	return &wrapper
 }
 
-func newSolutionExplorerWrapper() *FormatWrapper {
-	wrapper := FormatWrapper{
+func newSolutionExplorerWrapper() *explorer.FormatWrapper {
+	wrapper := explorer.FormatWrapper{
 		MethodFormats: map[string]string{
 			"ObjectiveValue":         "%0.4f",
 			"ChangeInObjectiveValue": "%0.4f",

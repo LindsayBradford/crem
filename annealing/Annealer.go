@@ -4,8 +4,8 @@
 package annealing
 
 import (
-	. "github.com/LindsayBradford/crem/annealing/explorer"
-	. "github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type Annealer interface {
@@ -18,8 +18,8 @@ type Annealer interface {
 	SetCoolingFactor(coolingFactor float64) error
 	CoolingFactor() float64
 
-	SolutionExplorer() Explorer
-	SetSolutionExplorer(explorer Explorer) error
+	SolutionExplorer() explorer.Explorer
+	SetSolutionExplorer(explorer explorer.Explorer) error
 
 	SetMaxIterations(iterations uint64)
 	MaxIterations() uint64
@@ -29,8 +29,8 @@ type Annealer interface {
 
 	Observers() []Observer
 
-	SetLogHandler(logger LogHandler) error
-	LogHandler() LogHandler
+	SetLogHandler(logger logging.Logger) error
+	LogHandler() logging.Logger
 
 	Initialise()
 	Clone() Annealer

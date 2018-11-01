@@ -4,9 +4,9 @@ package annealers
 
 import (
 	"github.com/LindsayBradford/crem/annealing"
-	. "github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/explorer"
 	cremerrors "github.com/LindsayBradford/crem/errors"
-	. "github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type Builder struct {
@@ -39,7 +39,7 @@ func (builder *Builder) WithId(title string) *Builder {
 	return builder
 }
 
-func (builder *Builder) WithLogHandler(logHandler LogHandler) *Builder {
+func (builder *Builder) WithLogHandler(logHandler logging.Logger) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetLogHandler(logHandler); err != nil {
 		builder.buildErrors.Add(err)
@@ -63,7 +63,7 @@ func (builder *Builder) WithCoolingFactor(coolingFactor float64) *Builder {
 	return builder
 }
 
-func (builder *Builder) WithSolutionExplorer(explorer Explorer) *Builder {
+func (builder *Builder) WithSolutionExplorer(explorer explorer.Explorer) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetSolutionExplorer(explorer); err != nil {
 		builder.buildErrors.Add(err)
@@ -81,7 +81,7 @@ func (builder *Builder) WithEventNotifier(delegate annealing.EventNotifier) *Bui
 
 func (builder *Builder) WithDumbSolutionExplorer(initialObjectiveValue float64) *Builder {
 	annealerBeingBuilt := builder.annealer
-	explorer := new(DumbExplorer)
+	explorer := new(explorer.DumbExplorer)
 	explorer.SetObjectiveValue(initialObjectiveValue)
 	explorer.SetScenarioId(annealerBeingBuilt.Id())
 	annealerBeingBuilt.SetSolutionExplorer(explorer)

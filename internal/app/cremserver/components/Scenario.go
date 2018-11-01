@@ -5,12 +5,13 @@ package components
 import (
 	"github.com/LindsayBradford/crem/config"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
+	"github.com/LindsayBradford/crem/logging/loggers"
 	"github.com/pkg/errors"
 )
 
 var (
-	ScenarioLogger handlers.LogHandler = handlers.DefaultNullLogHandler
+	ScenarioLogger logging.Logger = loggers.DefaultNullLogLogger
 )
 
 func RunScenarioFromConfigFile(configFile string) {

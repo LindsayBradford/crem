@@ -4,10 +4,11 @@ package annealers
 
 import (
 	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/pkg/errors"
 
-	. "github.com/LindsayBradford/crem/annealing/explorer"
-	. "github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/logging/loggers"
 )
 
 type SimpleAnnealer struct {
@@ -17,8 +18,8 @@ type SimpleAnnealer struct {
 	maxIterations    uint64
 	currentIteration uint64
 	eventNotifier    annealing.EventNotifier
-	solutionExplorer Explorer
-	logger           LogHandler
+	solutionExplorer explorer.Explorer
+	logger           logging.Logger
 }
 
 func (sa *SimpleAnnealer) Initialise() {
@@ -28,8 +29,8 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.maxIterations = 0
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
-	sa.solutionExplorer = NULL_EXPLORER
-	sa.logger = new(NullLogHandler)
+	sa.solutionExplorer = explorer.NULL_EXPLORER
+	sa.logger = new(loggers.NullLogger)
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
@@ -77,11 +78,11 @@ func (sa *SimpleAnnealer) CurrentIteration() uint64 {
 	return sa.currentIteration
 }
 
-func (sa *SimpleAnnealer) SolutionExplorer() Explorer {
+func (sa *SimpleAnnealer) SolutionExplorer() explorer.Explorer {
 	return sa.solutionExplorer
 }
 
-func (sa *SimpleAnnealer) SetSolutionExplorer(explorer Explorer) error {
+func (sa *SimpleAnnealer) SetSolutionExplorer(explorer explorer.Explorer) error {
 	if explorer == nil {
 		return errors.New("invalid attempt to set Solution Explorer to nil value")
 	}
@@ -89,7 +90,7 @@ func (sa *SimpleAnnealer) SetSolutionExplorer(explorer Explorer) error {
 	return nil
 }
 
-func (sa *SimpleAnnealer) SetLogHandler(logger LogHandler) error {
+func (sa *SimpleAnnealer) SetLogHandler(logger logging.Logger) error {
 	if logger == nil {
 		return errors.New("invalid attempt to set log handler to nil value")
 	}
@@ -97,7 +98,7 @@ func (sa *SimpleAnnealer) SetLogHandler(logger LogHandler) error {
 	return nil
 }
 
-func (sa *SimpleAnnealer) LogHandler() LogHandler {
+func (sa *SimpleAnnealer) LogHandler() logging.Logger {
 	return sa.logger
 }
 

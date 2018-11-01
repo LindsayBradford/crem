@@ -9,7 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/annealing/annealers"
 	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/errors"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type AnnealerBuilder struct {
@@ -21,8 +21,8 @@ type AnnealerBuilder struct {
 	observersBuilder annealingObserversBuilder
 	explorersBuilder solutionExplorerBuilder
 
-	defaultLogHandler handlers.LogHandler
-	logHandlers       []handlers.LogHandler
+	defaultLogHandler logging.Logger
+	logHandlers       []logging.Logger
 	observers         []annealing.Observer
 	annealingExplorer explorer.Explorer
 }
@@ -50,7 +50,7 @@ func (builder *AnnealerBuilder) RegisteringExplorer(registration ExplorerRegistr
 	return builder
 }
 
-func (builder *AnnealerBuilder) Build() (annealing.Annealer, handlers.LogHandler, error) {
+func (builder *AnnealerBuilder) Build() (annealing.Annealer, logging.Logger, error) {
 	builder.buildLogHandlers()
 	builder.defaultLogHandler.Debug("About to call Builder.Build() ")
 
@@ -89,7 +89,7 @@ func (builder *AnnealerBuilder) buildLogHandlers() {
 	logHandlers, logHandlerErrors := builder.loggersBuilder.Build()
 
 	if logHandlerErrors != nil {
-		newError := fmt.Errorf("failed to establish log handlers from config: %s", logHandlerErrors.Error())
+		newError := fmt.Errorf("failed to establish log loggers from config: %s", logHandlerErrors.Error())
 		builder.errors.Add(newError)
 	}
 

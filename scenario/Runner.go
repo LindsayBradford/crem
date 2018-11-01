@@ -8,17 +8,17 @@ import (
 	. "time"
 
 	"github.com/LindsayBradford/crem/annealing"
-	"github.com/LindsayBradford/crem/logging/handlers"
+	"github.com/LindsayBradford/crem/logging"
 )
 
 type CallableRunner interface {
 	Run() error
-	LogHandler() handlers.LogHandler
+	LogHandler() logging.Logger
 }
 
 type Runner struct {
 	annealer   annealing.Annealer
-	logHandler handlers.LogHandler
+	logHandler logging.Logger
 
 	name              string
 	operationType     string
@@ -90,7 +90,7 @@ func (runner *Runner) Run() error {
 	return runError
 }
 
-func (runner *Runner) LogHandler() handlers.LogHandler {
+func (runner *Runner) LogHandler() logging.Logger {
 	return runner.logHandler
 }
 

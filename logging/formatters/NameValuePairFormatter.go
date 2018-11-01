@@ -3,17 +3,17 @@
 package formatters
 
 import (
-	. "github.com/LindsayBradford/crem/logging/shared"
+	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/strings"
 )
 
-// NameValuePairFormatter formats a LogAttributes array into a string of comma-separated name-value pairs.
+// NameValuePairFormatter formats a Attributes array into a string of comma-separated name-value pairs.
 // TODO: Supply example encoding.
 type NameValuePairFormatter struct{}
 
 func (formatter *NameValuePairFormatter) Initialise() {}
 
-func (formatter *NameValuePairFormatter) Format(attributes LogAttributes) string {
+func (formatter *NameValuePairFormatter) Format(attributes logging.Attributes) string {
 	var builder strings.FluentBuilder
 
 	needsComma := false
