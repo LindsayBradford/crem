@@ -33,7 +33,7 @@ type ExplorerRegistration struct {
 }
 
 func (builder *AnnealerBuilder) initialise() {
-	builder.errors = new(errors.CompositeError)
+	builder.errors = errors.NewComposite("AnnealerBuilder initialisation")
 	builder.loggersBuilder.WithConfig(builder.config.Loggers)
 	builder.observersBuilder.WithConfig(builder.config)
 	builder.explorersBuilder.WithConfig(builder.config)
@@ -121,7 +121,7 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
-		newError := fmt.Errorf("failed to establish explorer explorer from config: %s", buildErrors.Error())
+		newError := fmt.Errorf("failed to establish explorer from config: %s", buildErrors.Error())
 		builder.errors.Add(newError)
 	}
 

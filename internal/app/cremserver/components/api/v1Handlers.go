@@ -79,6 +79,8 @@ func (m *Mux) handleScenarioConfigRetrieveError(retrieveError error, jobInError 
 	wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 	m.Logger().Warn(wrappingError)
 	jobInError.SetStatus(job.Invalid)
+	jobInError.Attributes["InvalidationTime"] = rest.FormattedTimestamp()
+	jobInError.Attributes["InvalidationDetail"] = wrappingError.Error()
 	m.AddToHistory(jobInError)
 	m.InternalServerError(w, r, errors.New("Invalid scenario configuration supplied"))
 	m.allowJobQueries(jobInError)
@@ -118,7 +120,14 @@ func (m *Mux) DoJob(jobToDo *job.Job) {
 
 	m.Logger().Info("Running Job [" + string(jobToDo.Id) + "].")
 
-	scenario.RunScenarioFromConfig(scenarioConfig)
+	runError := scenario.RunScenarioFromConfig(scenarioConfig)
+
+	if runError != nil {
+		jobToDo.Attributes["ErrorDetail"] = runError
+		jobToDo.Attributes["ErrorTime"] = rest.FormattedTimestamp()
+		jobToDo.SetStatus(job.Errored)
+		return
+	}
 
 	jobToDo.SetStatus(job.Completed)
 

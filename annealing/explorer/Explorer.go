@@ -53,3 +53,7 @@ type AnnealableExplorer interface {
 	ChangeIsDesirable() bool
 	ChangeAccepted() bool
 }
+
+type ParameterisedExplorer interface {
+	ParameterErrors() error
+}

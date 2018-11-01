@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing/explorer"
 	. "github.com/LindsayBradford/crem/errors"
+	errors2 "github.com/pkg/errors"
 )
 
 type solutionExplorerBuilder struct {
@@ -19,7 +20,7 @@ type ExplorerConfigFunction func(config SolutionExplorerConfig) explorer.Explore
 
 func (builder *solutionExplorerBuilder) initialise() *solutionExplorerBuilder {
 	if builder.errors == nil {
-		builder.errors = new(CompositeError)
+		builder.errors = NewComposite("SolutionExplorer initialisation")
 	}
 
 	if builder.registeredExplorers == nil {
@@ -62,7 +63,7 @@ func (builder *solutionExplorerBuilder) RegisteringExplorer(explorerType string,
 func (builder *solutionExplorerBuilder) Build(explorerName string) (explorer.Explorer, error) {
 	var myExplorer explorer.Explorer
 	if len(builder.config) == 0 {
-		builder.errors.Add(errors.New("configuration failed to specify any explorer explorers"))
+		builder.errors.Add(errors.New("configuration failed to specify any explorers"))
 	} else {
 		myExplorer = builder.findMyExplorer(explorerName, builder.buildExplorers())
 	}
@@ -95,6 +96,15 @@ func (builder *solutionExplorerBuilder) buildExplorers() []explorer.Explorer {
 		if foundExplorer {
 			configFunction := builder.registeredExplorers[currConfig.Type]
 			explorerList[index] = configFunction(currConfig)
+
+			parameterisedExplorer, ok := explorerList[index].(explorer.ParameterisedExplorer)
+			if ok {
+				if errors := parameterisedExplorer.ParameterErrors(); errors != nil {
+					wrappedErrors := errors2.Wrap(errors, "building explorer ["+currConfig.Name+"]")
+					builder.errors.Add(wrappedErrors)
+				}
+			}
+
 		} else {
 			builder.errors.Add(
 				errors.New("configuration specifies a explorer explorer type [\"" +

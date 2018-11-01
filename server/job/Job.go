@@ -20,6 +20,7 @@ const (
 	Unspecified Status = "UNSPECIFIED"
 	Created     Status = "CREATED"
 	Completed   Status = "COMPLETED"
+	Errored     Status = "ERRORED"
 	Invalid     Status = "INVALID"
 )
 
