@@ -6,8 +6,9 @@ package errors
 import (
 	"encoding/json"
 	"errors"
+	"strings"
 
-	"github.com/LindsayBradford/crem/strings"
+	cremstrings "github.com/LindsayBradford/crem/strings"
 )
 
 // CompositeError offers a convenience wrapper to a number of related error instances.
@@ -34,21 +35,59 @@ func (ce *CompositeError) Error() string {
 }
 
 func (ce *CompositeError) MarshalJSON() ([]byte, error) {
-	if len(ce.individualErrors) == 1 {
-		errorString := ce.individualErrors[0]
-		return json.Marshal(errorString.Error())
+	errorMessages := deriveMessagesFromError(ce, 0)
+	return json.Marshal(errorMessages)
+}
+
+type errorWithCause interface {
+	Cause() error
+}
+
+func deriveMessagesFromError(error error, indentLevel int) []string {
+	messages := make([]string, 0)
+
+	switch error.(type) {
+	case errorWithCause:
+		causingError := deriveRootCauseOf(error)
+		return deriveMessagesFromError(causingError, indentLevel)
+	case *CompositeError:
+		if errorAsComposite, errorIsComposite := error.(*CompositeError); errorIsComposite {
+			newMessages := deriveMessagesFromCompositeError(errorAsComposite, indentLevel)
+			messages = append(messages, newMessages...)
+		}
+	default:
+		messages = append(messages, indent(indentLevel)+error.Error())
 	}
 
-	errorStrings := make([]string, 0)
-	for _, thisError := range ce.individualErrors {
-		errorStrings = append(errorStrings, thisError.Error())
-	}
+	return messages
+}
 
-	return json.Marshal(errorStrings)
+func deriveMessagesFromCompositeError(error *CompositeError, indentLevel int) []string {
+	messages := make([]string, 0)
+	messages = append(messages, indent(indentLevel)+error.compositeText)
+	for _, individualError := range error.individualErrors {
+		newMessages := deriveMessagesFromError(individualError, indentLevel+1)
+		messages = append(messages, newMessages...)
+	}
+	return messages
+}
+
+func deriveRootCauseOf(error error) error {
+	var rootError = error
+	// loop through errors with causes... last error in chain (without a cause) IS the root cause.
+	for typedError, hasCause := rootError.(errorWithCause); hasCause; typedError, hasCause = rootError.(errorWithCause) {
+		rootError = typedError.Cause()
+	}
+	return rootError
+}
+
+func indent(indentLevel int) string {
+	const indentString = " "
+	return strings.Repeat(indentString, indentLevel)
 }
 
 func (ce *CompositeError) buildCompositeErrorString() string {
-	builder := strings.FluentBuilder{}
+	builder := cremstrings.FluentBuilder{}
 
 	builder.Add(ce.compositeText, ", composed of: [\n")
 

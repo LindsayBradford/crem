@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/annealing/explorer"
 	"github.com/LindsayBradford/crem/errors"
 	"github.com/LindsayBradford/crem/logging"
+	errors2 "github.com/pkg/errors"
 )
 
 type AnnealerBuilder struct {
@@ -74,7 +75,7 @@ func (builder *AnnealerBuilder) Build() (annealing.Annealer, logging.Logger, err
 	builder.defaultLogHandler.Debug("Call to Builder.Build() finished")
 
 	if baseBuildError != nil {
-		newError := fmt.Errorf("failed to establish annealer from config: %s", baseBuildError.Error())
+		newError := errors2.Wrap(baseBuildError, "failed to establish annealer from config")
 		builder.errors.Add(newError)
 	}
 
@@ -121,7 +122,7 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
-		newError := fmt.Errorf("failed to establish explorer from config: %s", buildErrors.Error())
+		newError := errors2.Wrap(buildErrors, "building explorer from config")
 		builder.errors.Add(newError)
 	}
 
