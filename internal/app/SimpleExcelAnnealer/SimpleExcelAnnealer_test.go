@@ -22,6 +22,6 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 		Runner:         RunFromConfigFile,
 	}
 
-	context.VerifyScenarioConfigFilesDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 	os.Remove(excelFileUnderTest)
 }

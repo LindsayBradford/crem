@@ -24,7 +24,7 @@ func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioConfigFilesDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
@@ -35,7 +35,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioConfigFilesDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
@@ -46,7 +46,7 @@ func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioConfigFilesDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }
 
 func TestValidJobsGetRequest_OkResponse(t *testing.T) {

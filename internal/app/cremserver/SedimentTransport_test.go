@@ -7,6 +7,8 @@ import (
 
 	configTesting "github.com/LindsayBradford/crem/config/testing"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
+	"github.com/LindsayBradford/crem/internal/app/cremserver/components/scenario"
+	"github.com/LindsayBradford/crem/logging/loggers"
 )
 
 func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
@@ -17,5 +19,18 @@ func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioConfigFilesDoesNotPanic()
+	scenario.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+}
+
+func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
+	context := configTesting.TestingContext{
+		Name:           "Attempted run of sediment transport annealer with bad inputs",
+		T:              t,
+		ConfigFilePath: "testdata/SedimentTransportTestConfig-BadInputs.toml",
+		Runner:         components.RunScenarioFromConfigFile,
+	}
+
+	scenario.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }

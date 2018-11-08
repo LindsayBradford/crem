@@ -17,7 +17,7 @@ type TestingContext struct {
 
 type ScenarioFileRunningFunction func(scenarioPath string)
 
-func (tc *TestingContext) VerifyScenarioConfigFilesDoesNotPanic() {
+func (tc *TestingContext) VerifyScenarioRunViaConfigFileDoesNotPanic() {
 	if testing.Short() {
 		tc.T.Skip("skipping " + tc.Name + " in short mode")
 	}
