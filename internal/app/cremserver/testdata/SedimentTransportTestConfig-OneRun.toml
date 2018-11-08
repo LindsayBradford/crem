@@ -1,0 +1,24 @@
+ScenarioName = "Test Sediment Transport Annealer - One run"
+
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 2_00_000 # 200
+
+[[SolutionExplorers]]
+Type = "SedimentTransportSolutionExplorer"
+Name = "TurbidityExplorer"
+[SolutionExplorers.Parameters]
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+
+[Annealer]
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
+MaximumIterations = 1_000_000 # 1M
+SolutionExplorer = "TurbidityExplorer"
+
