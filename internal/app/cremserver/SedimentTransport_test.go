@@ -5,29 +5,17 @@ package main
 import (
 	"testing"
 
+	configTesting "github.com/LindsayBradford/crem/config/testing"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
-	. "github.com/onsi/gomega"
 )
 
 func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
-	context := testContext{
-		name:       "Single run of sediment transport annealer",
-		t:          t,
-		configFile: "testdata/SedimentTransportTestConfig-OneRun.toml",
+	context := configTesting.TestingContext{
+		Name:           "Single run of sediment transport annealer",
+		T:              t,
+		ConfigFilePath: "testdata/SedimentTransportTestConfig-OneRun.toml",
+		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	verifyScenarioRunsAgainstContext(context)
-}
-
-func verifyScenarioRunsAgainstContext(context testContext) {
-	if testing.Short() {
-		context.t.Skip("skipping " + context.name + " in short mode")
-	}
-	g := NewGomegaWithT(context.t)
-
-	simulatedMainCall := func() {
-		components.RunScenarioFromConfigFile(context.configFile)
-	}
-
-	g.Expect(simulatedMainCall).To(Not(Panic()), context.name+" should not panic")
+	context.VerifyScenarioConfigFilesDoesNotPanic()
 }

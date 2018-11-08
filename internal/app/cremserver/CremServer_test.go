@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	configTesting "github.com/LindsayBradford/crem/config/testing"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components"
 	"github.com/LindsayBradford/crem/internal/app/cremserver/components/api"
 	"github.com/LindsayBradford/crem/logging/loggers"
@@ -15,68 +16,52 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type testContext struct {
-	name       string
-	t          *testing.T
-	configFile string
-}
-
 func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := testContext{
-		name:       "Single run of Dumb annealer",
-		t:          t,
-		configFile: "testdata/DumbAnnealerTestConfig-OneRun.toml",
+	context := configTesting.TestingContext{
+		Name:           "Single run of Dumb annealer",
+		T:              t,
+		ConfigFilePath: "testdata/DumbAnnealerTestConfig-OneRun.toml",
+		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	verifyDumbAnnealerRunsAgainstContext(context)
+	context.VerifyScenarioConfigFilesDoesNotPanic()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
-	context := testContext{
-		name:       "Three sequential runs of Dumb annealer",
-		t:          t,
-		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
+	context := configTesting.TestingContext{
+		Name:           "Three sequential runs of Dumb annealer",
+		T:              t,
+		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
+		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	verifyDumbAnnealerRunsAgainstContext(context)
+	context.VerifyScenarioConfigFilesDoesNotPanic()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
-	context := testContext{
-		name:       "Three concurrent runs of Dumb annealer",
-		t:          t,
-		configFile: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+	context := configTesting.TestingContext{
+		Name:           "Three concurrent runs of Dumb annealer",
+		T:              t,
+		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	verifyDumbAnnealerRunsAgainstContext(context)
-}
-
-func verifyDumbAnnealerRunsAgainstContext(context testContext) {
-	if testing.Short() {
-		context.t.Skip("skipping " + context.name + " in short mode")
-	}
-	g := NewGomegaWithT(context.t)
-
-	simulatedMainCall := func() {
-		components.RunScenarioFromConfigFile(context.configFile)
-	}
-
-	g.Expect(simulatedMainCall).To(Not(Panic()), context.name+" should not panic")
+	context.VerifyScenarioConfigFilesDoesNotPanic()
 }
 
 func TestValidJobsGetRequest_OkResponse(t *testing.T) {
-	context := testContext{
-		name:       "GET /jobs request returns 200 response",
-		t:          t,
-		configFile: "testdata/server.toml",
+	context := configTesting.TestingContext{
+		Name:           "GET /jobs request returns 200 response",
+		T:              t,
+		ConfigFilePath: "testdata/server.toml",
 	}
 
 	verifyResponseToValidJobsGetRequest(context)
 }
 
-func verifyResponseToValidJobsGetRequest(context testContext) {
+func verifyResponseToValidJobsGetRequest(context configTesting.TestingContext) {
 
-	g := NewGomegaWithT(context.t)
+	g := NewGomegaWithT(context.T)
 
 	muxUnderTest := buildMuxUnderTest()
 
@@ -88,24 +73,24 @@ func verifyResponseToValidJobsGetRequest(context testContext) {
 
 	responseContainer := requestContext.BuildJsonResponse()
 
-	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.name+" should return OK status")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusOK), context.Name+" should return OK status")
 
 	// verifyResponseTimeIsAboutNow(g, responseContainer)
 }
 
 func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
-	context := testContext{
-		name:       "POST /jobs request of invalid scenario returns 500 response",
-		t:          t,
-		configFile: "testdata/server.toml",
+	context := configTesting.TestingContext{
+		Name:           "POST /jobs request of invalid scenario returns 500 response",
+		T:              t,
+		ConfigFilePath: "testdata/server.toml",
 	}
 
 	verifyInternalServerErrorResponseToInvalidJobsPostRequest(context)
 }
 
-func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testContext) {
+func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context configTesting.TestingContext) {
 
-	g := NewGomegaWithT(context.t)
+	g := NewGomegaWithT(context.T)
 
 	muxUnderTest := buildMuxUnderTest()
 
@@ -119,7 +104,7 @@ func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testConte
 
 	responseContainer := requestContext.BuildJsonResponse()
 
-	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusInternalServerError), context.name+" should return 500 status")
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", http.StatusInternalServerError), context.Name+" should return 500 status")
 
 	verifyResponseTimeIsAboutNow(g, responseContainer)
 }
