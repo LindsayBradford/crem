@@ -1,6 +1,8 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package scenario
+// Copyright (c) 2018 Australian Rivers Institute.
+
+package parameters
 
 import (
 	"fmt"
@@ -8,38 +10,46 @@ import (
 	"github.com/LindsayBradford/crem/errors"
 )
 
-type ParameterMap map[string]interface{}
-type ParameterMetaDataMap map[string]ParameterMetaData
+type Map map[string]interface{}
+type MetaDataMap map[string]MetaData
 
 type Parameters struct {
-	parameterMap     ParameterMap
-	metaDataMap      ParameterMetaDataMap
+	paramMap         Map
+	metaDataMap      MetaDataMap
 	validationErrors *errors.CompositeError
 }
 
-type ParameterValidator func(key string, value interface{})
+type Validator func(key string, value interface{}) bool
 
-type ParameterMetaData struct {
-	validator    ParameterValidator
-	defaultValue interface{}
+type MetaData struct {
+	Key          string
+	Validator    Validator
+	DefaultValue interface{}
 }
 
 func (p *Parameters) Initialise() *Parameters {
 	p.validationErrors = errors.NewComposite("SolutionExplorer Parameters")
-	p.metaDataMap = make(ParameterMetaDataMap, 0)
+	p.metaDataMap = make(MetaDataMap, 0)
 	return p
 }
 
-func (p *Parameters) CreateDefaultParameters() {
-	p.parameterMap = make(ParameterMap, 0)
+func (p *Parameters) CreateDefaults() {
+	p.paramMap = make(Map, 0)
 	for key, value := range p.metaDataMap {
-		p.parameterMap[key] = value.defaultValue
+		p.paramMap[key] = value.DefaultValue
 	}
 }
 
-func (p *Parameters) Merge(params ParameterMap) {
+func (p *Parameters) AddMetaData(metaData MetaData) {
+	p.metaDataMap[metaData.Key] = metaData
+}
+
+func (p *Parameters) Merge(params Map) {
+	p.validationErrors = errors.NewComposite("SolutionExplorer Parameters")
 	for suppliedKey, suppliedValue := range params {
-		p.parameterMap[suppliedKey] = suppliedValue
+		if p.validateParam(suppliedKey, suppliedValue) {
+			p.paramMap[suppliedKey] = suppliedValue
+		}
 	}
 }
 
@@ -50,40 +60,43 @@ func (p *Parameters) ValidationErrors() error {
 	return nil
 }
 
-func (p *Parameters) Validate() {
-	for key, value := range p.parameterMap {
-		p.validateParam(key, value)
-	}
-}
-
-func (p *Parameters) validateParam(key string, value interface{}) {
+func (p *Parameters) validateParam(key string, value interface{}) bool {
 	if _, isPresent := p.metaDataMap[key]; isPresent {
-		p.metaDataMap[key].validator(key, value)
+		return p.metaDataMap[key].Validator(key, value)
 	} else {
 		p.keyMissingValidator(key)
 	}
+	return true
 }
 
 func (p *Parameters) keyMissingValidator(key string) {
 	p.validationErrors.AddMessage("Parameter [" + string(key) + "] is not a parameter for this explorer")
 }
 
-func (p *Parameters) ValidateIsDecimal(key string, value interface{}) {
+func (p *Parameters) ValidateIsDecimal(key string, value interface{}) bool {
 	_, typeIsOk := value.(float64)
 	if !typeIsOk {
 		p.validationErrors.AddMessage("Parameter [" + key + "] must be a decimal value")
+		return false
 	}
+	return true
 }
 
-func (p *Parameters) ValidateDecimalWithInclusiveBounds(key string, value interface{}, minValue float64, maxValue float64) {
+func (p *Parameters) ValidateDecimalWithInclusiveBounds(key string, value interface{}, minValue float64, maxValue float64) bool {
 	valueAsFloat, typeIsOk := value.(float64)
 	if !typeIsOk {
 		p.validationErrors.AddMessage("Parameter [" + key + "] must be a decimal value")
-		return
+		return false
 	}
 
 	if valueAsFloat < minValue || valueAsFloat > maxValue {
 		message := fmt.Sprintf("Parameter [%s] supplied with decimal value [%v], but must be between [%.04f] and [%.04f] inclusive", key, value, minValue, maxValue)
 		p.validationErrors.AddMessage(message)
+		return false
 	}
+	return true
+}
+
+func (p *Parameters) Get(key string) interface{} {
+	return p.paramMap[key]
 }
