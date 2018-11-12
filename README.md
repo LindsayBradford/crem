@@ -3,10 +3,9 @@
 [![Build Status](https://travis-ci.com/LindsayBradford/crem.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crem)
 [![GoDoc](https://godoc.org/github.com/LindsayBradford/crem?status.svg)](https://godoc.org/github.com/LindsayBradford/crem)
 
-
 #### Getting Started
 
-CREM makes use of a a number of 3rd-party libraries that are not included in this source repository. The [govendor](https://github.com/kardianos/govendor) utility governs library dependencies via its [vendor.json](src/github.com/LindsayBradford/crem/vendor/vendor.json). 
+CREM makes use of a a number of 3rd-party libraries that are not included in this source repository. The [govendor](https://github.com/kardianos/govendor) utility governs library dependencies via  [vendor.json](https://github.com/LindsayBradford/crem/blob/master/vendor/vendor.json). 
 Once you've git-cloned this repository, run:
 
 ```
@@ -17,14 +16,12 @@ Once you've git-cloned this repository, run:
 
 to download compatible versions of the libraries CREM depends on as [vendor libraries](https://golang.org/cmd/go/#hdr-Vendor_Directories). 
 
-From there a `go build` from  within [internal/app/cremserver](src/github.com/LindsayBradford/crem/internal/app/cremserver) should produce 
-a `cremserver.exe` executable.   
-
-You can then tun cremserver.exe from the command-line, specifying a scenario config file like this:
+From there a `go build` from  within [internal/app/cremserver](https://github.com/LindsayBradford/crem/blob/master/internal/app/cremserver) should produce 
+a `cremserver.exe` executable.  Then run your new executable  from the command-line, specifying a scenario config file like this:
 
 ```> cremserver.exe --ScenarioFile <someScenarioFile>```
 
-You'll find a [simple test scenario configuration](src/github.com/LindsayBradford/crem/internal/app/cremserver/testdata/DumbAnnealerTestConfig-OneRun.toml) here. Further detail on configuring a scenario can be found in the [wiki](https://github.com/LindsayBradford/crem/wiki/Configuration#scenario-configuration). 
+You'll find a [simple test scenario configuration](https://github.com/LindsayBradford/crem/blob/master/internal/app/cremserver/testdata/DumbAnnealerTestConfig-OneRun.toml) here. Further detail on configuring a scenario can be found in the [wiki](https://github.com/LindsayBradford/crem/wiki/Configuration#scenario-configuration). 
 
 #### Overview:
 
