@@ -3,9 +3,28 @@
 [![Build Status](https://travis-ci.com/LindsayBradford/crem.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crem)
 [![GoDoc](https://godoc.org/github.com/LindsayBradford/crem?status.svg)](https://godoc.org/github.com/LindsayBradford/crem)
 
-## Release 0.1 - 04/06/2018
 
-TBD: <Add blurb>
+#### Getting Started
+
+CREM makes use of a a number of 3rd-party libraries that are not included in this source repository. The [govendor](https://github.com/kardianos/govendor) utility governs library dependencies via its [vendor.json](src/github.com/LindsayBradford/crem/vendor/vendor.json). 
+Once you've git-cloned this repository, run:
+
+```
+> go get https://github.com/kardianos/govendor
+> cd <new CREM repository folder>
+> govendor sync
+```
+
+to download compatible versions of the libraries CREM depends on as [vendor libraries](https://golang.org/cmd/go/#hdr-Vendor_Directories). 
+
+From there a `go build` from  within [internal/app/cremserver](src/github.com/LindsayBradford/crem/internal/app/cremserver) should produce 
+a `cremserver.exe` executable.   
+
+You can then tun cremserver.exe from the command-line, specifying a scenario config file like this:
+
+```> cremserver.exe --ScenarioFile <someScenarioFile>```
+
+You'll find a [simple test scenario configuration](src/github.com/LindsayBradford/crem/internal/app/cremserver/testdata/DumbAnnealerTestConfig-OneRun.toml) here. Further detail on configuring a scenario can be found in the [wiki](https://github.com/LindsayBradford/crem/wiki/Configuration#scenario-configuration). 
 
 #### Overview:
 
@@ -49,7 +68,10 @@ detailed in [LICENCE.md](LICENCE.md).
 
 #### Dependencies:
 
+CREM makes use of the following libraries:
+
 - [Gomega](https://github.com/onsi/gomega)  For a Fluent-API based approach to test assertions
 - [go-ole](https://github.com/go-ole/go-ole) For I/O via Excel files
+- [BurntSushi/toml](https://github.com/BurntSushi/toml) for TOML config file support
 - [pkg/errors](https://github.com/pkg/errors) For error wrapping
 - [nu7hatch/gouuid](https://github.com//nu7hatch/gouuid) For UUID generation
