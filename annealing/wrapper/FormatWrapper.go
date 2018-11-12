@@ -22,7 +22,7 @@ func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 		"iD":               defaultStringFormat,
 		"Temperature":      defaultFloat64Format,
 		"CoolingFactor":    defaultFloat64Format,
-		"MaxIterations":    defaultUintFormat,
+		"MaximumIterations":    defaultUintFormat,
 		"CurrentIteration": defaultUintFormat,
 	}
 	return wrapper
@@ -49,8 +49,8 @@ func (wrapper *FormatWrapper) CoolingFactor() string {
 	return wrapper.applyFormatting("CoolingFactor", wrapper.AnnealerToFormat.CoolingFactor())
 }
 
-func (wrapper *FormatWrapper) MaxIterations() string {
-	return wrapper.applyFormatting("MaxIterations", wrapper.AnnealerToFormat.MaxIterations())
+func (wrapper *FormatWrapper) MaximumIterations() string {
+	return wrapper.applyFormatting("MaximumIterations", wrapper.AnnealerToFormat.MaximumIterations())
 }
 
 func (wrapper *FormatWrapper) CurrentIteration() string {

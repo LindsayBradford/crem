@@ -4,6 +4,7 @@ package annealers
 
 import (
 	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	"github.com/LindsayBradford/crem/logging"
 	"github.com/pkg/errors"
 
@@ -14,23 +15,22 @@ import (
 type SimpleAnnealer struct {
 	id               string
 	temperature      float64
-	coolingFactor    float64
-	maxIterations    uint64
 	currentIteration uint64
 	eventNotifier    annealing.EventNotifier
 	solutionExplorer explorer.Explorer
 	logger           logging.Logger
+
+	parameters Parameters
 }
 
 func (sa *SimpleAnnealer) Initialise() {
 	sa.id = "Simple Annealer"
 	sa.temperature = 1
-	sa.coolingFactor = 1
-	sa.maxIterations = 0
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
 	sa.solutionExplorer = explorer.NULL_EXPLORER
 	sa.logger = new(loggers.NullLogger)
+	sa.parameters.Initialise()
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
@@ -40,6 +40,15 @@ func (sa *SimpleAnnealer) SetId(title string) {
 
 func (sa *SimpleAnnealer) Id() string {
 	return sa.id
+}
+
+func (sa *SimpleAnnealer) SetParameters(params parameters.Map)  error {
+	sa.parameters.Merge(params)
+
+	temperature, _ := sa.parameters.Get(StartingTemperature).(float64)
+	sa.SetTemperature(temperature)
+
+	return sa.parameters.ValidationErrors()
 }
 
 func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
@@ -54,24 +63,14 @@ func (sa *SimpleAnnealer) Temperature() float64 {
 	return sa.temperature
 }
 
-func (sa *SimpleAnnealer) SetCoolingFactor(coolingFactor float64) error {
-	if coolingFactor <= 0 || coolingFactor > 1 {
-		return errors.New("invalid attempt to set annealer cooling factor to value <= 0 or > 1")
-	}
-	sa.coolingFactor = coolingFactor
-	return nil
-}
 
 func (sa *SimpleAnnealer) CoolingFactor() float64 {
-	return sa.coolingFactor
+	return sa.parameters.Get(CoolingFactor).(float64)
 }
 
-func (sa *SimpleAnnealer) SetMaxIterations(iterations uint64) {
-	sa.maxIterations = iterations
-}
 
-func (sa *SimpleAnnealer) MaxIterations() uint64 {
-	return sa.maxIterations
+func (sa *SimpleAnnealer) MaximumIterations() uint64 {
+	return uint64(sa.parameters.Get(MaximumIterations).(int64))
 }
 
 func (sa *SimpleAnnealer) CurrentIteration() uint64 {
@@ -178,13 +177,13 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {
-	return sa.maxIterations == 0
+	return sa.parameters.Get(MaximumIterations) == 0
 }
 
 func (sa *SimpleAnnealer) checkIfDone() bool {
-	return sa.currentIteration >= sa.maxIterations
+	return sa.currentIteration >= uint64(sa.parameters.Get(MaximumIterations).(int64))
 }
 
 func (sa *SimpleAnnealer) cooldown() {
-	sa.temperature *= sa.coolingFactor
+	sa.temperature *= sa.parameters.Get(CoolingFactor).(float64)
 }

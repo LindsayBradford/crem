@@ -5,6 +5,7 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	cremerrors "github.com/LindsayBradford/crem/errors"
 	"github.com/LindsayBradford/crem/logging"
 )
@@ -47,19 +48,13 @@ func (builder *Builder) WithLogHandler(logHandler logging.Logger) *Builder {
 	return builder
 }
 
-func (builder *Builder) WithStartingTemperature(temperature float64) *Builder {
+func (builder *Builder) WithParameters(params parameters.Map) *Builder {
 	annealerBeingBuilt := builder.annealer
-	if err := annealerBeingBuilt.SetTemperature(temperature); err != nil {
-		builder.buildErrors.Add(err)
-	}
-	return builder
-}
 
-func (builder *Builder) WithCoolingFactor(coolingFactor float64) *Builder {
-	annealerBeingBuilt := builder.annealer
-	if err := annealerBeingBuilt.SetCoolingFactor(coolingFactor); err != nil {
-		builder.buildErrors.Add(err)
+	if parameterErrors := annealerBeingBuilt.SetParameters(params); parameterErrors != nil {
+		builder.buildErrors.Add(parameterErrors)
 	}
+
 	return builder
 }
 
@@ -85,12 +80,6 @@ func (builder *Builder) WithDumbSolutionExplorer(initialObjectiveValue float64) 
 	explorer.SetObjectiveValue(initialObjectiveValue)
 	explorer.SetScenarioId(annealerBeingBuilt.Id())
 	annealerBeingBuilt.SetSolutionExplorer(explorer)
-	return builder
-}
-
-func (builder *Builder) WithMaxIterations(iterations uint64) *Builder {
-	annealerBeingBuilt := builder.annealer
-	annealerBeingBuilt.SetMaxIterations(iterations)
 	return builder
 }
 

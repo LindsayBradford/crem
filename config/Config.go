@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	"github.com/LindsayBradford/crem/strings"
 	"github.com/pkg/errors"
 )
@@ -124,11 +125,9 @@ func (at *AnnealerType) UnmarshalText(text []byte) error {
 
 type AnnealingConfig struct {
 	Type                AnnealerType
-	StartingTemperature float64
-	CoolingFactor       float64
-	MaximumIterations   uint64
 	EventNotifier       EventNotifierType
 	SolutionExplorer    string
+	Parameters parameters.Map
 }
 
 type LoggerType struct {
@@ -255,7 +254,7 @@ type SolutionExplorerConfig struct {
 	Type       string
 	Name       string
 	Penalty    float64
-	Parameters map[string]interface{}
+	Parameters parameters.Map
 	InputFiles map[string]string
 }
 

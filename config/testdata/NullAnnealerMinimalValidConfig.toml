@@ -4,7 +4,8 @@ Name = "validConfig"
 
 [Annealer]
 Type = "Simple"
+SolutionExplorer = "validConfig"
+[Annealer.Parameters]
 StartingTemperature = 10.0
 CoolingFactor =  0.99
 MaximumIterations = 5
-SolutionExplorer = "validConfig"

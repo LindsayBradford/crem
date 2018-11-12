@@ -10,7 +10,8 @@ Penalty = 100.5 # 100.0
 
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
+SolutionExplorer = "DoraTheExplorer"
+[Annealer.Parameters]
 StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995
 MaximumIterations = 2_000 # 2000
-SolutionExplorer = "DoraTheExplorer"

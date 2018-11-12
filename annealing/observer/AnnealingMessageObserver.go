@@ -41,18 +41,18 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event annealing.Event
 	switch event.EventType {
 	case annealing.StartedAnnealing:
 		builder.
-			Add("Maximum Iterations [", annealer.MaxIterations(), "], ").
+			Add("Maximum Iterations [", annealer.MaximumIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
 	case annealing.StartedIteration:
 		builder.
-			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
 			Add("Temperature [", annealer.Temperature(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "]")
 	case annealing.FinishedIteration:
 		builder.
-			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Change [", explorer.ChangeInObjectiveValue(), "], ").
 			Add("Desirable? [", explorer.ChangeIsDesirable(), "], ").
@@ -60,7 +60,7 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event annealing.Event
 			Add("Accepted? [", explorer.ChangeAccepted(), "]")
 	case annealing.FinishedAnnealing:
 		builder.
-			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaxIterations(), "], ").
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
 			Add("Objective value [", explorer.ObjectiveValue(), "], ").
 			Add("Temperature [", annealer.Temperature(), "]")
 	case annealing.Note:

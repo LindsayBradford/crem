@@ -63,9 +63,7 @@ func (builder *AnnealerBuilder) Build() (annealing.Annealer, logging.Logger, err
 	newAnnealer, baseBuildError :=
 		builder.buildAnnealerOfType(annealerConfig.Type).
 			WithId(builder.config.ScenarioName).
-			WithStartingTemperature(annealerConfig.StartingTemperature).
-			WithCoolingFactor(annealerConfig.CoolingFactor).
-			WithMaxIterations(annealerConfig.MaximumIterations).
+			WithParameters(annealerConfig.Parameters).
 			WithLogHandler(builder.defaultLogHandler).
 			WithSolutionExplorer(builder.annealingExplorer).
 			WithEventNotifier(builder.buildEventNotifier()).

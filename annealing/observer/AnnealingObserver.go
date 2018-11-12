@@ -41,7 +41,7 @@ func newAnnealerWrapper() *wrapper.FormatWrapper {
 		MethodFormats: map[string]string{
 			"Temperature":      "%0.4f",
 			"CoolingFactor":    "%0.3f",
-			"MaxIterations":    "%03d",
+			"MaximumIterations":    "%03d",
 			"CurrentIteration": "%03d",
 		},
 	}

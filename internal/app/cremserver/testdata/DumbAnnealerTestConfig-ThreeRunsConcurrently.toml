@@ -12,7 +12,8 @@ Type = "DumbSolutionExplorer"
 Name = "DerpaDaExBurba"
 
 [Annealer]
+SolutionExplorer = "DerpaDaExBurba"
+[Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
 MaximumIterations = 1_000_000 # 1M
-SolutionExplorer = "DerpaDaExBurba"

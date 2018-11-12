@@ -26,7 +26,7 @@ func (m *IterationCountFilter) ShouldFilter(event annealing.Event) bool {
 
 	annealer := event.Annealer
 	if event.EventType == annealing.FinishedIteration &&
-		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaxIterations() ||
+		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations() ||
 			annealer.CurrentIteration()%m.iterationModulo == 0) {
 		return false
 	}

@@ -3,6 +3,7 @@
 package annealers
 
 import (
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	. "github.com/onsi/gomega"
 )
 import "testing"
@@ -12,11 +13,15 @@ func TestAnneal(t *testing.T) {
 
 	builder := new(Builder)
 
+	params := parameters.Map {
+		StartingTemperature: float64(10),
+		CoolingFactor:       0.997,
+		MaximumIterations:   int64(10000),
+	}
+
 	annealer, _ := builder.
 		ElapsedTimeTrackingAnnealer().
-		WithStartingTemperature(10).
-		WithCoolingFactor(.997).
-		WithMaxIterations(100000).
+		WithParameters(params).
 		Build()
 
 	elapsedTimeAnnealer, _ := annealer.(*ElapsedTimeTrackingAnnealer)

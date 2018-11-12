@@ -14,7 +14,7 @@ func TestFormatWrapper_Defaults(t *testing.T) {
 
 	const expectedTemperature = "1.000000"
 	const expectedCoolingFactor = "1.000000"
-	const expectedMaxIterations = "0"
+	const expectedMaximumIterations = "0"
 	const expectedCurrentIteration = "0"
 
 	annealer := new(annealers.SimpleAnnealer)
@@ -31,7 +31,7 @@ func TestFormatWrapper_Defaults(t *testing.T) {
 		"FormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
 
 	g.Expect(
-		wrapperUnderTest.MaxIterations()).To(BeIdenticalTo(expectedMaxIterations),
+		wrapperUnderTest.MaximumIterations()).To(BeIdenticalTo(expectedMaximumIterations),
 		"FormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
 
 	g.Expect(
@@ -44,7 +44,7 @@ func TestFormatWrapper_FormatOverrides(t *testing.T) {
 
 	const expectedTemperature = "1.00"
 	const expectedCoolingFactor = "1.0"
-	const expectedMaxIterations = "000"
+	const expectedMaximumIterations = "000"
 	const expectedCurrentIteration = "00"
 
 	annealer := new(annealers.SimpleAnnealer)
@@ -63,9 +63,9 @@ func TestFormatWrapper_FormatOverrides(t *testing.T) {
 		wrapperUnderTest.CoolingFactor()).To(BeIdenticalTo(expectedCoolingFactor),
 		"FormatWrapper should not have defaulted to cooling temperature of \"%s\"", expectedCoolingFactor)
 
-	wrapperUnderTest.MethodFormats["MaxIterations"] = "%03d"
+	wrapperUnderTest.MethodFormats["MaximumIterations"] = "%03d"
 	g.Expect(
-		wrapperUnderTest.MaxIterations()).To(BeIdenticalTo(expectedMaxIterations),
+		wrapperUnderTest.MaximumIterations()).To(BeIdenticalTo(expectedMaximumIterations),
 		"FormatWrapper  should not have defaulted to max iterations of \"%s\"", expectedCoolingFactor)
 
 	wrapperUnderTest.MethodFormats["CurrentIteration"] = "%02d"

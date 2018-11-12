@@ -1,11 +1,10 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 package parameters
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/LindsayBradford/crem/errors"
 )
@@ -81,6 +80,34 @@ func (p *Parameters) ValidateIsDecimal(key string, value interface{}) bool {
 	}
 	return true
 }
+
+func (p *Parameters) ValidateIsDecimalBetweenZeroAndOne(key string, value interface{}) bool {
+	return p.ValidateDecimalWithInclusiveBounds(key, value, 0, 1)
+}
+
+func (p *Parameters) ValidateIsNonNegativeDecimal(key string, value interface{}) bool {
+	return p.ValidateDecimalWithInclusiveBounds(key, value, 0, math.MaxFloat64)
+}
+
+func (p *Parameters) ValidateIsUnsignedInteger(key string, value interface{}) bool {
+	return p.ValidateIntegerWithInclusiveBounds(key, value, 0, math.MaxInt64)
+}
+
+func (p *Parameters) ValidateIntegerWithInclusiveBounds(key string, value interface{}, minValue int64, maxValue int64) bool {
+	valueAsInteger, typeIsOk := value.(int64)
+	if !typeIsOk {
+		p.validationErrors.AddMessage("Parameter [" + key + "] must be n integer value")
+		return false
+	}
+
+	if valueAsInteger < minValue || valueAsInteger > maxValue {
+		message := fmt.Sprintf("Parameter [%s] supplied with integer value [%v], but must be between [%d] and [%.d] inclusive", key, value, minValue, maxValue)
+		p.validationErrors.AddMessage(message)
+		return false
+	}
+	return true
+}
+
 
 func (p *Parameters) ValidateDecimalWithInclusiveBounds(key string, value interface{}, minValue float64, maxValue float64) bool {
 	valueAsFloat, typeIsOk := value.(float64)

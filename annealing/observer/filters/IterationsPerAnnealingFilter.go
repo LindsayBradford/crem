@@ -7,7 +7,7 @@ import "github.com/LindsayBradford/crem/annealing"
 // PercentileOfIterationsPerAnnealingFilter filters FinishedIteration Annealing Event instances at a rate of 1 every
 // percentile number of iterations received. . StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
 type PercentileOfIterationsPerAnnealingFilter struct {
-	maxIterations      uint64
+	MaximumIterations      uint64
 	percentileToReport float64
 	iterationModulo    uint64
 	generatesEvents    bool
@@ -21,15 +21,15 @@ func (m *PercentileOfIterationsPerAnnealingFilter) WithPercentileOfIterations(pe
 }
 
 // WithPercentileOfIterations defines the number of Annealing Iteration Event instances to report over the entire run.
-func (m *PercentileOfIterationsPerAnnealingFilter) WithMaxIterations(maxIterations uint64) *PercentileOfIterationsPerAnnealingFilter {
-	m.maxIterations = maxIterations
+func (m *PercentileOfIterationsPerAnnealingFilter) WithMaximumIterations(MaximumIterations uint64) *PercentileOfIterationsPerAnnealingFilter {
+	m.MaximumIterations = MaximumIterations
 	m.deriveModuloIfPossible()
 	return m
 }
 
 func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 	m.generatesEvents = false
-	if m.maxIterations > 0 && m.percentileToReport > 0 {
+	if m.MaximumIterations > 0 && m.percentileToReport > 0 {
 		m.generatesEvents = true
 		if m.percentileToReport > 1 {
 			m.percentileToReport = 1
@@ -37,7 +37,7 @@ func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 		if m.percentileToReport == 1 {
 			m.iterationModulo = 1
 		} else {
-			m.iterationModulo = uint64((float64)(m.maxIterations) * m.percentileToReport)
+			m.iterationModulo = uint64((float64)(m.MaximumIterations) * m.percentileToReport)
 		}
 	}
 }

@@ -41,7 +41,7 @@ func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event annealing.Eve
 	switch event.EventType {
 	case annealing.StartedAnnealing:
 		logAttributes = append(logAttributes,
-			logging.NameValuePair{Name: "MaximumIterations", Value: annealer.MaxIterations()},
+			logging.NameValuePair{Name: "MaximumIterations", Value: annealer.MaximumIterations()},
 			logging.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
 			logging.NameValuePair{Name: "CoolingFactor", Value: annealer.CoolingFactor()},
 		)

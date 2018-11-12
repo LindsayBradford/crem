@@ -7,15 +7,15 @@
 package annealers
 
 import (
-	"fmt"
+	"testing"
 
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	"github.com/LindsayBradford/crem/logging"
 	"github.com/LindsayBradford/crem/logging/loggers"
 	. "github.com/onsi/gomega"
 )
-import "testing"
 
 type dummyObserver struct{}
 
@@ -24,35 +24,36 @@ func (*dummyObserver) ObserveAnnealingEvent(event annealing.Event) {}
 func TestBuild_OverridingDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	const expectedTemperature float64 = 1000
-	const expectedCoolingFactor float64 = 0.5
-	const expectedIterations uint64 = 5000
 	expectedLogHandler := new(loggers.BareBonesLogger)
 	expectedSolutionExplorer := new(explorer.DumbExplorer)
 	expectedObservers := []annealing.Observer{new(dummyObserver)}
 
 	builder := new(Builder)
 
+	expectedParams := parameters.Map {
+		StartingTemperature: 1000.0,
+		CoolingFactor:       0.5,
+		MaximumIterations:   int64(5000),
+	}
+
 	annealer, _ := builder.
 		SimpleAnnealer().
-		WithStartingTemperature(expectedTemperature).
-		WithCoolingFactor(expectedCoolingFactor).
-		WithMaxIterations(expectedIterations).
+		WithParameters(expectedParams).
 		WithLogHandler(expectedLogHandler).
 		WithSolutionExplorer(expectedSolutionExplorer).
 		WithObservers(expectedObservers...).
 		Build()
 
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(expectedTemperature),
+		annealer.Temperature()).To(BeNumerically("==",expectedParams[StartingTemperature]),
 		"Annealer should have built with supplied Temperature")
 
 	g.Expect(
-		annealer.CoolingFactor()).To(BeIdenticalTo(expectedCoolingFactor),
+		annealer.CoolingFactor()).To(BeNumerically("==",expectedParams[CoolingFactor]),
 		"Annealer should have built with supplied Cooling Factor")
 
 	g.Expect(
-		annealer.MaxIterations()).To(BeIdenticalTo(expectedIterations),
+		annealer.MaximumIterations()).To(BeNumerically("==",expectedParams[MaximumIterations]),
 		"Annealer should have built with supplied Iterations")
 
 	g.Expect(
@@ -75,27 +76,29 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 func TestBuild_BadInputs(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	const badTemperature float64 = -1
-	const badCoolingFactor float64 = 1.0000001
+	badParams := parameters.Map {
+		StartingTemperature: -1,
+		CoolingFactor:       1.00000001,
+		MaximumIterations:   -1,
+	}
+
 	badLogHandler := logging.Logger(nil)
 	badExplorer := explorer.Explorer(nil)
-
-	expectedErrors := 5
 
 	builder := new(Builder)
 
 	annealer, err := builder.
 		SimpleAnnealer().
-		WithStartingTemperature(badTemperature).
-		WithCoolingFactor(badCoolingFactor).
+		WithParameters(badParams).
 		WithLogHandler(badLogHandler).
 		WithSolutionExplorer(badExplorer).
 		WithObservers(nil).
 		Build()
 
 	g.Expect(
-		err.Size()).To(BeIdenticalTo(expectedErrors),
-		"Annealer should have built with "+fmt.Sprintf("%d", expectedErrors)+"errors")
+		err.Size()).To(BeNumerically(">", 3),"Annealer should have built with errors")
+
+	t.Log(err)
 
 	g.Expect(
 		annealer).To(BeNil(),

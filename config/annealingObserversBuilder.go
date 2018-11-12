@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/LindsayBradford/crem/annealing"
+	"github.com/LindsayBradford/crem/annealing/annealers"
 	"github.com/LindsayBradford/crem/annealing/observer"
 	"github.com/LindsayBradford/crem/annealing/observer/filters"
 	. "github.com/LindsayBradford/crem/errors"
@@ -28,7 +29,7 @@ func (builder *annealingObserversBuilder) initialise() *annealingObserversBuilde
 func (builder *annealingObserversBuilder) WithConfig(cremConfig *CREMConfig) *annealingObserversBuilder {
 	builder.initialise()
 	builder.config = cremConfig.AnnealingObservers
-	builder.maximumIterations = cremConfig.Annealer.MaximumIterations
+	builder.maximumIterations = uint64(cremConfig.Annealer.Parameters[annealers.MaximumIterations].(int64))
 	return builder
 }
 
@@ -131,7 +132,7 @@ func (builder *annealingObserversBuilder) buildFilter(currConfig AnnealingObserv
 		percentileOfIterations := currConfig.PercentileOfIterations
 		filter = new(filters.PercentileOfIterationsPerAnnealingFilter).
 			WithPercentileOfIterations(percentileOfIterations).
-			WithMaxIterations(builder.maximumIterations)
+			WithMaximumIterations(builder.maximumIterations)
 	default:
 		panic("Should not reach here")
 	}

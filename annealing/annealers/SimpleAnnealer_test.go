@@ -11,6 +11,7 @@ import (
 
 	"github.com/LindsayBradford/crem/annealing"
 	"github.com/LindsayBradford/crem/annealing/explorer"
+	"github.com/LindsayBradford/crem/annealing/parameters"
 	"github.com/LindsayBradford/crem/logging/loggers"
 	. "github.com/onsi/gomega"
 )
@@ -30,7 +31,7 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with default Cooling Factor of 1")
 
 	g.Expect(
-		annealer.MaxIterations()).To(BeZero(),
+		annealer.MaximumIterations()).To(BeZero(),
 		"Annealer should have built with default iterations of 0")
 
 	g.Expect(
@@ -63,7 +64,8 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 		annealer.Temperature()).To(BeNumerically("==", 1),
 		"Annealer should have ignored crap Temperature set attempt")
 
-	coolingFactorErr := annealer.SetCoolingFactor(1.000001)
+	coolingFactorParam := parameters.Map{CoolingFactor: 1.5}
+	coolingFactorErr := annealer.SetParameters(coolingFactorParam)
 
 	g.Expect(coolingFactorErr).To(Not(BeNil()))
 	g.Expect(annealer.CoolingFactor()).To(BeNumerically("==", 1),
@@ -99,9 +101,13 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	annealer.SetTemperature(startTemperature)
-	annealer.SetCoolingFactor(coolingFactor)
-	annealer.SetMaxIterations(iterations)
+	expectedParams := parameters.Map {
+		StartingTemperature: startTemperature,
+		CoolingFactor:       coolingFactor,
+		MaximumIterations:   int64(iterations),
+	}
+
+	annealer.SetParameters(expectedParams)
 
 	g.Expect(
 		annealer.CurrentIteration()).To(BeZero(),
@@ -130,9 +136,13 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	const expectedIterations = uint64(3)
 
-	annealer.SetTemperature(1000.0)
-	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(expectedIterations)
+	expectedParams := parameters.Map {
+		StartingTemperature: 1000.0,
+		CoolingFactor:       0.5,
+		MaximumIterations:   int64(expectedIterations),
+	}
+
+	annealer.SetParameters(expectedParams)
 
 	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
 
@@ -177,9 +187,13 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	const expectedIterations = uint64(3)
 
-	annealer.SetTemperature(1000.0)
-	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(expectedIterations)
+	expectedParams := parameters.Map {
+		StartingTemperature: 1000.0,
+		CoolingFactor:       0.5,
+		MaximumIterations:   int64(expectedIterations),
+	}
+
+	annealer.SetParameters(expectedParams)
 
 	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
 
@@ -231,9 +245,13 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 
 	const expectedTryCount = uint64(3)
 
-	annealer.SetTemperature(1000.0)
-	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(expectedTryCount)
+	expectedParams := parameters.Map {
+		StartingTemperature: 1000.0,
+		CoolingFactor:       0.5,
+		MaximumIterations:   int64(expectedTryCount),
+	}
+
+	annealer.SetParameters(expectedParams)
 
 	expectedSolutionExplorer := new(TryCountingSolutionExplorer)
 
@@ -264,9 +282,13 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	annealer.SetTemperature(1000.0)
-	annealer.SetCoolingFactor(0.5)
-	annealer.SetMaxIterations(3)
+	expectedParams := parameters.Map {
+		StartingTemperature: 1000.0,
+		CoolingFactor:       0.5,
+		MaximumIterations:   int64(3),
+	}
+
+	annealer.SetParameters(expectedParams)
 
 	expectedLogHandler := new(DummyLogHandler)
 

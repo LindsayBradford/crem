@@ -18,7 +18,10 @@ SuspendedSedimentProportion = 0.5   # 0.5 (default)
 NotAnExplorerParameter = 0
 
 [Annealer]
+SolutionExplorer = "TurbidityExplorer"
+[Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
 MaximumIterations = 1_000_000 # 1M
-SolutionExplorer = "TurbidityExplorer"
+
+

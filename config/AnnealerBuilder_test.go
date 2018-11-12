@@ -40,8 +40,8 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 		"Annealer should have built with config supplied CoolingFactor")
 
 	g.Expect(
-		annealerUnderTest.MaxIterations()).To(BeNumerically("==", 5),
-		"Annealer should have built with config supplied MaxIterations")
+		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
+		"Annealer should have built with config supplied MaximumIterations")
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
@@ -85,8 +85,8 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 		"Annealer should have built with config supplied CoolingFactor")
 
 	g.Expect(
-		annealerUnderTest.MaxIterations()).To(BeNumerically("==", 5),
-		"Annealer should have built with config supplied MaxIterations")
+		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
+		"Annealer should have built with config supplied MaximumIterations")
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
@@ -291,8 +291,8 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		"Annealer should have built with config supplied CoolingFactor")
 
 	g.Expect(
-		annealerUnderTest.MaxIterations()).To(BeNumerically("==", 2000),
-		"Annealer should have built with config supplied MaxIterations")
+		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 2000),
+		"Annealer should have built with config supplied MaximumIterations")
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
