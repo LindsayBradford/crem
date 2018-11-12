@@ -16,11 +16,16 @@ var (
 	randomNumberGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
+const (
+	_              = iota
+	Penalty string = "Penalty"
+)
+
 type SimpleExcelSolutionExplorer struct {
 	SingleObjectiveAnnealableExplorer
 
 	dataSourcePath string
-	penalty        float64
+	parameters     *Parameters
 
 	annealingData *annealingTable
 	trackingData  *trackingTable
@@ -124,6 +129,7 @@ type trackingData struct {
 
 func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.SingleObjectiveAnnealableExplorer.Initialise()
+	e.parameters.Initialise()
 	e.excelDataAdapter.Initialise().WithOleFunctionWrapper(e.oleWrapper)
 
 	e.excelDataAdapter.initialiseDataSource(e.dataSourcePath)
@@ -143,9 +149,14 @@ func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.LogHandler().Info(e.ScenarioId() + ": Data retrieved from workbook [" + e.dataSourcePath + "]")
 }
 
-func (e *SimpleExcelSolutionExplorer) WithPenalty(penalty float64) *SimpleExcelSolutionExplorer {
-	e.penalty = penalty
+func (e *SimpleExcelSolutionExplorer) WithParameters(params map[string]interface{}) *SimpleExcelSolutionExplorer {
+	e.parameters = new(Parameters).Initialise()
+	e.parameters.Merge(params)
 	return e
+}
+
+func (e *SimpleExcelSolutionExplorer) ParameterErrors() error {
+	return e.parameters.ValidationErrors()
 }
 
 func (e *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string) *SimpleExcelSolutionExplorer {
@@ -209,11 +220,13 @@ func (e *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
 }
 
 func (e *SimpleExcelSolutionExplorer) deriveTotalPenalty() float64 {
+	penalty, _ := e.parameters.Get(Penalty).(float64)
+
 	totalPenalty := float64(0)
 	for index := 0; index < len(e.annealingData.rows); index++ {
 		totalPenalty += float64(e.annealingData.rows[index].PlanningUnitStatus) * e.annealingData.rows[index].Cost
 	}
-	return math.Max(0, e.penalty-totalPenalty)
+	return math.Max(0, penalty-totalPenalty)
 }
 
 func (e *SimpleExcelSolutionExplorer) deriveFeatureCost() float64 {

@@ -11,8 +11,6 @@ import (
 	"github.com/LindsayBradford/crem/scenario"
 )
 
-const defaultPenalty = 1
-
 func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (scenario.CallableRunner, logging.Logger) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
@@ -52,12 +50,8 @@ func buildSimpleExcelExplorerRegistration(wrapper func(f func())) config.Explore
 	return config.ExplorerRegistration{
 		ExplorerType: "SimpleExcelSolutionExplorer",
 		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
-			penalty, ok := config.Parameters["Penalty"].(float64)
-			if !ok {
-				penalty = defaultPenalty
-			}
 			return new(SimpleExcelSolutionExplorer).
-				WithPenalty(penalty).
+				WithParameters(config.Parameters).
 				WithName(config.Name).
 				WithInputFile(config.InputFiles["ExcelDataSource"]).
 				WithOleFunctionWrapper(wrapper)
