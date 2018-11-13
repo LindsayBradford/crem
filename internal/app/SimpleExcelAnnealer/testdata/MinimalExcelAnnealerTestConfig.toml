@@ -4,8 +4,8 @@ ScenarioName = "Minimal Excel Annealer Test Config"
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
 [SolutionExplorers.InputFiles]
-ExcelDataSource = "testdata/SimpleExcelAnnealerTestFixture.xls"
 [SolutionExplorers.Parameters]
+DataSourcePath = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.5 # 100.0
 
 [Annealer]

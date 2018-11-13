@@ -19,10 +19,13 @@ const (
 
 	integerKey            = "integerKey"
 	nonNegativeIntegerKey = "nonNegativeIntegerKey"
+
+	readableFileKey = "readableFileKey"
 )
 
 const defaultDecimalValue = float64(1)
 const defaultIntegerValue = int64(1)
+const defaultStringValue = "<undefiled>"
 
 func TestEmptyParameters_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -42,6 +45,7 @@ func TestAddMetaData_CreateDefaults(t *testing.T) {
 
 	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
 	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetString(readableFileKey)).To(Equal(defaultStringValue), "metadata should have set correct default")
 }
 
 func TestMergeValidDecimal_NoErrors(t *testing.T) {
@@ -84,6 +88,22 @@ func TestMergeValidInteger_NoErrors(t *testing.T) {
 	parametersUnderTest.Merge(paramsToMerge)
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
 	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", 5), "metadata should have set correct default")
+}
+
+func TestMergeValidFilePath_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge.SetString(readableFileKey, "testdata/readableFile.txt")
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetString(readableFileKey)).To(Equal("testdata/readableFile.txt"), "metadata should have set correct default")
 }
 
 func TestMergeUnknownParameter_Error(t *testing.T) {
@@ -240,6 +260,29 @@ func TestMergeInvalidNonNegativeIntegers_Error(t *testing.T) {
 	g.Expect(parametersUnderTest.GetInt64(nonNegativeIntegerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
 }
 
+func TestMergeInvalidFilePath_Error(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge[readableFileKey] = 0.4
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+
+
+	paramsToMerge.SetString(readableFileKey, "a non-existent file path")
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+}
+
+
 func addMetaDataUnderTest(params *Parameters) {
 	params.AddMetaData(
 		MetaData{
@@ -278,6 +321,14 @@ func addMetaDataUnderTest(params *Parameters) {
 			Key:          nonNegativeIntegerKey,
 			Validator:    params.IsNonNegativeInteger,
 			DefaultValue: defaultIntegerValue,
+		},
+	)
+
+	params.AddMetaData(
+		MetaData{
+			Key:          readableFileKey,
+			Validator:    params.IsReadableFile,
+			DefaultValue: defaultStringValue,
 		},
 	)
 }

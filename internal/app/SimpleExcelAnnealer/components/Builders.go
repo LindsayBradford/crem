@@ -53,7 +53,6 @@ func buildSimpleExcelExplorerRegistration(wrapper func(f func())) config.Explore
 			return new(SimpleExcelSolutionExplorer).
 				WithParameters(config.Parameters).
 				WithName(config.Name).
-				WithInputFile(config.InputFiles["ExcelDataSource"]).
 				WithOleFunctionWrapper(wrapper)
 		},
 	}

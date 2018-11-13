@@ -5,6 +5,7 @@ package parameters
 import (
 	"fmt"
 	"math"
+	"os"
 
 	"github.com/LindsayBradford/crem/errors"
 )
@@ -22,6 +23,10 @@ func (m Map) SetInt64(key string, value int64) {
 }
 
 func (m Map) SetFloat64(key string, value float64) {
+	m[key] = value
+}
+
+func (m Map) SetString(key string, value string) {
 	m[key] = value
 }
 
@@ -141,10 +146,34 @@ func (p *Parameters) IsIntegerWithInclusiveBounds(key string, value interface{},
 	return true
 }
 
+func (p *Parameters) IsReadableFile(key string, value interface{}) bool {
+	valueAsString, typeIsOk := value.(string)
+	if !typeIsOk {
+		p.validationErrors.AddMessage("Parameter [" + key + "] must be a string")
+		return false
+	}
+	if !isReadableFilePath(valueAsString) {
+		p.validationErrors.AddMessage("Parameter [" + key + "] must be a valid path to a readable file")
+		return false
+	}
+	return true
+}
+
+func isReadableFilePath(filePath string) bool {
+	file, err := os.OpenFile(filePath, os.O_RDONLY, 0666)
+	defer file.Close()
+
+	return err == nil
+}
+
 func (p *Parameters) GetInt64(key string) int64 {
 	return p.paramMap[key].(int64)
 }
 
 func (p *Parameters) GetFloat64(key string) float64 {
 	return p.paramMap[key].(float64)
+}
+
+func (p *Parameters) GetString(key string) string {
+	return p.paramMap[key].(string)
 }

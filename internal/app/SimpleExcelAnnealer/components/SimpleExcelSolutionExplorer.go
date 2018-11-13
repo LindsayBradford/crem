@@ -19,12 +19,12 @@ var (
 const (
 	_              = iota
 	Penalty string = "Penalty"
+	DataSourcePath string = "DataSourcePath"
 )
 
 type SimpleExcelSolutionExplorer struct {
 	SingleObjectiveAnnealableExplorer
 
-	dataSourcePath string
 	parameters     *Parameters
 
 	annealingData *annealingTable
@@ -129,11 +129,12 @@ type trackingData struct {
 
 func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.SingleObjectiveAnnealableExplorer.Initialise()
-	e.parameters.Initialise()
 	e.excelDataAdapter.Initialise().WithOleFunctionWrapper(e.oleWrapper)
 
-	e.excelDataAdapter.initialiseDataSource(e.dataSourcePath)
-	e.LogHandler().Info(e.ScenarioId() + ": Opening Excel workbook [" + e.dataSourcePath + "] as data source")
+	dataSourcePath := e.parameters.GetString(DataSourcePath)
+
+	e.excelDataAdapter.initialiseDataSource(dataSourcePath)
+	e.LogHandler().Info(e.ScenarioId() + ": Opening Excel workbook [" + dataSourcePath + "] as data source")
 
 	e.LogHandler().Debug(e.ScenarioId() + ": Retrieving annealing data from workbook")
 	e.annealingData = e.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
@@ -146,7 +147,7 @@ func (e *SimpleExcelSolutionExplorer) Initialise() {
 	e.LogHandler().Debug(e.ScenarioId() + ": Clearing tracking data from workbook")
 	e.trackingData = e.excelDataAdapter.initialiseTrackingTable()
 
-	e.LogHandler().Info(e.ScenarioId() + ": Data retrieved from workbook [" + e.dataSourcePath + "]")
+	e.LogHandler().Info(e.ScenarioId() + ": Data retrieved from workbook [" + dataSourcePath + "]")
 }
 
 func (e *SimpleExcelSolutionExplorer) WithParameters(params map[string]interface{}) *SimpleExcelSolutionExplorer {
@@ -157,11 +158,6 @@ func (e *SimpleExcelSolutionExplorer) WithParameters(params map[string]interface
 
 func (e *SimpleExcelSolutionExplorer) ParameterErrors() error {
 	return e.parameters.ValidationErrors()
-}
-
-func (e *SimpleExcelSolutionExplorer) WithInputFile(inputFilePath string) *SimpleExcelSolutionExplorer {
-	e.dataSourcePath = inputFilePath
-	return e
 }
 
 func (e *SimpleExcelSolutionExplorer) WithOleFunctionWrapper(wrapper func(f func())) *SimpleExcelSolutionExplorer {

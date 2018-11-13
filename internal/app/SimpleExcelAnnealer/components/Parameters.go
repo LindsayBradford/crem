@@ -25,4 +25,12 @@ func (p *Parameters) buildMetaData() {
 			DefaultValue: 1.0,
 		},
 	)
+
+	p.AddMetaData(
+		parameters.MetaData{
+			Key:          DataSourcePath,
+			Validator:    p.IsReadableFile,
+			DefaultValue: "",
+		},
+	)
 }
