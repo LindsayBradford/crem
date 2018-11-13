@@ -3,11 +3,26 @@
 package parameters
 
 import (
-	"math"
 	"testing"
 
 	. "github.com/onsi/gomega"
 )
+
+const (
+	_ = iota
+
+	notValidKey = "notValidKey"
+
+	decimalKey                  = "decimalKey"
+	nonNegativeDecimalKey       = "nonNegativeDecimalKey"
+	betweenZeroAndOneDecimalKey = "betweenZeroAndOneDecimalKey"
+
+	integerKey            = "integerKey"
+	nonNegativeIntegerKey = "nonNegativeIntegerKey"
+)
+
+const defaultDecimalValue = float64(1)
+const defaultIntegerValue = int64(1)
 
 func TestEmptyParameters_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -17,7 +32,7 @@ func TestEmptyParameters_NoErrors(t *testing.T) {
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
 }
 
-func TestParametersAddMetaData_CreateDefaults(t *testing.T) {
+func TestAddMetaData_CreateDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters).Initialise()
@@ -25,10 +40,11 @@ func TestParametersAddMetaData_CreateDefaults(t *testing.T) {
 
 	parametersUnderTest.CreateDefaults()
 
-	g.Expect(parametersUnderTest.Get("testKey")).To(BeNumerically("==", 0.69), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
 }
 
-func TestParameters_MergeValidParameter_NoErrors(t *testing.T) {
+func TestMergeValidDecimal_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters).Initialise()
@@ -37,16 +53,19 @@ func TestParameters_MergeValidParameter_NoErrors(t *testing.T) {
 	parametersUnderTest.CreateDefaults()
 
 	paramsToMerge := make(Map, 0)
-	paramsToMerge["testKey"] = 0.5
 
+	paramsToMerge.SetFloat64(decimalKey, -0.5)
 	parametersUnderTest.Merge(paramsToMerge)
-
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", -0.5), "metadata should have set correct default")
 
-	g.Expect(parametersUnderTest.Get("testKey")).To(BeNumerically("==", 0.5), "metadata should have set correct default")
+	paramsToMerge.SetFloat64(decimalKey, 0.5)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", 0.5), "metadata should have set correct default")
 }
 
-func TestParameters_MergeUnknownParameter_Error(t *testing.T) {
+func TestMergeValidInteger_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters).Initialise()
@@ -55,17 +74,54 @@ func TestParameters_MergeUnknownParameter_Error(t *testing.T) {
 	parametersUnderTest.CreateDefaults()
 
 	paramsToMerge := make(Map, 0)
-	paramsToMerge["notAKnownKey"] = 0.5
 
+	paramsToMerge.SetInt64(integerKey, -5)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", -5), "metadata should have set correct default")
+
+	paramsToMerge.SetInt64(integerKey, 5)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", 5), "metadata should have set correct default")
+}
+
+func TestMergeUnknownParameter_Error(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge.SetFloat64(notValidKey, 0.5)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+}
+
+func TestMergeInvalidDecimal_Error(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge[decimalKey] = "DefinitelyNotADecimal"
 	parametersUnderTest.Merge(paramsToMerge)
 
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-	g.Expect(parametersUnderTest.Get("testKey")).To(BeNumerically("==", 0.69), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
 }
 
-func TestParameters_MergeInvalidParameter_Error(t *testing.T) {
+func TestMergeInvalidInteger_Error(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters).Initialise()
@@ -74,17 +130,16 @@ func TestParameters_MergeInvalidParameter_Error(t *testing.T) {
 	parametersUnderTest.CreateDefaults()
 
 	paramsToMerge := make(Map, 0)
-	paramsToMerge["testKey"] = "DefinitelyNotADecimal"
 
+	paramsToMerge[integerKey] = "DefinitelyNotAnInteger"
 	parametersUnderTest.Merge(paramsToMerge)
-
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-	g.Expect(parametersUnderTest.Get("testKey")).To(BeNumerically("==", 0.69), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
 }
 
-func TestParameters_MergeInvalidBoundParameter_Error(t *testing.T) {
+func TestMergeInvalidNonNegativeDecimals_Error(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters).Initialise()
@@ -94,53 +149,135 @@ func TestParameters_MergeInvalidBoundParameter_Error(t *testing.T) {
 
 	paramsToMerge := make(Map, 0)
 
-	paramsToMerge["testBoundKey"] = 0.0004
+	paramsToMerge.SetFloat64(nonNegativeDecimalKey, -0.00001)
 	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
 
+	paramsToMerge[nonNegativeDecimalKey] = "NotEvenADecimal"
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+
+	g.Expect(parametersUnderTest.GetFloat64(nonNegativeDecimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
+}
+
+func TestMergeBetweenZeroAndOneDecimal(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	validLowerBoundDecimalValue := float64(0)
+	validUpperBoundDecimalValue := float64(1)
+
+	paramsToMerge.SetFloat64(betweenZeroAndOneDecimalKey, validLowerBoundDecimalValue)
+	parametersUnderTest.Merge(paramsToMerge)
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "no error on merging valid parameter")
 
-	paramsToMerge["testBoundKey"] = 0.00051
+	paramsToMerge.SetFloat64(betweenZeroAndOneDecimalKey, validUpperBoundDecimalValue)
 	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "no error on merging valid parameter")
 
+	paramsToMerge.SetFloat64(betweenZeroAndOneDecimalKey, -0.00001)
+	parametersUnderTest.Merge(paramsToMerge)
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-	paramsToMerge["testBoundKey"] = 0.999
+	paramsToMerge.SetFloat64(betweenZeroAndOneDecimalKey, 1.00001)
 	parametersUnderTest.Merge(paramsToMerge)
-
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-	paramsToMerge["testBoundKey"] = "NotEvenADecimal"
+	paramsToMerge[betweenZeroAndOneDecimalKey] = "NotEvenADecimal"
 	parametersUnderTest.Merge(paramsToMerge)
-
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-	g.Expect(parametersUnderTest.Get("testBoundKey")).To(BeNumerically("==", 0.0004), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetFloat64(betweenZeroAndOneDecimalKey)).To(BeNumerically("==", validUpperBoundDecimalValue), "metadata should have set correct default")
+}
+
+func TestMergeValidNonNegativeInteger_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge.SetInt64(nonNegativeIntegerKey, 5)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetInt64(nonNegativeIntegerKey)).To(BeNumerically("==", 5), "metadata should have set correct default")
+}
+
+func TestMergeInvalidNonNegativeIntegers_Error(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge.SetInt64(nonNegativeIntegerKey, -1)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+
+	paramsToMerge[nonNegativeIntegerKey] = "NotEvenAnInteger"
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging invalid parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+
+	g.Expect(parametersUnderTest.GetInt64(nonNegativeIntegerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
 }
 
 func addMetaDataUnderTest(params *Parameters) {
 	params.AddMetaData(
 		MetaData{
-			Key:          "testKey",
-			Validator:    params.ValidateIsDecimal,
-			DefaultValue: 0.69,
+			Key:          decimalKey,
+			Validator:    params.IsDecimal,
+			DefaultValue: defaultDecimalValue,
 		},
 	)
-
-	validateIsBankErosionFudgeFactor := func(key string, value interface{}) bool {
-		minValue := 1 * math.Pow(10, -4)
-		maxValue := 5 * math.Pow(10, -4)
-		return params.ValidateDecimalWithInclusiveBounds(key, value, minValue, maxValue)
-	}
 
 	params.AddMetaData(
 		MetaData{
-			Key:          "testBoundKey",
-			Validator:    validateIsBankErosionFudgeFactor,
-			DefaultValue: 0.0005,
+			Key:          nonNegativeDecimalKey,
+			Validator:    params.IsNonNegativeDecimal,
+			DefaultValue: defaultDecimalValue,
 		},
 	)
 
+	params.AddMetaData(
+		MetaData{
+			Key:          betweenZeroAndOneDecimalKey,
+			Validator:    params.IsDecimalBetweenZeroAndOne,
+			DefaultValue: defaultDecimalValue,
+		},
+	)
+
+	params.AddMetaData(
+		MetaData{
+			Key:          integerKey,
+			Validator:    params.IsInteger,
+			DefaultValue: defaultIntegerValue,
+		},
+	)
+
+	params.AddMetaData(
+		MetaData{
+			Key:          nonNegativeIntegerKey,
+			Validator:    params.IsNonNegativeInteger,
+			DefaultValue: defaultIntegerValue,
+		},
+	)
 }

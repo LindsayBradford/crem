@@ -220,7 +220,7 @@ func (e *SimpleExcelSolutionExplorer) makeRandomChange(temperature float64) {
 }
 
 func (e *SimpleExcelSolutionExplorer) deriveTotalPenalty() float64 {
-	penalty, _ := e.parameters.Get(Penalty).(float64)
+	penalty := e.parameters.GetFloat64(Penalty)
 
 	totalPenalty := float64(0)
 	for index := 0; index < len(e.annealingData.rows); index++ {

@@ -21,7 +21,7 @@ func (p *Parameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          Penalty,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 1.0,
 		},
 	)

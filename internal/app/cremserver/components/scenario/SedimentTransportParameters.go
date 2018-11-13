@@ -31,7 +31,7 @@ func (p *SedimentTransportParameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          WaterDensity,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 1.0,
 		},
 	)
@@ -39,7 +39,7 @@ func (p *SedimentTransportParameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          LocalAcceleration,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 9.81,
 		},
 	)
@@ -47,7 +47,7 @@ func (p *SedimentTransportParameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          GullyCompensationFactor,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 0.5,
 		},
 	)
@@ -55,7 +55,7 @@ func (p *SedimentTransportParameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          SedimentDensity,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 1.5,
 		},
 	)
@@ -63,7 +63,7 @@ func (p *SedimentTransportParameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          SuspendedSedimentProportion,
-			Validator:    p.ValidateIsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 0.5,
 		},
 	)
@@ -72,5 +72,5 @@ func (p *SedimentTransportParameters) buildMetaData() {
 func (p *SedimentTransportParameters) validateIsBankErosionFudgeFactor(key string, value interface{}) bool {
 	minValue := 1 * math.Pow(10, -4)
 	maxValue := 5 * math.Pow(10, -4)
-	return p.ValidateDecimalWithInclusiveBounds(key, value, minValue, maxValue)
+	return p.IsDecimalWithInclusiveBounds(key, value, minValue, maxValue)
 }

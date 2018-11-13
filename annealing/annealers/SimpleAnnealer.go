@@ -42,10 +42,10 @@ func (sa *SimpleAnnealer) Id() string {
 	return sa.id
 }
 
-func (sa *SimpleAnnealer) SetParameters(params parameters.Map)  error {
+func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 	sa.parameters.Merge(params)
 
-	temperature, _ := sa.parameters.Get(StartingTemperature).(float64)
+	temperature := sa.parameters.GetFloat64(StartingTemperature)
 	sa.SetTemperature(temperature)
 
 	return sa.parameters.ValidationErrors()
@@ -63,14 +63,12 @@ func (sa *SimpleAnnealer) Temperature() float64 {
 	return sa.temperature
 }
 
-
 func (sa *SimpleAnnealer) CoolingFactor() float64 {
-	return sa.parameters.Get(CoolingFactor).(float64)
+	return sa.parameters.GetFloat64(CoolingFactor)
 }
 
-
 func (sa *SimpleAnnealer) MaximumIterations() uint64 {
-	return uint64(sa.parameters.Get(MaximumIterations).(int64))
+	return uint64(sa.parameters.GetInt64(MaximumIterations))
 }
 
 func (sa *SimpleAnnealer) CurrentIteration() uint64 {
@@ -177,13 +175,13 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {
-	return sa.parameters.Get(MaximumIterations) == 0
+	return sa.parameters.GetInt64(MaximumIterations) == 0
 }
 
 func (sa *SimpleAnnealer) checkIfDone() bool {
-	return sa.currentIteration >= uint64(sa.parameters.Get(MaximumIterations).(int64))
+	return sa.currentIteration >= uint64(sa.parameters.GetInt64(MaximumIterations))
 }
 
 func (sa *SimpleAnnealer) cooldown() {
-	sa.temperature *= sa.parameters.Get(CoolingFactor).(float64)
+	sa.temperature *= sa.parameters.GetFloat64(CoolingFactor)
 }

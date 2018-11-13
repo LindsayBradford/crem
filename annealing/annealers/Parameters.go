@@ -26,7 +26,7 @@ func (p *Parameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          StartingTemperature,
-			Validator:    p.ValidateIsNonNegativeDecimal,
+			Validator:    p.IsNonNegativeDecimal,
 			DefaultValue: float64(0),
 		},
 	)
@@ -34,7 +34,7 @@ func (p *Parameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          MaximumIterations,
-			Validator:    p.ValidateIsUnsignedInteger,
+			Validator:    p.IsNonNegativeInteger,
 			DefaultValue: int64(0),
 		},
 	)
@@ -42,7 +42,7 @@ func (p *Parameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
 			Key:          CoolingFactor,
-			Validator:    p.ValidateIsDecimalBetweenZeroAndOne,
+			Validator:    p.IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(1.0),
 		},
 	)
