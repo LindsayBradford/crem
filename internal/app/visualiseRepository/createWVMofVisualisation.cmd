@@ -1,0 +1,1 @@
+ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i repositoryVisualisation.ppm  -vcodec wmv1 -r 60 -qscale 0 repositoryVisualisation.wmv  &REM https://www.ffmpeg.org/download.html#build-windows

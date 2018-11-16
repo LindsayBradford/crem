@@ -14,3 +14,7 @@
 
 #Ignore all subdirectories of vendor.  govendor's  vendor.json governs dependencies
 vendor/*/
+
+# Video data
+*.wmv
+*.ppm
