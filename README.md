@@ -16,12 +16,12 @@ Once you've git-cloned this repository, run:
 
 to download compatible versions of the libraries CREM depends on as [vendor libraries](https://golang.org/cmd/go/#hdr-Vendor_Directories). 
 
-From there a `go build` from  within [internal/app/cremserver](https://github.com/LindsayBradford/crem/blob/master/internal/app/cremserver) should produce 
-a `cremserver.exe` executable.  Then run your new executable  from the command-line, specifying a scenario config file like this:
+From there a `go build` from  within [cmd/cremengine](https://github.com/LindsayBradford/crem/blob/master/cmd/cremengine) should produce 
+a `cremengine.exe` executable.  Then run your new executable  from the command-line, specifying a scenario config file like this:
 
-```> cremserver.exe --ScenarioFile <someScenarioFile>```
+```> cremengine.exe --ScenarioFile <someScenarioFile>```
 
-You'll find a [simple test scenario configuration](https://github.com/LindsayBradford/crem/blob/master/internal/app/cremserver/testdata/DumbAnnealerTestConfig-OneRun.toml) here. Further detail on configuring a scenario can be found in the [wiki](https://github.com/LindsayBradford/crem/wiki/Configuration#scenario-configuration). 
+You'll find a [simple test scenario configuration](https://github.com/LindsayBradford/crem/blob/master/cmd/cremengine/testdata/DumbAnnealerTestConfig-OneRun.toml) here. Further detail on configuring a scenario can be found in the [wiki](https://github.com/LindsayBradford/crem/wiki/Configuration#scenario-configuration). 
 
 #### Overview:
 
