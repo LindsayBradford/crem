@@ -1,6 +1,7 @@
 # Catchment Resilience Exploration Modeller
 
 [![Build Status](https://travis-ci.com/LindsayBradford/crem.svg?token=Xt8jEnqxCbgTcvvxNK8e&branch=master)](https://travis-ci.com/LindsayBradford/crem)
+[![Go Report Card](https://goreportcard.com/badge/github.com/LindsayBradford/crem)](https://goreportcard.com/report/github.com/LindsayBradford/crem)
 [![GoDoc](https://godoc.org/github.com/LindsayBradford/crem?status.svg)](https://godoc.org/github.com/LindsayBradford/crem)
 
 #### Getting Started
