@@ -5,7 +5,7 @@
 
 #### Getting Started
 
-CREM makes use of a a number of 3rd-party libraries that are not included in this source repository. The [govendor](https://github.com/kardianos/govendor) utility governs library dependencies via  [vendor.json](https://github.com/LindsayBradford/crem/blob/master/vendor/vendor.json). 
+CREM makes use of a number of 3rd-party libraries that are not included in this source repository. The [govendor](https://github.com/kardianos/govendor) utility governs library dependencies via  [vendor.json](https://github.com/LindsayBradford/crem/blob/master/vendor/vendor.json). 
 Once you've git-cloned this repository, run:
 
 ```

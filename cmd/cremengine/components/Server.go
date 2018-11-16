@@ -4,9 +4,9 @@ package components
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/config"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/internal/pkg/server"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
+	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
 type Server struct {

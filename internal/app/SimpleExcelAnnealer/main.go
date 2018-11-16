@@ -7,11 +7,11 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
-	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
+	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/pkg/errors"
 )
 

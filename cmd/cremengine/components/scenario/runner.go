@@ -7,8 +7,8 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
+	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/pkg/errors"
 )
 

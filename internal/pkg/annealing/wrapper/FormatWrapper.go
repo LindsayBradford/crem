@@ -19,11 +19,11 @@ const defaultUintFormat = "%d"
 
 func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 	wrapper.MethodFormats = map[string]string{
-		"iD":               defaultStringFormat,
-		"Temperature":      defaultFloat64Format,
-		"CoolingFactor":    defaultFloat64Format,
-		"MaximumIterations":    defaultUintFormat,
-		"CurrentIteration": defaultUintFormat,
+		"iD":                defaultStringFormat,
+		"Temperature":       defaultFloat64Format,
+		"CoolingFactor":     defaultFloat64Format,
+		"MaximumIterations": defaultUintFormat,
+		"CurrentIteration":  defaultUintFormat,
 	}
 	return wrapper
 }

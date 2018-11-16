@@ -275,13 +275,11 @@ func TestMergeInvalidFilePath_Error(t *testing.T) {
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 
-
 	paramsToMerge.SetString(readableFileKey, "a non-existent file path")
 	parametersUnderTest.Merge(paramsToMerge)
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
 	t.Log(parametersUnderTest.ValidationErrors())
 }
-
 
 func addMetaDataUnderTest(params *Parameters) {
 	params.AddMetaData(

@@ -39,10 +39,10 @@ func wrapSolutionExplorer(explorer explorer.Explorer) *explorer.FormatWrapper {
 func newAnnealerWrapper() *wrapper.FormatWrapper {
 	wrapper := wrapper.FormatWrapper{
 		MethodFormats: map[string]string{
-			"Temperature":      "%0.4f",
-			"CoolingFactor":    "%0.3f",
-			"MaximumIterations":    "%03d",
-			"CurrentIteration": "%03d",
+			"Temperature":       "%0.4f",
+			"CoolingFactor":     "%0.3f",
+			"MaximumIterations": "%03d",
+			"CurrentIteration":  "%03d",
 		},
 	}
 	return &wrapper

@@ -10,9 +10,9 @@ import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components"
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/api"
 	configTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/internal/pkg/server/test"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
 )
 

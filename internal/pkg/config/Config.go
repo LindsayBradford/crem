@@ -124,10 +124,10 @@ func (at *AnnealerType) UnmarshalText(text []byte) error {
 }
 
 type AnnealingConfig struct {
-	Type                AnnealerType
-	EventNotifier       EventNotifierType
-	SolutionExplorer    string
-	Parameters parameters.Map
+	Type             AnnealerType
+	EventNotifier    EventNotifierType
+	SolutionExplorer string
+	Parameters       parameters.Map
 }
 
 type LoggerType struct {

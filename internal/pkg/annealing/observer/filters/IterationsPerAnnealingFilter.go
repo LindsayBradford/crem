@@ -7,7 +7,7 @@ import "github.com/LindsayBradford/crem/internal/pkg/annealing"
 // PercentileOfIterationsPerAnnealingFilter filters FinishedIteration Annealing Event instances at a rate of 1 every
 // percentile number of iterations received. . StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
 type PercentileOfIterationsPerAnnealingFilter struct {
-	MaximumIterations      uint64
+	MaximumIterations  uint64
 	percentileToReport float64
 	iterationModulo    uint64
 	generatesEvents    bool

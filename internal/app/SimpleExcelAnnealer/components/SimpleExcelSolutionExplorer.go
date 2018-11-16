@@ -17,15 +17,15 @@ var (
 )
 
 const (
-	_              = iota
-	Penalty string = "Penalty"
+	_                     = iota
+	Penalty        string = "Penalty"
 	DataSourcePath string = "DataSourcePath"
 )
 
 type SimpleExcelSolutionExplorer struct {
 	SingleObjectiveAnnealableExplorer
 
-	parameters     *Parameters
+	parameters *Parameters
 
 	annealingData *annealingTable
 	trackingData  *trackingTable

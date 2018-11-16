@@ -101,7 +101,7 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	expectedParams := parameters.Map {
+	expectedParams := parameters.Map{
 		StartingTemperature: startTemperature,
 		CoolingFactor:       coolingFactor,
 		MaximumIterations:   int64(iterations),
@@ -136,7 +136,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	const expectedIterations = uint64(3)
 
-	expectedParams := parameters.Map {
+	expectedParams := parameters.Map{
 		StartingTemperature: 1000.0,
 		CoolingFactor:       0.5,
 		MaximumIterations:   int64(expectedIterations),
@@ -187,7 +187,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	const expectedIterations = uint64(3)
 
-	expectedParams := parameters.Map {
+	expectedParams := parameters.Map{
 		StartingTemperature: 1000.0,
 		CoolingFactor:       0.5,
 		MaximumIterations:   int64(expectedIterations),
@@ -245,7 +245,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 
 	const expectedTryCount = uint64(3)
 
-	expectedParams := parameters.Map {
+	expectedParams := parameters.Map{
 		StartingTemperature: 1000.0,
 		CoolingFactor:       0.5,
 		MaximumIterations:   int64(expectedTryCount),
@@ -282,7 +282,7 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	expectedParams := parameters.Map {
+	expectedParams := parameters.Map{
 		StartingTemperature: 1000.0,
 		CoolingFactor:       0.5,
 		MaximumIterations:   int64(3),
