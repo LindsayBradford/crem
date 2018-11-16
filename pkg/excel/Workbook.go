@@ -33,7 +33,6 @@ func (wb *WorkbookImpl) Worksheets() (worksheets Worksheets) {
 	defer func() {
 		if r := recover(); r != nil {
 			panic(errors.New("cannot retrieve worksheets"))
-			worksheets = nil
 		}
 	}()
 

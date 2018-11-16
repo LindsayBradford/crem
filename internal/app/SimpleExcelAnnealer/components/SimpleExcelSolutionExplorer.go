@@ -258,8 +258,7 @@ func (e *SimpleExcelSolutionExplorer) addTrackerData() {
 func (e *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
 	dataToTraverse := e.annealingData
 	totalSmallPUs := uint64(0)
-	var index = 0
-	for index = 0; index < len(dataToTraverse.rows)/2; index++ {
+	for index := 0; index < len(dataToTraverse.rows)/2; index++ {
 		totalSmallPUs += uint64(dataToTraverse.rows[index].PlanningUnitStatus)
 	}
 	return totalSmallPUs
@@ -268,8 +267,7 @@ func (e *SimpleExcelSolutionExplorer) deriveSmallPUs() uint64 {
 func (e *SimpleExcelSolutionExplorer) deriveLargePUs() uint64 {
 	dataToTraverse := e.annealingData
 	totalLargePUs := uint64(0)
-	var index = 0
-	for index = len(dataToTraverse.rows) / 2; index < len(dataToTraverse.rows); index++ {
+	for index := len(dataToTraverse.rows) / 2; index < len(dataToTraverse.rows); index++ {
 		totalLargePUs += uint64(dataToTraverse.rows[index].PlanningUnitStatus)
 	}
 	return totalLargePUs

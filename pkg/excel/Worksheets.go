@@ -30,7 +30,6 @@ func (sheets *WorksheetsImpl) Add() (worksheet Worksheet) {
 		if r := recover(); r != nil {
 			msg := fmt.Sprintf("Cannot create new excel worksheet: %s", r)
 			panic(errors.New(msg))
-			worksheet = nil
 		}
 	}()
 

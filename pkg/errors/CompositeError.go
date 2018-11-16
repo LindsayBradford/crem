@@ -15,8 +15,8 @@ import (
 // It allows a number of errors to be collected together and delivered  as if they were one error, along with the
 // ability to learn more about individual errors if needed.
 type CompositeError struct {
-	compositeText    string  `json:"Summary"`
-	individualErrors []error `json:"validationErrors"`
+	compositeText    string
+	individualErrors []error
 }
 
 // NewComposite returns a CompositeError that formats as the given text prefixing a list of error texts for those
