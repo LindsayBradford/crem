@@ -5,10 +5,10 @@ package components
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/annealing/explorer"
-	"github.com/LindsayBradford/crem/config"
-	"github.com/LindsayBradford/crem/logging"
-	"github.com/LindsayBradford/crem/scenario"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 )
 
 func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (scenario.CallableRunner, logging.Logger) {

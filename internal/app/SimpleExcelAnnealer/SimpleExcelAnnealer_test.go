@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	configTesting "github.com/LindsayBradford/crem/config/testing"
+	configTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
 )
 
 const baseTestFilePath = "testdata/SimpleExcelAnnealerTestConfig-OneRun"

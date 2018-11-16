@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/LindsayBradford/crem/excel"
+	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/pkg/errors"
 )
 
