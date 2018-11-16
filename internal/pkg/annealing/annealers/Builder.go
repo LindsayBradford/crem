@@ -27,7 +27,7 @@ func (builder *Builder) forAnnealer(annealer annealing.Annealer) *Builder {
 	builder.annealer = annealer
 	builder.annealer.Initialise()
 	if builder.buildErrors == nil {
-		builder.buildErrors = cremerrors.NewComposite("Failed to build valid annealer")
+		builder.buildErrors = cremerrors.New("Failed to build valid annealer")
 	}
 	return builder
 }

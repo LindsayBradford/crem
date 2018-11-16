@@ -11,22 +11,20 @@ import (
 	cremstrings "github.com/LindsayBradford/crem/pkg/strings"
 )
 
-// CompositeError offers a convenience wrapper to a number of related error instances.
-// It allows a number of errors to be collected together and delivered  as if they were one error, along with the
-// ability to learn more about individual errors if needed.
+// CompositeError allows a number of errors to be collected together and treated as if they were a single error.
 type CompositeError struct {
 	compositeText    string
 	individualErrors []error
 }
 
-// NewComposite returns a CompositeError that formats as the given text prefixing a list of error texts for those
-// errors that it is composed of.
-func NewComposite(text string) *CompositeError {
+// New returns a new CompositeError. The text parameter supplied is used as a prefix when reporting a list of errors.
+func New(text string) *CompositeError {
 	newError := new(CompositeError)
 	newError.compositeText = text
 	return newError
 }
 
+// Error conforms to the built-in interface type for representing an error condition over a composed set of errors.
 func (ce *CompositeError) Error() string {
 	if len(ce.individualErrors) == 1 {
 		return ce.individualErrors[0].Error()
@@ -34,6 +32,7 @@ func (ce *CompositeError) Error() string {
 	return ce.buildCompositeErrorString()
 }
 
+// MarshalJSON conforms to the built-in interface type for encoding a composed set of errors as json string array.
 func (ce *CompositeError) MarshalJSON() ([]byte, error) {
 	errorMessages := deriveMessagesFromError(ce, 0)
 	return json.Marshal(errorMessages)
@@ -100,23 +99,24 @@ func (ce *CompositeError) buildCompositeErrorString() string {
 	return builder.String()
 }
 
-// Size returns the number of sub-errors that have been composed together to form the given CompositeError
+// Size returns the number of sub-errors in a CompositeError. It counts only directly accessible sub-errors (no nesting).
 func (ce *CompositeError) Size() int {
 	return len(ce.individualErrors)
 }
 
-// Add combines newError to the array of sub-errors that have been composed together to form the given CompositeError
+// Add includes newError as one of the sub-errors of a CompositeError
 func (ce *CompositeError) Add(newError error) {
 	ce.individualErrors = append(ce.individualErrors, newError)
 }
 
-// Add combines message as a new error  to the array of sub-errors that have been composed together to form the given CompositeError
+// Add combines the supplied message as a new built-in error to the array of sub-errors of a CompositeError
 func (ce *CompositeError) AddMessage(message string) {
 	newError := errors.New(message)
 	ce.Add(newError)
 }
 
-// SubError returns the sub-error at the index specified by position for the given CompositeError
-func (ce *CompositeError) SubError(position int) error {
-	return ce.individualErrors[position]
+// SubError returns the sub-error at the given array index of a CompositeError
+func (ce *CompositeError) SubError(index int) error {
+	return ce.individualErrors[index]
 }
+

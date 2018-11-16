@@ -41,7 +41,7 @@ type MetaData struct {
 type Validator func(key string, value interface{}) bool
 
 func (p *Parameters) Initialise() *Parameters {
-	p.validationErrors = errors.NewComposite("SolutionExplorer Parameters")
+	p.validationErrors = errors.New("SolutionExplorer Parameters")
 	p.metaDataMap = make(MetaDataMap, 0)
 	return p
 }
@@ -58,7 +58,7 @@ func (p *Parameters) AddMetaData(metaData MetaData) {
 }
 
 func (p *Parameters) Merge(params Map) {
-	p.validationErrors = errors.NewComposite("SolutionExplorer Parameters")
+	p.validationErrors = errors.New("SolutionExplorer Parameters")
 	for suppliedKey, suppliedValue := range params {
 		if p.validateParam(suppliedKey, suppliedValue) {
 			p.paramMap[suppliedKey] = suppliedValue

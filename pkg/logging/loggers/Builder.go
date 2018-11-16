@@ -25,7 +25,7 @@ func (builder *Builder) ForDefaultLogHandler() *Builder {
 // ForNativeLibraryLogHandler instructs Builder to use the native built-in go library wrapper as its
 // Logger
 func (builder *Builder) ForNativeLibraryLogHandler() *Builder {
-	builder.buildErrors = cremerrors.NewComposite("Failed to build valid Logger")
+	builder.buildErrors = cremerrors.New("Failed to build valid Logger")
 
 	newHandler := new(NativeLibraryLogger)
 
@@ -41,7 +41,7 @@ func (builder *Builder) ForNativeLibraryLogHandler() *Builder {
 // ForNativeLibraryLogHandler instructs Builder to use the native built-in go library wrapper as its
 // Logger
 func (builder *Builder) ForBareBonesLogHandler() *Builder {
-	builder.buildErrors = cremerrors.NewComposite("Failed to build valid Logger")
+	builder.buildErrors = cremerrors.New("Failed to build valid Logger")
 
 	newHandler := new(BareBonesLogger)
 

@@ -34,7 +34,7 @@ type ExplorerRegistration struct {
 }
 
 func (builder *AnnealerBuilder) initialise() {
-	builder.errors = errors.NewComposite("AnnealerBuilder initialisation")
+	builder.errors = errors.New("AnnealerBuilder initialisation")
 	builder.loggersBuilder.WithConfig(builder.config.Loggers)
 	builder.observersBuilder.WithConfig(builder.config)
 	builder.explorersBuilder.WithConfig(builder.config)

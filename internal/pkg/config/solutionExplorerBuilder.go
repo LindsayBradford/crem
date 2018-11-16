@@ -20,7 +20,7 @@ type ExplorerConfigFunction func(config SolutionExplorerConfig) explorer.Explore
 
 func (builder *solutionExplorerBuilder) initialise() *solutionExplorerBuilder {
 	if builder.errors == nil {
-		builder.errors = NewComposite("SolutionExplorer initialisation")
+		builder.errors = New("SolutionExplorer initialisation")
 	}
 
 	if builder.registeredExplorers == nil {

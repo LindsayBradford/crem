@@ -4,6 +4,7 @@ package errors
 
 import (
 	"errors"
+	"fmt"
 
 	. "github.com/onsi/gomega"
 )
@@ -12,7 +13,7 @@ import "testing"
 func TestCompositeError_add(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	errorUnderTest := NewComposite("testingComposite")
+	errorUnderTest := New("testingComposite")
 
 	expectedSubError0 := errors.New("subError0")
 
@@ -51,4 +52,16 @@ func TestCompositeError_add(t *testing.T) {
 
 	g.Expect(actualCompositeErrorString).To(ContainSubstring(expectedSubError1.Error()),
 		"Composite error should return error string of its second sub-error")
+}
+
+func ExampleCompositeError_Add() {
+	newComposite := New("error prefix")
+	newComposite.Add(errors.New("first error"))
+	newComposite.Add(errors.New("second error"))
+	fmt.Printf("%v", newComposite)
+
+	// Output: error prefix, composed of: [
+	// 	first error
+	// 	second error
+	// ]
 }
