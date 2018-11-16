@@ -119,4 +119,3 @@ func (ce *CompositeError) AddMessage(message string) {
 func (ce *CompositeError) SubError(index int) error {
 	return ce.individualErrors[index]
 }
-
