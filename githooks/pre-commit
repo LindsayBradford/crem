@@ -1,0 +1,21 @@
+#!/bin/sh
+
+status=0
+IFS=$'\n'
+for file in $(git diff --cached --name-only | grep -e '\.go$'); do
+   badfile="$(git --no-pager show :"$file" | gofmt -s -l)"
+   if test -n "$badfile" ; then
+       echo "git pre-commit check failed: file needs gofmt: $file"
+       status=1
+   fi
+done
+
+badtest="$(go test ./... | grep "FAIL:" | awk '{print $3}')"
+if test -n "$badtest" ; then
+  for bad in $badtest; do
+    echo "git pre-commit check failed: go test failed: $bad"
+  done
+  status=1
+fi
+
+exit $status
