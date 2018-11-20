@@ -1,21 +1,77 @@
-#!/bin/sh
+#!/usr/bin/perl
+# Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
-status=0
-IFS=$'\n'
-for file in $(git diff --cached --name-only | grep -e '\.go$'); do
-   badfile="$(git --no-pager show :"$file" | gofmt -s -l)"
-   if test -n "$badfile" ; then
-       echo "git pre-commit check failed: file needs gofmt: $file"
-       status=1
-   fi
-done
+use strict;
+use warnings;
 
-badtest="$(go test ./... | grep "FAIL:" | awk '{print $3}')"
-if test -n "$badtest" ; then
-  for bad in $badtest; do
-    echo "git pre-commit check failed: go test failed: $bad"
-  done
-  status=1
-fi
+use constant {
+	SUCCESS => 0,
+	FAILURE => 1,
+};
 
-exit $status
+use constant checkPrefix => "git pre-commit check:";
+
+doChecks();
+
+sub doChecks {
+	my $failureCount=0;
+
+	$failureCount += checkStagedGoFileFormatting();
+	$failureCount += checkGoTestPasses();
+
+	reportStatusAndExit($failureCount);
+}
+
+sub checkStagedGoFileFormatting {
+	my @allStagedFiles = `git diff --staged --name-only`;
+	my @stagedGoFiles = grep(/\.go$/, @allStagedFiles);
+
+	my $unformattedFileNumber = 0;
+	foreach my $file (@stagedGoFiles) {
+		my $unformattedFile = `gofmt -s -l $file`;
+		if ($unformattedFile ne "") {
+			print checkPrefix, " file needs gofmt: $unformattedFile\n";
+			$unformattedFileNumber += 1;
+		}
+	}
+
+	if ($unformattedFileNumber ge 1) {
+		return FAILURE;
+	}
+
+	return SUCCESS;
+}
+
+sub checkGoTestPasses {
+	my @goTestResults = `go test ./...`;
+	my @failedTests = grep(/FAIL:/, @goTestResults);
+
+	foreach my $failedTest (@failedTests) {
+		my @failureDetail = split(/\s/, $failedTest);
+		my $failedFileName = $failureDetail[2];
+		print checkPrefix, " file with failing test(s): $failedFileName\n";
+	}
+	
+	my $failedTestNumber = @failedTests;
+	if ($failedTestNumber ge 1) {
+		return FAILURE;
+	}
+	
+	return SUCCESS;
+}
+
+sub reportStatusAndExit {
+	my ($errorCount) = @_;
+
+	my $statusString = "SUCCESS";
+	my $exitStatus = SUCCESS;
+	
+	if ($errorCount > 0) {
+		$statusString = "FAILURE";
+		$exitStatus = FAILURE;
+	} 
+
+	print checkPrefix, " $statusString\n";	
+	
+	exit $exitStatus;
+}
