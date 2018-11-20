@@ -15,6 +15,7 @@ func main() {
 		components.RunServerFromConfigFile(args.ServerConfigFile)
 	}
 }
+
 func shouldRunScenario(args *commandline.Arguments) bool {
 	return args.ScenarioFile != ""
 }
