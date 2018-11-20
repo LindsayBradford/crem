@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+# Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+
+use strict;
+use warnings;
+
+use File::Copy qw(copy);
+
+use constant {
+	SUCCESS => 0,
+	FAILURE => 1,
+};
+
+use constant checkPrefix => "git post-commit:";
+
+doPostCommitWork();
+
+sub doPostCommitWork {
+	my $failureCount=0;
+
+	$failureCount += buildCremEngineInDeployDirectory();
+
+	reportStatusAndExit($failureCount);
+}
+
+sub buildCremEngineInDeployDirectory {
+	my $deployDir = $ENV{'CREM_ENGINE_PATH'};
+	my $deployFile = "$deployDir/cremengine.exe";
+	my $sourceFile = "cmd/cremengine/main.go";
+	
+	my $buildCommand = "go build -o \"$deployFile\" $sourceFile";
+	
+	print checkPrefix, " ", $buildCommand, "\n";
+	
+	return system($buildCommand);
+}
+
+sub reportStatusAndExit {
+	my ($errorCount) = @_;
+
+	my $statusString = "SUCCESS";
+	my $exitStatus = SUCCESS;
+	
+	if ($errorCount > 0) {
+		$statusString = "FAILURE";
+		$exitStatus = FAILURE;
+	} 
+
+	print checkPrefix, " $statusString\n";	
+	
+	exit $exitStatus;
+}
