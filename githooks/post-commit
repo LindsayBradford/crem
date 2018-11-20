@@ -6,10 +6,11 @@ use warnings;
 
 use File::Copy qw(copy);
 
-use constant {
-	SUCCESS => 0,
-	FAILURE => 1,
-};
+use File::Basename qw(dirname);
+use Cwd  qw(abs_path);
+use lib dirname(dirname abs_path $0) . '/githooks';
+
+use shared;
 
 use constant checkPrefix => "git post-commit:";
 
@@ -20,7 +21,7 @@ sub doPostCommitWork {
 
 	$failureCount += buildCremEngineInDeployDirectory();
 
-	reportStatusAndExit($failureCount);
+	shared::reportStatusAndExit($failureCount, checkPrefix);
 }
 
 sub buildCremEngineInDeployDirectory {
@@ -33,20 +34,4 @@ sub buildCremEngineInDeployDirectory {
 	print checkPrefix, " ", $buildCommand, "\n";
 	
 	return system($buildCommand);
-}
-
-sub reportStatusAndExit {
-	my ($errorCount) = @_;
-
-	my $statusString = "SUCCESS";
-	my $exitStatus = SUCCESS;
-	
-	if ($errorCount > 0) {
-		$statusString = "FAILURE";
-		$exitStatus = FAILURE;
-	} 
-
-	print checkPrefix, " $statusString\n";	
-	
-	exit $exitStatus;
 }

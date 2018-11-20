@@ -4,10 +4,11 @@
 use strict;
 use warnings;
 
-use constant {
-	SUCCESS => 0,
-	FAILURE => 1,
-};
+use File::Basename qw(dirname);
+use Cwd  qw(abs_path);
+use lib dirname(dirname abs_path $0) . '/githooks';
+
+use shared;
 
 use constant checkPrefix => "git pre-commit check:";
 
@@ -19,7 +20,7 @@ sub doChecks {
 	$failureCount += checkStagedGoFileFormatting();
 	$failureCount += checkGoTestPasses();
 
-	reportStatusAndExit($failureCount);
+	shared::reportStatusAndExit($failureCount, checkPrefix);
 }
 
 sub checkStagedGoFileFormatting {
@@ -36,10 +37,10 @@ sub checkStagedGoFileFormatting {
 	}
 
 	if ($unformattedFileNumber ge 1) {
-		return FAILURE;
+		return shared::FAILURE;
 	}
 
-	return SUCCESS;
+	return shared::SUCCESS;
 }
 
 sub checkGoTestPasses {
@@ -54,24 +55,8 @@ sub checkGoTestPasses {
 	
 	my $failedTestNumber = @failedTests;
 	if ($failedTestNumber ge 1) {
-		return FAILURE;
+		return shared::FAILURE;
 	}
 	
-	return SUCCESS;
-}
-
-sub reportStatusAndExit {
-	my ($errorCount) = @_;
-
-	my $statusString = "SUCCESS";
-	my $exitStatus = SUCCESS;
-	
-	if ($errorCount > 0) {
-		$statusString = "FAILURE";
-		$exitStatus = FAILURE;
-	} 
-
-	print checkPrefix, " $statusString\n";	
-	
-	exit $exitStatus;
+	return shared::SUCCESS;
 }
