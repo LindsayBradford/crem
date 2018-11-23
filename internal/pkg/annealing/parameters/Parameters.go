@@ -36,6 +36,7 @@ type MetaData struct {
 	Key          string
 	Validator    Validator
 	DefaultValue interface{}
+	IsOptional   bool
 }
 
 type Validator func(key string, value interface{}) bool
@@ -46,10 +47,17 @@ func (p *Parameters) Initialise() *Parameters {
 	return p
 }
 
+func (p *Parameters) HasEntry(entryKey string) bool {
+	_, entryFound := p.paramMap[entryKey]
+	return entryFound
+}
+
 func (p *Parameters) CreateDefaults() {
 	p.paramMap = make(Map, 0)
 	for key, value := range p.metaDataMap {
-		p.paramMap[key] = value.DefaultValue
+		if !value.IsOptional {
+			p.paramMap[key] = value.DefaultValue
+		}
 	}
 }
 
