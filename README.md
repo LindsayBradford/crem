@@ -10,7 +10,7 @@ CREM makes use of a number of 3rd-party libraries that are not included in this 
 Once you've git-cloned this repository, run:
 
 ```
-> go get https://github.com/kardianos/govendor
+> go get github.com/kardianos/govendor
 > cd <new CREM repository folder>
 > govendor sync
 ```
