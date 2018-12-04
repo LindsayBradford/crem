@@ -10,6 +10,7 @@ Type = "DumbSolutionExplorer"
 Name = "DerpaDaExBurba"
 [SolutionExplorers.Parameters]
 #OptimisationDirection = "Maximising"
+#DecisionVariable = "NotValid"
 
 [Annealer]
 SolutionExplorer = "DerpaDaExBurba"

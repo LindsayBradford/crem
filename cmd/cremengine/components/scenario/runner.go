@@ -32,7 +32,6 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
 			RegisteringExplorer(buildSedimentTransportExplorerRegistration()).
-			RegisteringExplorer(buildNewDumbExplorerRegistration()).
 			Build()
 
 	if buildError != nil {
@@ -56,17 +55,6 @@ func buildSedimentTransportExplorerRegistration() config.ExplorerRegistration {
 		ExplorerType: "SedimentTransportSolutionExplorer",
 		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
 			return new(SedimentTransportSolutionExplorer).
-				WithName(config.Name).
-				WithParameters(config.Parameters)
-		},
-	}
-}
-
-func buildNewDumbExplorerRegistration() config.ExplorerRegistration {
-	return config.ExplorerRegistration{
-		ExplorerType: "NewDumbExplorer",
-		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
-			return explorer.NewDumbExplorer().
 				WithName(config.Name).
 				WithParameters(config.Parameters)
 		},

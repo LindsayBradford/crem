@@ -57,6 +57,7 @@ func (ke *KirkpatrickExplorer) setDecisionVariableFromParams() {
 		ke.decisionVariable = decisionVariable
 	} else {
 		ke.decisionVariable = model.NullDecisionVariable
+		panic("Decision variable [" + decisionVariableName + "] not recognised by model") // TODO: log instead
 	}
 }
 
