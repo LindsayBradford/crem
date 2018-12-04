@@ -154,7 +154,7 @@ func TestAnnealerBuilder_MismatchedSolutionExplorerNamesConfig(t *testing.T) {
 		builderUnderTest.WithConfig(configUnderTest).Build()
 
 	g.Expect(buildError).To(Not(BeNil()), "Annealer build should have failed.")
-	g.Expect(buildError.Error()).To(ContainSubstring("configuration specifies a non-existent explorer explorer"))
+	g.Expect(buildError.Error()).To(ContainSubstring("configuration specifies a non-existent explorer"))
 	t.Logf("Annealer build error reported: %s", buildError)
 
 	g.Expect(annealerUnderTest).To(BeNil(), "Annealer build failure should have returned nil annealer.")

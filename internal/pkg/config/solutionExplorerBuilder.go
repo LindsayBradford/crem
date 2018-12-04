@@ -43,7 +43,7 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	builder.RegisteringExplorer(
 		"DumbSolutionExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
-			return new(explorer.DumbExplorer).WithName(config.Name)
+			return explorer.NewDumbExplorer().WithName(config.Name).WithParameters(config.Parameters)
 		},
 	)
 }

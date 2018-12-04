@@ -3,15 +3,17 @@ ScenarioName = "Test Dumb Annealer - One run"
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 2_00_000 # 200
+NumberOfIterations = 1 # 200
 
 [[SolutionExplorers]]
 Type = "DumbSolutionExplorer"
 Name = "DerpaDaExBurba"
+[SolutionExplorers.Parameters]
+#OptimisationDirection = "Maximising"
 
 [Annealer]
 SolutionExplorer = "DerpaDaExBurba"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
-CoolingFactor =  0.99  # 0.99
-MaximumIterations = 1_000_000 # 1M
+CoolingFactor =  0.95  # 0.99
+MaximumIterations = 2_000 # 1M

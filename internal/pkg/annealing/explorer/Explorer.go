@@ -10,7 +10,6 @@ import (
 
 type Explorer interface {
 	Name() string
-	SetName(name string)
 
 	ScenarioId() string
 	SetScenarioId(name string)

@@ -74,6 +74,10 @@ func (p *Parameters) Merge(params Map) {
 	}
 }
 
+func (p *Parameters) AddValidationErrorMessage(errorMessage string) {
+	p.validationErrors.AddMessage(errorMessage)
+}
+
 func (p *Parameters) ValidationErrors() error {
 	if p.validationErrors.Size() > 0 {
 		return p.validationErrors
@@ -149,6 +153,15 @@ func (p *Parameters) IsIntegerWithInclusiveBounds(key string, value interface{},
 	if valueAsInteger < minValue || valueAsInteger > maxValue {
 		message := fmt.Sprintf("Parameter [%s] supplied with integer value [%v], but must be between [%d] and [%d] inclusive", key, value, minValue, maxValue)
 		p.validationErrors.AddMessage(message)
+		return false
+	}
+	return true
+}
+
+func (p *Parameters) IsString(key string, value interface{}) bool {
+	_, typeIsOk := value.(string)
+	if !typeIsOk {
+		p.validationErrors.AddMessage("Parameter [" + key + "] must be a string value")
 		return false
 	}
 	return true

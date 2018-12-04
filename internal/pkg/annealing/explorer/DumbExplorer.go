@@ -2,61 +2,37 @@
 
 package explorer
 
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
+)
+
+func NewDumbExplorer() *DumbExplorer {
+	explorer := new(DumbExplorer).WithModel(dumb.New())
+	explorer.parameters.Initialise()
+	return explorer
+}
+
 type DumbExplorer struct {
-	SingleObjectiveAnnealableExplorer
+	KirkpatrickExplorer
 }
 
-func (dse *DumbExplorer) WithName(name string) *DumbExplorer {
-	dse.SingleObjectiveAnnealableExplorer.WithName(name)
-	return dse
+func (nde *DumbExplorer) WithName(name string) *DumbExplorer {
+	nde.KirkpatrickExplorer.WithName(name)
+	return nde
 }
 
-func (dse *DumbExplorer) SetObjectiveValue(initialObjectiveValue float64) {
-	dse.objectiveValue = initialObjectiveValue
+func (nde *DumbExplorer) WithParameters(params parameters.Map) *DumbExplorer {
+	nde.KirkpatrickExplorer.WitParameters(params)
+	return nde
 }
 
-func (dse *DumbExplorer) Initialise() {
-	dse.SingleObjectiveAnnealableExplorer.Initialise()
+func (nde *DumbExplorer) ParameterErrors() error {
+	return nde.parameters.ValidationErrors()
 }
 
-func (dse *DumbExplorer) TearDown() {
-	dse.SingleObjectiveAnnealableExplorer.TearDown()
-}
-
-func (dse *DumbExplorer) TryRandomChange(temperature float64) {
-	dse.makeRandomChange()
-	dse.DecideOnWhetherToAcceptChange(temperature, dse.AcceptLastChange, dse.RevertLastChange)
-}
-
-func (dse *DumbExplorer) makeRandomChange() {
-	randomValue := dse.RandomNumberGenerator().Intn(2)
-
-	var changeInObjectiveValue float64
-	switch randomValue {
-	case 0:
-		changeInObjectiveValue = -1
-	case 1:
-		changeInObjectiveValue = 1
-	}
-	if dse.objectiveValue+changeInObjectiveValue >= 0 {
-		dse.changeInObjectiveValue = changeInObjectiveValue
-	} else {
-		dse.changeInObjectiveValue = 0
-	}
-
-	dse.objectiveValue += dse.changeInObjectiveValue
-}
-
-func (dse *DumbExplorer) AcceptLastChange() {
-	dse.SingleObjectiveAnnealableExplorer.AcceptLastChange()
-}
-
-func (dse *DumbExplorer) RevertLastChange() {
-	dse.objectiveValue -= dse.changeInObjectiveValue
-	dse.SingleObjectiveAnnealableExplorer.RevertLastChange()
-}
-
-func (dse *DumbExplorer) Clone() Explorer {
-	clone := *dse
-	return &clone
+func (nde *DumbExplorer) WithModel(model model.Model) *DumbExplorer {
+	nde.KirkpatrickExplorer.WithModel(model)
+	return nde
 }
