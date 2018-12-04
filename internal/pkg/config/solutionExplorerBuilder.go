@@ -82,7 +82,7 @@ func (builder *solutionExplorerBuilder) findMyExplorer(myExplorerName string, ex
 		}
 	}
 	builder.errors.Add(
-		errors.New("configuration specifies a non-existent explorer explorer [\"" +
+		errors.New("configuration specifies a non-existent explorer [\"" +
 			myExplorerName + "\"] for its Annealer"),
 	)
 	return nil
