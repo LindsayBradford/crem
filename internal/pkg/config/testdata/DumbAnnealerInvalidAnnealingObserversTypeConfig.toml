@@ -2,7 +2,7 @@
 Type = "NoKnownValidAnnealingObserverType"
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "validConfig"
 
 [Annealer]

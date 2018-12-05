@@ -7,7 +7,7 @@ IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "Every
 NumberOfIterations = 2_00_000 # 200
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "DerpaDaExBurba"
 
 [Annealer]

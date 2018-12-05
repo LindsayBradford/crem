@@ -6,7 +6,7 @@ IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "Every
 NumberOfIterations = 1 # 200
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "DerpaDaExBurba"
 [SolutionExplorers.Parameters]
 #OptimisationDirection = "Maximising"

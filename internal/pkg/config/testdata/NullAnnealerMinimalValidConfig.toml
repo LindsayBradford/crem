@@ -1,5 +1,5 @@
 [[SolutionExplorers]]
-Type = "NullSolutionExplorer"
+Type = "NullExplorer"
 Name = "validConfig"
 
 [Annealer]

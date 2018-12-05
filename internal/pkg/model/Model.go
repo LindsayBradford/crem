@@ -2,8 +2,6 @@
 
 package model
 
-const ObjectiveValue = "ObjectiveValue"
-
 type Model interface {
 	TryRandomChange()
 
@@ -23,7 +21,11 @@ func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
 func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
-	return NullDecisionVariable, nil
+	newVariable := DecisionVariableImpl{
+		name:  name,
+		value: 0,
+	}
+	return &newVariable, nil
 }
 func (nm *nullModel) Change(decisionVariable DecisionVariable) (float64, error) { return 0, nil }
 func (nm *nullModel) SetDecisionVariable(name string, value float64) error      { return nil }

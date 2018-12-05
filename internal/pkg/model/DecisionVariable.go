@@ -20,6 +20,13 @@ func (ndv *nullDecisionVariable) SetName(name string)    {}
 func (ndv *nullDecisionVariable) Value() float64         { return 0 }
 func (ndv *nullDecisionVariable) SetValue(value float64) {}
 
+const ObjectiveValue = "ObjectiveValue"
+
+var ObjectiveValueDecisionVariable = &DecisionVariableImpl{
+	name:  ObjectiveValue,
+	value: 0,
+}
+
 type DecisionVariableImpl struct {
 	name  string
 	value float64

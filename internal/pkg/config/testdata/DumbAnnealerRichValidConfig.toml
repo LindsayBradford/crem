@@ -44,7 +44,7 @@ IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIteratio
 PercentileOfIterations = 10.0
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "DoraTheExplorer"
 
 [Annealer]

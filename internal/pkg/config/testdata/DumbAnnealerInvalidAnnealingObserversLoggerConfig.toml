@@ -3,7 +3,7 @@ Type = "MessageObserver"
 Logger = "InvalidLoggerName"
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "validConfig"
 
 [Annealer]

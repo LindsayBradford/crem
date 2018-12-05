@@ -179,5 +179,4 @@ func (kp *Parameters) buildMetaData() {
 			DefaultValue: float64(2000),
 		},
 	)
-
 }

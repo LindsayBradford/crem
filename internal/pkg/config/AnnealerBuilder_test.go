@@ -49,7 +49,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(explorer.DumbExplorer)
+	dummyExplorer := new(explorer.KirkpatrickExplorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -300,10 +300,10 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(explorer.DumbExplorer)
+	explorer := explorer.NewKirkpatrickExplorer()
 
 	g.Expect(
-		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
+		solutionExplorerUnderTest).To(BeAssignableToTypeOf(explorer),
 		"Annealer should have built with config supplied Explorer")
 
 	actualObservers := annealerUnderTest.Observers()

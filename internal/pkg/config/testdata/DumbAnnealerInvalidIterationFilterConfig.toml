@@ -3,7 +3,7 @@ Type = "MessageObserver"
 IterationFilter = "ThereAintNoSuchFilter"
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "DoraTheExplorer"
 
 [Annealer]

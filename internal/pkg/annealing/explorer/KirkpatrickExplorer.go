@@ -21,9 +21,10 @@ type KirkpatrickExplorer struct {
 	optimisationDirection optimisationDirection
 }
 
-func New() *KirkpatrickExplorer {
+func NewKirkpatrickExplorer() *KirkpatrickExplorer {
 	newExplorer := new(KirkpatrickExplorer)
 	newExplorer.parameters.Initialise()
+	newExplorer.model = model.NullModel
 	return newExplorer
 }
 
@@ -31,12 +32,17 @@ func (ke *KirkpatrickExplorer) Initialise() {
 	ke.BaseExplorer.Initialise()
 }
 
+func (ke *KirkpatrickExplorer) WithName(name string) *KirkpatrickExplorer {
+	ke.name = name
+	return ke
+}
+
 func (ke *KirkpatrickExplorer) WithModel(model model.Model) *KirkpatrickExplorer {
 	ke.model = model
 	return ke
 }
 
-func (ke *KirkpatrickExplorer) WitParameters(params parameters.Map) *KirkpatrickExplorer {
+func (ke *KirkpatrickExplorer) WithParameters(params parameters.Map) *KirkpatrickExplorer {
 	ke.parameters.Merge(params)
 
 	ke.setOptimisationDirectionFromParams()
@@ -57,7 +63,7 @@ func (ke *KirkpatrickExplorer) setDecisionVariableFromParams() {
 		ke.decisionVariable = decisionVariable
 	} else {
 		ke.decisionVariable = model.NullDecisionVariable
-		panic("Decision variable [" + decisionVariableName + "] not recognised by model") // TODO: log instead
+		ke.parameters.AddValidationErrorMessage("Decision variable [" + decisionVariableName + "] not recognised by model")
 	}
 }
 

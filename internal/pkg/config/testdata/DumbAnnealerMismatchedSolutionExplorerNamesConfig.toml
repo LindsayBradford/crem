@@ -1,5 +1,5 @@
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "someExplorerName"
 
 [Annealer]

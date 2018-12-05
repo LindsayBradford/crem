@@ -8,7 +8,7 @@ Type = "MessageObserver"
 Logger = "I'm a lumberjack and I'm OK"
 
 [[SolutionExplorers]]
-Type = "DumbSolutionExplorer"
+Type = "DumbExplorer"
 Name = "validConfig"
 
 [Annealer]

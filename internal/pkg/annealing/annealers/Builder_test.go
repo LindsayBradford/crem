@@ -12,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
@@ -25,7 +26,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedLogHandler := new(loggers.BareBonesLogger)
-	expectedSolutionExplorer := new(explorer.DumbExplorer)
+	expectedSolutionExplorer := new(explorer.NullExplorer)
 	expectedObservers := []annealing.Observer{new(dummyObserver)}
 
 	builder := new(Builder)
@@ -105,26 +106,24 @@ func TestBuild_BadInputs(t *testing.T) {
 		"Annealer should not have been built")
 }
 
-func TestAnnealerBuilder_WithDumbSolutionExplorer(t *testing.T) {
+func TestAnnealerBuilder_WithKirkpatrickExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	expectedObjectiveValue := float64(10)
-
-	expectedSolutionExplorer := new(explorer.DumbExplorer)
-	expectedSolutionExplorer.SetObjectiveValue(expectedObjectiveValue)
+	expectedSolutionExplorer := explorer.NewKirkpatrickExplorer()
+	expectedSolutionExplorer.WithModel(dumb.New())
 	expectedSolutionExplorer.SetScenarioId("Simple Annealer")
 
 	builder := new(Builder)
 
 	annealer, err := builder.
 		SimpleAnnealer().
-		WithDumbSolutionExplorer(expectedObjectiveValue).
+		WithDumbSolutionExplorer().
 		Build()
 
 	g.Expect(err).To(BeNil(), "Annealer should have built without errors")
 
 	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(expectedSolutionExplorer),
+		annealer.SolutionExplorer()).To(BeAssignableToTypeOf(expectedSolutionExplorer),
 		"Annealer should have built with expected DumbExplorer")
 
 }
