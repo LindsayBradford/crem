@@ -9,10 +9,13 @@ Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 200 # 200
 
+[[Models]]
+Type = "DumbModel"
+Name = "ReplaceMeWithSimpleExcelModel"  # TODO: Yeah Linds, that's dodgy. FIx it tomorrow!
+
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-[SolutionExplorers.InputFiles]
 [SolutionExplorers.Parameters]
 DataSourcePath = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.5 # 100.0
@@ -20,6 +23,7 @@ Penalty = 100.5 # 100.0
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
 SolutionExplorer = "DoraTheExplorer"
+Model = "ReplaceMeWithSimpleExcelModel"
 [Annealer.Parameters]
 StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995

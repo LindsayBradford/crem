@@ -1,9 +1,14 @@
+[[Models]]
+Type = "DumbModel"
+Name = "hurrDurr"
+
 [[SolutionExplorers]]
 Type = "DumbExplorer"
 Name = "validConfig"
 
 [Annealer]
 SolutionExplorer = "validConfig"
+Model = "hurrDurr"
 [Annealer.Parameters]
 StartingTemperature = 10.0
 CoolingFactor =  0.99

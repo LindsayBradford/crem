@@ -8,6 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	errors2 "github.com/pkg/errors"
@@ -21,11 +22,13 @@ type AnnealerBuilder struct {
 	loggersBuilder   LogHandlersBuilder
 	observersBuilder annealingObserversBuilder
 	explorersBuilder solutionExplorerBuilder
+	modelsBuilder    modelBuilder
 
 	defaultLogHandler logging.Logger
 	logHandlers       []logging.Logger
 	observers         []annealing.Observer
 	annealingExplorer explorer.Explorer
+	annealingModel    model.Model
 }
 
 type ExplorerRegistration struct {
@@ -33,11 +36,17 @@ type ExplorerRegistration struct {
 	ConfigFunction ExplorerConfigFunction
 }
 
+type ModelRegistration struct {
+	ModelType      string
+	ConfigFunction ModelConfigFunction
+}
+
 func (builder *AnnealerBuilder) initialise() {
 	builder.errors = errors.New("AnnealerBuilder initialisation")
 	builder.loggersBuilder.WithConfig(builder.config.Loggers)
 	builder.observersBuilder.WithConfig(builder.config)
 	builder.explorersBuilder.WithConfig(builder.config)
+	builder.modelsBuilder.WithConfig(builder.config)
 }
 
 func (builder *AnnealerBuilder) WithConfig(suppliedConfig *CREMConfig) *AnnealerBuilder {
@@ -51,11 +60,17 @@ func (builder *AnnealerBuilder) RegisteringExplorer(registration ExplorerRegistr
 	return builder
 }
 
+func (builder *AnnealerBuilder) RegisteringModel(registration ModelRegistration) *AnnealerBuilder {
+	builder.modelsBuilder.RegisteringModel(registration.ModelType, registration.ConfigFunction)
+	return builder
+}
+
 func (builder *AnnealerBuilder) Build() (annealing.Annealer, logging.Logger, error) {
 	builder.buildLogHandlers()
 	builder.defaultLogHandler.Debug("About to call Builder.Build() ")
 
 	builder.buildObservers()
+	builder.buildModel()
 	builder.buildSolutionExplorer()
 
 	annealerConfig := builder.config.Annealer
@@ -115,6 +130,18 @@ func (builder *AnnealerBuilder) buildObservers() {
 	builder.observers = configuredObservers
 }
 
+func (builder *AnnealerBuilder) buildModel() {
+	myModelName := builder.config.Annealer.Model
+	newModel, buildErrors := builder.modelsBuilder.Build(myModelName)
+
+	if buildErrors != nil {
+		newError := errors2.Wrap(buildErrors, "building model from config")
+		builder.errors.Add(newError)
+	}
+
+	builder.annealingModel = newModel
+}
+
 func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	myExplorerName := builder.config.Annealer.SolutionExplorer
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
@@ -122,6 +149,8 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	if buildErrors != nil {
 		newError := errors2.Wrap(buildErrors, "building explorer from config")
 		builder.errors.Add(newError)
+	} else {
+		newExplorer.SetModel(builder.annealingModel)
 	}
 
 	builder.annealingExplorer = newExplorer

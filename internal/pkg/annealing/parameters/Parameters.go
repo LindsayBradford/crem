@@ -42,7 +42,7 @@ type MetaData struct {
 type Validator func(key string, value interface{}) bool
 
 func (p *Parameters) Initialise() *Parameters {
-	p.validationErrors = errors.New("SolutionExplorer Parameters")
+	p.validationErrors = errors.New("Parameters")
 	p.metaDataMap = make(MetaDataMap, 0)
 	return p
 }

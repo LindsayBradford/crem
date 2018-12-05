@@ -1,3 +1,7 @@
+[[Models]]
+Type = "NullModel"
+Name = "Nhilismo"
+
 [[SolutionExplorers]]
 Type = "NullExplorer"
 Name = "validConfig"
@@ -5,6 +9,7 @@ Name = "validConfig"
 [Annealer]
 Type = "Simple"
 SolutionExplorer = "validConfig"
+Model = "Nhilismo"
 [Annealer.Parameters]
 StartingTemperature = 10.0
 CoolingFactor =  0.99

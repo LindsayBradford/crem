@@ -5,6 +5,7 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/pkg/errors"
 
@@ -18,6 +19,7 @@ type SimpleAnnealer struct {
 	currentIteration uint64
 	eventNotifier    annealing.EventNotifier
 	solutionExplorer explorer.Explorer
+	model            model.Model
 	logger           logging.Logger
 
 	parameters Parameters

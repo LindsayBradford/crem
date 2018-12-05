@@ -7,13 +7,16 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/pkg/errors"
 )
 
 type BaseExplorer struct {
-	name                   string
-	scenarioId             string
+	name       string
+	scenarioId string
+	model      model.Model
+
 	objectiveValue         float64
 	changeInObjectiveValue float64
 	changeIsDesirable      bool
@@ -50,6 +53,19 @@ func (explorer *BaseExplorer) SetName(name string) {
 
 func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
 	explorer.name = name
+	return explorer
+}
+
+func (explorer *BaseExplorer) Model() model.Model {
+	return explorer.model
+}
+
+func (explorer *BaseExplorer) SetModel(model model.Model) {
+	explorer.model = model
+}
+
+func (explorer *BaseExplorer) WithModel(model model.Model) *BaseExplorer {
+	explorer.model = model
 	return explorer
 }
 

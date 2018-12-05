@@ -3,23 +3,37 @@
 package model
 
 type Model interface {
+	Name() string
+	SetName(name string)
 	TryRandomChange()
 
 	AcceptChange()
 	RevertChange()
 
 	DecisionVariable(name string) (DecisionVariable, error)
-	Change(decisionVariable DecisionVariable) (float64, error)
+	Change(decisionVariableName string) (float64, error)
 }
 
 var NullModel = new(nullModel)
 
-type nullModel struct{}
+func NewNullModel() *nullModel {
+	newModel := new(nullModel).WithName("NullModel")
+	return newModel
+}
 
-func (nm *nullModel) Name() string     { return "NullModel" }
-func (nm *nullModel) TryRandomChange() {}
-func (nm *nullModel) AcceptChange()    {}
-func (nm *nullModel) RevertChange()    {}
+type nullModel struct {
+	name string
+}
+
+func (nm *nullModel) Name() string { return nm.name }
+func (nm *nullModel) WithName(name string) *nullModel {
+	nm.SetName(name)
+	return nm
+}
+func (nm *nullModel) SetName(name string) { nm.name = name }
+func (nm *nullModel) TryRandomChange()    {}
+func (nm *nullModel) AcceptChange()       {}
+func (nm *nullModel) RevertChange()       {}
 func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
 	newVariable := DecisionVariableImpl{
 		name:  name,
@@ -27,5 +41,5 @@ func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
 	}
 	return &newVariable, nil
 }
-func (nm *nullModel) Change(decisionVariable DecisionVariable) (float64, error) { return 0, nil }
-func (nm *nullModel) SetDecisionVariable(name string, value float64) error      { return nil }
+func (nm *nullModel) Change(decisionVariableName string) (float64, error)  { return 0, nil }
+func (nm *nullModel) SetDecisionVariable(name string, value float64) error { return nil }

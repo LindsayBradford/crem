@@ -64,6 +64,7 @@ type CREMConfig struct {
 	Loggers            []LoggerConfig
 	AnnealingObservers []AnnealingObserverConfig
 	SolutionExplorers  []SolutionExplorerConfig
+	Models             []ModelConfig
 }
 
 type EventNotifierType struct {
@@ -126,6 +127,7 @@ func (at *AnnealerType) UnmarshalText(text []byte) error {
 type AnnealingConfig struct {
 	Type             AnnealerType
 	EventNotifier    EventNotifierType
+	Model            string
 	SolutionExplorer string
 	Parameters       parameters.Map
 }
@@ -253,9 +255,7 @@ func (filter *IterationFilter) UnmarshalText(text []byte) error {
 type SolutionExplorerConfig struct {
 	Type       string
 	Name       string
-	Penalty    float64
 	Parameters parameters.Map
-	InputFiles map[string]string
 }
 
 func processUnmarshalContext(context unmarshalContext) error {
@@ -292,6 +292,12 @@ func listToString(list ...string) string {
 		needsComma = true
 	}
 	return builder.String()
+}
+
+type ModelConfig struct {
+	Type       string
+	Name       string
+	Parameters parameters.Map
 }
 
 type HttpServerConfig struct {

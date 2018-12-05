@@ -13,6 +13,7 @@ import (
 )
 
 type Model struct {
+	name                  string
 	randomNumberGenerator *rand.Rand
 
 	decisionVariables     map[string]model.DecisionVariable
@@ -22,6 +23,7 @@ type Model struct {
 
 func New() *Model {
 	newModel := new(Model)
+	newModel.name = "DumbModel"
 
 	newModel.randomNumberGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
 	newModel.buildDecisionVariables()
@@ -29,13 +31,17 @@ func New() *Model {
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
 	newModel.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
+	newModel.tempDecisionVariables[model.ObjectiveValue].SetValue(initialValue)
 
 	return newModel
 }
 
-func (dm *Model) Name() string {
-	return "DumbModel"
+func (dm *Model) Name() string { return dm.name }
+func (dm *Model) WithName(name string) *Model {
+	dm.name = name
+	return dm
 }
+func (dm *Model) SetName(name string) { dm.name = name }
 
 func (dm *Model) buildDecisionVariables() {
 	dm.decisionVariables = make(map[string]model.DecisionVariable, 1)
@@ -50,11 +56,12 @@ func (dm *Model) buildDecisionVariables() {
 	dm.tempDecisionVariables[model.ObjectiveValue] = tempObjectiveValueVar
 }
 
-func (dm *Model) WitParameters(params parameters.Map) *Model {
+func (dm *Model) WithParameters(params parameters.Map) *Model {
 	dm.parameters.Merge(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
 	dm.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
+	dm.tempDecisionVariables[model.ObjectiveValue].SetValue(initialValue)
 
 	return dm
 }
@@ -130,9 +137,10 @@ func (dm *Model) DecisionVariable(name string) (model.DecisionVariable, error) {
 	return model.NullDecisionVariable, errors.New("decision variable [" + name + "] not defined for model [" + dm.Name() + " ].")
 }
 
-func (dm *Model) Change(decisionVariable model.DecisionVariable) (float64, error) {
-	tmpDecisionVar, found := dm.tempDecisionVariables[decisionVariable.Name()]
-	if !found {
+func (dm *Model) Change(decisionVariableName string) (float64, error) {
+	decisionVariable, foundActual := dm.decisionVariables[decisionVariableName]
+	tmpDecisionVar, foundTemp := dm.tempDecisionVariables[decisionVariable.Name()]
+	if !foundActual || !foundTemp {
 		return 0, errors.New("no temporary decision variable of name [" + decisionVariable.Name() + "] in model [" + dm.Name() + "].")
 	}
 

@@ -5,6 +5,7 @@ package explorer
 import (
 	"math/rand"
 
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
@@ -13,6 +14,9 @@ type Explorer interface {
 
 	ScenarioId() string
 	SetScenarioId(name string)
+
+	Model() model.Model
+	SetModel(model model.Model)
 
 	Initialise()
 	Clone() Explorer
@@ -51,8 +55,4 @@ type AnnealableExplorer interface {
 
 	ChangeIsDesirable() bool
 	ChangeAccepted() bool
-}
-
-type ParameterisedExplorer interface {
-	ParameterErrors() error
 }

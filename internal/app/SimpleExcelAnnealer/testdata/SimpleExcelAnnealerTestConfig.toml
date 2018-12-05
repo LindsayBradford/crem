@@ -15,7 +15,6 @@ NumberOfIterations = 200 # 200
 [[SolutionExplorers]]
 Type = "SimpleExcelSolutionExplorer"
 Name = "DoraTheExplorer"
-[SolutionExplorers.InputFiles]
 [SolutionExplorers.Parameters]
 DataSourcePath = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.5 # 100.0

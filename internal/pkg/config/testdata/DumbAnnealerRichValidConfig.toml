@@ -43,6 +43,14 @@ Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 PercentileOfIterations = 10.0
 
+[[Models]]
+Type = "DumbModel"
+Name = "HurrDurrHurrDurr"
+[Models.Parameters]
+InitialObjectiveValue = 2_000.0
+MaximumObjectiveValue = 2_500.0
+MinimumObjectiveValue = 1_500.0
+
 [[SolutionExplorers]]
 Type = "DumbExplorer"
 Name = "DoraTheExplorer"
@@ -50,6 +58,7 @@ Name = "DoraTheExplorer"
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
 SolutionExplorer = "DoraTheExplorer"
+Model = "HurrDurrHurrDurr"
 EventNotifier = "Concurrent"  # "Synchronous" | Concurrent"
 [Annealer.Parameters]
 StartingTemperature = 50.0 #50

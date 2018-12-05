@@ -6,6 +6,7 @@ import (
 	"errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	errors2 "github.com/pkg/errors"
@@ -52,7 +53,7 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	)
 
 	builder.RegisteringExplorer(
-		"KirkpatrickSolutionExplorer",
+		"KirkpatrickExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
 			return explorer.NewKirkpatrickExplorer().
 				WithName(config.Name).
@@ -110,7 +111,7 @@ func (builder *solutionExplorerBuilder) buildExplorers() []explorer.Explorer {
 			configFunction := builder.registeredExplorers[currConfig.Type]
 			explorerList[index] = configFunction(currConfig)
 
-			parameterisedExplorer, ok := explorerList[index].(explorer.ParameterisedExplorer)
+			parameterisedExplorer, ok := explorerList[index].(parameters.ParameterisedEntity)
 			if ok {
 				if errors := parameterisedExplorer.ParameterErrors(); errors != nil {
 					wrappedErrors := errors2.Wrap(errors, "building explorer ["+currConfig.Name+"]")
@@ -120,7 +121,7 @@ func (builder *solutionExplorerBuilder) buildExplorers() []explorer.Explorer {
 
 		} else {
 			builder.errors.Add(
-				errors.New("configuration specifies a explorer explorer type [\"" +
+				errors.New("configuration specifies an explorer type [\"" +
 					currConfig.Type + "\"], but no explorers are registered for that type"),
 			)
 		}

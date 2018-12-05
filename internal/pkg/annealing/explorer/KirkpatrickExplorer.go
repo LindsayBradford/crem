@@ -15,7 +15,6 @@ const guaranteed = 1
 type KirkpatrickExplorer struct {
 	BaseExplorer
 	parameters KirkpatrickExplorerParameters
-	model      model.Model
 
 	decisionVariable      model.DecisionVariable
 	optimisationDirection optimisationDirection
@@ -119,7 +118,8 @@ func (ke *KirkpatrickExplorer) ChangeIsDesirable() bool {
 }
 
 func (ke *KirkpatrickExplorer) changeInObjectiveValue() float64 {
-	if change, changeError := ke.model.Change(ke.decisionVariable); changeError == nil {
+	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
+	if change, changeError := ke.model.Change(decisionVariableName); changeError == nil {
 		ke.SetChangeInObjectiveValue(change)
 		return change
 	}

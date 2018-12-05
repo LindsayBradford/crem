@@ -124,3 +124,14 @@ func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer test.JsonRes
 
 	g.Expect(responseTime).To(BeTemporally("~", time.Now(), time.Millisecond*5), " should return status time of about now")
 }
+
+func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
+	context := configTesting.TestingContext{
+		Name:           "Single run of Kirkpatrick Dumb annealer",
+		T:              t,
+		ConfigFilePath: "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
+		Runner:         components.RunScenarioFromConfigFile,
+	}
+
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+}

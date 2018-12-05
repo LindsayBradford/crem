@@ -1,3 +1,7 @@
+[[Models]]
+Type = "DumbModel"
+Name = "hurrDurr"
+
 [[SolutionExplorers]]
 Type = "TestDefinedSolutionExplorer"
 Name = "testyName"
@@ -5,6 +9,7 @@ Name = "testyName"
 [Annealer]
 Type = "Simple"
 SolutionExplorer = "testyName"
+Model = "hurrDurr"
 [Annealer.Parameters]
 StartingTemperature = 10.0
 CoolingFactor =  0.99
