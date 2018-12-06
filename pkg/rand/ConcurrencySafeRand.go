@@ -11,6 +11,24 @@ import (
 	"time"
 )
 
+// Container defines an interface embedding a Model
+type Container interface {
+	RandomNumberGenerator() *ConcurrencySafeRand
+	SetRandomNumberGenerator(generator *ConcurrencySafeRand)
+}
+
+type ContainedRandomNumberGenerator struct {
+	randomNumberGenerator *ConcurrencySafeRand
+}
+
+func (g *ContainedRandomNumberGenerator) RandomNumberGenerator() *ConcurrencySafeRand {
+	return g.randomNumberGenerator
+}
+
+func (g *ContainedRandomNumberGenerator) SetRandomNumberGenerator(generator *ConcurrencySafeRand) {
+	g.randomNumberGenerator = generator
+}
+
 // ConcurrencySafeRand is a concurrency-safe source of random numbers
 type ConcurrencySafeRand struct {
 	sync.Mutex
@@ -41,4 +59,12 @@ func (csr *ConcurrencySafeRand) Intn(n int) int {
 	csr.Lock()
 	defer csr.Unlock()
 	return csr.unsafeRand.Intn(n)
+}
+
+// Int63n returns, as an int64, a non-negative pseudo-random number in [0,n).
+// It panics if n <= 0.
+func (csr *ConcurrencySafeRand) Int63n(n int64) int64 {
+	csr.Lock()
+	defer csr.Unlock()
+	return csr.unsafeRand.Int63n(n)
 }

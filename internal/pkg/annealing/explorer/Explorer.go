@@ -3,11 +3,10 @@
 package explorer
 
 import (
-	"math/rand"
-
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/LindsayBradford/crem/pkg/rand"
 )
 
 type Explorer interface {
@@ -23,8 +22,8 @@ type Explorer interface {
 	Clone() Explorer
 	TryRandomChange(temperature float64)
 
-	SetRandomNumberGenerator(*rand.Rand)
-	RandomNumberGenerator() *rand.Rand
+	SetRandomNumberGenerator(safeRand *rand.ConcurrencySafeRand)
+	RandomNumberGenerator() *rand.ConcurrencySafeRand
 
 	model.Container
 	logging.Container

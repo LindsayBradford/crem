@@ -7,14 +7,13 @@ package kirkpatrick
 import (
 	"errors"
 	"math"
-	"math/rand"
-	"time"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/LindsayBradford/crem/pkg/rand"
 )
 
 const guaranteed = 1
@@ -26,8 +25,8 @@ type Explorer struct {
 
 	parameters            Parameters
 	optimisationDirection optimisationDirection
+	rand.ContainedRandomNumberGenerator
 
-	randomNumberGenerator *rand.Rand
 	acceptanceProbability float64
 	changeIsDesirable     bool
 	changeAccepted        bool
@@ -44,15 +43,7 @@ func New() *Explorer {
 
 func (ke *Explorer) Initialise() {
 	ke.logHandler.Debug(ke.scenarioId + ": Initialising Solution Explorer")
-	ke.SetRandomNumberGenerator(rand.New(rand.NewSource(time.Now().UnixNano())))
-}
-
-func (ke *Explorer) RandomNumberGenerator() *rand.Rand {
-	return ke.randomNumberGenerator
-}
-
-func (ke *Explorer) SetRandomNumberGenerator(generator *rand.Rand) {
-	ke.randomNumberGenerator = generator
+	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -146,7 +137,7 @@ func (ke *Explorer) acceptOrRevertChange(annealingTemperature float64) {
 // newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
 // (which by default returns a random number in the range [0,1).
 // See: http://mumble.net/~campbell/2014/04/28/uniform-random-float
-func newRandomValue(randomNumberGenerator *rand.Rand) float64 {
+func newRandomValue(randomNumberGenerator *rand.ConcurrencySafeRand) float64 {
 	distributionRange := int64(math.Pow(2, 53))
 	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange-1)
 }
