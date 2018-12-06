@@ -96,7 +96,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(null.Explorer)
+	dummyExplorer := null.NullExplorer
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),

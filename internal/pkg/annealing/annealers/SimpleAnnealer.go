@@ -54,6 +54,10 @@ func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 	return sa.parameters.ValidationErrors()
 }
 
+func (sa *SimpleAnnealer) ParameterErrors() error {
+	return sa.parameters.ValidationErrors()
+}
+
 func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 	if temperature <= 0 {
 		return errors.New("invalid attempt to set annealer temperature to value <= 0")

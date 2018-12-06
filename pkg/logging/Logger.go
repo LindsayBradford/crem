@@ -1,7 +1,5 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 // loggers package defines loggers responsible for formatters log entries (delegated to Formatter) and delivering
 // the formatted entries to whatever log destinations are needed.
 package logging
@@ -35,4 +33,10 @@ type Logger interface {
 
 	SupportsLogLevel(logLevel Level) bool
 	Override(logLevel Level, destination Destination)
+}
+
+// Container defines an interface for users wishing to embed a Logger.
+type Container interface {
+	SetLogHandler(logger Logger) error
+	LogHandler() Logger
 }

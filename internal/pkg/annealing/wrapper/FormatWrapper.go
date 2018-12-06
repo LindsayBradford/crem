@@ -9,7 +9,7 @@ import (
 )
 
 type FormatWrapper struct {
-	AnnealerToFormat annealing.Annealer
+	AnnealerToFormat annealing.Observable
 	MethodFormats    map[string]string
 }
 
@@ -33,7 +33,7 @@ func (wrapper *FormatWrapper) Wrapping(annealer annealing.Annealer) *FormatWrapp
 	return wrapper
 }
 
-func (wrapper *FormatWrapper) Wrap(annealer annealing.Annealer) {
+func (wrapper *FormatWrapper) Wrap(annealer annealing.Observable) {
 	wrapper.AnnealerToFormat = annealer
 }
 

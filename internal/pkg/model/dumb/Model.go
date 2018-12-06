@@ -8,11 +8,12 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/rand"
 )
 
 type Model struct {
-	name                  string
+	name.Named
 	randomNumberGenerator *rand.ConcurrencySafeRand
 
 	decisionVariables     map[string]model.DecisionVariable
@@ -22,7 +23,7 @@ type Model struct {
 
 func New() *Model {
 	newModel := new(Model)
-	newModel.name = "DumbModel"
+	newModel.SetName("DumbModel")
 
 	newModel.randomNumberGenerator = rand.NewTimeSeeded()
 	newModel.buildDecisionVariables()
@@ -35,12 +36,10 @@ func New() *Model {
 	return newModel
 }
 
-func (dm *Model) Name() string { return dm.name }
 func (dm *Model) WithName(name string) *Model {
-	dm.name = name
+	dm.SetName(name)
 	return dm
 }
-func (dm *Model) SetName(name string) { dm.name = name }
 
 func (dm *Model) buildDecisionVariables() {
 	dm.decisionVariables = make(map[string]model.DecisionVariable, 1)

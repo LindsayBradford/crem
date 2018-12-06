@@ -10,6 +10,11 @@ import (
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
 
+type Container interface {
+	SetParameters(params Map) error
+	ParameterErrors() error
+}
+
 type Parameters struct {
 	paramMap         Map
 	metaDataMap      MetaDataMap

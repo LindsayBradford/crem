@@ -2,19 +2,40 @@
 
 package model
 
+import "github.com/LindsayBradford/crem/pkg/name"
+
 type Model interface {
-	Name() string
-	SetName(name string)
+	name.Nameable
+	DecisionVariableContainer
 
 	TryRandomChange()
-
-	DecisionVariable(name string) (DecisionVariable, error)
-	DecisionVariableChange(decisionVariableName string) (float64, error)
-
 	AcceptChange()
 	RevertChange()
 
 	Clone() Model
+}
+
+// Container defines an interface embedding a Model
+type Container interface {
+	Model() Model
+	SetModel(model Model)
+}
+
+type Contained struct {
+	model Model
+}
+
+func (c *Contained) Model() Model {
+	return c.model
+}
+
+func (c *Contained) SetModel(model Model) {
+	c.model = model
+}
+
+type DecisionVariableContainer interface {
+	DecisionVariable(name string) (DecisionVariable, error)
+	DecisionVariableChange(decisionVariableName string) (float64, error)
 }
 
 var NullModel = new(nullModel)
@@ -25,18 +46,17 @@ func NewNullModel() *nullModel {
 }
 
 type nullModel struct {
-	name string
+	name.Named
 }
 
-func (nm *nullModel) Name() string { return nm.name }
 func (nm *nullModel) WithName(name string) *nullModel {
 	nm.SetName(name)
 	return nm
 }
-func (nm *nullModel) SetName(name string) { nm.name = name }
-func (nm *nullModel) TryRandomChange()    {}
-func (nm *nullModel) AcceptChange()       {}
-func (nm *nullModel) RevertChange()       {}
+
+func (nm *nullModel) TryRandomChange() {}
+func (nm *nullModel) AcceptChange()    {}
+func (nm *nullModel) RevertChange()    {}
 func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
 	newVariable := DecisionVariableImpl{
 		name:  name,

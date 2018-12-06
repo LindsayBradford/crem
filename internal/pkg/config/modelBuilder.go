@@ -99,7 +99,7 @@ func (builder *modelBuilder) buildModels() []model.Model {
 			configFunction := builder.registeredModels[currConfig.Type]
 			modelList[index] = configFunction(currConfig)
 
-			parameterisedExplorer, ok := modelList[index].(parameters.ParameterisedEntity)
+			parameterisedExplorer, ok := modelList[index].(parameters.Container)
 			if ok {
 				if errors := parameterisedExplorer.ParameterErrors(); errors != nil {
 					wrappedErrors := errors2.Wrap(errors, "building model ["+currConfig.Name+"]")

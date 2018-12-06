@@ -9,11 +9,12 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 )
 
 type BaseExplorer struct {
-	name       string
+	name.Named
 	scenarioId string
 	model      model.Model
 
@@ -43,16 +44,8 @@ func (explorer *BaseExplorer) SetRandomNumberGenerator(generator *rand.Rand) {
 	explorer.randomNumberGenerator = generator
 }
 
-func (explorer *BaseExplorer) Name() string {
-	return explorer.name
-}
-
-func (explorer *BaseExplorer) SetName(name string) {
-	explorer.name = name
-}
-
 func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
-	explorer.name = name
+	explorer.SetName(name)
 	return explorer
 }
 

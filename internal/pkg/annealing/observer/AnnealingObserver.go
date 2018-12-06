@@ -24,13 +24,13 @@ type AnnealingObserver struct {
 // Allows for the receipt of Event instances, but deliberately takes no action in observer those events.
 func (l *AnnealingObserver) ObserveAnnealingEvent(event annealing.Event) {}
 
-func wrapAnnealer(eventAnnealer annealing.Annealer) *wrapper.FormatWrapper {
+func wrapAnnealer(eventAnnealer annealing.Observable) *wrapper.FormatWrapper {
 	wrapper := newAnnealerWrapper()
 	wrapper.Wrap(eventAnnealer)
 	return wrapper
 }
 
-func wrapSolutionExplorer(explorer explorer.Explorer) *explorer.FormatWrapper {
+func wrapSolutionExplorer(explorer explorer.Observable) *explorer.FormatWrapper {
 	wrapper := newSolutionExplorerWrapper()
 	wrapper.Wrap(explorer)
 	return wrapper

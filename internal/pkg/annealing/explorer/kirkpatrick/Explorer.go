@@ -14,12 +14,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 const guaranteed = 1
 
 type Explorer struct {
-	name       string
+	name.Named
 	scenarioId string
 	model      model.Model
 
@@ -37,7 +38,7 @@ type Explorer struct {
 func New() *Explorer {
 	newExplorer := new(Explorer)
 	newExplorer.parameters.Initialise()
-	newExplorer.SetModel(model.NullModel)
+	newExplorer.SetModel(model.NewNullModel())
 	return newExplorer
 }
 
@@ -52,14 +53,6 @@ func (ke *Explorer) RandomNumberGenerator() *rand.Rand {
 
 func (ke *Explorer) SetRandomNumberGenerator(generator *rand.Rand) {
 	ke.randomNumberGenerator = generator
-}
-
-func (ke *Explorer) Name() string {
-	return ke.name
-}
-
-func (ke *Explorer) SetName(name string) {
-	ke.name = name
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {

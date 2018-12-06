@@ -2,7 +2,9 @@
 
 package null
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+)
 
 var NullExplorer = new(Explorer)
 
@@ -15,7 +17,7 @@ func (e *Explorer) Initialise() {
 }
 
 func (e *Explorer) WithName(name string) *Explorer {
-	e.SingleObjectiveAnnealableExplorer.WithName(name)
+	e.SetName(name)
 	return e
 }
 

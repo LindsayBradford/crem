@@ -113,7 +113,7 @@ func (builder *solutionExplorerBuilder) buildExplorers() []explorer.Explorer {
 			configFunction := builder.registeredExplorers[currConfig.Type]
 			explorerList[index] = configFunction(currConfig)
 
-			parameterisedExplorer, ok := explorerList[index].(parameters.ParameterisedEntity)
+			parameterisedExplorer, ok := explorerList[index].(parameters.Container)
 			if ok {
 				if errors := parameterisedExplorer.ParameterErrors(); errors != nil {
 					wrappedErrors := errors2.Wrap(errors, "building explorer ["+currConfig.Name+"]")

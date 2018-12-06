@@ -7,7 +7,7 @@ import (
 )
 
 type FormatWrapper struct {
-	StateToFormat ObservableExplorer
+	StateToFormat Observable
 	MethodFormats map[string]string
 }
 
@@ -26,12 +26,12 @@ func (fw *FormatWrapper) Initialise() *FormatWrapper {
 	return fw
 }
 
-func (fw *FormatWrapper) Wrapping(explorer ObservableExplorer) *FormatWrapper {
+func (fw *FormatWrapper) Wrapping(explorer Observable) *FormatWrapper {
 	fw.Wrap(explorer)
 	return fw
 }
 
-func (fw *FormatWrapper) Wrap(explorer ObservableExplorer) {
+func (fw *FormatWrapper) Wrap(explorer Observable) {
 	fw.StateToFormat = explorer
 }
 

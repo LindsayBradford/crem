@@ -9,29 +9,36 @@ import (
 )
 
 type Annealer interface {
-	SetId(title string)
-	Id() string
+	Initialise()
 
-	SetParameters(params parameters.Map) error
+	parameters.Container
+	explorer.Container
+	logging.Container
+
+	Observable
+
+	SetEventNotifier(notifier EventNotifier) error
+
+	Cloneable
+	Anneal()
+}
+
+type Observable interface {
+	AddObserver(observer Observer) error
+	Observers() []Observer
+
+	Identifiable
 	Temperature() float64
 	CoolingFactor() float64
 	MaximumIterations() uint64
-
-	SolutionExplorer() explorer.Explorer
-	SetSolutionExplorer(explorer explorer.Explorer) error
-
-	SetEventNotifier(notifier EventNotifier) error
-	AddObserver(observer Observer) error
-
-	Observers() []Observer
-
-	SetLogHandler(logger logging.Logger) error
-	LogHandler() logging.Logger
-
-	Initialise()
-	Clone() Annealer
-
 	CurrentIteration() uint64
+}
 
-	Anneal()
+type Identifiable interface {
+	SetId(title string)
+	Id() string
+}
+
+type Cloneable interface {
+	Clone() Annealer
 }
