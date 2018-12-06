@@ -13,15 +13,14 @@ import (
 
 // ConcurrencySafeRand is a concurrency-safe source of random numbers
 type ConcurrencySafeRand struct {
+	sync.Mutex
 	unsafeRand *rand.Rand
-	mutex      sync.Mutex
 }
 
 // New returns a new ConcurrencySafeRand that uses random values from src to generate other random values.
 func New(src rand.Source) *ConcurrencySafeRand {
 	unsafeRand := rand.New(src)
-	mutex := sync.Mutex{}
-	return &ConcurrencySafeRand{unsafeRand: unsafeRand, mutex: mutex}
+	return &ConcurrencySafeRand{unsafeRand: unsafeRand}
 }
 
 // New returns a new ConcurrencySafeRand that uses random values seeded from a source of the system-time to generate
@@ -32,14 +31,14 @@ func NewTimeSeeded() *ConcurrencySafeRand {
 
 // Uint64 returns a pseudo-random 64-bit value as a uint64 from the default Source.
 func (csr *ConcurrencySafeRand) Uint64() uint64 {
-	csr.mutex.Lock()
-	defer csr.mutex.Unlock()
+	csr.Lock()
+	defer csr.Unlock()
 	return csr.unsafeRand.Uint64()
 }
 
 // Intn returns, as an int, a non-negative pseudo-random number in [0,n). It panics if n <= 0.
 func (csr *ConcurrencySafeRand) Intn(n int) int {
-	csr.mutex.Lock()
-	defer csr.mutex.Unlock()
+	csr.Lock()
+	defer csr.Unlock()
 	return csr.unsafeRand.Intn(n)
 }
