@@ -4,6 +4,7 @@ package annealers
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -30,7 +31,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.temperature = 1
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
-	sa.solutionExplorer = explorer.NULL_EXPLORER
+	sa.solutionExplorer = null.NullExplorer
 	sa.logger = new(loggers.NullLogger)
 	sa.parameters.Initialise()
 }

@@ -8,12 +8,12 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
-	rand2 "github.com/LindsayBradford/crem/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/rand"
 )
 
 type Model struct {
 	name                  string
-	randomNumberGenerator *rand2.ConcurrencySafeRand
+	randomNumberGenerator *rand.ConcurrencySafeRand
 
 	decisionVariables     map[string]model.DecisionVariable
 	tempDecisionVariables map[string]model.DecisionVariable
@@ -24,7 +24,7 @@ func New() *Model {
 	newModel := new(Model)
 	newModel.name = "DumbModel"
 
-	newModel.randomNumberGenerator = rand2.NewTimeSeeded()
+	newModel.randomNumberGenerator = rand.NewTimeSeeded()
 	newModel.buildDecisionVariables()
 	newModel.parameters.Initialise()
 
@@ -150,45 +150,4 @@ func (dm *Model) DecisionVariableChange(variableName string) (float64, error) {
 func (dm *Model) Clone() model.Model {
 	clone := *dm
 	return &clone
-}
-
-const (
-	InitialObjectiveValue = "InitialObjectiveValue"
-	MinimumObjectiveValue = "MinimumObjectiveValue"
-	MaximumObjectiveValue = "MaximumObjectiveValue"
-)
-
-type Parameters struct {
-	parameters.Parameters
-}
-
-func (kp *Parameters) Initialise() *Parameters {
-	kp.Parameters.Initialise()
-	kp.buildMetaData()
-	kp.CreateDefaults()
-	return kp
-}
-
-func (kp *Parameters) buildMetaData() {
-	kp.AddMetaData(
-		parameters.MetaData{
-			Key:          InitialObjectiveValue,
-			Validator:    kp.Parameters.IsDecimal,
-			DefaultValue: float64(1000),
-		},
-	)
-	kp.AddMetaData(
-		parameters.MetaData{
-			Key:          MinimumObjectiveValue,
-			Validator:    kp.Parameters.IsDecimal,
-			DefaultValue: float64(0),
-		},
-	)
-	kp.AddMetaData(
-		parameters.MetaData{
-			Key:          MaximumObjectiveValue,
-			Validator:    kp.Parameters.IsDecimal,
-			DefaultValue: float64(2000),
-		},
-	)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type FormatWrapper struct {
-	StateToFormat AnnealableExplorer
+	StateToFormat ObservableExplorer
 	MethodFormats map[string]string
 }
 
@@ -15,47 +15,47 @@ const defaultFloat64Format = "%f"
 const defaultBoolFormat = "%y"
 const defaultPercentFormat = "%f"
 
-func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
-	wrapper.MethodFormats = map[string]string{
+func (fw *FormatWrapper) Initialise() *FormatWrapper {
+	fw.MethodFormats = map[string]string{
 		"ObjectiveValue":         defaultFloat64Format,
 		"ChangeInObjectiveValue": defaultFloat64Format,
 		"ChangeIsDesirable":      defaultBoolFormat,
 		"ChangeAccepted":         defaultBoolFormat,
 		"AcceptanceProbability":  defaultPercentFormat,
 	}
-	return wrapper
+	return fw
 }
 
-func (wrapper *FormatWrapper) Wrapping(explorer Explorer) *FormatWrapper {
-	wrapper.Wrap(explorer)
-	return wrapper
+func (fw *FormatWrapper) Wrapping(explorer ObservableExplorer) *FormatWrapper {
+	fw.Wrap(explorer)
+	return fw
 }
 
-func (wrapper *FormatWrapper) Wrap(explorer Explorer) {
-	wrapper.StateToFormat = explorer
+func (fw *FormatWrapper) Wrap(explorer ObservableExplorer) {
+	fw.StateToFormat = explorer
 }
 
-func (wrapper *FormatWrapper) ObjectiveValue() string {
-	return wrapper.applyFormatting("ObjectiveValue", wrapper.StateToFormat.ObjectiveValue())
+func (fw *FormatWrapper) ObjectiveValue() string {
+	return fw.applyFormatting("ObjectiveValue", fw.StateToFormat.ObjectiveValue())
 }
 
-func (wrapper *FormatWrapper) ChangeInObjectiveValue() string {
-	return wrapper.applyFormatting("ChangeInObjectiveValue", wrapper.StateToFormat.ChangeInObjectiveValue())
+func (fw *FormatWrapper) ChangeInObjectiveValue() string {
+	return fw.applyFormatting("ChangeInObjectiveValue", fw.StateToFormat.ChangeInObjectiveValue())
 }
 
-func (wrapper *FormatWrapper) ChangeIsDesirable() string {
-	return wrapper.applyFormatting("ChangeIsDesirable", wrapper.StateToFormat.ChangeIsDesirable())
+func (fw *FormatWrapper) ChangeIsDesirable() string {
+	return fw.applyFormatting("ChangeIsDesirable", fw.StateToFormat.ChangeIsDesirable())
 }
 
-func (wrapper *FormatWrapper) ChangeAccepted() string {
-	return wrapper.applyFormatting("ChangeAccepted", wrapper.StateToFormat.ChangeAccepted())
+func (fw *FormatWrapper) ChangeAccepted() string {
+	return fw.applyFormatting("ChangeAccepted", fw.StateToFormat.ChangeAccepted())
 }
 
-func (wrapper *FormatWrapper) AcceptanceProbability() string {
-	return wrapper.applyFormatting("AcceptanceProbability", wrapper.StateToFormat.AcceptanceProbability())
+func (fw *FormatWrapper) AcceptanceProbability() string {
+	return fw.applyFormatting("AcceptanceProbability", fw.StateToFormat.AcceptanceProbability())
 }
 
-func (wrapper *FormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
-	formatToApply := wrapper.MethodFormats[formatKey]
+func (fw *FormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
+	formatToApply := fw.MethodFormats[formatKey]
 	return fmt.Sprintf(formatToApply, valueToFormat)
 }

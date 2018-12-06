@@ -5,6 +5,7 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	cremerrors "github.com/LindsayBradford/crem/pkg/errors"
@@ -77,7 +78,7 @@ func (builder *Builder) WithEventNotifier(delegate annealing.EventNotifier) *Bui
 
 func (builder *Builder) WithDumbSolutionExplorer() *Builder {
 	annealerBeingBuilt := builder.annealer
-	explorer := explorer.NewKirkpatrickExplorer().WithModel(dumb.New())
+	explorer := kirkpatrick.New().WithModel(dumb.New())
 	explorer.SetScenarioId(annealerBeingBuilt.Id())
 	annealerBeingBuilt.SetSolutionExplorer(explorer)
 	return builder

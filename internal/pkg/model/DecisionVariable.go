@@ -5,6 +5,7 @@ package model
 type DecisionVariable interface {
 	Name() string
 	SetName(name string)
+
 	Value() float64
 	SetValue(value float64)
 }

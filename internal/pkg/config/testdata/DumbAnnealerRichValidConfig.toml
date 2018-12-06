@@ -52,7 +52,7 @@ MaximumObjectiveValue = 2_500.0
 MinimumObjectiveValue = 1_500.0
 
 [[SolutionExplorers]]
-Type = "DumbExplorer"
+Type = "KirkpatrickExplorer"
 Name = "DoraTheExplorer"
 
 [Annealer]

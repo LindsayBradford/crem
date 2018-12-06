@@ -7,6 +7,8 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	. "github.com/onsi/gomega"
 )
@@ -49,7 +51,7 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(explorer.KirkpatrickExplorer)
+	dummyExplorer := kirkpatrick.New()
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -94,7 +96,7 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
 		"Annealer should have built with config supplied Explorer")
 
-	dummyExplorer := new(explorer.NullExplorer)
+	dummyExplorer := new(null.Explorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
@@ -300,7 +302,7 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"),
 		"Annealer should have built with config supplied Explorer")
 
-	explorer := explorer.NewKirkpatrickExplorer()
+	explorer := new(kirkpatrick.Explorer)
 
 	g.Expect(
 		solutionExplorerUnderTest).To(BeAssignableToTypeOf(explorer),

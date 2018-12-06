@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
@@ -43,7 +43,7 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with NullLogger")
 
 	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(explorer.NULL_EXPLORER),
+		annealer.SolutionExplorer()).To(Equal(null.NullExplorer),
 		"Annealer should have built with Null Solution Explorer")
 
 	g.Expect(
@@ -80,7 +80,7 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	explorerErr := annealer.SetSolutionExplorer(nil)
 
 	g.Expect(explorerErr).To(Not(BeNil()))
-	g.Expect(annealer.SolutionExplorer()).To(Equal(explorer.NULL_EXPLORER),
+	g.Expect(annealer.SolutionExplorer()).To(Equal(null.NullExplorer),
 		"Annealer should have ignored crap Solution Explorer set attempt")
 
 	observersErr := annealer.AddObserver(nil)
@@ -268,7 +268,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 }
 
 type TryCountingSolutionExplorer struct {
-	explorer.NullExplorer
+	null.Explorer
 	changesTried uint64
 }
 

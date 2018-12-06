@@ -23,19 +23,10 @@ type Explorer interface {
 	TryRandomChange(temperature float64)
 
 	ObjectiveValue() float64
-	SetObjectiveValue(objectiveValue float64)
-
 	ChangeInObjectiveValue() float64
-	SetChangeInObjectiveValue(change float64)
-
 	AcceptanceProbability() float64
-	SetAcceptanceProbability(probability float64)
-
 	ChangeIsDesirable() bool
-	DecideOnWhetherToAcceptChange(annealingTemperature float64, acceptFunction func(), rejectFunction func())
-	AcceptLastChange()
 	ChangeAccepted() bool
-	RevertLastChange()
 
 	SetRandomNumberGenerator(*rand.Rand)
 	RandomNumberGenerator() *rand.Rand
@@ -46,13 +37,10 @@ type Explorer interface {
 	TearDown()
 }
 
-type AnnealableExplorer interface {
+type ObservableExplorer interface {
 	ObjectiveValue() float64
-
 	ChangeInObjectiveValue() float64
-
 	AcceptanceProbability() float64
-
 	ChangeIsDesirable() bool
 	ChangeAccepted() bool
 }

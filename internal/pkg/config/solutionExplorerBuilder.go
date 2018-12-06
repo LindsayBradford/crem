@@ -6,6 +6,8 @@ import (
 	"errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	. "github.com/LindsayBradford/crem/pkg/errors"
@@ -38,14 +40,14 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	builder.RegisteringExplorer(
 		"NullExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
-			return new(explorer.NullExplorer).WithName(config.Name)
+			return new(null.Explorer).WithName(config.Name)
 		},
 	)
 
 	builder.RegisteringExplorer(
 		"DumbExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
-			return explorer.NewKirkpatrickExplorer().
+			return kirkpatrick.New().
 				WithModel(dumb.New()).
 				WithName(config.Name).
 				WithParameters(config.Parameters)
@@ -55,7 +57,7 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 	builder.RegisteringExplorer(
 		"KirkpatrickExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
-			return explorer.NewKirkpatrickExplorer().
+			return kirkpatrick.New().
 				WithName(config.Name).
 				WithParameters(config.Parameters)
 		},

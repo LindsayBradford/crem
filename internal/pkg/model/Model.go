@@ -5,13 +5,14 @@ package model
 type Model interface {
 	Name() string
 	SetName(name string)
-	TryRandomChange()
 
-	AcceptChange()
-	RevertChange()
+	TryRandomChange()
 
 	DecisionVariable(name string) (DecisionVariable, error)
 	DecisionVariableChange(decisionVariableName string) (float64, error)
+
+	AcceptChange()
+	RevertChange()
 
 	Clone() Model
 }

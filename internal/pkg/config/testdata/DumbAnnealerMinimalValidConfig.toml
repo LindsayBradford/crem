@@ -3,7 +3,7 @@ Type = "DumbModel"
 Name = "hurrDurr"
 
 [[SolutionExplorers]]
-Type = "DumbExplorer"
+Type = "KirkpatrickExplorer"
 Name = "validConfig"
 
 [Annealer]

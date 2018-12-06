@@ -11,6 +11,8 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -26,7 +28,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedLogHandler := new(loggers.BareBonesLogger)
-	expectedSolutionExplorer := new(explorer.NullExplorer)
+	expectedSolutionExplorer := new(null.Explorer)
 	expectedObservers := []annealing.Observer{new(dummyObserver)}
 
 	builder := new(Builder)
@@ -109,7 +111,7 @@ func TestBuild_BadInputs(t *testing.T) {
 func TestAnnealerBuilder_WithKirkpatrickExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	expectedSolutionExplorer := explorer.NewKirkpatrickExplorer()
+	expectedSolutionExplorer := kirkpatrick.New()
 	expectedSolutionExplorer.WithModel(dumb.New())
 	expectedSolutionExplorer.SetScenarioId("Simple Annealer")
 
