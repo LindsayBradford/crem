@@ -8,9 +8,6 @@ NumberOfIterations = 1 # 200
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
 Name = "Nhilismo"
-[SolutionExplorers.Parameters]
-#OptimisationDirection = "Maximising"
-#DecisionVariable = "NotValid"
 
 [Annealer]
 SolutionExplorer = "Nhilismo"

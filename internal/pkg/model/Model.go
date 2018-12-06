@@ -11,7 +11,9 @@ type Model interface {
 	RevertChange()
 
 	DecisionVariable(name string) (DecisionVariable, error)
-	Change(decisionVariableName string) (float64, error)
+	DecisionVariableChange(decisionVariableName string) (float64, error)
+
+	Clone() Model
 }
 
 var NullModel = new(nullModel)
@@ -41,5 +43,11 @@ func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
 	}
 	return &newVariable, nil
 }
-func (nm *nullModel) Change(decisionVariableName string) (float64, error)  { return 0, nil }
+func (nm *nullModel) DecisionVariableChange(decisionVariableName string) (float64, error) {
+	return 0, nil
+}
 func (nm *nullModel) SetDecisionVariable(name string, value float64) error { return nil }
+func (nm *nullModel) Clone() Model {
+	clone := *nm
+	return &clone
+}

@@ -6,12 +6,17 @@ Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 2_00_000 # 200
 
+[[Models]]
+Type = "DumbModel"
+Name = "HurrDurr"
+
 [[SolutionExplorers]]
 Type = "DumbExplorer"
-Name = "DerpaDaExBurba"
+Name = "HurrDurrLookin"
 
 [Annealer]
-SolutionExplorer = "DerpaDaExBurba"
+SolutionExplorer = "HurrDurrLookin"
+Model = "HurrDurr"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99

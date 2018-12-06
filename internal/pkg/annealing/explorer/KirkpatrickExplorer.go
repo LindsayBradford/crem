@@ -119,7 +119,7 @@ func (ke *KirkpatrickExplorer) ChangeIsDesirable() bool {
 
 func (ke *KirkpatrickExplorer) changeInObjectiveValue() float64 {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	if change, changeError := ke.model.Change(decisionVariableName); changeError == nil {
+	if change, changeError := ke.model.DecisionVariableChange(decisionVariableName); changeError == nil {
 		ke.SetChangeInObjectiveValue(change)
 		return change
 	}
@@ -142,6 +142,8 @@ func (ke *KirkpatrickExplorer) SetAcceptanceProbability(probability float64) {
 
 func (ke *KirkpatrickExplorer) Clone() Explorer {
 	clone := *ke
+	modelClone := ke.Model().Clone()
+	clone.SetModel(modelClone)
 	return &clone
 }
 

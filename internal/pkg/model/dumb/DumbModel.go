@@ -5,16 +5,15 @@ package dumb
 import (
 	"errors"
 	"math"
-	"math/rand"
-	"time"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	rand2 "github.com/LindsayBradford/crem/pkg/rand"
 )
 
 type Model struct {
 	name                  string
-	randomNumberGenerator *rand.Rand
+	randomNumberGenerator *rand2.ConcurrencySafeRand
 
 	decisionVariables     map[string]model.DecisionVariable
 	tempDecisionVariables map[string]model.DecisionVariable
@@ -25,7 +24,7 @@ func New() *Model {
 	newModel := new(Model)
 	newModel.name = "DumbModel"
 
-	newModel.randomNumberGenerator = rand.New(rand.NewSource(time.Now().UnixNano()))
+	newModel.randomNumberGenerator = rand2.NewTimeSeeded()
 	newModel.buildDecisionVariables()
 	newModel.parameters.Initialise()
 
@@ -137,8 +136,8 @@ func (dm *Model) DecisionVariable(name string) (model.DecisionVariable, error) {
 	return model.NullDecisionVariable, errors.New("decision variable [" + name + "] not defined for model [" + dm.Name() + " ].")
 }
 
-func (dm *Model) Change(decisionVariableName string) (float64, error) {
-	decisionVariable, foundActual := dm.decisionVariables[decisionVariableName]
+func (dm *Model) DecisionVariableChange(variableName string) (float64, error) {
+	decisionVariable, foundActual := dm.decisionVariables[variableName]
 	tmpDecisionVar, foundTemp := dm.tempDecisionVariables[decisionVariable.Name()]
 	if !foundActual || !foundTemp {
 		return 0, errors.New("no temporary decision variable of name [" + decisionVariable.Name() + "] in model [" + dm.Name() + "].")
@@ -146,6 +145,11 @@ func (dm *Model) Change(decisionVariableName string) (float64, error) {
 
 	difference := tmpDecisionVar.Value() - decisionVariable.Value()
 	return difference, nil
+}
+
+func (dm *Model) Clone() model.Model {
+	clone := *dm
+	return &clone
 }
 
 const (
