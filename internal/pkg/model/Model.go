@@ -12,7 +12,7 @@ type Model interface {
 	AcceptChange()
 	RevertChange()
 
-	Clone() Model
+	DeepClone() Model
 }
 
 // Container defines an interface embedding a Model
@@ -68,7 +68,7 @@ func (nm *nullModel) DecisionVariableChange(decisionVariableName string) (float6
 	return 0, nil
 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64) error { return nil }
-func (nm *nullModel) Clone() Model {
+func (nm *nullModel) DeepClone() Model {
 	clone := *nm
 	return &clone
 }

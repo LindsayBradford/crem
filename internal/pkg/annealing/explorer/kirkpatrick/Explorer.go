@@ -23,15 +23,16 @@ type Explorer struct {
 	scenarioId string
 	model      model.Model
 
+	rand.ContainedRand
+	logHandler logging.Logger
+
 	parameters            Parameters
 	optimisationDirection optimisationDirection
-	rand.ContainedRandomNumberGenerator
 
 	acceptanceProbability float64
 	changeIsDesirable     bool
 	changeAccepted        bool
 	objectiveValueChange  float64
-	logHandler            logging.Logger
 }
 
 func New() *Explorer {
@@ -125,21 +126,13 @@ func (ke *Explorer) acceptOrRevertChange(annealingTemperature float64) {
 		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / annealingTemperature)
 		ke.SetAcceptanceProbability(probabilityToAcceptBadChange)
 
-		randomValue := newRandomValue(ke.RandomNumberGenerator())
+		randomValue := ke.RandomNumberGenerator().Float64Unitary()
 		if probabilityToAcceptBadChange > randomValue {
 			ke.AcceptLastChange()
 		} else {
 			ke.RevertLastChange()
 		}
 	}
-}
-
-// newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
-// (which by default returns a random number in the range [0,1).
-// See: http://mumble.net/~campbell/2014/04/28/uniform-random-float
-func newRandomValue(randomNumberGenerator *rand.ConcurrencySafeRand) float64 {
-	distributionRange := int64(math.Pow(2, 53))
-	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange-1)
 }
 
 func (ke *Explorer) ChangeTriedIsDesirable() bool {
@@ -209,10 +202,16 @@ func (ke *Explorer) SetLogHandler(logHandler logging.Logger) error {
 	return nil
 }
 
-func (ke *Explorer) Clone() explorer.Explorer {
+func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
-	modelClone := ke.Model().Clone()
+	modelClone := ke.Model().DeepClone()
 	clone.SetModel(modelClone)
+	return &clone
+}
+
+func (ke *Explorer) CloneObservable() explorer.Explorer {
+	clone := *ke
+	clone.SetModel(model.NullModel)
 	return &clone
 }
 

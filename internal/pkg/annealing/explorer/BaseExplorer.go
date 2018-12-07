@@ -3,14 +3,10 @@
 package explorer
 
 import (
-	"math"
-	"math/rand"
-	"time"
-
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
-	rand2 "github.com/LindsayBradford/crem/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/rand"
 	"github.com/pkg/errors"
 )
 
@@ -24,25 +20,17 @@ type BaseExplorer struct {
 	changeIsDesirable      bool
 	changeAccepted         bool
 	acceptanceProbability  float64
-	randomNumberGenerator  *rand2.ConcurrencySafeRand
-	logHandler             logging.Logger
+	rand.ContainedRand
+	logHandler logging.Logger
 }
 
 func (explorer *BaseExplorer) Initialise() {
 	explorer.logHandler.Debug(explorer.scenarioId + ": Initialising Solution Explorer")
-	explorer.SetRandomNumberGenerator(rand2.New(rand.NewSource(time.Now().UnixNano())))
+	explorer.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
 func (explorer *BaseExplorer) TearDown() {
 	explorer.logHandler.Debug(explorer.scenarioId + ": Triggering tear-down of Solution Explorer")
-}
-
-func (explorer *BaseExplorer) RandomNumberGenerator() *rand2.ConcurrencySafeRand {
-	return explorer.randomNumberGenerator
-}
-
-func (explorer *BaseExplorer) SetRandomNumberGenerator(generator *rand2.ConcurrencySafeRand) {
-	explorer.randomNumberGenerator = generator
 }
 
 func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
@@ -117,14 +105,6 @@ func (explorer *BaseExplorer) SetAcceptanceProbability(probability float64) {
 func (explorer *BaseExplorer) DecideOnWhetherToAcceptChange(annealingTemperature float64, acceptFunction func(), rejectFunction func()) {
 }
 
-// newRandomValue returns the next random number in the range [0,1] from the supplied randomNumberGenerator.
-// (which by default returns a random number in the range [0,1).
-// See: http://mumble.net/~campbell/2014/04/28/uniform-random-float
-func newRandomValue(randomNumberGenerator *rand2.ConcurrencySafeRand) float64 {
-	distributionRange := int64(math.Pow(2, 53))
-	return float64(randomNumberGenerator.Int63n(distributionRange)) / float64(distributionRange-1)
-}
-
 func (explorer *BaseExplorer) ChangeIsDesirable() bool {
 	if explorer.changeInObjectiveValue <= 0 {
 		return true
@@ -144,7 +124,15 @@ func (explorer *BaseExplorer) ChangeAccepted() bool {
 	return explorer.changeAccepted
 }
 
-func (explorer *BaseExplorer) Clone() Explorer {
+func (explorer *BaseExplorer) DeepClone() Explorer {
 	clone := *explorer
+	modelClone := clone.Model().DeepClone()
+	clone.SetModel(modelClone)
+	return &clone
+}
+
+func (explorer *BaseExplorer) CloneObservable() Explorer {
+	clone := *explorer
+	clone.SetModel(model.NullModel)
 	return &clone
 }

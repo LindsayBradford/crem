@@ -14,7 +14,7 @@ import (
 
 type Model struct {
 	name.Named
-	randomNumberGenerator *rand.ConcurrencySafeRand
+	rand.ContainedRand
 
 	decisionVariables     map[string]model.DecisionVariable
 	tempDecisionVariables map[string]model.DecisionVariable
@@ -25,7 +25,7 @@ func New() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 
-	newModel.randomNumberGenerator = rand.NewTimeSeeded()
+	newModel.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	newModel.buildDecisionVariables()
 	newModel.parameters.Initialise()
 
@@ -81,7 +81,7 @@ func (dm *Model) TryRandomChange() {
 }
 
 func (dm *Model) generateRandomChange() float64 {
-	randomValue := dm.randomNumberGenerator.Intn(2)
+	randomValue := dm.RandomNumberGenerator().Intn(2)
 
 	var changeInObjectiveValue float64
 	switch randomValue {
@@ -146,7 +146,8 @@ func (dm *Model) DecisionVariableChange(variableName string) (float64, error) {
 	return difference, nil
 }
 
-func (dm *Model) Clone() model.Model {
+func (dm *Model) DeepClone() model.Model {
 	clone := *dm
+	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return &clone
 }

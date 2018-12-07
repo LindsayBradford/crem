@@ -19,12 +19,11 @@ type Explorer interface {
 	Initialise()
 	TearDown()
 
-	Clone() Explorer
+	DeepClone() Explorer
+	CloneObservable() Explorer
 	TryRandomChange(temperature float64)
 
-	SetRandomNumberGenerator(safeRand *rand.ConcurrencySafeRand)
-	RandomNumberGenerator() *rand.ConcurrencySafeRand
-
+	rand.Container
 	model.Container
 	logging.Container
 }

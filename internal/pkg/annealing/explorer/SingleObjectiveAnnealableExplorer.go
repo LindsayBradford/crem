@@ -25,7 +25,7 @@ func (explorer *SingleObjectiveAnnealableExplorer) DecideOnWhetherToAcceptChange
 		probabilityToAcceptBadChange := math.Exp(-explorer.ChangeInObjectiveValue() / annealingTemperature)
 		explorer.SetAcceptanceProbability(probabilityToAcceptBadChange)
 
-		randomValue := newRandomValue(explorer.RandomNumberGenerator())
+		randomValue := explorer.RandomNumberGenerator().Float64Unitary()
 		if probabilityToAcceptBadChange > randomValue {
 			acceptChange()
 		} else {

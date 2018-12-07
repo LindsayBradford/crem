@@ -123,12 +123,19 @@ func (sa *SimpleAnnealer) Observers() []annealing.Observer {
 }
 
 func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
-	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.Clone(), eventType)
+	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
 }
 
 func (sa *SimpleAnnealer) Clone() annealing.Annealer {
 	clone := *sa
-	explorerClone := sa.SolutionExplorer().Clone()
+	explorerClone := sa.SolutionExplorer().DeepClone()
+	clone.SetSolutionExplorer(explorerClone)
+	return &clone
+}
+
+func (sa *SimpleAnnealer) CloneObservable() annealing.Annealer {
+	clone := *sa
+	explorerClone := sa.SolutionExplorer().CloneObservable()
 	clone.SetSolutionExplorer(explorerClone)
 	return &clone
 }
