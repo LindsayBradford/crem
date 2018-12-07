@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -30,6 +31,7 @@ type Explorer struct {
 	changeIsDesirable     bool
 	changeAccepted        bool
 	objectiveValueChange  float64
+	temperature           float64
 }
 
 func New() *Explorer {
@@ -42,6 +44,10 @@ func New() *Explorer {
 func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	ke.Model().Initialise()
+	if modelWithScenarioId, hasScenarioId := ke.Model().(scenario.Identifiable); hasScenarioId {
+		modelWithScenarioId.SetScenarioId(ke.ScenarioId())
+	}
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -107,6 +113,7 @@ func (ke *Explorer) TryRandomChange(temperature float64) {
 }
 
 func (ke *Explorer) acceptOrRevertChange(annealingTemperature float64) {
+	ke.temperature = annealingTemperature
 	if ke.ChangeTriedIsDesirable() {
 		ke.SetAcceptanceProbability(guaranteed)
 		ke.AcceptLastChange()
@@ -134,6 +141,10 @@ func (ke *Explorer) ChangeTriedIsDesirable() bool {
 		return ke.changeIsDesirable
 	}
 	return false
+}
+
+func (ke *Explorer) Temperature() float64 {
+	return ke.temperature
 }
 
 func (ke *Explorer) ChangeIsDesirable() bool {
@@ -194,4 +205,5 @@ func (ke *Explorer) CloneObservable() explorer.Explorer {
 
 func (ke *Explorer) TearDown() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
+	ke.Model().TearDown()
 }

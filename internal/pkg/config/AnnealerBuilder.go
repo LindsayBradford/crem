@@ -134,6 +134,10 @@ func (builder *AnnealerBuilder) buildModel() {
 	myModelName := builder.config.Annealer.Model
 	newModel, buildErrors := builder.modelsBuilder.Build(myModelName)
 
+	if loggingModel, isLogger := newModel.(logging.Container); isLogger {
+		loggingModel.SetLogHandler(builder.defaultLogHandler)
+	}
+
 	if buildErrors != nil {
 		newError := errors2.Wrap(buildErrors, "building model from config")
 		builder.errors.Add(newError)

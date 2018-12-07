@@ -80,6 +80,14 @@ func (cm *CatchmentModel) ParameterErrors() error {
 	return cm.parameters.ValidationErrors()
 }
 
+func (cm *CatchmentModel) Initialise() {
+	// This model doesn't need any special initialising.
+}
+
+func (cm *CatchmentModel) TearDown() {
+	// This model doesn't need any special tearDown.
+}
+
 func (cm *CatchmentModel) TryRandomChange() {
 	// TODO: randomly choose a management action to toggle.
 }

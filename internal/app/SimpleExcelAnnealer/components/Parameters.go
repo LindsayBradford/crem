@@ -6,6 +6,12 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 )
 
+const (
+	_                     = iota
+	Penalty        string = "Penalty"
+	DataSourcePath string = "DataSourcePath"
+)
+
 type Parameters struct {
 	parameters.Parameters
 }

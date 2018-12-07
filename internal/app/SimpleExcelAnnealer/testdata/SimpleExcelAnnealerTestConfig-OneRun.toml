@@ -10,20 +10,20 @@ IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "Every
 NumberOfIterations = 200 # 200
 
 [[Models]]
-Type = "DumbModel"
-Name = "ReplaceMeWithSimpleExcelModel"  # TODO: Yeah Linds, that's dodgy. FIx it tomorrow!
-
-[[SolutionExplorers]]
-Type = "SimpleExcelSolutionExplorer"
-Name = "DoraTheExplorer"
-[SolutionExplorers.Parameters]
+Type = "SimpleExcelModel"
+Name = "Flexinatee"
+[Models.Parameters]
 DataSourcePath = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.5 # 100.0
 
+[[SolutionExplorers]]
+Type = "SimpleExcelExplorer"
+Name = "Flexinator"
+
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
-SolutionExplorer = "DoraTheExplorer"
-Model = "ReplaceMeWithSimpleExcelModel"
+SolutionExplorer = "Flexinator"
+Model = "Flexinatee"
 [Annealer.Parameters]
 StartingTemperature = 50.0 #50
 CoolingFactor =  0.995  # 0.995

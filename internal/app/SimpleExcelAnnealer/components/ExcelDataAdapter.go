@@ -9,12 +9,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/pkg/errors"
 )
 
 const tracker = "Tracker"
 const data = "Data"
+
+var randomNumberGenerator = rand.NewTimeSeeded()
 
 type ExcelDataAdapter struct {
 	excelHandler     excel.Handler
@@ -59,6 +62,7 @@ func (eda *ExcelDataAdapter) initialiseDataSource(filePath string) {
 
 func (eda *ExcelDataAdapter) retrieveAnnealingTableFromWorkbook() (table *annealingTable) {
 	table = new(annealingTable)
+	table.SetRandomNumberGenerator(rand.NewTimeSeeded())
 
 	eda.oleWrapper(func() {
 		worksheet := eda.workbook.WorksheetNamed(data)

@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
@@ -15,7 +16,8 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func(
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
-			RegisteringExplorer(buildSimpleExcelExplorerRegistration(wrapper)).
+			RegisteringModel(buildSimpleExcelModelRegistration(wrapper)).
+			RegisteringExplorer(buildSimpleExcelExplorerRegistration()).
 			Build()
 
 	if buildError != nil {
@@ -46,14 +48,25 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func(
 	return runner, humanLogHandler
 }
 
-func buildSimpleExcelExplorerRegistration(wrapper func(f func())) config.ExplorerRegistration {
-	return config.ExplorerRegistration{
-		ExplorerType: "SimpleExcelSolutionExplorer",
-		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
-			return new(SimpleExcelSolutionExplorer).
+func buildSimpleExcelModelRegistration(wrapper func(f func())) config.ModelRegistration {
+	return config.ModelRegistration{
+		ModelType: "SimpleExcelModel",
+		ConfigFunction: func(config config.ModelConfig) model.Model {
+			return NewSimpleExcelModel().
 				WithParameters(config.Parameters).
 				WithName(config.Name).
 				WithOleFunctionWrapper(wrapper)
+		},
+	}
+}
+
+func buildSimpleExcelExplorerRegistration() config.ExplorerRegistration {
+	return config.ExplorerRegistration{
+		ExplorerType: "SimpleExcelExplorer",
+		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
+			return NewSimpleExcelExplorer().
+				WithParameters(config.Parameters).
+				WithName(config.Name)
 		},
 	}
 }

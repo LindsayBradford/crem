@@ -16,9 +16,9 @@ type Model struct {
 	name.ContainedName
 	rand.ContainedRand
 
+	parameters            Parameters
 	decisionVariables     map[string]model.DecisionVariable
 	tempDecisionVariables map[string]model.DecisionVariable
-	parameters            Parameters
 }
 
 func New() *Model {
@@ -72,6 +72,14 @@ const (
 	downward = -1
 	upward   = 1
 )
+
+func (dm *Model) Initialise() {
+	// This model doesn't need any special initialising.
+}
+
+func (dm *Model) TearDown() {
+	// This model doesn't need any special tearDown.
+}
 
 func (dm *Model) TryRandomChange() {
 	originalValue := dm.objectiveValue()

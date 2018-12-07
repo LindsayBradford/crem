@@ -8,6 +8,9 @@ type Model interface {
 	name.Nameable
 	DecisionVariableContainer
 
+	Initialise()
+	TearDown()
+
 	TryRandomChange()
 	AcceptChange()
 	RevertChange()
@@ -55,6 +58,8 @@ func (nm *nullModel) WithName(name string) *nullModel {
 	return nm
 }
 
+func (nm *nullModel) Initialise()      {}
+func (nm *nullModel) TearDown()        {}
 func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
