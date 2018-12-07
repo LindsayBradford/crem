@@ -16,8 +16,7 @@ type Annealer interface {
 	logging.Container
 
 	Observable
-
-	SetEventNotifier(notifier EventNotifier) error
+	EventNotifierContainer
 
 	Cloneable
 	Anneal()

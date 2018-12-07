@@ -182,7 +182,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	notifier := new(annealing.ConcurrentAnnealingEventNotifier)
 	annealer.SetEventNotifier(notifier)
-	g.Expect(annealer.eventNotifier).To(Equal(notifier),
+	g.Expect(annealer.EventNotifier()).To(Equal(notifier),
 		"Annealer should use the event notifier assigned to it")
 
 	const expectedIterations = uint64(3)

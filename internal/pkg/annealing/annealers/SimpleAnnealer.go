@@ -18,7 +18,7 @@ type SimpleAnnealer struct {
 	explorer.ContainedExplorer
 	model.ContainedModel
 
-	eventNotifier annealing.EventNotifier
+	annealing.ContainedEventNotifier
 	logging.ContainedLogger
 
 	parameters Parameters
@@ -32,7 +32,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.id = "Simple Annealer"
 	sa.temperature = 1
 	sa.currentIteration = 0
-	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
+	sa.SetEventNotifier(new(annealing.SynchronousAnnealingEventNotifier))
 	sa.SetLogHandler(new(loggers.NullLogger))
 	sa.SetSolutionExplorer(null.NullExplorer)
 	sa.parameters.Initialise()
@@ -84,24 +84,16 @@ func (sa *SimpleAnnealer) CurrentIteration() uint64 {
 	return sa.currentIteration
 }
 
-func (sa *SimpleAnnealer) SetEventNotifier(delegate annealing.EventNotifier) error {
-	if delegate == nil {
-		return errors.New("invalid attempt to set event notifier to nil value")
-	}
-	sa.eventNotifier = delegate
-	return nil
-}
-
 func (sa *SimpleAnnealer) AddObserver(observer annealing.Observer) error {
-	return sa.eventNotifier.AddObserver(observer)
+	return sa.EventNotifier().AddObserver(observer)
 }
 
 func (sa *SimpleAnnealer) Observers() []annealing.Observer {
-	return sa.eventNotifier.Observers()
+	return sa.EventNotifier().Observers()
 }
 
 func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
-	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
+	sa.EventNotifier().NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
 }
 
 func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {

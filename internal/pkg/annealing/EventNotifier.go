@@ -1,5 +1,7 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
+// Copyright (c) 2018 Australian Rivers Institute.
+
 package annealing
 
 import (
@@ -10,6 +12,29 @@ type EventNotifier interface {
 	AddObserver(observer Observer) error
 	Observers() []Observer
 	NotifyObserversOfAnnealingEvent(annealer Annealer, eventType EventType)
+}
+
+// EventNotifierContainer  defines an interface embedding an EventNotifier
+type EventNotifierContainer interface {
+	EventNotifier() EventNotifier
+	SetEventNotifier(notifier EventNotifier) error
+}
+
+// ContainedEventNotifier offers a struct implementing the EventNotifierContainer interface.
+type ContainedEventNotifier struct {
+	notifier EventNotifier
+}
+
+func (cen *ContainedEventNotifier) EventNotifier() EventNotifier {
+	return cen.notifier
+}
+
+func (cen *ContainedEventNotifier) SetEventNotifier(notifier EventNotifier) error {
+	if notifier == nil {
+		return errors.New("invalid attempt to set event notifier to nil value")
+	}
+	cen.notifier = notifier
+	return nil
 }
 
 type SynchronousAnnealingEventNotifier struct {
