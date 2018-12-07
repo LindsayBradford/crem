@@ -8,8 +8,8 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/LindsayBradford/crem/pkg/rand"
 )
 
 type Model struct {

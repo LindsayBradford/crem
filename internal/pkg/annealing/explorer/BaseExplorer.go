@@ -4,9 +4,9 @@ package explorer
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/LindsayBradford/crem/pkg/rand"
 	"github.com/pkg/errors"
 )
 
