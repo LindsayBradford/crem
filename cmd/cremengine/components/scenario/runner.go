@@ -5,8 +5,8 @@ package scenario
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/pkg/errors"
@@ -31,7 +31,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 	newAnnealer, _, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
-			RegisteringExplorer(buildSedimentTransportExplorerRegistration()).
+			RegisteringModel(buildCatchmentModelRegistration()).
 			Build()
 
 	if buildError != nil {
@@ -50,11 +50,11 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 	return runner, nil
 }
 
-func buildSedimentTransportExplorerRegistration() config.ExplorerRegistration {
-	return config.ExplorerRegistration{
-		ExplorerType: "SedimentTransportSolutionExplorer",
-		ConfigFunction: func(config config.SolutionExplorerConfig) explorer.Explorer {
-			return new(SedimentTransportSolutionExplorer).
+func buildCatchmentModelRegistration() config.ModelRegistration {
+	return config.ModelRegistration{
+		ModelType: "CatchmentModel",
+		ConfigFunction: func(config config.ModelConfig) model.Model {
+			return NewCatchmentModel().
 				WithName(config.Name).
 				WithParameters(config.Parameters)
 		},

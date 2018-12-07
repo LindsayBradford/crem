@@ -15,7 +15,7 @@ func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
 	context := configTesting.TestingContext{
 		Name:           "Single run of sediment transport annealer",
 		T:              t,
-		ConfigFilePath: "testdata/SedimentTransportTestConfig-OneRun.toml",
+		ConfigFilePath: "testdata/CatchmentConfig-OneRun.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
@@ -27,7 +27,7 @@ func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
 	context := configTesting.TestingContext{
 		Name:           "Attempted run of sediment transport annealer with bad inputs",
 		T:              t,
-		ConfigFilePath: "testdata/SedimentTransportTestConfig-BadInputs.toml",
+		ConfigFilePath: "testdata/CatchmentConfig-BadInputs.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
