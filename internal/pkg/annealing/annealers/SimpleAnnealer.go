@@ -34,7 +34,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
 	sa.SetLogHandler(new(loggers.NullLogger))
-	sa.solutionExplorer = null.New()
+	sa.solutionExplorer = new(null.Explorer)
 	sa.parameters.Initialise()
 }
 
