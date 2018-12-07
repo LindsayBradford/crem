@@ -12,22 +12,21 @@ import (
 )
 
 type Explorer interface {
-	Observable
 	name.Nameable
+	model.Container
+	rand.Container
+
+	Observable
+	logging.Container
 
 	ScenarioId() string
 	SetScenarioId(name string)
 
+	DeepClone() Explorer
 	Initialise()
 	TearDown()
 
-	DeepClone() Explorer
-	CloneObservable() Explorer
 	TryRandomChange(temperature float64)
-
-	rand.Container
-	model.Container
-	logging.Container
 }
 
 type Observable interface {
@@ -36,6 +35,7 @@ type Observable interface {
 	AcceptanceProbability() float64
 	ChangeIsDesirable() bool
 	ChangeAccepted() bool
+	CloneObservable() Explorer
 }
 
 // Container defines an interface embedding a Model
