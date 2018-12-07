@@ -39,7 +39,7 @@ func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() time.Duration {
 	return annealer.finishTime.Sub(annealer.startTime)
 }
 
-func (annealer *ElapsedTimeTrackingAnnealer) Clone() annealing.Annealer {
+func (annealer *ElapsedTimeTrackingAnnealer) DeepClone() annealing.Annealer {
 	clone := *annealer
 	explorerClone := annealer.SolutionExplorer().DeepClone()
 	clone.SetSolutionExplorer(explorerClone)

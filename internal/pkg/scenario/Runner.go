@@ -138,7 +138,7 @@ func (runner *Runner) runScenario() error {
 }
 
 func (runner *Runner) run(runNumber uint64) {
-	annealerCopy := runner.annealer.Clone()
+	annealerCopy := runner.annealer.DeepClone()
 
 	annealerCopy.SetId(runner.generateCloneId(runNumber))
 

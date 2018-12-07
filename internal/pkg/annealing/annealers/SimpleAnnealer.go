@@ -15,8 +15,8 @@ import (
 )
 
 type SimpleAnnealer struct {
-	solutionExplorer explorer.Explorer
-	model            model.Model
+	explorer.ContainedExplorer
+	model.ContainedModel
 
 	eventNotifier annealing.EventNotifier
 	logging.ContainedLogger
@@ -34,13 +34,13 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
 	sa.SetLogHandler(new(loggers.NullLogger))
-	sa.solutionExplorer = new(null.Explorer)
+	sa.SetSolutionExplorer(null.NullExplorer)
 	sa.parameters.Initialise()
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
 	sa.id = title
-	sa.solutionExplorer.SetScenarioId(title)
+	sa.SolutionExplorer().SetScenarioId(title)
 }
 
 func (sa *SimpleAnnealer) Id() string {
@@ -84,18 +84,6 @@ func (sa *SimpleAnnealer) CurrentIteration() uint64 {
 	return sa.currentIteration
 }
 
-func (sa *SimpleAnnealer) SolutionExplorer() explorer.Explorer {
-	return sa.solutionExplorer
-}
-
-func (sa *SimpleAnnealer) SetSolutionExplorer(explorer explorer.Explorer) error {
-	if explorer == nil {
-		return errors.New("invalid attempt to set Solution Explorer to nil value")
-	}
-	sa.solutionExplorer = explorer
-	return nil
-}
-
 func (sa *SimpleAnnealer) SetEventNotifier(delegate annealing.EventNotifier) error {
 	if delegate == nil {
 		return errors.New("invalid attempt to set event notifier to nil value")
@@ -116,7 +104,7 @@ func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
 	sa.eventNotifier.NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
 }
 
-func (sa *SimpleAnnealer) Clone() annealing.Annealer {
+func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {
 	clone := *sa
 	explorerClone := sa.SolutionExplorer().DeepClone()
 	clone.SetSolutionExplorer(explorerClone)
@@ -131,7 +119,7 @@ func (sa *SimpleAnnealer) CloneObservable() annealing.Annealer {
 }
 
 func (sa *SimpleAnnealer) Anneal() {
-	sa.solutionExplorer.SetLogHandler(sa.LogHandler())
+	sa.SolutionExplorer().SetLogHandler(sa.LogHandler())
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -143,15 +131,15 @@ func (sa *SimpleAnnealer) Anneal() {
 		}
 	}()
 
-	sa.solutionExplorer.Initialise()
-	defer sa.solutionExplorer.TearDown()
+	sa.SolutionExplorer().Initialise()
+	defer sa.SolutionExplorer().TearDown()
 
 	sa.annealingStarted()
 
 	for done := sa.initialDoneValue(); !done; {
 		sa.iterationStarted()
 
-		sa.solutionExplorer.TryRandomChange(sa.temperature)
+		sa.SolutionExplorer().TryRandomChange(sa.temperature)
 
 		sa.iterationFinished()
 		sa.cooldown()

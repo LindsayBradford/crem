@@ -40,5 +40,5 @@ type Identifiable interface {
 }
 
 type Cloneable interface {
-	Clone() Annealer
+	DeepClone() Annealer
 }

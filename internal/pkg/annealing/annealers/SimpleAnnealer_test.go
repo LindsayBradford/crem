@@ -258,7 +258,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 	explorerErr := annealer.SetSolutionExplorer(expectedSolutionExplorer)
 
 	g.Expect(explorerErr).To(BeNil())
-	g.Expect(annealer.solutionExplorer).To(BeIdenticalTo(expectedSolutionExplorer),
+	g.Expect(annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer),
 		"Annealer should have accepted CountingObserver as new Explorer")
 
 	annealer.Anneal()
