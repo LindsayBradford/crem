@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
 
+// Container is an interface for anything needing Parameters
 type Container interface {
 	SetParameters(params Map) error
 	ParameterErrors() error

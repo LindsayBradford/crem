@@ -17,7 +17,7 @@ import (
 const defaultLoggerIndex = 0
 
 var (
-	ServerLogger logging.Logger = loggers.DefaultNullLogLogger
+	ServerLogger logging.Logger = loggers.DefaultNullLogger
 
 	cremServerStatus = admin.ServiceStatus{
 		ServiceName: config.ShortApplicationName,

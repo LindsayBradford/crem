@@ -7,13 +7,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/pkg/errors"
 )
 
 type BaseExplorer struct {
-	name.Named
+	name.ContainedName
 	scenarioId string
-	model      model.Model
+	model.ContainedModel
+	logging.ContainedLogger
 
 	objectiveValue         float64
 	changeInObjectiveValue float64
@@ -21,16 +21,15 @@ type BaseExplorer struct {
 	changeAccepted         bool
 	acceptanceProbability  float64
 	rand.ContainedRand
-	logHandler logging.Logger
 }
 
 func (explorer *BaseExplorer) Initialise() {
-	explorer.logHandler.Debug(explorer.scenarioId + ": Initialising Solution Explorer")
+	explorer.LogHandler().Debug(explorer.scenarioId + ": Initialising Solution Explorer")
 	explorer.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
 func (explorer *BaseExplorer) TearDown() {
-	explorer.logHandler.Debug(explorer.scenarioId + ": Triggering tear-down of Solution Explorer")
+	explorer.LogHandler().Debug(explorer.scenarioId + ": Triggering tear-down of Solution Explorer")
 }
 
 func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
@@ -38,16 +37,8 @@ func (explorer *BaseExplorer) WithName(name string) *BaseExplorer {
 	return explorer
 }
 
-func (explorer *BaseExplorer) Model() model.Model {
-	return explorer.model
-}
-
-func (explorer *BaseExplorer) SetModel(model model.Model) {
-	explorer.model = model
-}
-
 func (explorer *BaseExplorer) WithModel(model model.Model) *BaseExplorer {
-	explorer.model = model
+	explorer.SetModel(model)
 	return explorer
 }
 
@@ -62,18 +53,6 @@ func (explorer *BaseExplorer) SetScenarioId(id string) {
 func (explorer *BaseExplorer) WithScenarioId(id string) *BaseExplorer {
 	explorer.scenarioId = id
 	return explorer
-}
-
-func (explorer *BaseExplorer) LogHandler() logging.Logger {
-	return explorer.logHandler
-}
-
-func (explorer *BaseExplorer) SetLogHandler(logHandler logging.Logger) error {
-	if logHandler == nil {
-		return errors.New("invalid attempt to set log handler to nil value")
-	}
-	explorer.logHandler = logHandler
-	return nil
 }
 
 func (explorer *BaseExplorer) TryRandomChange(temperature float64) {}

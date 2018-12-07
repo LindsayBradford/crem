@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ScenarioLogger logging.Logger = loggers.DefaultNullLogLogger
+	ScenarioLogger logging.Logger = loggers.DefaultNullLogger
 )
 
 func RunScenarioFromConfigFile(configFile string) {

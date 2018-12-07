@@ -7,7 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 )
 
-var DefaultNullLogLogger = new(NullLogger)
+var DefaultNullLogger = new(NullLogger)
 
 type NullLogger struct{}
 

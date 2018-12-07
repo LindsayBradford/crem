@@ -8,22 +8,24 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 )
 
 type SimpleAnnealer struct {
+	solutionExplorer explorer.Explorer
+	model            model.Model
+
+	eventNotifier annealing.EventNotifier
+	logging.ContainedLogger
+
+	parameters Parameters
+
 	id               string
 	temperature      float64
 	currentIteration uint64
-	eventNotifier    annealing.EventNotifier
-	solutionExplorer explorer.Explorer
-	model            model.Model
-	logger           logging.Logger
-
-	parameters Parameters
 }
 
 func (sa *SimpleAnnealer) Initialise() {
@@ -31,8 +33,8 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.temperature = 1
 	sa.currentIteration = 0
 	sa.eventNotifier = new(annealing.SynchronousAnnealingEventNotifier)
-	sa.solutionExplorer = null.NullExplorer
-	sa.logger = new(loggers.NullLogger)
+	sa.SetLogHandler(new(loggers.NullLogger))
+	sa.solutionExplorer = null.New()
 	sa.parameters.Initialise()
 }
 
@@ -92,18 +94,6 @@ func (sa *SimpleAnnealer) SetSolutionExplorer(explorer explorer.Explorer) error 
 	}
 	sa.solutionExplorer = explorer
 	return nil
-}
-
-func (sa *SimpleAnnealer) SetLogHandler(logger logging.Logger) error {
-	if logger == nil {
-		return errors.New("invalid attempt to set log handler to nil value")
-	}
-	sa.logger = logger
-	return nil
-}
-
-func (sa *SimpleAnnealer) LogHandler() logging.Logger {
-	return sa.logger
 }
 
 func (sa *SimpleAnnealer) SetEventNotifier(delegate annealing.EventNotifier) error {

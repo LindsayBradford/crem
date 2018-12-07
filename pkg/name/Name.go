@@ -8,15 +8,15 @@ type Nameable interface {
 	SetName(name string)
 }
 
-// Named is a struct offering a default implementation of Nameable
-type Named struct {
+// ContainedName is a struct offering a default implementation of Nameable
+type ContainedName struct {
 	name string
 }
 
-func (n *Named) Name() string {
+func (n *ContainedName) Name() string {
 	return n.name
 }
 
-func (n *Named) SetName(name string) {
+func (n *ContainedName) SetName(name string) {
 	n.name = name
 }

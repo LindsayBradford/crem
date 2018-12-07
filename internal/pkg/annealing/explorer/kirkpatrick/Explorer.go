@@ -1,11 +1,8 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 package kirkpatrick
 
 import (
-	"errors"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
@@ -19,12 +16,12 @@ import (
 const guaranteed = 1
 
 type Explorer struct {
-	name.Named
-	scenarioId string
-	model      model.Model
-
+	name.ContainedName
+	model.ContainedModel
 	rand.ContainedRand
-	logHandler logging.Logger
+	logging.ContainedLogger
+
+	scenarioId string
 
 	parameters            Parameters
 	optimisationDirection optimisationDirection
@@ -43,7 +40,7 @@ func New() *Explorer {
 }
 
 func (ke *Explorer) Initialise() {
-	ke.logHandler.Debug(ke.scenarioId + ": Initialising Solution Explorer")
+	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
@@ -52,16 +49,8 @@ func (ke *Explorer) WithName(name string) *Explorer {
 	return ke
 }
 
-func (ke *Explorer) Model() model.Model {
-	return ke.model
-}
-
-func (ke *Explorer) SetModel(model model.Model) {
-	ke.model = model
-}
-
 func (ke *Explorer) WithModel(model model.Model) *Explorer {
-	ke.model = model
+	ke.SetModel(model)
 	return ke
 }
 
@@ -190,18 +179,6 @@ func (ke *Explorer) SetAcceptanceProbability(probability float64) {
 	ke.acceptanceProbability = math.Min(guaranteed, probability)
 }
 
-func (ke *Explorer) LogHandler() logging.Logger {
-	return ke.logHandler
-}
-
-func (ke *Explorer) SetLogHandler(logHandler logging.Logger) error {
-	if logHandler == nil {
-		return errors.New("invalid attempt to set log handler to nil value")
-	}
-	ke.logHandler = logHandler
-	return nil
-}
-
 func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
 	modelClone := ke.Model().DeepClone()
@@ -216,5 +193,5 @@ func (ke *Explorer) CloneObservable() explorer.Explorer {
 }
 
 func (ke *Explorer) TearDown() {
-	ke.logHandler.Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
+	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
 }

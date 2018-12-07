@@ -4,16 +4,26 @@ package null
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 )
 
-var NullExplorer = new(Explorer)
+var NullExplorer = New()
 
 type Explorer struct {
-	explorer.SingleObjectiveAnnealableExplorer
+	explorer.BaseExplorer
+	logging.ContainedLogger
+}
+
+func New() *Explorer {
+	newExplorer := new(Explorer)
+	newExplorer.Initialise()
+	return newExplorer
 }
 
 func (e *Explorer) Initialise() {
 	e.SetObjectiveValue(0)
+	e.BaseExplorer.SetLogHandler(loggers.DefaultNullLogger)
 }
 
 func (e *Explorer) WithName(name string) *Explorer {

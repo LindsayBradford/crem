@@ -13,7 +13,7 @@ import (
 )
 
 type Model struct {
-	name.Named
+	name.ContainedName
 	rand.ContainedRand
 
 	decisionVariables     map[string]model.DecisionVariable

@@ -21,15 +21,16 @@ type Container interface {
 	SetModel(model Model)
 }
 
-type Contained struct {
+// ContainedModel is a struct offering a default implementation of Container
+type ContainedModel struct {
 	model Model
 }
 
-func (c *Contained) Model() Model {
+func (c *ContainedModel) Model() Model {
 	return c.model
 }
 
-func (c *Contained) SetModel(model Model) {
+func (c *ContainedModel) SetModel(model Model) {
 	c.model = model
 }
 
@@ -46,7 +47,7 @@ func NewNullModel() *nullModel {
 }
 
 type nullModel struct {
-	name.Named
+	name.ContainedName
 }
 
 func (nm *nullModel) WithName(name string) *nullModel {
