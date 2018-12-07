@@ -326,11 +326,11 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 }
 
 type TestRegistereableExplorer struct {
-	explorer.BaseExplorer
+	kirkpatrick.Explorer
 }
 
 func (tre *TestRegistereableExplorer) WithName(name string) *TestRegistereableExplorer {
-	tre.BaseExplorer.WithName(name)
+	tre.SetName(name)
 	return tre
 }
 
