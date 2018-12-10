@@ -1,14 +1,20 @@
 ScenarioName = "Minimal Excel Annealer Test Config"
 
-[[SolutionExplorers]]
-Type = "SimpleExcelSolutionExplorer"
-Name = "DoraTheExplorer"
-[SolutionExplorers.Parameters]
+[[Models]]
+Type = "SimpleExcelModel"
+Name = "durrModel"
+[Models.Parameters]
 DataSourcePath = "testdata/SimpleExcelAnnealerTestFixture.xls"
 Penalty = 100.5 # 100.0
 
+
+[[SolutionExplorers]]
+Type = "SimpleExcelExplorer"
+Name = "DoraTheExplorer"
+
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
+Model = "durrModel"
 SolutionExplorer = "DoraTheExplorer"
 [Annealer.Parameters]
 StartingTemperature = 50.0 #50

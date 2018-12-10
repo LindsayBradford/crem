@@ -14,6 +14,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
 type SimpleExcelModel struct {
@@ -31,7 +32,7 @@ type SimpleExcelModel struct {
 	explorerData                ExplorerData
 	previousPlanningUnitChanged uint64
 	excelDataAdapter            ExcelDataAdapter
-	oleWrapper                  func(f func())
+	oleWrapper                  threading.MainThreadFunctionWrapper
 }
 
 func NewSimpleExcelModel() *SimpleExcelModel {
@@ -63,7 +64,7 @@ func (sem *SimpleExcelModel) ParameterErrors() error {
 	return sem.parameters.ValidationErrors()
 }
 
-func (sem *SimpleExcelModel) WithOleFunctionWrapper(wrapper func(f func())) *SimpleExcelModel {
+func (sem *SimpleExcelModel) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *SimpleExcelModel {
 	sem.oleWrapper = wrapper
 	return sem
 }

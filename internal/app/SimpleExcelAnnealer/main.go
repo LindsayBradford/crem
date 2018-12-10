@@ -5,43 +5,23 @@ package main
 
 import (
 	"os"
-	"runtime"
 
 	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
 var (
 	defaultLogHandler logging.Logger
-	mainThreadChannel = make(chan func())
+	mainThreadChannel threading.MainThreadChannel
 )
 
 func init() {
-	runtime.LockOSThread() // ensure main goroutine is locked to OS thread for proper callOnMainThread behaviour.
-}
-
-func mainThreadFunctionHandler() {
-	for function := range mainThreadChannel {
-		function()
-	}
-}
-
-func callOnMainThread(function func()) {
-	done := make(chan bool, 1)
-	mainThreadChannel <- func() {
-		function()
-		done <- true
-	}
-	<-done
-}
-
-func closeMainThreadChannel() {
-	close(mainThreadChannel)
-	runtime.UnlockOSThread()
+	mainThreadChannel = threading.GetMainThreadChannel()
 }
 
 func main() {
@@ -67,7 +47,7 @@ func retrieveConfig(configFile string) *config.CREMConfig {
 }
 
 func buildScenarioOffConfig(scenarioConfig *config.CREMConfig) scenario.CallableRunner {
-	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, callOnMainThread, closeMainThreadChannel)
+	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, &mainThreadChannel)
 	defaultLogHandler = annealerLogHandler
 	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")
 	return scenarioRunner
@@ -89,7 +69,7 @@ func runScenario(scenarioRunner scenario.CallableRunner) {
 	go scenarioRunner.Run()
 
 	defaultLogHandler.Debug("starting ole function polling")
-	mainThreadFunctionHandler()
+	mainThreadChannel.RunHandler()
 
 	flushStreams()
 }

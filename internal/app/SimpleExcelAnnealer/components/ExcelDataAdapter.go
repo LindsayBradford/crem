@@ -11,6 +11,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/excel"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +24,7 @@ type ExcelDataAdapter struct {
 	excelHandler     excel.Handler
 	workbook         excel.Workbook
 	absoluteFilePath string
-	oleWrapper       func(f func())
+	oleWrapper       threading.MainThreadFunctionWrapper
 }
 
 func (eda *ExcelDataAdapter) Initialise() *ExcelDataAdapter {
@@ -38,7 +39,7 @@ func (eda *ExcelDataAdapter) Initialise() *ExcelDataAdapter {
 	return eda
 }
 
-func (eda *ExcelDataAdapter) WithOleFunctionWrapper(wrapper func(f func())) *ExcelDataAdapter {
+func (eda *ExcelDataAdapter) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *ExcelDataAdapter {
 	eda.oleWrapper = wrapper
 	return eda
 }

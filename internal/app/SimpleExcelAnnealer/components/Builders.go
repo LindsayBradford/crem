@@ -10,13 +10,14 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
-func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func()), tearDown func()) (scenario.CallableRunner, logging.Logger) {
+func BuildScenarioRunner(scenarioConfig *config.CREMConfig, mainThreadChannel *threading.MainThreadChannel) (scenario.CallableRunner, logging.Logger) {
 	newAnnealer, humanLogHandler, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
-			RegisteringModel(buildSimpleExcelModelRegistration(wrapper)).
+			RegisteringModel(buildSimpleExcelModelRegistration(mainThreadChannel.Call)).
 			RegisteringExplorer(buildSimpleExcelExplorerRegistration()).
 			Build()
 
@@ -32,7 +33,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func(
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
-		WithTearDownFunction(tearDown).
+		WithTearDownFunction(mainThreadChannel.Close).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	runner = new(scenario.SpreadsheetSafeScenarioRunner).ThatLocks(runner)
@@ -48,7 +49,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig, wrapper func(f func(
 	return runner, humanLogHandler
 }
 
-func buildSimpleExcelModelRegistration(wrapper func(f func())) config.ModelRegistration {
+func buildSimpleExcelModelRegistration(wrapper threading.MainThreadFunctionWrapper) config.ModelRegistration {
 	return config.ModelRegistration{
 		ModelType: "SimpleExcelModel",
 		ConfigFunction: func(config config.ModelConfig) model.Model {
