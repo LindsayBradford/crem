@@ -12,16 +12,6 @@ import (
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
-const (
-	_                                  = iota
-	BankErosionFudgeFactor      string = "BankErosionFudgeFactor"
-	WaterDensity                string = "WaterDensity"
-	LocalAcceleration           string = "LocalAcceleration"
-	GullyCompensationFactor     string = "GullyCompensationFactor"
-	SedimentDensity             string = "SedimentDensity"
-	SuspendedSedimentProportion string = "SuspendedSedimentProportion"
-)
-
 type CatchmentModel struct {
 	name.ContainedName
 	rand.ContainedRand

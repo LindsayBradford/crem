@@ -9,6 +9,17 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 )
 
+const (
+	_                                  = iota
+	BankErosionFudgeFactor      string = "BankErosionFudgeFactor"
+	WaterDensity                string = "WaterDensity"
+	LocalAcceleration           string = "LocalAcceleration"
+	GullyCompensationFactor     string = "GullyCompensationFactor"
+	SedimentDensity             string = "SedimentDensity"
+	SuspendedSedimentProportion string = "SuspendedSedimentProportion"
+	DataSourcePath              string = "DataSource"
+)
+
 type CatchmentParameters struct {
 	parameters.Parameters
 }
@@ -74,6 +85,14 @@ func (cp *CatchmentParameters) buildMetaData() {
 			Key:          SuspendedSedimentProportion,
 			Validator:    cp.IsDecimal,
 			DefaultValue: 0.5,
+		},
+	)
+
+	cp.AddMetaData(
+		parameters.MetaData{
+			Key:          DataSourcePath,
+			Validator:    cp.IsReadableFile,
+			DefaultValue: "",
 		},
 	)
 }
