@@ -4,6 +4,7 @@
 package main
 
 import (
+	"os"
 	"testing"
 
 	configTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
@@ -22,5 +23,5 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 	}
 
 	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
-	// os.Remove(excelFileUnderTest)
+	os.Remove(excelFileUnderTest)
 }

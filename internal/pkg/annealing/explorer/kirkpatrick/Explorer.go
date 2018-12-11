@@ -109,14 +109,18 @@ func (ke *Explorer) ObjectiveValue() float64 {
 
 func (ke *Explorer) TryRandomChange(temperature float64) {
 	ke.Model().TryRandomChange()
-	ke.acceptOrRevertChange(temperature)
+	ke.defaultAcceptOrRevertChange(temperature)
 }
 
-func (ke *Explorer) acceptOrRevertChange(annealingTemperature float64) {
+func (ke *Explorer) defaultAcceptOrRevertChange(annealingTemperature float64) {
+	ke.AcceptOrRevertChange(annealingTemperature, ke.AcceptLastChange, ke.RevertLastChange)
+}
+
+func (ke *Explorer) AcceptOrRevertChange(annealingTemperature float64, acceptFunction func(), revertFunction func()) {
 	ke.temperature = annealingTemperature
 	if ke.ChangeTriedIsDesirable() {
 		ke.SetAcceptanceProbability(guaranteed)
-		ke.AcceptLastChange()
+		acceptFunction()
 	} else {
 		absoluteChangeInObjectiveValue := math.Abs(ke.ChangeInObjectiveValue())
 		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / annealingTemperature)
@@ -124,9 +128,9 @@ func (ke *Explorer) acceptOrRevertChange(annealingTemperature float64) {
 
 		randomValue := ke.RandomNumberGenerator().Float64Unitary()
 		if probabilityToAcceptBadChange > randomValue {
-			ke.AcceptLastChange()
+			acceptFunction()
 		} else {
-			ke.RevertLastChange()
+			revertFunction()
 		}
 	}
 }

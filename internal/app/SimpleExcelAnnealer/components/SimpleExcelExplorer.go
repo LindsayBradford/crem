@@ -48,6 +48,11 @@ func (see *SimpleExcelExplorer) DeepClone() explorer.Explorer {
 	return &clone
 }
 
+func (see *SimpleExcelExplorer) TryRandomChange(temperature float64) {
+	see.Model().TryRandomChange()
+	see.Explorer.AcceptOrRevertChange(temperature, see.AcceptLastChange, see.RevertLastChange)
+}
+
 func (see *SimpleExcelExplorer) AcceptLastChange() {
 	see.Explorer.AcceptLastChange()
 	see.simpleExcelModel().SetExplorerData(see.buildExplorerData())
