@@ -192,6 +192,7 @@ func (ke *Explorer) SetAcceptanceProbability(probability float64) {
 
 func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
+	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	modelClone := ke.Model().DeepClone()
 	clone.SetModel(modelClone)
 	return &clone
