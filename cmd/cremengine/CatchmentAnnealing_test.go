@@ -20,7 +20,7 @@ func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
 	}
 
 	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFile()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }
 
 func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
@@ -32,5 +32,5 @@ func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
 	}
 
 	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFile()
+	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
 }
