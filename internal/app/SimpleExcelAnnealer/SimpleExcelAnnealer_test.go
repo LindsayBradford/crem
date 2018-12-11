@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"testing"
 
 	configTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
@@ -15,7 +14,7 @@ const configFileUnderTest = baseTestFilePath + ".toml"
 const excelFileUnderTest = baseTestFilePath + ".xls"
 
 func TestAnnealerIntegrationOneRun(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Single run of Simple Excel Annealer",
 		T:              t,
 		ConfigFilePath: configFileUnderTest,
@@ -23,5 +22,5 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 	}
 
 	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
-	os.Remove(excelFileUnderTest)
+	// os.Remove(excelFileUnderTest)
 }

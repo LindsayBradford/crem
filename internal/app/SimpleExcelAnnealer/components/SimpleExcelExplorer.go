@@ -2,7 +2,13 @@
 
 package components
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/rand"
+)
 
 func NewSimpleExcelExplorer() *SimpleExcelExplorer {
 	explorer := new(SimpleExcelExplorer)
@@ -12,6 +18,34 @@ func NewSimpleExcelExplorer() *SimpleExcelExplorer {
 
 type SimpleExcelExplorer struct {
 	kirkpatrick.Explorer
+}
+
+func (see *SimpleExcelExplorer) WithName(name string) *SimpleExcelExplorer {
+	see.Explorer.WithName(name)
+	return see
+}
+
+func (see *SimpleExcelExplorer) WithModel(model model.Model) *SimpleExcelExplorer {
+	see.Explorer.WithModel(model)
+	return see
+}
+
+func (see *SimpleExcelExplorer) WithScenarioId(id string) *SimpleExcelExplorer {
+	see.Explorer.WithScenarioId(id)
+	return see
+}
+
+func (see *SimpleExcelExplorer) WithParameters(params parameters.Map) *SimpleExcelExplorer {
+	see.Explorer.WithParameters(params)
+	return see
+}
+
+func (see *SimpleExcelExplorer) DeepClone() explorer.Explorer {
+	clone := *see
+	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	modelClone := see.Model().DeepClone()
+	clone.SetModel(modelClone)
+	return &clone
 }
 
 func (see *SimpleExcelExplorer) AcceptLastChange() {

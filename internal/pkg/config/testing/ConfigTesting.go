@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type TestingContext struct {
+type Context struct {
 	Name           string
 	T              *testing.T
 	ConfigFilePath string
@@ -17,7 +17,7 @@ type TestingContext struct {
 
 type ScenarioFileRunningFunction func(scenarioPath string)
 
-func (tc *TestingContext) VerifyScenarioRunViaConfigFileDoesNotPanic() {
+func (tc *Context) VerifyScenarioRunViaConfigFileDoesNotPanic() {
 	if testing.Short() {
 		tc.T.Skip("skipping " + tc.Name + " in short mode")
 	}

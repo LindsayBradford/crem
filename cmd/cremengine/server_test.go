@@ -17,40 +17,40 @@ import (
 )
 
 func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Single run of Dumb annealer",
 		T:              t,
 		ConfigFilePath: "testdata/DumbAnnealerTestConfig-OneRun.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Three sequential runs of Dumb annealer",
 		T:              t,
 		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }
 
 func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Three concurrent runs of Dumb annealer",
 		T:              t,
 		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }
 
 func TestValidJobsGetRequest_OkResponse(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "GET /jobs request returns 200 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -59,7 +59,7 @@ func TestValidJobsGetRequest_OkResponse(t *testing.T) {
 	verifyResponseToValidJobsGetRequest(context)
 }
 
-func verifyResponseToValidJobsGetRequest(context configTesting.TestingContext) {
+func verifyResponseToValidJobsGetRequest(context configTesting.Context) {
 
 	g := NewGomegaWithT(context.T)
 
@@ -79,7 +79,7 @@ func verifyResponseToValidJobsGetRequest(context configTesting.TestingContext) {
 }
 
 func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "POST /jobs request of invalid scenario returns 500 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -88,7 +88,7 @@ func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
 	verifyInternalServerErrorResponseToInvalidJobsPostRequest(context)
 }
 
-func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context configTesting.TestingContext) {
+func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context configTesting.Context) {
 
 	g := NewGomegaWithT(context.T)
 
@@ -126,12 +126,12 @@ func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer test.JsonRes
 }
 
 func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Single run of Kirkpatrick Dumb annealer",
 		T:              t,
 		ConfigFilePath: "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
 		Runner:         components.RunScenarioFromConfigFile,
 	}
 
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }

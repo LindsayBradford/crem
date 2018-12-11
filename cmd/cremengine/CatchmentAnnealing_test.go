@@ -12,7 +12,7 @@ import (
 )
 
 func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Single run of sediment transport annealer",
 		T:              t,
 		ConfigFilePath: "testdata/CatchmentConfig-OneRun.toml",
@@ -20,11 +20,11 @@ func TestSedimentTransportAnnealerScenarioOneRun(t *testing.T) {
 	}
 
 	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }
 
 func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
-	context := configTesting.TestingContext{
+	context := configTesting.Context{
 		Name:           "Attempted run of sediment transport annealer with bad inputs",
 		T:              t,
 		ConfigFilePath: "testdata/CatchmentConfig-BadInputs.toml",
@@ -32,5 +32,5 @@ func TestSedimentTransportAnnealerScenarioBadInputs(t *testing.T) {
 	}
 
 	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	context.VerifyScenarioRunViaConfigFile()
 }
