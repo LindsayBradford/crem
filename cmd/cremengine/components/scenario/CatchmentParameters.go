@@ -17,7 +17,7 @@ const (
 	GullyCompensationFactor     string = "GullyCompensationFactor"
 	SedimentDensity             string = "SedimentDensity"
 	SuspendedSedimentProportion string = "SuspendedSedimentProportion"
-	DataSourcePath              string = "DataSource"
+	DataSourcePath              string = "DataSourcePath"
 )
 
 type CatchmentParameters struct {
