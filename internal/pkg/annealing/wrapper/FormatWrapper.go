@@ -3,9 +3,8 @@
 package wrapper
 
 import (
-	"fmt"
-
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"golang.org/x/text/message"
 )
 
 type FormatWrapper struct {
@@ -16,6 +15,16 @@ type FormatWrapper struct {
 const defaultStringFormat = "%s"
 const defaultFloat64Format = "%f"
 const defaultUintFormat = "%d"
+
+const englishLocalisation = "en"
+
+var (
+	localised *message.Printer
+)
+
+func init() {
+	localised = message.NewPrinter(message.MatchLanguage(englishLocalisation))
+}
 
 func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 	wrapper.MethodFormats = map[string]string{
@@ -59,5 +68,5 @@ func (wrapper *FormatWrapper) CurrentIteration() string {
 
 func (wrapper *FormatWrapper) applyFormatting(formatKey string, valueToFormat interface{}) string {
 	formatToApply := wrapper.MethodFormats[formatKey]
-	return fmt.Sprintf(formatToApply, valueToFormat)
+	return localised.Sprintf(formatToApply, valueToFormat)
 }
