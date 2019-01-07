@@ -18,14 +18,11 @@ type SimpleAnnealer struct {
 	explorer.ContainedExplorer
 	model.ContainedModel
 
-	annealing.ContainedEventNotifier
 	logging.ContainedLogger
 
 	parameters Parameters
 
-	id               string
-	temperature      float64
-	currentIteration uint64
+	ContainedObservable
 }
 
 func (sa *SimpleAnnealer) Initialise() {
@@ -36,28 +33,35 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.SetLogHandler(new(loggers.NullLogger))
 	sa.SetSolutionExplorer(null.NullExplorer)
 	sa.parameters.Initialise()
+	sa.assignStateFromParameters()
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
-	sa.id = title
+	sa.ContainedObservable.SetId(title)
 	sa.SolutionExplorer().SetScenarioId(title)
-}
-
-func (sa *SimpleAnnealer) Id() string {
-	return sa.id
 }
 
 func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 	sa.parameters.Merge(params)
-
-	temperature := sa.parameters.GetFloat64(StartingTemperature)
-	sa.SetTemperature(temperature)
-
+	sa.assignStateFromParameters()
 	return sa.parameters.ValidationErrors()
+}
+
+func (sa *SimpleAnnealer) assignStateFromParameters() {
+	sa.SetTemperature(sa.parameters.GetFloat64(StartingTemperature))
+	sa.coolingFactor = sa.parameters.GetFloat64(CoolingFactor)
+	sa.maximumIterations = uint64(sa.parameters.GetInt64(MaximumIterations))
 }
 
 func (sa *SimpleAnnealer) ParameterErrors() error {
 	return sa.parameters.ValidationErrors()
+}
+
+func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {
+	clone := *sa
+	explorerClone := sa.SolutionExplorer().DeepClone()
+	clone.SetSolutionExplorer(explorerClone)
+	return &clone
 }
 
 func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
@@ -68,46 +72,15 @@ func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 	return nil
 }
 
-func (sa *SimpleAnnealer) Temperature() float64 {
-	return sa.temperature
-}
-
-func (sa *SimpleAnnealer) CoolingFactor() float64 {
-	return sa.parameters.GetFloat64(CoolingFactor)
-}
-
-func (sa *SimpleAnnealer) MaximumIterations() uint64 {
-	return uint64(sa.parameters.GetInt64(MaximumIterations))
-}
-
-func (sa *SimpleAnnealer) CurrentIteration() uint64 {
-	return sa.currentIteration
-}
-
-func (sa *SimpleAnnealer) AddObserver(observer annealing.Observer) error {
-	return sa.EventNotifier().AddObserver(observer)
-}
-
-func (sa *SimpleAnnealer) Observers() []annealing.Observer {
-	return sa.EventNotifier().Observers()
-}
-
 func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
 	sa.EventNotifier().NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
 }
 
-func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {
-	clone := *sa
-	explorerClone := sa.SolutionExplorer().DeepClone()
-	clone.SetSolutionExplorer(explorerClone)
-	return &clone
-}
-
-func (sa *SimpleAnnealer) CloneObservable() annealing.Annealer {
-	clone := *sa
+func (sa *SimpleAnnealer) CloneObservable() annealing.Observable {
+	observable := sa.ContainedObservable
 	explorerClone := sa.SolutionExplorer().CloneObservable()
-	clone.SetSolutionExplorer(explorerClone)
-	return &clone
+	observable.SetObservableExplorer(explorerClone)
+	return &observable
 }
 
 func (sa *SimpleAnnealer) Anneal() {

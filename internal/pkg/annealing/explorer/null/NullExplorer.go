@@ -30,7 +30,7 @@ func (e *Explorer) RevertLastChange()                             {}
 func (e *Explorer) ScenarioId() string                            { return "" }
 func (e *Explorer) SetScenarioId(id string)                       {}
 func (e *Explorer) DeepClone() explorer.Explorer                  { return e }
-func (e *Explorer) CloneObservable() explorer.Explorer            { return e }
+func (e *Explorer) CloneObservable() explorer.Observable          { return e }
 func (e *Explorer) Model() model.Model                            { return nil }
 func (e *Explorer) SetModel(model model.Model)                    {}
 func (e *Explorer) SetLogHandler(logHandler logging.Logger) error { return nil }

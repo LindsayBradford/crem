@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/observable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -13,8 +14,6 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
-
-const guaranteed = 1
 
 type Explorer struct {
 	name.ContainedName
@@ -27,11 +26,7 @@ type Explorer struct {
 	parameters            Parameters
 	optimisationDirection optimisationDirection
 
-	acceptanceProbability float64
-	changeIsDesirable     bool
-	changeAccepted        bool
-	objectiveValueChange  float64
-	temperature           float64
+	observable.ContainedObservable
 }
 
 func New() *Explorer {
@@ -117,9 +112,9 @@ func (ke *Explorer) defaultAcceptOrRevertChange(annealingTemperature float64) {
 }
 
 func (ke *Explorer) AcceptOrRevertChange(annealingTemperature float64, acceptFunction func(), revertFunction func()) {
-	ke.temperature = annealingTemperature
+	ke.SetTemperature(annealingTemperature)
 	if ke.ChangeTriedIsDesirable() {
-		ke.SetAcceptanceProbability(guaranteed)
+		ke.SetAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
 		absoluteChangeInObjectiveValue := math.Abs(ke.ChangeInObjectiveValue())
@@ -138,21 +133,13 @@ func (ke *Explorer) AcceptOrRevertChange(annealingTemperature float64, acceptFun
 func (ke *Explorer) ChangeTriedIsDesirable() bool {
 	switch ke.optimisationDirection {
 	case Minimising:
-		ke.changeIsDesirable = ke.changeInObjectiveValue() < 0
-		return ke.changeIsDesirable
+		ke.SetChangeIsDesirable(ke.changeInObjectiveValue() <= 0)
+		return ke.ChangeIsDesirable()
 	case Maximising:
-		ke.changeIsDesirable = ke.changeInObjectiveValue() > 0
-		return ke.changeIsDesirable
+		ke.SetChangeIsDesirable(ke.changeInObjectiveValue() >= 0)
+		return ke.ChangeIsDesirable()
 	}
 	return false
-}
-
-func (ke *Explorer) Temperature() float64 {
-	return ke.temperature
-}
-
-func (ke *Explorer) ChangeIsDesirable() bool {
-	return ke.changeIsDesirable
 }
 
 func (ke *Explorer) changeInObjectiveValue() float64 {
@@ -164,34 +151,14 @@ func (ke *Explorer) changeInObjectiveValue() float64 {
 	return 0
 }
 
-func (ke *Explorer) ChangeInObjectiveValue() float64 {
-	return ke.objectiveValueChange
-}
-
-func (ke *Explorer) SetChangeInObjectiveValue(change float64) {
-	ke.objectiveValueChange = change
-}
-
 func (ke *Explorer) AcceptLastChange() {
 	ke.Model().AcceptChange()
-	ke.changeAccepted = true
+	ke.SetChangeAccepted(true)
 }
 
 func (ke *Explorer) RevertLastChange() {
 	ke.Model().RevertChange()
-	ke.changeAccepted = false
-}
-
-func (ke *Explorer) ChangeAccepted() bool {
-	return ke.changeAccepted
-}
-
-func (ke *Explorer) AcceptanceProbability() float64 {
-	return ke.acceptanceProbability
-}
-
-func (ke *Explorer) SetAcceptanceProbability(probability float64) {
-	ke.acceptanceProbability = math.Min(guaranteed, probability)
+	ke.SetChangeAccepted(false)
 }
 
 func (ke *Explorer) DeepClone() explorer.Explorer {
@@ -202,10 +169,10 @@ func (ke *Explorer) DeepClone() explorer.Explorer {
 	return &clone
 }
 
-func (ke *Explorer) CloneObservable() explorer.Explorer {
-	clone := *ke
-	clone.SetModel(model.NullModel)
-	return &clone
+func (ke *Explorer) CloneObservable() explorer.Observable {
+	observable := ke.ContainedObservable
+	observable.SetObjectiveValue(ke.ObjectiveValue())
+	return &observable
 }
 
 func (ke *Explorer) TearDown() {

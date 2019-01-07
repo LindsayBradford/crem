@@ -11,7 +11,7 @@ import (
 type EventNotifier interface {
 	AddObserver(observer Observer) error
 	Observers() []Observer
-	NotifyObserversOfAnnealingEvent(annealer Annealer, eventType EventType)
+	NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType)
 }
 
 // EventNotifierContainer  defines an interface embedding an EventNotifier
@@ -56,7 +56,7 @@ func (notifier *SynchronousAnnealingEventNotifier) AddObserver(newObserver Obser
 	return nil
 }
 
-func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType EventType) {
+func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType) {
 	event := Event{EventType: eventType, Annealer: annealer}
 	for _, currObserver := range notifier.observers {
 		currObserver.ObserveAnnealingEvent(event)
@@ -94,7 +94,7 @@ func (notifier *ConcurrentAnnealingEventNotifier) AddObserver(newObserver Observ
 	return nil
 }
 
-func (notifier *ConcurrentAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Annealer, eventType EventType) {
+func (notifier *ConcurrentAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType) {
 	event := Event{EventType: eventType, Annealer: annealer}
 	for _, observerChannel := range notifier.observerChannels {
 		observerChannel <- event

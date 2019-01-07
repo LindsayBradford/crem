@@ -32,7 +32,7 @@ func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event annealing.Eve
 	}
 
 	annealer := wrapAnnealer(event.Annealer)
-	explorer := wrapSolutionExplorer(event.Annealer.SolutionExplorer())
+	explorer := wrapSolutionExplorer(event.Annealer.ObservableExplorer())
 
 	logAttributes := make(logging.Attributes, 0)
 	logAttributes = append(logAttributes, logging.NameValuePair{Name: "Id", Value: annealer.Id()})

@@ -33,7 +33,7 @@ func (amo *AnnealingMessageObserver) ObserveAnnealingEvent(event annealing.Event
 	}
 
 	annealer := wrapAnnealer(event.Annealer)
-	explorer := wrapSolutionExplorer(event.Annealer.SolutionExplorer())
+	explorer := wrapSolutionExplorer(event.Annealer.ObservableExplorer())
 
 	var builder strings.FluentBuilder
 	builder.Add("Id [", event.Annealer.Id(), "], ", "Event [", event.EventType.String(), "]: ")

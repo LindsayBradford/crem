@@ -25,8 +25,7 @@ func New() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 
-	newModel.SetRandomNumberGenerator(rand.NewTimeSeeded())
-	newModel.buildDecisionVariables()
+	newModel.BuildDecisionVariables()
 	newModel.parameters.Initialise()
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
@@ -41,7 +40,7 @@ func (dm *Model) WithName(name string) *Model {
 	return dm
 }
 
-func (dm *Model) buildDecisionVariables() {
+func (dm *Model) BuildDecisionVariables() {
 	dm.decisionVariables = make(map[string]model.DecisionVariable, 1)
 	dm.tempDecisionVariables = make(map[string]model.DecisionVariable, 1)
 
@@ -74,7 +73,7 @@ const (
 )
 
 func (dm *Model) Initialise() {
-	// This model doesn't need any special initialising.
+	dm.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
 func (dm *Model) TearDown() {
@@ -114,6 +113,11 @@ func (dm *Model) objectiveValue() float64 {
 
 func (dm *Model) setObjectiveValue(value float64) {
 	dm.tempDecisionVariables[model.ObjectiveValue].SetValue(value)
+}
+
+func (dm *Model) SetDecisionVariable(name string, value float64) {
+	dm.decisionVariables[name].SetValue(value)
+	dm.tempDecisionVariables[name].SetValue(value)
 }
 
 func (dm *Model) copyDecisionVarValueToTemp(varName string) {

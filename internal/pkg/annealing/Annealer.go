@@ -31,6 +31,9 @@ type Observable interface {
 	CoolingFactor() float64
 	MaximumIterations() uint64
 	CurrentIteration() uint64
+
+	ObservableExplorer() explorer.Observable
+	SetObservableExplorer(explorer explorer.Observable) error
 }
 
 type Identifiable interface {

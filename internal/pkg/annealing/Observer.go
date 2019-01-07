@@ -8,7 +8,7 @@ type Observer interface {
 
 type Event struct {
 	EventType EventType
-	Annealer  Annealer
+	Annealer  Observable
 	Note      string
 }
 
