@@ -171,7 +171,7 @@ func (sem *SimpleExcelModel) AcceptChange() {
 func (sem *SimpleExcelModel) addTrackerData() {
 	newRow := new(trackingData)
 
-	if change, err := sem.DecisionVariableChange(model.ObjectiveValue); err != nil {
+	if change, err := sem.DecisionVariableChange(model.ObjectiveValue); err == nil {
 		newRow.ObjectiveFunctionChange = change
 	}
 	newRow.Temperature = sem.explorerData.Temperature
