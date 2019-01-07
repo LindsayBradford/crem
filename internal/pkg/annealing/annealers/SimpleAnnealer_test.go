@@ -47,6 +47,17 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with no AnnealerObservers")
 }
 
+func TestSimpleAnnealer_DeepClone(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	annealer := new(SimpleAnnealer)
+	annealer.Initialise()
+
+	actualClone := annealer.DeepClone()
+
+	g.Expect(actualClone).To(Equal(annealer), "Deep clone of annealer should equal it")
+}
+
 func TestSimpleAnnealer_Errors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -295,6 +306,58 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 		"Annealer should have accepted DummyLogHandler as new logger")
 }
 
+func TestSimpleAnnealer_BadParameters(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	annealer := new(SimpleAnnealer)
+	annealer.Initialise()
+
+	expectedParams := parameters.Map{
+		StartingTemperature: 1000,
+		CoolingFactor:       true,
+		MaximumIterations:   "nope, not even close",
+	}
+
+	expectedLogHandler := new(DummyLogHandler)
+	annealer.SetLogHandler(expectedLogHandler)
+
+	actualError := annealer.SetParameters(expectedParams)
+
+	g.Expect(actualError).To(Not(BeNil()))
+	t.Log(actualError)
+
+	g.Expect(actualError).To(Equal(annealer.ParameterErrors()))
+}
+
 type DummyLogHandler struct {
 	loggers.NullLogger
+}
+
+func TestSimpleAnnealer_PanicingExplorer(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	annealer := new(SimpleAnnealer)
+	annealer.Initialise()
+
+	annealer.SetSolutionExplorer(new(flawedExplorer))
+
+	expectedParams := parameters.Map{
+		MaximumIterations: int64(1),
+	}
+
+	annealer.SetParameters(expectedParams)
+
+	annealingCall := func() {
+		annealer.Anneal()
+	}
+
+	g.Expect(annealingCall).To(Panic())
+}
+
+type flawedExplorer struct {
+	null.Explorer
+}
+
+func (fe *flawedExplorer) TryRandomChange(temperature float64) {
+	panic("gotta panic")
 }

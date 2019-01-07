@@ -30,6 +30,8 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	expectedLogHandler := new(loggers.BareBonesLogger)
 	expectedSolutionExplorer := new(null.Explorer)
 	expectedObservers := []annealing.Observer{new(dummyObserver)}
+	expectedId := "someId"
+	expectedEventNotifier := new(annealing.ConcurrentAnnealingEventNotifier)
 
 	builder := new(Builder)
 
@@ -41,9 +43,11 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 
 	annealer, _ := builder.
 		SimpleAnnealer().
+		WithId(expectedId).
 		WithParameters(expectedParams).
 		WithLogHandler(expectedLogHandler).
 		WithSolutionExplorer(expectedSolutionExplorer).
+		WithEventNotifier(expectedEventNotifier).
 		WithObservers(expectedObservers...).
 		Build()
 
@@ -74,6 +78,14 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	g.Expect(
 		annealer.Observers()).To(Equal(expectedObservers),
 		"Annealer should have built with supplied Observers")
+
+	g.Expect(
+		annealer.EventNotifier()).To(Equal(expectedEventNotifier),
+		"Annealer should have built with supplied EventNotifier")
+
+	g.Expect(
+		annealer.Id()).To(Equal(expectedId),
+		"Annealer should have built with supplied Id")
 }
 
 func TestBuild_BadInputs(t *testing.T) {
@@ -87,6 +99,7 @@ func TestBuild_BadInputs(t *testing.T) {
 
 	badLogHandler := logging.Logger(nil)
 	badExplorer := explorer.Explorer(nil)
+	badEventNotifier := annealing.EventNotifier(nil)
 
 	builder := new(Builder)
 
@@ -95,11 +108,12 @@ func TestBuild_BadInputs(t *testing.T) {
 		WithParameters(badParams).
 		WithLogHandler(badLogHandler).
 		WithSolutionExplorer(badExplorer).
+		WithEventNotifier(badEventNotifier).
 		WithObservers(nil).
 		Build()
 
 	g.Expect(
-		err.Size()).To(BeNumerically(">", 3), "Annealer should have built with errors")
+		err.Size()).To(BeNumerically(">", 4), "Annealer should have built with errors")
 
 	t.Log(err)
 

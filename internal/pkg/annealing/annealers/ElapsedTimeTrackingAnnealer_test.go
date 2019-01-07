@@ -29,6 +29,10 @@ func TestAnneal(t *testing.T) {
 	g.Expect(
 		elapsedTimeAnnealer.ElapsedTime()).To(BeZero(), "Annealer should recorded zero elapsed time")
 
+	actualClone := annealer.DeepClone()
+
+	g.Expect(actualClone).To(Equal(annealer), "Deep clone of annealer should equal clone")
+
 	annealer.Anneal()
 
 	g.Expect(
