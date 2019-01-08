@@ -22,6 +22,7 @@ type Logger interface {
 	Error(message interface{})
 
 	LogAtLevel(logLevel Level, message interface{})
+	LogAtLevelWithAttributes(logLevel Level, attributes Attributes)
 
 	Initialise()
 

@@ -3,6 +3,7 @@
 package annealers
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
@@ -359,5 +360,5 @@ type flawedExplorer struct {
 }
 
 func (fe *flawedExplorer) TryRandomChange(temperature float64) {
-	panic("gotta panic")
+	panic(errors.New("gotta panic"))
 }

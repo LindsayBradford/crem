@@ -92,9 +92,8 @@ func (sa *SimpleAnnealer) Anneal() {
 			if ok {
 				wrappingError := errors.Wrap(baseError, "annealing function failed")
 				panic(wrappingError)
-			} else {
-				panic(r)
 			}
+			panic(r)
 		}
 	}()
 

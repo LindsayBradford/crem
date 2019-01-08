@@ -20,6 +20,8 @@ func (handler *NullLogger) Info(message interface{})                            
 func (handler *NullLogger) Warn(message interface{})                               {}
 func (handler *NullLogger) Error(message interface{})                              {}
 func (handler *NullLogger) LogAtLevel(logLevel logging.Level, message interface{}) {}
+func (handler *NullLogger) LogAtLevelWithAttributes(logLevel logging.Level, attributes logging.Attributes) {
+}
 
 func (handler *NullLogger) Initialise()                                                      {}
 func (handler *NullLogger) SetDestinations(*logging.Destinations)                            {}

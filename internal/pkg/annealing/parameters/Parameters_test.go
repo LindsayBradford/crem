@@ -20,6 +20,7 @@ const (
 	integerKey            = "integerKey"
 	nonNegativeIntegerKey = "nonNegativeIntegerKey"
 
+	stringKey       = "stringKey"
 	readableFileKey = "readableFileKey"
 
 	optionalKey = "optionalKey"
@@ -47,8 +48,8 @@ func TestAddMetaData_CreateDefaults(t *testing.T) {
 
 	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
 	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetString(stringKey)).To(Equal(defaultStringValue), "metadata should have set correct default")
 	g.Expect(parametersUnderTest.GetString(readableFileKey)).To(Equal(defaultStringValue), "metadata should have set correct default")
-
 	g.Expect(parametersUnderTest.HasEntry(optionalKey)).To(BeFalse(), "default for optional meta data entry should not have been created")
 }
 
@@ -94,6 +95,23 @@ func TestMergeValidInteger_NoErrors(t *testing.T) {
 	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", 5), "metadata should have set correct default")
 }
 
+func TestMergeValidString_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+	expectedStringValue := "here is a string"
+
+	paramsToMerge.SetString(stringKey, expectedStringValue)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
+	g.Expect(parametersUnderTest.GetString(stringKey)).To(Equal(expectedStringValue), "metadata should have set correct default")
+}
+
 func TestMergeValidFilePath_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -103,11 +121,12 @@ func TestMergeValidFilePath_NoErrors(t *testing.T) {
 	parametersUnderTest.CreateDefaults()
 
 	paramsToMerge := make(Map, 0)
+	expecteFilePathValue := "testdata/readableFile.txt"
 
-	paramsToMerge.SetString(readableFileKey, "testdata/readableFile.txt")
+	paramsToMerge.SetString(readableFileKey, expecteFilePathValue)
 	parametersUnderTest.Merge(paramsToMerge)
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
-	g.Expect(parametersUnderTest.GetString(readableFileKey)).To(Equal("testdata/readableFile.txt"), "metadata should have set correct default")
+	g.Expect(parametersUnderTest.GetString(readableFileKey)).To(Equal(expecteFilePathValue), "metadata should have set correct default")
 }
 
 func TestMergeUnknownParameter_Error(t *testing.T) {
@@ -264,6 +283,22 @@ func TestMergeInvalidNonNegativeIntegers_Error(t *testing.T) {
 	g.Expect(parametersUnderTest.GetInt64(nonNegativeIntegerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
 }
 
+func TestMergeInvalidString_Error(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	addMetaDataUnderTest(parametersUnderTest)
+
+	parametersUnderTest.CreateDefaults()
+
+	paramsToMerge := make(Map, 0)
+
+	paramsToMerge.SetInt64(stringKey, 42)
+	parametersUnderTest.Merge(paramsToMerge)
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()), "error on merging unknown parameter")
+	t.Log(parametersUnderTest.ValidationErrors())
+}
+
 func TestMergeInvalidFilePath_Error(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -303,7 +338,16 @@ func TestMergeOptionalParameter(t *testing.T) {
 	parametersUnderTest.Merge(paramsToMerge)
 
 	g.Expect(parametersUnderTest.GetFloat64(optionalKey)).To(BeNumerically("==", expectedValue), "metadata should have set correct default")
+}
 
+func TestAddValidationErrorMessage(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	parametersUnderTest := new(Parameters).Initialise()
+	parametersUnderTest.AddValidationErrorMessage("here is a user-defined validation error, useful for embedding semantics tests to one or more parameters")
+
+	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()))
+	t.Log(parametersUnderTest.ValidationErrors())
 }
 
 func addMetaDataUnderTest(params *Parameters) {
@@ -344,6 +388,14 @@ func addMetaDataUnderTest(params *Parameters) {
 			Key:          nonNegativeIntegerKey,
 			Validator:    params.IsNonNegativeInteger,
 			DefaultValue: defaultIntegerValue,
+		},
+	)
+
+	params.AddMetaData(
+		MetaData{
+			Key:          stringKey,
+			Validator:    params.IsString,
+			DefaultValue: defaultStringValue,
 		},
 	)
 

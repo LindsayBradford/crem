@@ -50,6 +50,12 @@ func (bbl *BareBonesLogger) LogAtLevel(logLevel logging.Level, message interface
 	bbl.writeString(logLevel, bbl.formatter.Format(messageAttributes))
 }
 
+func (bbl *BareBonesLogger) LogAtLevelWithAttributes(logLevel logging.Level, logAttributes logging.Attributes) {
+	logAttributes = prependLogLevel(logLevel, logAttributes)
+	logAttributes = prependTimestamp(logAttributes)
+	bbl.writeString(logLevel, bbl.formatter.Format(logAttributes))
+}
+
 func (bbl *BareBonesLogger) writeString(logLevel logging.Level, text string) {
 	var builder strings.FluentBuilder
 	builder.Add(text, "\n")

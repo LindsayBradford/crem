@@ -5,7 +5,6 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
-	"github.com/LindsayBradford/crem/pkg/errors"
 )
 
 type ContainedObservable struct {
@@ -34,14 +33,6 @@ func (co *ContainedObservable) SetId(title string) {
 
 func (co *ContainedObservable) Id() string {
 	return co.id
-}
-
-func (co *ContainedObservable) SetTemperature(temperature float64) error {
-	if temperature <= 0 {
-		return errors.New("invalid attempt to set annealer temperature to value <= 0")
-	}
-	co.temperature = temperature
-	return nil
 }
 
 func (co *ContainedObservable) Temperature() float64 {
