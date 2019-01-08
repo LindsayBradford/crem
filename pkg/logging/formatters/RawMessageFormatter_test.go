@@ -22,7 +22,6 @@ func ExampleRawMessageFormatter_Format() {
 	}
 
 	exampleFormatter := new(RawMessageFormatter)
-	exampleFormatter.Initialise()
 
 	exampleMsg := exampleFormatter.Format(exampleAttributes)
 	fmt.Print(exampleMsg)
@@ -40,7 +39,6 @@ func TestRawMessageFormatter_FormatError(t *testing.T) {
 	}
 
 	exampleFormatter := new(RawMessageFormatter)
-	exampleFormatter.Initialise()
 
 	actualMessage := exampleFormatter.Format(attribsUnderTest)
 	g.Expect(actualMessage).To(Equal(expectedMessage))
@@ -56,7 +54,6 @@ func TestRawMessageFormatter_FormatWarn(t *testing.T) {
 	}
 
 	exampleFormatter := new(RawMessageFormatter)
-	exampleFormatter.Initialise()
 
 	actualMessage := exampleFormatter.Format(attribsUnderTest)
 	g.Expect(actualMessage).To(Equal(expectedMessage))
@@ -71,7 +68,6 @@ func TestRawMessageFormatter_FormatEmpty(t *testing.T) {
 	}
 
 	exampleFormatter := new(RawMessageFormatter)
-	exampleFormatter.Initialise()
 
 	actualMessage := exampleFormatter.Format(attribsUnderTest)
 	g.Expect(actualMessage).To(Equal(expectedMessage))

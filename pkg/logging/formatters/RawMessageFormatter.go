@@ -15,8 +15,6 @@ const MessageWarnLabel = "Warn"
 // the 'Message, 'Error' and 'Warn' attribute, returning a "formatted" string exactly as per the attribute's value.
 type RawMessageFormatter struct{}
 
-func (formatter *RawMessageFormatter) Initialise() {}
-
 func (formatter *RawMessageFormatter) Format(attributes logging.Attributes) string {
 	for _, attribute := range attributes {
 		if isSupportedName(attribute.Name) {

@@ -34,7 +34,6 @@ func (nll *NativeLibraryLogger) addLogLevel(logLevel logging.Level) *NativeLibra
 }
 
 func (nll *NativeLibraryLogger) WithFormatter(formatter logging.Formatter) *NativeLibraryLogger {
-	formatter.Initialise()
 	nll.formatter = formatter
 	return nll
 }

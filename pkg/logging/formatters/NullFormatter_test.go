@@ -9,13 +9,11 @@ import (
 )
 
 func ExampleNullFormatter_Format() {
-
 	exampleAttributes := logging.Attributes{
 		{Name: "NoMatter", Value: "Ignored anyway"},
 	}
 
 	exampleFormatter := new(NullFormatter)
-	exampleFormatter.Initialise()
 
 	exampleJson := exampleFormatter.Format(exampleAttributes)
 	fmt.Print(exampleJson)

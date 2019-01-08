@@ -64,8 +64,6 @@ func (builder *Builder) WithName(name string) *Builder {
 // WithFormatter instructs Builder to ensure that the Logger constructed will use formatter for its log
 // entry formatters. If not called, the default NullFormatter will be used.
 func (builder *Builder) WithFormatter(formatter logging.Formatter) *Builder {
-	formatter.Initialise()
-
 	handlerBeingBuilt := builder.logHandler
 	handlerBeingBuilt.SetFormatter(formatter)
 

@@ -22,7 +22,6 @@ type BareBonesLogger struct {
 func (bbl *BareBonesLogger) Initialise() {}
 
 func (bbl *BareBonesLogger) WithFormatter(formatter logging.Formatter) *BareBonesLogger {
-	formatter.Initialise()
 	bbl.formatter = formatter
 	return bbl
 }

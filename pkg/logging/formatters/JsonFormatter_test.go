@@ -25,7 +25,6 @@ func ExampleJsonFormatter_Format() {
 	}
 
 	exampleFormatter := new(JsonFormatter)
-	exampleFormatter.Initialise()
 
 	exampleJson := exampleFormatter.Format(exampleAttributes)
 	fmt.Print(exampleJson)

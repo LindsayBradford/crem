@@ -12,8 +12,6 @@ const nullFormatMessage = "No formatter specified. Using the NullFormatter."
 // for the observer to do anything meaningful.
 type NullFormatter struct{}
 
-func (nf *NullFormatter) Initialise() {}
-
 func (nf *NullFormatter) Format(attributes logging.Attributes) string {
 	return nullFormatMessage
 }

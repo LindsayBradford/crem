@@ -13,8 +13,6 @@ import (
 // NameValuePairFormatter formats a Attributes array into a string of comma-separated name-value pairs.
 type NameValuePairFormatter struct{}
 
-func (formatter *NameValuePairFormatter) Initialise() {}
-
 func (formatter *NameValuePairFormatter) Format(attributes logging.Attributes) string {
 	var builder strings.FluentBuilder
 

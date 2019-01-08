@@ -27,7 +27,6 @@ func ExampleNameValuePairFormatter_Format() {
 	}
 
 	exampleFormatter := new(NameValuePairFormatter)
-	exampleFormatter.Initialise()
 
 	exampleNvp := exampleFormatter.Format(exampleAttributes)
 	fmt.Print(exampleNvp)

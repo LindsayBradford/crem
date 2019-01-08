@@ -13,8 +13,6 @@ import (
 // JsonFormatter formats a Attributes array into an equivalent JSON encoding.
 type JsonFormatter struct{}
 
-func (formatter *JsonFormatter) Initialise() {}
-
 func (formatter *JsonFormatter) Format(attributes logging.Attributes) string {
 	var builder strings.FluentBuilder
 
