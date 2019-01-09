@@ -5,8 +5,10 @@ package components
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
@@ -15,9 +17,18 @@ var (
 )
 
 func RunScenarioFromConfigFile(configFile string) {
+	excel.EnableSpreadsheetSafeties()
+	defer excel.DisableSpreadsheetSafeties()
+
+	go runScenarioFromConfigFile(configFile)
+	threading.GetMainThreadChannel().RunHandler()
+}
+
+func runScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
 	establishScenarioLogger(configuration)
 	scenario.RunScenarioFromConfig(configuration)
+	threading.GetMainThreadChannel().Close()
 }
 
 func establishScenarioLogger(configuration *config.CREMConfig) {

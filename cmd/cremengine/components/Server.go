@@ -18,6 +18,7 @@ func (s *Server) Initialise() *Server {
 	return s
 }
 
+// mainThreadChannel *threading.MainThreadChannel
 func (s *Server) WithConfig(configuration *config.HttpServerConfig) *Server {
 	s.RestServer.WithConfig(configuration)
 	return s

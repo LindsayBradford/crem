@@ -25,6 +25,13 @@ func GetMainThreadChannel() MainThreadChannel {
 	return mainThreadChannel
 }
 
+// ResetMainThreadChannel returns an internally initialised  MainThreadChannel and locks the main goroutine to the OS thread.
+// Behaviour is not guaranteed if this is not called from the main go routine.
+func ResetMainThreadChannel() MainThreadChannel {
+	mainThreadChannel = make(MainThreadChannel)
+	return GetMainThreadChannel()
+}
+
 // RunHandler enters into a loop of receiving and executing functions for the channel. For expected behaviour, it should
 // be the only function running on the main goroutine.
 func (mtc MainThreadChannel) RunHandler() {

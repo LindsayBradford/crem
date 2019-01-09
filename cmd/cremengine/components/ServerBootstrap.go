@@ -9,8 +9,10 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
+	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
@@ -26,8 +28,13 @@ var (
 )
 
 func RunServerFromConfigFile(configFile string) {
+	excel.EnableSpreadsheetSafeties()
+	defer excel.DisableSpreadsheetSafeties()
+
 	configuredServer := buildServerFromConfigFile(configFile)
-	start(configuredServer)
+	go start(configuredServer)
+
+	threading.GetMainThreadChannel().RunHandler()
 }
 
 func buildServerFromConfigFile(configFile string) *server.RestServer {
@@ -67,9 +74,11 @@ func buildServerFrom(serverConfig *config.HttpServerConfig) *server.RestServer {
 }
 
 func buildApiMux(serverConfig *config.HttpServerConfig) *api.Mux {
+	mainThreadChannel := threading.GetMainThreadChannel()
 	return new(api.Mux).
 		Initialise().
-		WithJobQueueLength(serverConfig.JobQueueLength)
+		WithJobQueueLength(serverConfig.JobQueueLength).
+		WithMainThreadChannel(&mainThreadChannel)
 }
 
 func start(server *server.RestServer) {

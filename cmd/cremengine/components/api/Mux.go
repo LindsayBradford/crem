@@ -6,6 +6,7 @@ import (
 	serverApi "github.com/LindsayBradford/crem/internal/pkg/server/api"
 	"github.com/LindsayBradford/crem/internal/pkg/server/job"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
+	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
 const jobsPath = "jobs"
@@ -14,6 +15,8 @@ type JobArray []*job.Job
 
 type Mux struct {
 	serverApi.Mux
+
+	mainThreadChannel *threading.MainThreadChannel
 
 	jobs       *JobQueue
 	JobHistory JobArray
@@ -34,6 +37,11 @@ func (m *Mux) Initialise() *Mux {
 
 func (m *Mux) WithJobQueueLength(length uint64) *Mux {
 	m.jobs.WithQueueLength(length)
+	return m
+}
+
+func (m *Mux) WithMainThreadChannel(channel *threading.MainThreadChannel) *Mux {
+	m.mainThreadChannel = channel
 	return m
 }
 

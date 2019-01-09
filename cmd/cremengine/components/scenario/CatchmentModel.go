@@ -3,15 +3,21 @@
 package scenario
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
 type CatchmentModel struct {
 	dumb.Model
 	parameters CatchmentParameters
+	dataSet    *excel.DataSet
 }
 
 func NewCatchmentModel() *CatchmentModel {
@@ -26,6 +32,11 @@ func NewCatchmentModel() *CatchmentModel {
 
 func (cm *CatchmentModel) WithName(name string) *CatchmentModel {
 	cm.SetName(name)
+	return cm
+}
+
+func (cm *CatchmentModel) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *CatchmentModel {
+	cm.dataSet = excel.NewDataSet("CremDataSet", wrapper)
 	return cm
 }
 
@@ -47,8 +58,18 @@ func (cm *CatchmentModel) ParameterErrors() error {
 func (cm *CatchmentModel) Initialise() {
 	cm.Model.Initialise()
 
+	dataSourcePath := cm.deriveDataSourcePath()
+
+	cm.dataSet.Load(dataSourcePath)
+
 	initialValue := cm.parameters.GetFloat64(dumb.InitialObjectiveValue)
 	cm.Model.SetDecisionVariable("ObjectiveValue", initialValue)
+}
+
+func (cm *CatchmentModel) deriveDataSourcePath() string {
+	relativeFilePath := cm.parameters.GetString(DataSourcePath)
+	workingDirectory, _ := os.Getwd()
+	return filepath.Join(workingDirectory, relativeFilePath)
 }
 
 func (cm *CatchmentModel) TearDown() {

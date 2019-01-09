@@ -9,12 +9,23 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
 var (
 	LogHandler logging.Logger
 )
+
+func RunServerScenarioFromConfig(cremConfig *config.CREMConfig) error {
+	scenarioRunner, runnerError := BuildScenarioRunner(cremConfig)
+	if runnerError != nil {
+		return runnerError
+	}
+
+	go runScenario(scenarioRunner)
+	return nil
+}
 
 func RunScenarioFromConfig(cremConfig *config.CREMConfig) error {
 	scenarioRunner, runnerError := BuildScenarioRunner(cremConfig)
@@ -56,6 +67,7 @@ func buildCatchmentModelRegistration() config.ModelRegistration {
 		ConfigFunction: func(config config.ModelConfig) model.Model {
 			return NewCatchmentModel().
 				WithName(config.Name).
+				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
 				WithParameters(config.Parameters)
 		},
 	}
@@ -66,6 +78,7 @@ func runScenario(scenarioRunner scenario.CallableRunner) {
 		wrappingError := errors.Wrap(runError, "running scenario")
 		LogHandler.Error(wrappingError)
 	}
+	flushStreams()
 }
 
 func flushStreams() {

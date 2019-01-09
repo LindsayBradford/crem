@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
 )
@@ -94,7 +95,7 @@ func (mi *MuxImpl) logRequestReceipt(r *http.Request) {
 }
 
 func (mi *MuxImpl) handlerFor(r *http.Request) (handlerFunction HandlerFunc, found bool) {
-	handlerFunction, found = mi.HandlerMap[r.URL.String()]
+	handlerFunction, found = mi.HandlerMap[r.URL.Path]
 	return
 }
 
@@ -159,5 +160,6 @@ func (mi *MuxImpl) Start(address string) {
 }
 
 func (mi *MuxImpl) Shutdown() {
+	threading.GetMainThreadChannel().Close()
 	mi.server.Shutdown(context.Background())
 }

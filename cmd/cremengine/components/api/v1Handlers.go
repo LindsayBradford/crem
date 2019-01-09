@@ -120,7 +120,7 @@ func (m *Mux) DoJob(jobToDo *job.Job) {
 
 	m.Logger().Info("Running Job [" + string(jobToDo.Id) + "].")
 
-	runError := scenario.RunScenarioFromConfig(scenarioConfig)
+	runError := scenario.RunServerScenarioFromConfig(scenarioConfig)
 
 	if runError != nil {
 		jobToDo.Attributes["ErrorDetail"] = runError

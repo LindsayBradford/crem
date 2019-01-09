@@ -9,6 +9,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/go-ole/go-ole"
 )
 
@@ -21,7 +22,7 @@ func TestMain(m *testing.M) {
 }
 
 var (
-	mainThreadChannel = make(chan func())
+	mainThreadChannel = make(threading.MainThreadChannel)
 )
 
 func setup() {
@@ -36,7 +37,7 @@ func tearDown() {
 	ole.CoUninitialize()
 }
 
-func callOnMainThread(function func()) {
+func callOnMainThread(function threading.MainThreadFunction) {
 	done := make(chan bool, 1)
 	mainThreadChannel <- func() {
 		function()

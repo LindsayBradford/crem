@@ -1,3 +1,5 @@
+// +build windows
+
 // Copyright (c) 2018 Australian Rivers Institute.
 
 package main
@@ -5,10 +7,16 @@ package main
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
+	"github.com/LindsayBradford/crem/pkg/logging"
+)
+
+var (
+	defaultLogHandler logging.Logger
 )
 
 func main() {
 	args := commandline.ParseArguments()
+
 	if shouldRunScenario(args) {
 		components.RunScenarioFromConfigFile(args.ScenarioFile)
 	} else {

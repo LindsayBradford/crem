@@ -6,13 +6,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/pkg/excel"
+	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
-func NewDataSet(name string, oleWrapper func(f func())) *DataSet {
-	excelDataSet := new(DataSet)
-	excelDataSet.Initialise(name)
-	excelDataSet.WithOleFunctionWrapper(oleWrapper)
+func NewDataSet(name string, oleWrapper threading.MainThreadFunctionWrapper) *DataSet {
+	excelDataSet := new(DataSet).WithOleFunctionWrapper(oleWrapper)
 	excelDataSet.excelHandler.Initialise()
+	excelDataSet.Initialise(name)
 	return excelDataSet
 }
 
@@ -40,10 +40,10 @@ type DataSet struct {
 
 	excelHandler     excel.Handler
 	absoluteFilePath string
-	oleWrapper       func(f func())
+	oleWrapper       threading.MainThreadFunctionWrapper
 }
 
-func (ds *DataSet) WithOleFunctionWrapper(wrapper func(f func())) *DataSet {
+func (ds *DataSet) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *DataSet {
 	ds.oleWrapper = wrapper
 	return ds
 }
