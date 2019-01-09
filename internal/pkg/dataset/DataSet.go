@@ -33,10 +33,6 @@ func (dsi *DataSetImpl) Name() string {
 	return dsi.name
 }
 
-func (dsi *DataSetImpl) SetName(name string) {
-	dsi.name = name
-}
-
 func (dsi *DataSetImpl) Tables() map[string]Table {
 	return dsi.tables
 }
