@@ -16,19 +16,23 @@ var (
 	ScenarioLogger logging.Logger = loggers.DefaultNullLogger
 )
 
-func RunScenarioFromConfigFile(configFile string) {
+func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
 	excel.EnableSpreadsheetSafeties()
 	defer excel.DisableSpreadsheetSafeties()
 
-	go runScenarioFromConfigFile(configFile)
+	go runMainThreadBoundScenarioFromConfigFile(configFile)
 	threading.GetMainThreadChannel().RunHandler()
 }
 
-func runScenarioFromConfigFile(configFile string) {
+func runMainThreadBoundScenarioFromConfigFile(configFile string) {
+	RunScenarioFromConfigFile(configFile)
+	threading.GetMainThreadChannel().Close()
+}
+
+func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
 	establishScenarioLogger(configuration)
 	scenario.RunScenarioFromConfig(configuration)
-	threading.GetMainThreadChannel().Close()
 }
 
 func establishScenarioLogger(configuration *config.CREMConfig) {

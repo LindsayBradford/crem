@@ -18,7 +18,7 @@ func main() {
 	args := commandline.ParseArguments()
 
 	if shouldRunScenario(args) {
-		components.RunScenarioFromConfigFile(args.ScenarioFile)
+		components.RunExcelCompatibleScenarioFromConfigFile(args.ScenarioFile)
 	} else {
 		components.RunServerFromConfigFile(args.ServerConfigFile)
 	}
