@@ -16,9 +16,8 @@ type Model struct {
 	name.ContainedName
 	rand.ContainedRand
 
-	parameters            Parameters
-	decisionVariables     map[string]model.DecisionVariable
-	tempDecisionVariables map[string]model.DecisionVariable
+	parameters        Parameters
+	decisionVariables model.VolatileDecisionVariables
 }
 
 func New() *Model {
@@ -30,7 +29,6 @@ func New() *Model {
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
 	newModel.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
-	newModel.tempDecisionVariables[model.ObjectiveValue].SetValue(initialValue)
 
 	return newModel
 }
@@ -41,16 +39,14 @@ func (dm *Model) WithName(name string) *Model {
 }
 
 func (dm *Model) BuildDecisionVariables() {
-	dm.decisionVariables = make(map[string]model.DecisionVariable, 1)
-	dm.tempDecisionVariables = make(map[string]model.DecisionVariable, 1)
+	dm.decisionVariables = model.NewVolatileDecisionVariables()
+	dm.createDecisionVariableFor(model.ObjectiveValue)
+}
 
-	objectiveValueVar := new(model.DecisionVariableImpl)
-	objectiveValueVar.SetName(model.ObjectiveValue)
-	dm.decisionVariables[model.ObjectiveValue] = objectiveValueVar
-
-	tempObjectiveValueVar := new(model.DecisionVariableImpl)
-	tempObjectiveValueVar.SetName(model.ObjectiveValue)
-	dm.tempDecisionVariables[model.ObjectiveValue] = tempObjectiveValueVar
+func (dm *Model) createDecisionVariableFor(name string) {
+	newVariable := new(model.VolatileDecisionVariable)
+	newVariable.SetName(name)
+	dm.decisionVariables[name] = newVariable
 }
 
 func (dm *Model) WithParameters(params parameters.Map) *Model {
@@ -58,7 +54,6 @@ func (dm *Model) WithParameters(params parameters.Map) *Model {
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
 	dm.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
-	dm.tempDecisionVariables[model.ObjectiveValue].SetValue(initialValue)
 
 	return dm
 }
@@ -112,32 +107,19 @@ func (dm *Model) objectiveValue() float64 {
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.tempDecisionVariables[model.ObjectiveValue].SetValue(value)
+	dm.decisionVariables[model.ObjectiveValue].SetTemporaryValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
 	dm.decisionVariables[name].SetValue(value)
-	dm.tempDecisionVariables[name].SetValue(value)
-}
-
-func (dm *Model) copyDecisionVarValueToTemp(varName string) {
-	dm.tempDecisionVariables[varName].SetValue(
-		dm.decisionVariables[varName].Value(),
-	)
-}
-
-func (dm *Model) copyTempDecisionVarValueToActual(varName string) {
-	dm.decisionVariables[varName].SetValue(
-		dm.tempDecisionVariables[varName].Value(),
-	)
 }
 
 func (dm *Model) AcceptChange() {
-	dm.copyTempDecisionVarValueToActual(model.ObjectiveValue)
+	dm.decisionVariables[model.ObjectiveValue].Accept()
 }
 
 func (dm *Model) RevertChange() {
-	dm.copyDecisionVarValueToTemp(model.ObjectiveValue)
+	dm.decisionVariables[model.ObjectiveValue].Revert()
 }
 
 func (dm *Model) DecisionVariable(name string) (model.DecisionVariable, error) {
@@ -149,12 +131,11 @@ func (dm *Model) DecisionVariable(name string) (model.DecisionVariable, error) {
 
 func (dm *Model) DecisionVariableChange(variableName string) (float64, error) {
 	decisionVariable, foundActual := dm.decisionVariables[variableName]
-	tmpDecisionVar, foundTemp := dm.tempDecisionVariables[decisionVariable.Name()]
-	if !foundActual || !foundTemp {
+	if !foundActual {
 		return 0, errors.New("no temporary decision variable of name [" + decisionVariable.Name() + "] in model [" + dm.Name() + "].")
 	}
 
-	difference := tmpDecisionVar.Value() - decisionVariable.Value()
+	difference := decisionVariable.TemporaryValue() - decisionVariable.Value()
 	return difference, nil
 }
 

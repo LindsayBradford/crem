@@ -2,12 +2,16 @@
 
 package model
 
+type DecisionVariables map[string]DecisionVariable
+type DecisionVariableImplementations map[string]DecisionVariableImpl
+
+func NewDecisionVariableImplementations() DecisionVariableImplementations {
+	return make(DecisionVariableImplementations, 1)
+}
+
 type DecisionVariable interface {
 	Name() string
-	SetName(name string)
-
 	Value() float64
-	SetValue(value float64)
 }
 
 const NullDecisionVariableName = "NullDecisionVariable"
@@ -33,7 +37,7 @@ type DecisionVariableImpl struct {
 	value float64
 }
 
-func (dvi *DecisionVariableImpl) Name() string           { return dvi.name }
-func (dvi *DecisionVariableImpl) SetName(name string)    { dvi.name = name }
-func (dvi *DecisionVariableImpl) Value() float64         { return dvi.value }
-func (dvi *DecisionVariableImpl) SetValue(value float64) { dvi.value = value }
+func (dvi DecisionVariableImpl) Name() string           { return dvi.name }
+func (dvi DecisionVariableImpl) SetName(name string)    { dvi.name = name }
+func (dvi DecisionVariableImpl) Value() float64         { return dvi.value }
+func (dvi DecisionVariableImpl) SetValue(value float64) { dvi.value = value }

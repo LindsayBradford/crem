@@ -20,6 +20,8 @@ HereIsARogueModelParameter = 0.2    # BADNESS HERE BOSS!
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
+[SolutionExplorers.Parameters]
+DecisionVariable = "SedimentLoad"
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"

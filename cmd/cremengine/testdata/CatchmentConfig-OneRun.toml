@@ -20,6 +20,8 @@ DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
+[SolutionExplorers.Parameters]
+DecisionVariable = "SedimentLoad"
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"

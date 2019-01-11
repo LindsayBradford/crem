@@ -6,11 +6,12 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/model/dumb"
 )
 
 const (
 	_                                  = iota
+	DefaultObjectiveVariable    string = "DefaultObjectiveVariable"
+	SedimentLoad                string = "SedimentLoad"
 	BankErosionFudgeFactor      string = "BankErosionFudgeFactor"
 	WaterDensity                string = "WaterDensity"
 	LocalAcceleration           string = "LocalAcceleration"
@@ -32,13 +33,22 @@ func (cp *CatchmentParameters) Initialise() *CatchmentParameters {
 }
 
 func (cp *CatchmentParameters) buildMetaData() {
-	cp.AddMetaData( // TODO: This is just a placeholder for initial testing
+	cp.AddMetaData(
 		parameters.MetaData{
-			Key:          dumb.InitialObjectiveValue,
+			Key:          SedimentLoad,
 			Validator:    cp.IsNonNegativeDecimal,
-			DefaultValue: 2000.0,
+			DefaultValue: float64(0),
 		},
 	)
+
+	// cp.AddMetaData(
+	// 	parameters.MetaData{
+	// 		Key:          DefaultObjectiveVariable,
+	// 		Validator:    cp.IsString,
+	// 		DefaultValue: SedimentLoad,
+	// 		IsOptional:   true,
+	// 	},
+	// )
 
 	cp.AddMetaData(
 		parameters.MetaData{
