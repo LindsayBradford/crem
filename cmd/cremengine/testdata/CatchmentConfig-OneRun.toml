@@ -1,9 +1,12 @@
 ScenarioName = "Test Catchment Annealer - One run"
 
 [[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 2_00_000 # 200
+
+[[AnnealingObservers]]
+Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
 
 [[Models]]
 Type = "CatchmentModel"

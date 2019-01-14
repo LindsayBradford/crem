@@ -207,13 +207,14 @@ var (
 	UnspecifiedAnnealingObserverType = AnnealingObserverType{""}
 	AttributeObserver                = AnnealingObserverType{"AttributeObserver"}
 	MessageObserver                  = AnnealingObserverType{"MessageObserver"}
+	InvariantObserver                = AnnealingObserverType{"InvariantObserver"}
 )
 
 func (ot *AnnealingObserverType) UnmarshalText(text []byte) error {
 	context := unmarshalContext{
 		configKey: "[[AnnealingObservers]].Type",
 		validValues: []string{
-			AttributeObserver.value, MessageObserver.value,
+			AttributeObserver.value, MessageObserver.value, InvariantObserver.value,
 		},
 		textToValidate: string(text),
 		assignmentFunction: func() {

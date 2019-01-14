@@ -5,6 +5,9 @@ Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 1 # 200
 
+[[AnnealingObservers]]
+Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+
 [[Models]]
 Type = "DumbModel"
 Name = "HurrDurr"

@@ -103,6 +103,7 @@ func (cm *CatchmentModel) DecisionVariableChange(variableName string) (float64, 
 	}
 
 	difference := decisionVariable.TemporaryValue() - decisionVariable.Value()
+
 	return difference, nil
 }
 

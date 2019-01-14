@@ -88,6 +88,9 @@ func buildObserver(observerType AnnealingObserverType, logger logging.Logger, fi
 		newObserver = new(observer.AnnealingAttributeObserver).
 			WithLogHandler(logger).
 			WithFilter(filter)
+	case InvariantObserver:
+		newObserver = new(observer.AnnealingInvariantObserver).
+			WithLogHandler(logger)
 	case MessageObserver, UnspecifiedAnnealingObserverType:
 		newObserver = new(observer.AnnealingMessageObserver).
 			WithLogHandler(logger).
