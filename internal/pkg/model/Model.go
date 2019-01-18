@@ -38,8 +38,8 @@ func (c *ContainedModel) SetModel(model Model) {
 }
 
 type DecisionVariableContainer interface {
-	DecisionVariable(name string) (DecisionVariable, error)
-	DecisionVariableChange(decisionVariableName string) (float64, error)
+	DecisionVariable(name string) DecisionVariable
+	DecisionVariableChange(decisionVariableName string) float64
 }
 
 var NullModel = new(nullModel)
@@ -63,15 +63,13 @@ func (nm *nullModel) TearDown()        {}
 func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
-func (nm *nullModel) DecisionVariable(name string) (DecisionVariable, error) {
+func (nm *nullModel) DecisionVariable(name string) DecisionVariable {
 	newVariable := DecisionVariableImpl{
 		name:  name,
 		value: 0,
 	}
-	return &newVariable, nil
+	return &newVariable
 }
-func (nm *nullModel) DecisionVariableChange(decisionVariableName string) (float64, error) {
-	return 0, nil
-}
-func (nm *nullModel) SetDecisionVariable(name string, value float64) error { return nil }
-func (nm *nullModel) DeepClone() Model                                     { return nm }
+func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
+func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}
+func (nm *nullModel) DeepClone() Model                                           { return nm }

@@ -3,7 +3,6 @@
 package dumb
 
 import (
-	"errors"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
@@ -17,18 +16,18 @@ type Model struct {
 	rand.ContainedRand
 
 	parameters        Parameters
-	decisionVariables model.VolatileDecisionVariables
+	decisionVariables DecisionVariables
 }
 
 func New() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 
-	newModel.BuildDecisionVariables()
+	newModel.decisionVariables.Initialise()
 	newModel.parameters.Initialise()
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
-	newModel.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
+	newModel.decisionVariables.SetValue(model.ObjectiveValue, initialValue)
 
 	return newModel
 }
@@ -38,22 +37,11 @@ func (dm *Model) WithName(name string) *Model {
 	return dm
 }
 
-func (dm *Model) BuildDecisionVariables() {
-	dm.decisionVariables = model.NewVolatileDecisionVariables()
-	dm.createDecisionVariableFor(model.ObjectiveValue)
-}
-
-func (dm *Model) createDecisionVariableFor(name string) {
-	newVariable := new(model.VolatileDecisionVariable)
-	newVariable.SetName(name)
-	dm.decisionVariables[name] = newVariable
-}
-
 func (dm *Model) WithParameters(params parameters.Map) *Model {
 	dm.parameters.Merge(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
-	dm.decisionVariables[model.ObjectiveValue].SetValue(initialValue)
+	dm.decisionVariables.SetValue(model.ObjectiveValue, initialValue)
 
 	return dm
 }
@@ -103,40 +91,33 @@ func (dm *Model) capChangeOverRange(value float64) float64 {
 }
 
 func (dm *Model) objectiveValue() float64 {
-	return dm.decisionVariables[model.ObjectiveValue].Value()
+	return dm.decisionVariables.Value(model.ObjectiveValue)
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.decisionVariables[model.ObjectiveValue].SetTemporaryValue(value)
+	dm.decisionVariables.Variable(model.ObjectiveValue).SetTemporaryValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
-	dm.decisionVariables[name].SetValue(value)
+	dm.decisionVariables.SetValue(name, value)
 }
 
 func (dm *Model) AcceptChange() {
-	dm.decisionVariables[model.ObjectiveValue].Accept()
+	dm.decisionVariables.Variable(model.ObjectiveValue).Accept()
 }
 
 func (dm *Model) RevertChange() {
-	dm.decisionVariables[model.ObjectiveValue].Revert()
+	dm.decisionVariables.Variable(model.ObjectiveValue).Revert()
 }
 
-func (dm *Model) DecisionVariable(name string) (model.DecisionVariable, error) {
-	if variable, found := dm.decisionVariables[name]; found == true {
-		return variable, nil
-	}
-	return model.NullDecisionVariable, errors.New("decision variable [" + name + "] not defined for model [" + dm.Name() + " ].")
+func (dm *Model) DecisionVariable(name string) model.DecisionVariable {
+	return dm.decisionVariables.Variable(name)
 }
 
-func (dm *Model) DecisionVariableChange(variableName string) (float64, error) {
-	decisionVariable, foundActual := dm.decisionVariables[variableName]
-	if !foundActual {
-		return 0, errors.New("no temporary decision variable of name [" + decisionVariable.Name() + "] in model [" + dm.Name() + "].")
-	}
-
+func (dm *Model) DecisionVariableChange(variableName string) float64 {
+	decisionVariable := dm.decisionVariables.Variable(variableName)
 	difference := decisionVariable.TemporaryValue() - decisionVariable.Value()
-	return difference, nil
+	return difference
 }
 
 func (dm *Model) DeepClone() model.Model {

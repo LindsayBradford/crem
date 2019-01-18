@@ -63,9 +63,9 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 
 func buildCatchmentModelRegistration() config.ModelRegistration {
 	return config.ModelRegistration{
-		ModelType: "CatchmentModel",
+		ModelType: "Model",
 		ConfigFunction: func(config config.ModelConfig) model.Model {
-			return NewCatchmentModel().
+			return NewModel().
 				WithName(config.Name).
 				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
 				WithParameters(config.Parameters)

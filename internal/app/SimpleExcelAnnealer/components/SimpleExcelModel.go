@@ -3,7 +3,6 @@
 package components
 
 import (
-	"errors"
 	"math"
 	"path/filepath"
 	"strings"
@@ -171,9 +170,7 @@ func (sem *SimpleExcelModel) AcceptChange() {
 func (sem *SimpleExcelModel) addTrackerData() {
 	newRow := new(trackingData)
 
-	if change, err := sem.DecisionVariableChange(model.ObjectiveValue); err == nil {
-		newRow.ObjectiveFunctionChange = change
-	}
+	newRow.ObjectiveFunctionChange = sem.DecisionVariableChange(model.ObjectiveValue)
 	newRow.Temperature = sem.explorerData.Temperature
 	newRow.ChangeIsDesirable = sem.explorerData.ChangeIsDesirable
 	newRow.ChangeAccepted = sem.explorerData.ChangeAccepted
@@ -220,22 +217,19 @@ func (sem *SimpleExcelModel) copyTempDecisionVarValueToActual(varName string) {
 	)
 }
 
-func (sem *SimpleExcelModel) DecisionVariable(name string) (model.DecisionVariable, error) {
-	if variable, found := sem.decisionVariables[name]; found == true {
-		return variable, nil
-	}
-	return model.NullDecisionVariable, errors.New("decision variable [" + name + "] not defined for model [" + sem.Name() + " ].")
+func (sem *SimpleExcelModel) DecisionVariable(name string) model.DecisionVariable {
+	return sem.decisionVariables[name]
 }
 
-func (sem *SimpleExcelModel) DecisionVariableChange(variableName string) (float64, error) {
+func (sem *SimpleExcelModel) DecisionVariableChange(variableName string) float64 {
 	decisionVariable, foundActual := sem.decisionVariables[variableName]
 	tmpDecisionVar, foundTemp := sem.tempDecisionVariables[decisionVariable.Name()]
 	if !foundActual || !foundTemp {
-		return 0, errors.New("no temporary decision variable of name [" + decisionVariable.Name() + "] in model [" + sem.Name() + "].")
+		return 0 //TODO: Move to new framework
 	}
 
 	difference := tmpDecisionVar.Value() - decisionVariable.Value()
-	return difference, nil
+	return difference
 }
 
 func (sem *SimpleExcelModel) DeepClone() model.Model {

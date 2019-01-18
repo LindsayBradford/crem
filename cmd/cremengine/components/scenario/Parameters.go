@@ -10,105 +10,95 @@ import (
 
 const (
 	_                                  = iota
-	DefaultObjectiveVariable    string = "DefaultObjectiveVariable"
-	SedimentLoad                string = "SedimentLoad"
 	BankErosionFudgeFactor      string = "BankErosionFudgeFactor"
 	WaterDensity                string = "WaterDensity"
 	LocalAcceleration           string = "LocalAcceleration"
 	GullyCompensationFactor     string = "GullyCompensationFactor"
 	SedimentDensity             string = "SedimentDensity"
 	SuspendedSedimentProportion string = "SuspendedSedimentProportion"
+	YearsOfErosion              string = "YearsOfErosion"
 	DataSourcePath              string = "DataSourcePath"
 )
 
-type CatchmentParameters struct {
+type Parameters struct {
 	parameters.Parameters
 }
 
-func (cp *CatchmentParameters) Initialise() *CatchmentParameters {
-	cp.Parameters.Initialise()
-	cp.buildMetaData()
-	cp.CreateDefaults()
-	return cp
+func (p *Parameters) Initialise() *Parameters {
+	p.Parameters.Initialise()
+	p.buildMetaData()
+	p.CreateDefaults()
+	return p
 }
 
-func (cp *CatchmentParameters) buildMetaData() {
-	cp.AddMetaData(
-		parameters.MetaData{
-			Key:          SedimentLoad,
-			Validator:    cp.IsNonNegativeDecimal,
-			DefaultValue: float64(0),
-		},
-	)
-
-	// cp.AddMetaData(
-	// 	parameters.MetaData{
-	// 		Key:          DefaultObjectiveVariable,
-	// 		Validator:    cp.IsString,
-	// 		DefaultValue: SedimentLoad,
-	// 		IsOptional:   true,
-	// 	},
-	// )
-
-	cp.AddMetaData(
+func (p *Parameters) buildMetaData() {
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          BankErosionFudgeFactor,
-			Validator:    cp.validateIsBankErosionFudgeFactor,
+			Validator:    p.validateIsBankErosionFudgeFactor,
 			DefaultValue: 5 * math.Pow(10, -4),
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          WaterDensity,
-			Validator:    cp.IsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 1.0,
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          LocalAcceleration,
-			Validator:    cp.IsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 9.81,
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          GullyCompensationFactor,
-			Validator:    cp.IsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 0.5,
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          SedimentDensity,
-			Validator:    cp.IsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 1.5,
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          SuspendedSedimentProportion,
-			Validator:    cp.IsDecimal,
+			Validator:    p.IsDecimal,
 			DefaultValue: 0.5,
 		},
 	)
 
-	cp.AddMetaData(
+	p.AddMetaData(
+		parameters.MetaData{
+			Key:          YearsOfErosion,
+			Validator:    p.IsNonNegativeInteger,
+			DefaultValue: 100,
+		},
+	)
+
+	p.AddMetaData(
 		parameters.MetaData{
 			Key:          DataSourcePath,
-			Validator:    cp.IsReadableFile,
+			Validator:    p.IsReadableFile,
 			DefaultValue: "",
 		},
 	)
 }
 
-func (cp *CatchmentParameters) validateIsBankErosionFudgeFactor(key string, value interface{}) bool {
+func (p *Parameters) validateIsBankErosionFudgeFactor(key string, value interface{}) bool {
 	minValue := 1 * math.Pow(10, -4)
 	maxValue := 5 * math.Pow(10, -4)
-	return cp.IsDecimalWithInclusiveBounds(key, value, minValue, maxValue)
+	return p.IsDecimalWithInclusiveBounds(key, value, minValue, maxValue)
 }

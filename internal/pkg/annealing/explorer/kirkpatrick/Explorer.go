@@ -84,10 +84,14 @@ func (ke *Explorer) setOptimisationDirectionFromParams() {
 
 func (ke *Explorer) checkDecisionVariableFromParams() {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	_, dvError := ke.Model().DecisionVariable(decisionVariableName)
-	if dvError != nil {
-		ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
-	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
+		}
+	}()
+
+	ke.Model().DecisionVariable(decisionVariableName)
 }
 
 func (ke *Explorer) ParameterErrors() error {
@@ -96,10 +100,8 @@ func (ke *Explorer) ParameterErrors() error {
 
 func (ke *Explorer) ObjectiveValue() float64 {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	if dv, dvError := ke.Model().DecisionVariable(decisionVariableName); dvError == nil {
-		return dv.Value()
-	}
-	return 0
+	variable := ke.Model().DecisionVariable(decisionVariableName)
+	return variable.Value()
 }
 
 func (ke *Explorer) TryRandomChange(temperature float64) {
@@ -144,11 +146,9 @@ func (ke *Explorer) ChangeTriedIsDesirable() bool {
 
 func (ke *Explorer) changeInObjectiveValue() float64 {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	if change, changeError := ke.Model().DecisionVariableChange(decisionVariableName); changeError == nil {
-		ke.SetChangeInObjectiveValue(change)
-		return change
-	}
-	return 0
+	change := ke.Model().DecisionVariableChange(decisionVariableName)
+	ke.SetChangeInObjectiveValue(change)
+	return change
 }
 
 func (ke *Explorer) AcceptLastChange() {
