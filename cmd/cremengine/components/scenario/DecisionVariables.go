@@ -22,3 +22,17 @@ func (dv *DecisionVariables) Initialise() *DecisionVariables {
 func (dv *DecisionVariables) buildDecisionVariables() {
 	dv.NewForName(SedimentLoad)
 }
+
+type ContainedDecisionVariables struct {
+	decisionVariables DecisionVariables
+}
+
+func (c *ContainedDecisionVariables) DecisionVariable(name string) model.DecisionVariable {
+	return c.decisionVariables.Variable(name)
+}
+
+func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string) float64 {
+	decisionVariable := c.decisionVariables.Variable(variableName)
+	difference := decisionVariable.TemporaryValue() - decisionVariable.Value()
+	return difference
+}

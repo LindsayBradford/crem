@@ -23,8 +23,23 @@ func (bt *baseTable) SetSize(colNum uint, rowNum uint) {
 	}
 }
 
+func (bt *baseTable) Size() (colNum uint, rowNum uint) {
+	colNum = uint(len(bt.cells))
+	firstRow := bt.cells[0]
+	rowNum = uint(len(firstRow))
+	return
+}
+
 func (bt *baseTable) Cell(xPos uint, yPos uint) interface{} {
 	return bt.cells[xPos][yPos]
+}
+
+func (bt *baseTable) CellFloat64(xPos uint, yPos uint) float64 {
+	return bt.cells[xPos][yPos].(float64)
+}
+
+func (bt *baseTable) CellInt64(xPos uint, yPos uint) int64 {
+	return bt.cells[xPos][yPos].(int64)
 }
 
 func (bt *baseTable) SetCell(xPos uint, yPos uint, value interface{}) {

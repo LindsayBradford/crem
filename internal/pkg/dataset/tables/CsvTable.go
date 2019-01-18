@@ -4,6 +4,7 @@ package tables
 
 type CsvHeader []string
 
+// var _ dataset.Table = (*CsvTable)(nil)
 type CsvTable struct {
 	baseTable
 	header CsvHeader
