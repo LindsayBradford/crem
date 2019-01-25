@@ -7,10 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/threading"

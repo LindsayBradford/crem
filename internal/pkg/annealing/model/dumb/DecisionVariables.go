@@ -2,7 +2,7 @@
 
 package dumb
 
-import "github.com/LindsayBradford/crem/internal/pkg/model"
+import "github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 
 type DecisionVariables struct {
 	model.VolatileDecisionVariables

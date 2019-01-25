@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"

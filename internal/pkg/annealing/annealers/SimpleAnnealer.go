@@ -5,8 +5,8 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"

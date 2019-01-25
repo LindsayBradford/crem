@@ -5,8 +5,8 @@ package scenario
 import (
 	"os"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"

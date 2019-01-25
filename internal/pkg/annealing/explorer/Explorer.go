@@ -5,7 +5,7 @@ package explorer
 import (
 	"errors"
 
-	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"

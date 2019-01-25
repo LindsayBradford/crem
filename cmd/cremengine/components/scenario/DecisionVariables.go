@@ -2,7 +2,7 @@
 
 package scenario
 
-import "github.com/LindsayBradford/crem/internal/pkg/model"
+import "github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 
 const (
 	_                   = iota
