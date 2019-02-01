@@ -22,9 +22,14 @@ func (os *spyObserver) LastObserved() ManagementAction {
 	return os.lastObserved
 }
 
+const testType ManagementActionType = "test"
+const testVariableName ModelVariableName = "testVariable"
+
 func NewTestManagementAction() *SimpleManagementAction {
-	action := NewSimpleManagementAction()
-	action.SetModelVariable("test", 0.5)
+	action := new(SimpleManagementAction).
+		WithPlanningUnit("testPu").
+		WithType(testType).
+		WithVariable(testVariableName, 0.5)
 
 	return action
 }
