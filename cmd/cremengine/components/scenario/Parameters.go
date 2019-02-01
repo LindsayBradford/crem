@@ -18,6 +18,8 @@ const (
 	SuspendedSedimentProportion string = "SuspendedSedimentProportion"
 	YearsOfErosion              string = "YearsOfErosion"
 	DataSourcePath              string = "DataSourcePath"
+
+	RiparianRevegetationCostPerKilometer string = "RiparianRevegetationCostPerKilometer"
 )
 
 type Parameters struct {
@@ -93,6 +95,14 @@ func (p *Parameters) buildMetaData() {
 			Key:          DataSourcePath,
 			Validator:    p.IsReadableFile,
 			DefaultValue: "",
+		},
+	)
+
+	p.AddMetaData(
+		parameters.MetaData{
+			Key:          RiparianRevegetationCostPerKilometer,
+			Validator:    p.IsDecimal,
+			DefaultValue: float64(24000),
 		},
 	)
 }

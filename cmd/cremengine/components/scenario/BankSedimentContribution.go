@@ -16,6 +16,8 @@ const (
 	floodPlainWidthIndex    = 6
 	bankFullFlowIndex       = 7
 	riparianVegetationIndex = 8
+	planningUnitAreaIndex   = 9
+	riparianBufferAreaIndex = 10
 )
 
 type planningUnitId int64
