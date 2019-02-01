@@ -10,6 +10,10 @@ func NewVolatileDecisionVariables() VolatileDecisionVariables {
 
 type VolatileDecisionVariables map[string]*VolatileDecisionVariable
 
+func (vs *VolatileDecisionVariables) Add(newVariable *VolatileDecisionVariable) {
+	vs.asMap()[newVariable.Name()] = newVariable
+}
+
 func (vs *VolatileDecisionVariables) NewForName(name string) {
 	newVariable := new(VolatileDecisionVariable)
 	newVariable.SetName(name)

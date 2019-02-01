@@ -5,8 +5,7 @@ package scenario
 import "github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 
 const (
-	_                   = iota
-	SedimentLoad string = "SedimentLoad"
+	_ = iota
 )
 
 type DecisionVariables struct {
@@ -15,12 +14,7 @@ type DecisionVariables struct {
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
 	dv.VolatileDecisionVariables = model.NewVolatileDecisionVariables()
-	dv.buildDecisionVariables()
 	return dv
-}
-
-func (dv *DecisionVariables) buildDecisionVariables() {
-	dv.NewForName(SedimentLoad)
 }
 
 type ContainedDecisionVariables struct {

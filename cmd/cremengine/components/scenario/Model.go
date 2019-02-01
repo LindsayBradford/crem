@@ -30,7 +30,6 @@ func NewModel() *Model {
 	newModel := new(Model)
 	newModel.SetName("CatchmentModel")
 
-	newModel.decisionVariables.Initialise()
 	newModel.parameters.Initialise()
 
 	return newModel
@@ -44,7 +43,7 @@ type Model struct {
 
 	ContainedDecisionVariables
 
-	bankSedimentContribution BankSedimentContribution
+	sedimentLoad *SedimentLoad
 
 	dataSet *excel.DataSet
 }
@@ -90,31 +89,22 @@ func (m *Model) Initialise() {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
 
-	m.bankSedimentContribution.Initialise(csvPlanningUnitTable, m.parameters)
+	sedimentLoad := new(SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
 
-	m.decisionVariables.SetValue(SedimentLoad, m.deriveInitialSedimentLoad())
-}
+	// TODO: Create Management actions
+	// TODO: Have sedimentLoad subscribe to it's managemnt actions
+	// TODO: Randomise which management actions are active
 
-func (m *Model) deriveInitialSedimentLoad() float64 {
-	return m.bankSedimentContribution.OriginalSedimentContribution() +
-		m.gullySedimentContribution() +
-		m.hillSlopeSedimentContribution()
-}
-
-func (m *Model) gullySedimentContribution() float64 {
-	return 0 // TODO: implement
-}
-
-func (m *Model) hillSlopeSedimentContribution() float64 {
-	return 0 // implement
+	// TODO: Bit of a smell to this.  Why don't I like it?
+	m.decisionVariables.Add(&sedimentLoad.VolatileDecisionVariable)
 }
 
 func (m *Model) AcceptChange() {
-	m.decisionVariables.Variable(SedimentLoad).Accept()
+	m.sedimentLoad.Accept()
 }
 
 func (m *Model) RevertChange() {
-	m.decisionVariables.Variable(SedimentLoad).Revert()
+	m.sedimentLoad.Revert()
 }
 
 func (m *Model) deriveDataSourcePath() string {
@@ -154,11 +144,11 @@ func (m *Model) capChangeOverRange(value float64) float64 {
 }
 
 func (m *Model) objectiveValue() float64 {
-	return m.decisionVariables.Value(SedimentLoad)
+	return m.sedimentLoad.Value()
 }
 
 func (m *Model) setObjectiveValue(value float64) {
-	m.decisionVariables.Variable(SedimentLoad).SetTemporaryValue(value)
+	m.sedimentLoad.SetTemporaryValue(value)
 }
 
 func (m *Model) DeepClone() model.Model {
