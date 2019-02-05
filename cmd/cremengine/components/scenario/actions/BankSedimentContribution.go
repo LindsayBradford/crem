@@ -1,10 +1,11 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package scenario
+package actions
 
 import (
 	"math"
 
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 )
 
@@ -29,12 +30,12 @@ type sedimentTracker struct {
 
 type BankSedimentContribution struct {
 	planningUnitTable *tables.CsvTable
-	parameters        Parameters
+	parameters        parameters.Parameters
 
 	contributionMap map[planningUnitId]sedimentTracker
 }
 
-func (bsc *BankSedimentContribution) Initialise(planningUnitTable *tables.CsvTable, parameters Parameters) {
+func (bsc *BankSedimentContribution) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) {
 	bsc.planningUnitTable = planningUnitTable
 	bsc.parameters = parameters
 	bsc.populateContributionMap()
@@ -63,13 +64,13 @@ func (bsc *BankSedimentContribution) partialBankSedimentContribution(rowNumber u
 	riverLength := bsc.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
 	bankHeight := bsc.planningUnitTable.CellFloat64(bankHeightIndex, rowNumber)
 
-	sedimentDensity := bsc.parameters.GetFloat64(SedimentDensity)
-	suspendedSedimentProportion := bsc.parameters.GetFloat64(SuspendedSedimentProportion)
+	sedimentDensity := bsc.parameters.GetFloat64(parameters.SedimentDensity)
+	suspendedSedimentProportion := bsc.parameters.GetFloat64(parameters.SuspendedSedimentProportion)
 
-	bankErosionFudgeFactor := bsc.parameters.GetFloat64(BankErosionFudgeFactor)
+	bankErosionFudgeFactor := bsc.parameters.GetFloat64(parameters.BankErosionFudgeFactor)
 
-	waterDensity := bsc.parameters.GetFloat64(WaterDensity)
-	localAcceleration := bsc.parameters.GetFloat64(LocalAcceleration)
+	waterDensity := bsc.parameters.GetFloat64(parameters.WaterDensity)
+	localAcceleration := bsc.parameters.GetFloat64(parameters.LocalAcceleration)
 	bankFullDischarge := bsc.planningUnitTable.CellFloat64(bankFullFlowIndex, rowNumber)
 	channelSlope := bsc.planningUnitTable.CellFloat64(channelSlopeIndex, rowNumber)
 
@@ -93,11 +94,11 @@ func (bsc *BankSedimentContribution) OriginalSedimentContribution() float64 {
 	for _, tracker := range bsc.contributionMap {
 		originalVegetation := tracker.originalIntactRiparianVegetation
 		sedimentContribution += tracker.partialSedimentContribution *
-			bsc.sedimentImpactOfRiparianVegetation(originalVegetation)
+			bsc.SedimentImpactOfRiparianVegetation(originalVegetation)
 	}
 	return sedimentContribution
 }
 
-func (bsc *BankSedimentContribution) sedimentImpactOfRiparianVegetation(proportionOfIntactVegetation float64) float64 {
+func (bsc *BankSedimentContribution) SedimentImpactOfRiparianVegetation(proportionOfIntactVegetation float64) float64 {
 	return 1 - 0.95*proportionOfIntactVegetation //TODO: Why a 5% dampener here?  Nothing in documentation. Should it be a parameter?
 }

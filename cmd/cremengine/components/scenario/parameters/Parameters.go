@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package scenario
+package parameters
 
 import (
 	"math"

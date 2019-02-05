@@ -7,19 +7,18 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
-)
-
-const (
-	downward = -1
-	upward   = 1
 )
 
 const (
@@ -31,19 +30,20 @@ func NewModel() *Model {
 	newModel.SetName("CatchmentModel")
 
 	newModel.parameters.Initialise()
+	newModel.managementActions.Initialise()
 
 	return newModel
 }
 
 type Model struct {
 	name.ContainedName
-	rand.ContainedRand
 
-	parameters Parameters
+	parameters parameters.Parameters
 
-	ContainedDecisionVariables
+	managementActions action.ManagementActions
+	variables.ContainedDecisionVariables
 
-	sedimentLoad *SedimentLoad
+	sedimentLoad *variables.SedimentLoad
 
 	dataSet *excel.DataSet
 }
@@ -58,12 +58,12 @@ func (m *Model) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapp
 	return m
 }
 
-func (m *Model) WithParameters(params parameters.Map) *Model {
+func (m *Model) WithParameters(params baseParameters.Map) *Model {
 	m.SetParameters(params)
 	return m
 }
 
-func (m *Model) SetParameters(params parameters.Map) error {
+func (m *Model) SetParameters(params baseParameters.Map) error {
 	m.parameters.Merge(params)
 
 	return m.parameters.ValidationErrors()
@@ -74,7 +74,6 @@ func (m *Model) ParameterErrors() error {
 }
 
 func (m *Model) Initialise() {
-	m.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	dataSourcePath := m.deriveDataSourcePath()
 
 	m.dataSet.Load(dataSourcePath)
@@ -89,14 +88,17 @@ func (m *Model) Initialise() {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
 
-	sedimentLoad := new(SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
+	m.sedimentLoad = new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
 
-	// TODO: Create Management actions
-	// TODO: Have sedimentLoad subscribe to it's managemnt actions
-	// TODO: Randomise which management actions are active
+	// TODO: Create other sediment management actions
+	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
+	for _, action := range riverBankRestorations.ManagementActions() {
+		action.Subscribe(m.sedimentLoad)
+		m.managementActions.Add(action)
+	}
 
-	// TODO: Bit of a smell to this.  Why don't I like it?
-	m.decisionVariables.Add(&sedimentLoad.VolatileDecisionVariable)
+	m.managementActions.RandomlyToggleAllActivations()
+	m.DecisionVariables().Add(&m.sedimentLoad.VolatileDecisionVariable)
 }
 
 func (m *Model) AcceptChange() {
@@ -105,10 +107,11 @@ func (m *Model) AcceptChange() {
 
 func (m *Model) RevertChange() {
 	m.sedimentLoad.Revert()
+	m.managementActions.UndoLastActivationToggleUnobserved()
 }
 
 func (m *Model) deriveDataSourcePath() string {
-	relativeFilePath := m.parameters.GetString(DataSourcePath)
+	relativeFilePath := m.parameters.GetString(parameters.DataSourcePath)
 	workingDirectory, _ := os.Getwd()
 	return filepath.Join(workingDirectory, relativeFilePath)
 }
@@ -118,25 +121,7 @@ func (m *Model) TearDown() {
 }
 
 func (m *Model) TryRandomChange() {
-	// TODO: randomly choose a management action to toggle.
-	originalValue := m.objectiveValue()
-	change := m.generateRandomChange()
-	newValue := m.capChangeOverRange(originalValue + change)
-	m.setObjectiveValue(newValue)
-}
-
-func (m *Model) generateRandomChange() float64 {
-	randomValue := m.RandomNumberGenerator().Intn(2)
-
-	var changeInObjectiveValue float64
-	switch randomValue {
-	case 0:
-		changeInObjectiveValue = downward
-	case 1:
-		changeInObjectiveValue = upward
-	}
-
-	return changeInObjectiveValue
+	m.managementActions.RandomlyToggleOneActivation()
 }
 
 func (m *Model) capChangeOverRange(value float64) float64 {
@@ -153,6 +138,6 @@ func (m *Model) setObjectiveValue(value float64) {
 
 func (m *Model) DeepClone() model.Model {
 	clone := *m
-	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	clone.managementActions.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return &clone
 }

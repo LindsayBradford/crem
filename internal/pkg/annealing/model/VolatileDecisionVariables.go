@@ -79,6 +79,10 @@ func (v *VolatileDecisionVariable) TemporaryValue() float64 {
 	return v.temporary.value
 }
 
+func (v *VolatileDecisionVariable) ChangeInValue() float64 {
+	return v.TemporaryValue() - v.Value()
+}
+
 func (v *VolatileDecisionVariable) SetTemporaryValue(value float64) {
 	v.temporary.value = value
 }

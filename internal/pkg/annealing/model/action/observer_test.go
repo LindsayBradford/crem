@@ -111,3 +111,23 @@ func TestSimpleManagementAction_ToggleActivation(t *testing.T) {
 	g.Expect(actionUnderTest.IsActive()).To(BeTrue())
 	g.Expect(testSpyOne.LastObserved()).To(Equal(actionUnderTest))
 }
+
+func TestSimpleManagementAction_ToggleActivationUnobserved(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	testSpyOne := new(spyObserver)
+
+	actionUnderTest := NewTestManagementAction()
+
+	// when
+	actionUnderTest.Subscribe(testSpyOne)
+
+	// then
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+
+	actionUnderTest.ToggleActivationUnobserved()
+
+	g.Expect(actionUnderTest.IsActive()).To(BeTrue())
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+}

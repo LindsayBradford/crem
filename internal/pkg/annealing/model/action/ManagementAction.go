@@ -12,6 +12,9 @@ type ManagementAction interface {
 	ModelVariableValue(variableName ModelVariableName) float64
 
 	Subscribe(observers ...Observer)
+
+	ToggleActivation()
+	ToggleActivationUnobserved()
 }
 
 var _ ManagementAction = new(SimpleManagementAction)
@@ -58,8 +61,12 @@ func (sma *SimpleManagementAction) Type() ManagementActionType {
 }
 
 func (sma *SimpleManagementAction) ToggleActivation() {
-	sma.isActive = !sma.isActive
+	sma.ToggleActivationUnobserved()
 	sma.notifyObservers()
+}
+
+func (sma *SimpleManagementAction) ToggleActivationUnobserved() {
+	sma.isActive = !sma.isActive
 }
 
 func (sma *SimpleManagementAction) Activate() {
