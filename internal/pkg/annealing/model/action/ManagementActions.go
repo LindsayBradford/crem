@@ -29,6 +29,9 @@ func (m *ManagementActions) RandomlyToggleOneActivation() {
 
 func (m *ManagementActions) pickRandomManagementAction() ManagementAction {
 	numberOfActions := len(m.actions)
+	if numberOfActions < 1 {
+		return NullManagementAction
+	}
 	randomIndex := m.RandomNumberGenerator().Intn(numberOfActions)
 	return m.actions[randomIndex]
 }

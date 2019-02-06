@@ -8,20 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ Observer = new(spyObserver)
-
-type spyObserver struct {
-	lastObserved ManagementAction
-}
-
-func (os *spyObserver) Observe(action ManagementAction) {
-	os.lastObserved = action
-}
-
-func (os *spyObserver) LastObserved() ManagementAction {
-	return os.lastObserved
-}
-
 const testType ManagementActionType = "test"
 const testVariableName ModelVariableName = "testVariable"
 
