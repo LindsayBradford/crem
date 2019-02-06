@@ -28,7 +28,7 @@ DecisionVariable = "SedimentLoad"
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"
-Model = "CatchmentModel"
+Model = "TurbidityModel"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99

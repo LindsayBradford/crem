@@ -8,7 +8,7 @@ type Table interface {
 
 	Cell(xPos uint, yPos uint) interface{}
 	CellFloat64(xPos uint, yPos uint) float64
-	CellInt64(xPos uint, yPos uint) int64
+	CellString(xPos uint, yPos uint) string
 	SetCell(xPos uint, yPos uint, value interface{})
 
 	SetSize(colNum uint, rowNum uint)

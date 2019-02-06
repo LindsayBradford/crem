@@ -38,8 +38,8 @@ func (bt *baseTable) CellFloat64(xPos uint, yPos uint) float64 {
 	return bt.cells[xPos][yPos].(float64)
 }
 
-func (bt *baseTable) CellInt64(xPos uint, yPos uint) int64 {
-	return bt.cells[xPos][yPos].(int64)
+func (bt *baseTable) CellString(xPos uint, yPos uint) string {
+	return bt.cells[xPos][yPos].(string)
 }
 
 func (bt *baseTable) SetCell(xPos uint, yPos uint, value interface{}) {

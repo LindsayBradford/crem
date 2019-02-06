@@ -4,6 +4,7 @@ package actions
 
 import (
 	"math"
+	"strconv"
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -21,7 +22,7 @@ const (
 	riparianBufferAreaIndex = 10
 )
 
-type planningUnitId int64
+type planningUnitId string
 
 type sedimentTracker struct {
 	partialSedimentContribution      float64
@@ -51,8 +52,9 @@ func (bsc *BankSedimentContribution) populateContributionMap() {
 }
 
 func (bsc *BankSedimentContribution) populateContributionMapEntry(rowNumber uint) {
-	planningUnit := bsc.planningUnitTable.CellInt64(planningUnitIndex, rowNumber)
-	mapKey := planningUnitId(planningUnit)
+	planningUnit := bsc.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
+	planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
+	mapKey := planningUnitId(planningUnitAsString)
 
 	bsc.contributionMap[mapKey] = sedimentTracker{
 		partialSedimentContribution:      bsc.partialBankSedimentContribution(rowNumber),

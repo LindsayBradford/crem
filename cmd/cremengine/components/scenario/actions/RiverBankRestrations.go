@@ -38,10 +38,10 @@ func (r *RiverBankRestorations) createManagementActions() {
 }
 
 func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
-	planningUnit := r.planningUnitTable.CellInt64(planningUnitIndex, rowNumber)
-	mapKey := planningUnitId(planningUnit)
+	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 
-	planningUnitAsString := strconv.FormatInt(planningUnit, 10)
+	planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
+	mapKey := planningUnitId(planningUnitAsString)
 
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
 	changeInBufferVegetation := r.calculateChangeInBufferVegetation(rowNumber)

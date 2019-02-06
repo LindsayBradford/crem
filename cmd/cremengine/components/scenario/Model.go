@@ -31,6 +31,7 @@ func NewModel() *Model {
 
 	newModel.parameters.Initialise()
 	newModel.managementActions.Initialise()
+	newModel.DecisionVariables().Initialise()
 
 	return newModel
 }
