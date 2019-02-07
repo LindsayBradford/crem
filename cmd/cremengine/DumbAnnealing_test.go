@@ -4,55 +4,48 @@ package main
 
 import (
 	"testing"
-
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
-	testing2 "github.com/LindsayBradford/crem/internal/pkg/config/testing"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 )
 
-func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
-	context := testing2.Context{
-		Name:           "Three sequential runs of Dumb annealer",
-		T:              t,
-		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
-		Runner:         scenario.RunScenarioFromConfigFile,
+func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
+	context := BinaryTestingContext{
+		Name:              "Single run of Dumb Annealer",
+		T:                 t,
+		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-OneRun.toml",
+		ExpectedErrorCode: withSuccess,
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	testCremExecutableAgainstConfigFile(context)
 }
 
-func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := testing2.Context{
-		Name:           "Single run of Dumb annealer",
-		T:              t,
-		ConfigFilePath: "testdata/DumbAnnealerTestConfig-OneRun.toml",
-		Runner:         scenario.RunScenarioFromConfigFile,
+func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
+	context := BinaryTestingContext{
+		Name:              "Three sequential runs of Dumb Annealer",
+		T:                 t,
+		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
+		ExpectedErrorCode: withSuccess,
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	testCremExecutableAgainstConfigFile(context)
 }
 
 func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
-	context := testing2.Context{
-		Name:           "Three concurrent runs of Dumb annealer",
-		T:              t,
-		ConfigFilePath: "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
-		Runner:         scenario.RunScenarioFromConfigFile,
+	context := BinaryTestingContext{
+		Name:              "Three concurrent runs of Dumb Annealer",
+		T:                 t,
+		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
+		ExpectedErrorCode: withSuccess,
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	testCremExecutableAgainstConfigFile(context)
 }
 
 func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := testing2.Context{
-		Name:           "Single run of Kirkpatrick Dumb annealer",
-		T:              t,
-		ConfigFilePath: "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
-		Runner:         scenario.RunScenarioFromConfigFile,
+	context := BinaryTestingContext{
+		Name:              "Single run of Kirkpatrick Dumb Annealer",
+		T:                 t,
+		ConfigFilePath:    "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
+		ExpectedErrorCode: withSuccess,
 	}
 
-	context.VerifyScenarioRunViaConfigFileDoesNotPanic()
+	testCremExecutableAgainstConfigFile(context)
 }

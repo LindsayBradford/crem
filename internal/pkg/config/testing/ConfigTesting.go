@@ -5,7 +5,6 @@ package testing
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/pkg/threading"
 	. "github.com/onsi/gomega"
 )
 
@@ -29,20 +28,5 @@ func (tc *Context) VerifyScenarioRunViaConfigFileDoesNotPanic() {
 		tc.Runner(tc.ConfigFilePath)
 	}
 
-	// g.Eventually(threading.GetMainThreadChannel()).Should(BeClosed())
 	g.Expect(scenarioRun).To(Not(Panic()), tc.Name+" should not panic")
-}
-
-func (tc *Context) VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic() {
-	if testing.Short() {
-		tc.T.Skip("skipping " + tc.Name + " in short mode")
-	}
-
-	g := NewGomegaWithT(tc.T)
-
-	threading.ResetMainThreadChannel()
-
-	tc.Runner(tc.ConfigFilePath)
-
-	g.Eventually(threading.GetMainThreadChannel()).Should(BeClosed())
 }
