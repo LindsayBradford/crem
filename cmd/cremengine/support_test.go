@@ -1,3 +1,4 @@
+// +build windows
 // Copyright (c) 2019 Australian Rivers Institute.
 
 package main
@@ -25,9 +26,8 @@ func setup(m *testing.M) {
 	cremExceutablePath, err = gexec.Build("github.com/LindsayBradford/crem/cmd/cremengine")
 
 	if err != nil {
-		os.Exit(1)
+		os.Exit(withFailure)
 	}
-
 }
 
 func tearDown() {

@@ -1,3 +1,4 @@
+// +build windows
 // Copyright (c) 2019 Australian Rivers Institute.
 
 package main
