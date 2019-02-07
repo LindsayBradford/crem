@@ -4,34 +4,76 @@
 package main
 
 import (
+	"os"
+	"os/exec"
 	"testing"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components"
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
-	configTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 )
 
-func TestCatchmentModelAnnealerScenarioOneRun(t *testing.T) {
-	context := configTesting.Context{
-		Name:           "Single run of catchment model annealer",
-		T:              t,
-		ConfigFilePath: "testdata/CatchmentConfig-OneRun.toml",
-		Runner:         components.RunExcelCompatibleScenarioFromConfigFile,
-	}
+var cremExceutablePath string
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+func TestMain(m *testing.M) {
+	setup(m)
+	code := m.Run()
+	tearDown()
+	os.Exit(code)
 }
 
-func TestCatchmentModelAnnealerScenarioBadInputs(t *testing.T) {
-	context := configTesting.Context{
-		Name:           "Attempted run of catchment model annealer with bad inputs",
-		T:              t,
-		ConfigFilePath: "testdata/CatchmentConfig-BadInputs.toml",
-		Runner:         components.RunExcelCompatibleScenarioFromConfigFile,
+func setup(m *testing.M) {
+	var err error
+	cremExceutablePath, err = gexec.Build("github.com/LindsayBradford/crem/cmd/cremengine")
+
+	if err != nil {
+		os.Exit(1)
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
-	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
+func tearDown() {
+	gexec.CleanupBuildArtifacts()
+}
+
+const timeoutSeconds = 5
+
+const withSuccess = 0
+const withFailure = 1
+
+func TestCremEngine_ScenarioOneRun_ExitWithSuccess(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	commandLineArguments := buildScenarioArguments("testdata/CatchmentConfig-OneRun.toml")
+
+	// when
+	session, err := startCremExecutableWith(commandLineArguments)
+
+	// then
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Eventually(session, timeoutSeconds).Should(gexec.Exit(withSuccess))
+}
+
+func TestCremEngine_ScenarioBadInputs_ExitWithError(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	commandLineArguments := buildScenarioArguments("testdata/CatchmentConfig-BadInputs.toml")
+
+	// when
+	session, err := startCremExecutableWith(commandLineArguments)
+
+	// then
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Eventually(session, timeoutSeconds).Should(gexec.Exit(withFailure))
+}
+
+func startCremExecutableWith(commandLineArguments []string) (*gexec.Session, error) {
+	command := exec.Command(cremExceutablePath, commandLineArguments...)
+	session, err := gexec.Start(command, os.Stdout, os.Stderr)
+	return session, err
+}
+
+func buildScenarioArguments(scenarioFilePath string) []string {
+	return []string{"--ScenarioFile", scenarioFilePath}
 }

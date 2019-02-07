@@ -102,7 +102,7 @@ func Exit(exitValue interface{}) {
 	switch exitValue.(type) {
 	case error:
 		exitingError, _ := exitValue.(error)
-		fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.", exitingError)
+		fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.\n", exitingError)
 		exitCode = 1
 	case int:
 		exitValueAsInt, _ := exitValue.(int)

@@ -4,6 +4,7 @@ package components
 
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
+	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -32,12 +33,16 @@ func runMainThreadBoundScenarioFromConfigFile(configFile string) {
 func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
 	establishScenarioLogger(configuration)
-	scenario.RunScenarioFromConfig(configuration)
+
+	if runError := scenario.RunScenarioFromConfig(configuration); runError != nil {
+		commandline.Exit(runError)
+	}
 }
 
 func establishScenarioLogger(configuration *config.CREMConfig) {
 	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
 	ScenarioLogger = loggers[0]
+	scenario.LogHandler = ScenarioLogger // TODO: Code smell.  Why is this needed?
 }
 
 func retrieveScenarioConfiguration(configFile string) *config.CREMConfig {
