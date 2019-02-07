@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components"
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
@@ -18,7 +19,7 @@ func main() {
 	args := commandline.ParseArguments()
 
 	if shouldRunScenario(args) {
-		components.RunExcelCompatibleScenarioFromConfigFile(args.ScenarioFile)
+		scenario.RunExcelCompatibleScenarioFromConfigFile(args.ScenarioFile)
 	} else {
 		components.RunServerFromConfigFile(args.ServerConfigFile)
 	}

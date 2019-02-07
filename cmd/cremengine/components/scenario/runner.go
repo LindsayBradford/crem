@@ -8,13 +8,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
-)
-
-var (
-	LogHandler logging.Logger
 )
 
 func RunServerScenarioFromConfig(cremConfig *config.CREMConfig) error {

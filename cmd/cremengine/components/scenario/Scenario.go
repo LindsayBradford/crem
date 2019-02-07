@@ -1,20 +1,18 @@
-// Copyright (c) 2018 Australian Rivers Institute.
+// Copyright (c) 2019 Australian Rivers Institute.
 
-package components
+package scenario
 
 import (
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
 var (
-	ScenarioLogger logging.Logger = loggers.DefaultNullLogger
+	LogHandler logging.Logger
 )
 
 func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
@@ -34,15 +32,15 @@ func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
 	establishScenarioLogger(configuration)
 
-	if runError := scenario.RunScenarioFromConfig(configuration); runError != nil {
+	if runError := RunScenarioFromConfig(configuration); runError != nil {
 		commandline.Exit(runError)
 	}
 }
 
 func establishScenarioLogger(configuration *config.CREMConfig) {
 	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
-	ScenarioLogger = loggers[0]
-	scenario.LogHandler = ScenarioLogger // TODO: Code smell.  Why is this needed?
+	LogHandler = loggers[0]
+	LogHandler.Info("Configuring with [" + configuration.FilePath + "]")
 }
 
 func retrieveScenarioConfiguration(configFile string) *config.CREMConfig {
@@ -52,6 +50,5 @@ func retrieveScenarioConfiguration(configFile string) *config.CREMConfig {
 		panic(wrappingError)
 	}
 
-	ScenarioLogger.Info("Configuring with [" + configuration.FilePath + "]")
 	return configuration
 }
