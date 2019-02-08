@@ -3,30 +3,59 @@
 package testing
 
 import (
+	"os"
+	"os/exec"
 	"testing"
 
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/gexec"
 )
 
-type Context struct {
-	Name           string
-	T              *testing.T
-	ConfigFilePath string
-	Runner         ScenarioFileRunningFunction
+const WithSuccess = 0
+const WithFailure = 1
+
+type BinaryTestingContext struct {
+	Name              string
+	ExecutablePath    string
+	T                 *testing.T
+	ConfigFilePath    string
+	TimeoutSeconds    uint
+	ExpectedErrorCode int
 }
 
-type ScenarioFileRunningFunction func(scenarioPath string)
-
-func (tc *Context) VerifyScenarioRunViaConfigFileDoesNotPanic() {
+func TestExecutableAgainstConfigFile(tc BinaryTestingContext) {
 	if testing.Short() {
 		tc.T.Skip("skipping " + tc.Name + " in short mode")
 	}
 
 	g := NewGomegaWithT(tc.T)
 
-	scenarioRun := func() {
-		tc.Runner(tc.ConfigFilePath)
-	}
+	// given
+	commandLineArguments := buildScenarioArguments(tc.ConfigFilePath)
 
-	g.Expect(scenarioRun).To(Not(Panic()), tc.Name+" should not panic")
+	// when
+	session, err := startExecutableWithArguments(tc.ExecutablePath, commandLineArguments)
+
+	// then
+	g.Expect(err).ToNot(HaveOccurred())
+	g.Eventually(session, tc.TimeoutSeconds).Should(gexec.Exit(tc.ExpectedErrorCode))
+}
+
+func startExecutableWithArguments(executablePath string, commandLineArguments []string) (*gexec.Session, error) {
+	command := exec.Command(executablePath, commandLineArguments...)
+	session, err := gexec.Start(command, os.Stdout, os.Stderr)
+	return session, err
+}
+
+func buildScenarioArguments(scenarioFilePath string) []string {
+	return []string{"--ScenarioFile", scenarioFilePath}
+}
+
+type ScenarioFileRunningFunction func(scenarioPath string)
+
+type Context struct {
+	Name           string
+	T              *testing.T
+	ConfigFilePath string
+	Runner         ScenarioFileRunningFunction
 }

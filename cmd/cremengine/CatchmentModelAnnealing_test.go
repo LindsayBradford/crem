@@ -4,27 +4,32 @@
 package main
 
 import (
+	appTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
 	"testing"
 )
 
 func TestCremEngine_ScenarioOneRun_ExitWithSuccess(t *testing.T) {
-	context := BinaryTestingContext{
-		Name:              "Single run of CremEngine CatchmentModel",
+	context := appTesting.BinaryTestingContext{
 		T:                 t,
+		Name:              "Single run of CremEngine CatchmentModel",
+		ExecutablePath:    cremExceutablePath,
+		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		ConfigFilePath:    "testdata/CatchmentConfig-OneRun.toml",
-		ExpectedErrorCode: withSuccess,
+		ExpectedErrorCode: appTesting.WithSuccess,
 	}
 
-	testCremExecutableAgainstConfigFile(context)
+	appTesting.TestExecutableAgainstConfigFile(context)
 }
 
 func TestCremEngine_ScenarioBadInputs_ExitWithError(t *testing.T) {
-	context := BinaryTestingContext{
-		Name:              "Attempted run of CremEngine CatchmentModel with bad inputs",
+	context := appTesting.BinaryTestingContext{
 		T:                 t,
+		Name:              "Attempted run of CremEngine CatchmentModel with bad inputs",
+		ExecutablePath:    cremExceutablePath,
+		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		ConfigFilePath:    "testdata/CatchmentConfig-BadInputs.toml",
-		ExpectedErrorCode: withFailure,
+		ExpectedErrorCode: appTesting.WithFailure,
 	}
 
-	testCremExecutableAgainstConfigFile(context)
+	appTesting.TestExecutableAgainstConfigFile(context)
 }

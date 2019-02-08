@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/api"
-	testing2 "github.com/LindsayBradford/crem/internal/pkg/config/testing"
+	webTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/internal/pkg/server/test"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
@@ -16,7 +16,7 @@ import (
 )
 
 func TestValidJobsGetRequest_OkResponse(t *testing.T) {
-	context := testing2.Context{
+	context := webTesting.Context{
 		Name:           "GET /jobs request returns 200 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -25,7 +25,7 @@ func TestValidJobsGetRequest_OkResponse(t *testing.T) {
 	verifyResponseToValidJobsGetRequest(context)
 }
 
-func verifyResponseToValidJobsGetRequest(context testing2.Context) {
+func verifyResponseToValidJobsGetRequest(context webTesting.Context) {
 
 	g := gomega.NewGomegaWithT(context.T)
 
@@ -43,7 +43,7 @@ func verifyResponseToValidJobsGetRequest(context testing2.Context) {
 }
 
 func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
-	context := testing2.Context{
+	context := webTesting.Context{
 		Name:           "POST /jobs request of invalid scenario returns 500 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -52,7 +52,7 @@ func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
 	verifyInternalServerErrorResponseToInvalidJobsPostRequest(context)
 }
 
-func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context testing2.Context) {
+func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context webTesting.Context) {
 
 	g := gomega.NewGomegaWithT(context.T)
 
