@@ -131,7 +131,7 @@ func retrieveHeaderValue(detail headerCellDetail, sheet excel.Worksheet) float64
 
 func buildAscCellData(table *tables.AscTable, sheet excel.Worksheet) {
 	table.SetName(sheet.Name())
-	table.SetSize(table.Header().NumCols, table.Header().NumRows)
+	table.SetColumnAndRowSize(table.Header().NumCols, table.Header().NumRows)
 
 	for col := ascColOffset; col < table.Header().NumCols+ascColOffset; col++ {
 		for row := ascRowOffset; row < table.Header().NumRows+ascRowOffset; row++ {
@@ -172,7 +172,7 @@ func buildCsvCellData(table *tables.CsvTable, sheet excel.Worksheet) {
 	colCount := excel.ColumnCount(sheet)
 	rowCount := excel.RowCount(sheet)
 
-	table.SetSize(colCount, rowCount-1)
+	table.SetColumnAndRowSize(colCount, rowCount-1)
 
 	for col := csvColOffset; col < colCount+csvColOffset; col++ {
 		for row := csvRowOffset; row < rowCount+csvRowOffset-1; row++ {

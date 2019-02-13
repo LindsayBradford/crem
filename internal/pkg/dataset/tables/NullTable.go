@@ -15,5 +15,5 @@ func (nt *NullTable) CellString(xPos uint, yPos uint) string   { return "0" }
 
 func (nt *NullTable) SetCell(xPos uint, yPos uint, value interface{}) {}
 
-func (nt *NullTable) SetSize(colNum uint, rowNum uint) {}
-func (nt *NullTable) Size() (colNum uint, rowNum uint) { return 0, 0 }
+func (nt *NullTable) SetColumnAndRowSize(colNum uint, rowNum uint) {}
+func (nt *NullTable) ColumnAndRowSize() (colNum uint, rowNum uint) { return 0, 0 }

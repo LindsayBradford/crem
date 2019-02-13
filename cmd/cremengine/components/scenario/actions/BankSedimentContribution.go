@@ -43,7 +43,7 @@ func (bsc *BankSedimentContribution) Initialise(planningUnitTable *tables.CsvTab
 }
 
 func (bsc *BankSedimentContribution) populateContributionMap() {
-	_, rowCount := bsc.planningUnitTable.Size()
+	_, rowCount := bsc.planningUnitTable.ColumnAndRowSize()
 	bsc.contributionMap = make(map[planningUnitId]sedimentTracker, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {

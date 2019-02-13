@@ -99,7 +99,7 @@ func (ce *CompositeError) buildCompositeErrorString() string {
 	return builder.String()
 }
 
-// Size returns the number of sub-errors in a CompositeError. It counts only directly accessible sub-errors (no nesting).
+// ColumnAndRowSize returns the number of sub-errors in a CompositeError. It counts only directly accessible sub-errors (no nesting).
 func (ce *CompositeError) Size() int {
 	return len(ce.individualErrors)
 }

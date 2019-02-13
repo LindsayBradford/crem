@@ -29,7 +29,7 @@ func (r *RiverBankRestorations) ManagementActions() map[planningUnitId]*RiverBan
 }
 
 func (r *RiverBankRestorations) createManagementActions() {
-	_, rowCount := r.planningUnitTable.Size()
+	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
 	r.actionMap = make(map[planningUnitId]*RiverBankRestoration, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {

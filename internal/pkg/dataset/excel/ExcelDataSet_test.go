@@ -48,7 +48,7 @@ func TestDataSet_Load(t *testing.T) {
 	g.Expect(testAscTable.Cell(2, 2)).To(BeNumerically("==", 5), "Loaded dataset has table 'testAscTable'")
 	g.Expect(testAscTable.Cell(3, 3)).To(BeNumerically("==", 9), "Loaded dataset has table 'testAscTable'")
 
-	actualAscCols, actualAscRows := testAscTable.Size()
+	actualAscCols, actualAscRows := testAscTable.ColumnAndRowSize()
 	g.Expect(actualAscCols).To(BeNumerically("==", 5))
 	g.Expect(actualAscRows).To(BeNumerically("==", 5))
 
@@ -63,7 +63,7 @@ func TestDataSet_Load(t *testing.T) {
 	g.Expect(typedCsvTable.Cell(2, 2)).To(BeNumerically("==", 3.001), "Loaded dataset has table 'testAscTable'")
 	g.Expect(typedCsvTable.Cell(3, 3)).To(BeFalse(), "Loaded dataset has table 'testAscTable'")
 
-	actualCsvCols, actualCsvRows := typedCsvTable.Size()
+	actualCsvCols, actualCsvRows := typedCsvTable.ColumnAndRowSize()
 	g.Expect(actualCsvCols).To(BeNumerically("==", 4))
 	g.Expect(actualCsvRows).To(BeNumerically("==", 5))
 }

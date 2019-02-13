@@ -11,6 +11,6 @@ type Table interface {
 	CellString(xPos uint, yPos uint) string
 	SetCell(xPos uint, yPos uint, value interface{})
 
-	SetSize(colNum uint, rowNum uint)
-	Size() (colNum uint, rowNum uint)
+	SetColumnAndRowSize(colNum uint, rowNum uint)
+	ColumnAndRowSize() (colNum uint, rowNum uint)
 }
