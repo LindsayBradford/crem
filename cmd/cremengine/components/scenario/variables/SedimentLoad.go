@@ -64,8 +64,8 @@ func (sl *SedimentLoad) handleRiverBankRestorationAction() {
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		setTempVariable(actions.OriginalBufferVegetation, actions.ChangeInBufferVegetation)
+		setTempVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
 	case false:
-		setTempVariable(actions.ChangeInBufferVegetation, actions.OriginalBufferVegetation)
+		setTempVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
 	}
 }

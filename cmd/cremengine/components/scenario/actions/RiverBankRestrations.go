@@ -9,6 +9,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 )
 
+const defaultRevegetationProportion = float64(1)
+
 type RiverBankRestorations struct {
 	planningUnitTable *tables.CsvTable
 	parameters        parameters.Parameters
@@ -44,7 +46,6 @@ func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
 	mapKey := planningUnitId(planningUnitAsString)
 
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
-	changeInBufferVegetation := r.calculateChangeInBufferVegetation(rowNumber)
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
 
@@ -52,8 +53,8 @@ func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
 		new(RiverBankRestoration).
 			WithPlanningUnit(planningUnitAsString).
 			WithRiverBankRestorationType().
-			WithOriginalBufferVegetation(originalBufferVegetation).
-			WithChangeInBufferVegetation(changeInBufferVegetation).
+			WithUnActionedBufferVegetation(originalBufferVegetation).
+			WithActionedBufferVegetation(defaultRevegetationProportion).
 			WithImplementationCost(costInDollars)
 }
 
@@ -64,7 +65,7 @@ func (r *RiverBankRestorations) originalBufferVegetation(rowNumber uint) float64
 
 func (r *RiverBankRestorations) calculateChangeInBufferVegetation(rowNumber uint) float64 {
 	proportionOfRiparianVegetation := r.originalBufferVegetation(rowNumber)
-	changeInRiparianVegetation := 1 - proportionOfRiparianVegetation // TODO: Assumes full riparian revegation - revisit later.
+	changeInRiparianVegetation := defaultRevegetationProportion - proportionOfRiparianVegetation // TODO: Assumes full riparian revegation - revisit later.
 	return changeInRiparianVegetation
 }
 

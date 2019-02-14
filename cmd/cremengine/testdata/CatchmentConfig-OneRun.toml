@@ -3,7 +3,7 @@ ScenarioName = "Test Catchment Annealer - One run"
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 2_00_000 # 200
+NumberOfIterations = 1
 
 [[AnnealingObservers]]
 Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
@@ -32,4 +32,4 @@ Model = "TurbidityModel"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
-MaximumIterations = 1_000_000 # 1M
+MaximumIterations = 300 # 1M

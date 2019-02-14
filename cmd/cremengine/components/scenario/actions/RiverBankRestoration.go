@@ -27,16 +27,16 @@ func (r *RiverBankRestoration) WithImplementationCost(costInDollars float64) *Ri
 	return r
 }
 
-const ChangeInBufferVegetation action.ModelVariableName = "ChangeInBufferVegetation"
+const ActionedBufferVegetation action.ModelVariableName = "ActionedBufferVegetation"
 
-func (r *RiverBankRestoration) WithChangeInBufferVegetation(changeAsBufferProportion float64) *RiverBankRestoration {
-	r.SimpleManagementAction.WithVariable(ChangeInBufferVegetation, changeAsBufferProportion)
+func (r *RiverBankRestoration) WithActionedBufferVegetation(changeAsBufferProportion float64) *RiverBankRestoration {
+	r.SimpleManagementAction.WithVariable(ActionedBufferVegetation, changeAsBufferProportion)
 	return r
 }
 
 const OriginalBufferVegetation action.ModelVariableName = "OriginalBufferVegetation"
 
-func (r *RiverBankRestoration) WithOriginalBufferVegetation(originalBufferProportion float64) *RiverBankRestoration {
+func (r *RiverBankRestoration) WithUnActionedBufferVegetation(originalBufferProportion float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(OriginalBufferVegetation, originalBufferProportion)
 	return r
 }
