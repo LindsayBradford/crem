@@ -45,17 +45,41 @@ func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 // ShouldFilter filters only FinishedIteration Event instances, and fully filters out all StartedIteration
 // events. Every FinishedIteration events received on the specified percentile boundary, one event is allowed through
 // to the LogHandler.
+
+const (
+	filtered    = true
+	notFiltered = false
+)
+
+func isGenerallyFilterable(eventType annealing.EventType) bool {
+	switch eventType {
+	case annealing.StartedAnnealing,
+		annealing.FinishedIteration,
+		annealing.Note:
+		return filtered
+	default:
+		return notFiltered
+	}
+}
+
+func isModuloFilterable(eventType annealing.EventType) bool {
+	switch eventType {
+	case annealing.FinishedIteration,
+		annealing.Note:
+		return filtered
+	default:
+		return notFiltered
+	}
+}
+
 func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event annealing.Event) bool {
-	if event.EventType != annealing.StartedIteration && event.EventType != annealing.FinishedIteration {
-		return false
+	if !isGenerallyFilterable(event.EventType) {
+		return notFiltered
 	}
 
-	annealer := event.Annealer
-
-	if m.generatesEvents && event.EventType == annealing.FinishedIteration &&
-		annealer.CurrentIteration()%m.iterationModulo == 0 {
-		return false
+	if m.generatesEvents && isModuloFilterable(event.EventType) &&
+		event.Annealer.CurrentIteration()%m.iterationModulo == 0 {
+		return notFiltered
 	}
-
-	return true
+	return filtered
 }
