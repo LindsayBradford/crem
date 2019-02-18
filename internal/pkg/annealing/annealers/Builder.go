@@ -94,6 +94,12 @@ func (builder *Builder) WithObservers(observers ...observer.Observer) *Builder {
 		}
 	}
 
+	model := annealerBeingBuilt.SolutionExplorer().Model()
+	observableModel, isObservable := model.(observer.EventNotifierContainer)
+	if isObservable {
+		observableModel.SetEventNotifier(annealerBeingBuilt.EventNotifier())
+	}
+
 	return builder
 }
 

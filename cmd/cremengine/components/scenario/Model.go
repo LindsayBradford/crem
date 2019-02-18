@@ -15,6 +15,7 @@ import (
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -39,6 +40,7 @@ func NewModel() *Model {
 type Model struct {
 	name.ContainedName
 	name.ContainedIdentifier
+	observer.ContainedEventNotifier
 
 	parameters parameters.Parameters
 
@@ -123,7 +125,13 @@ func (m *Model) TearDown() {
 }
 
 func (m *Model) TryRandomChange() {
+	m.note("trying random change")
 	m.managementActions.RandomlyToggleOneActivation()
+}
+
+func (m *Model) note(text string) {
+	event := observer.Event{EventType: observer.Note, EventSource: m, Note: text}
+	m.EventNotifier().NotifyObserversOfEvent(event)
 }
 
 func (m *Model) capChangeOverRange(value float64) float64 {

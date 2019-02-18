@@ -33,44 +33,59 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 		return
 	}
 
+	var builder strings.FluentBuilder
+	builder.Add("Id [", event.EventSource.Id(), "], ", "Event [", event.EventType.String(), "]: ")
+
 	if observableAnnealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
-		annealer := wrapAnnealer(observableAnnealer)
-		explorer := wrapSolutionExplorer(observableAnnealer.ObservableExplorer())
-
-		var builder strings.FluentBuilder
-		builder.Add("Id [", event.EventSource.Id(), "], ", "Event [", event.EventType.String(), "]: ")
-
-		switch event.EventType {
-		case observer.StartedAnnealing:
-			builder.
-				Add("Maximum Iterations [", annealer.MaximumIterations(), "], ").
-				Add("Objective value [", explorer.ObjectiveValue(), "], ").
-				Add("Temperature [", annealer.Temperature(), "], ").
-				Add("Cooling Factor [", annealer.CoolingFactor(), "]")
-		case observer.StartedIteration:
-			builder.
-				Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
-				Add("Temperature [", annealer.Temperature(), "], ").
-				Add("Objective value [", explorer.ObjectiveValue(), "]")
-		case observer.FinishedIteration:
-			builder.
-				Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
-				Add("Objective value [", explorer.ObjectiveValue(), "], ").
-				Add("Change [", explorer.ChangeInObjectiveValue(), "], ").
-				Add("Desirable? [", explorer.ChangeIsDesirable(), "], ").
-				Add("Acceptance Probability [", explorer.AcceptanceProbability(), "], ").
-				Add("Accepted? [", explorer.ChangeAccepted(), "]")
-		case observer.FinishedAnnealing:
-			builder.
-				Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
-				Add("Objective value [", explorer.ObjectiveValue(), "], ").
-				Add("Temperature [", annealer.Temperature(), "]")
-		case observer.Note:
-			builder.Add("[", event.Note, "]")
-		default:
-			// deliberately does nothing extra
-		}
-
-		amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+		amo.observeAnnealingEvent(observableAnnealer, event, &builder)
+	} else {
+		amo.observeEvent(event, &builder)
 	}
+}
+
+func (amo *AnnealingMessageObserver) observeAnnealingEvent(observableAnnealer annealing.Observable, event observer.Event, builder *strings.FluentBuilder) {
+	annealer := wrapAnnealer(observableAnnealer)
+	explorer := wrapSolutionExplorer(observableAnnealer.ObservableExplorer())
+
+	switch event.EventType {
+	case observer.StartedAnnealing:
+		builder.
+			Add("Maximum Iterations [", annealer.MaximumIterations(), "], ").
+			Add("Objective value [", explorer.ObjectiveValue(), "], ").
+			Add("Temperature [", annealer.Temperature(), "], ").
+			Add("Cooling Factor [", annealer.CoolingFactor(), "]")
+	case observer.StartedIteration:
+		builder.
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
+			Add("Temperature [", annealer.Temperature(), "], ").
+			Add("Objective value [", explorer.ObjectiveValue(), "]")
+	case observer.FinishedIteration:
+		builder.
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
+			Add("Objective value [", explorer.ObjectiveValue(), "], ").
+			Add("Change [", explorer.ChangeInObjectiveValue(), "], ").
+			Add("Desirable? [", explorer.ChangeIsDesirable(), "], ").
+			Add("Acceptance Probability [", explorer.AcceptanceProbability(), "], ").
+			Add("Accepted? [", explorer.ChangeAccepted(), "]")
+	case observer.FinishedAnnealing:
+		builder.
+			Add("Iteration [", annealer.CurrentIteration(), "/", annealer.MaximumIterations(), "], ").
+			Add("Objective value [", explorer.ObjectiveValue(), "], ").
+			Add("Temperature [", annealer.Temperature(), "]")
+	default:
+		// deliberately does nothing extra
+	}
+
+	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+}
+
+func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
+	switch event.EventType {
+	case observer.Note:
+		builder.Add("[", event.Note, "]")
+	default:
+		// deliberately does nothing extra
+	}
+
+	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 }

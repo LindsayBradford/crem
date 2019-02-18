@@ -49,15 +49,12 @@ func (ke *Explorer) WithName(name string) *Explorer {
 
 func (ke *Explorer) WithModel(model model.Model) *Explorer {
 	ke.SetModel(model)
+
 	return ke
 }
 
 func (ke *Explorer) WithId(id string) *Explorer {
 	ke.SetId(id)
-
-	if modelWithId, hasId := ke.Model().(name.Identifiable); hasId {
-		modelWithId.SetId(id)
-	}
 	return ke
 }
 
