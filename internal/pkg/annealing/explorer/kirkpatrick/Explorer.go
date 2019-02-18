@@ -10,13 +10,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
-	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type Explorer struct {
 	name.ContainedName
+	name.ContainedIdentifier
 	model.ContainedModel
 	rand.ContainedRand
 	logging.ContainedLogger
@@ -40,9 +40,6 @@ func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
-	if modelWithScenarioId, hasScenarioId := ke.Model().(scenario.Identifiable); hasScenarioId {
-		modelWithScenarioId.SetScenarioId(ke.ScenarioId())
-	}
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -55,16 +52,12 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 	return ke
 }
 
-func (ke *Explorer) ScenarioId() string {
-	return ke.scenarioId
-}
+func (ke *Explorer) WithId(id string) *Explorer {
+	ke.SetId(id)
 
-func (ke *Explorer) SetScenarioId(id string) {
-	ke.scenarioId = id
-}
-
-func (ke *Explorer) WithScenarioId(id string) *Explorer {
-	ke.scenarioId = id
+	if modelWithId, hasScenarioId := ke.Model().(name.Identifiable); hasScenarioId {
+		modelWithId.SetId(id)
+	}
 	return ke
 }
 

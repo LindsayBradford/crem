@@ -31,7 +31,7 @@ func (see *SimpleExcelExplorer) WithModel(model model.Model) *SimpleExcelExplore
 }
 
 func (see *SimpleExcelExplorer) WithScenarioId(id string) *SimpleExcelExplorer {
-	see.Explorer.WithScenarioId(id)
+	see.Explorer.WithId(id)
 	return see
 }
 

@@ -15,14 +15,12 @@ const Guaranteed = 1
 
 type Explorer interface {
 	name.Nameable
+	name.Identifiable
 	model.Container
 	rand.Container
 
 	Observable
 	logging.Container
-
-	ScenarioId() string
-	SetScenarioId(name string)
 
 	DeepClone() Explorer
 	Initialise()

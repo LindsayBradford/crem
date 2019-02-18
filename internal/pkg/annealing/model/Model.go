@@ -6,6 +6,7 @@ import "github.com/LindsayBradford/crem/pkg/name"
 
 type Model interface {
 	name.Nameable
+	name.Identifiable
 	DecisionVariableContainer
 
 	Initialise()
@@ -51,6 +52,7 @@ func NewNullModel() *nullModel {
 
 type nullModel struct {
 	name.ContainedName
+	name.ContainedIdentifier
 }
 
 func (nm *nullModel) WithName(name string) *nullModel {

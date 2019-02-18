@@ -123,7 +123,7 @@ func TestAnnealerBuilder_WithKirkpatrickExplorer(t *testing.T) {
 
 	expectedSolutionExplorer := kirkpatrick.New()
 	expectedSolutionExplorer.WithModel(dumb.New())
-	expectedSolutionExplorer.SetScenarioId("Simple Annealer")
+	expectedSolutionExplorer.SetId("Simple Annealer")
 
 	builder := new(Builder)
 

@@ -10,7 +10,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
-	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -18,7 +17,7 @@ import (
 
 type SimpleExcelModel struct {
 	name.ContainedName
-	scenario.ContainedScenarioId
+	name.ContainedIdentifier
 	logging.ContainedLogger
 
 	parameters            Parameters
@@ -84,9 +83,9 @@ func (sem *SimpleExcelModel) Initialise() {
 	dataSourcePath := sem.parameters.GetString(DataSourcePath)
 	sem.excelDataAdapter.initialiseDataSource(dataSourcePath)
 
-	sem.LogHandler().Info(sem.ScenarioId() + ": Opening Excel workbook [" + dataSourcePath + "] as data source")
+	sem.LogHandler().Info(sem.Id() + ": Opening Excel workbook [" + dataSourcePath + "] as data source")
 
-	sem.LogHandler().Debug(sem.ScenarioId() + ": Retrieving annealing data from workbook")
+	sem.LogHandler().Debug(sem.Id() + ": Retrieving annealing data from workbook")
 	sem.annealingData = sem.excelDataAdapter.retrieveAnnealingTableFromWorkbook()
 
 	currentPenalty := sem.deriveTotalPenalty()
@@ -94,10 +93,10 @@ func (sem *SimpleExcelModel) Initialise() {
 
 	sem.decisionVariables[model.ObjectiveValue].SetValue(currentCost*0.8 + currentPenalty)
 
-	sem.LogHandler().Debug(sem.ScenarioId() + ": Clearing tracking data from workbook")
+	sem.LogHandler().Debug(sem.Id() + ": Clearing tracking data from workbook")
 	sem.trackingData = sem.excelDataAdapter.initialiseTrackingTable()
 
-	sem.LogHandler().Info(sem.ScenarioId() + ": Data retrieved from workbook [" + dataSourcePath + "]")
+	sem.LogHandler().Info(sem.Id() + ": Data retrieved from workbook [" + dataSourcePath + "]")
 }
 
 func (sem *SimpleExcelModel) TearDown() {
@@ -106,19 +105,19 @@ func (sem *SimpleExcelModel) TearDown() {
 }
 
 func (sem *SimpleExcelModel) saveDataToWorkbookAndClose() {
-	newFileName := toSafeFileName(sem.ScenarioId())
+	newFileName := toSafeFileName(sem.Id())
 
 	originalFilePath := filepath.Dir(sem.excelDataAdapter.absoluteFilePath)
 	outputPath := filepath.Join(originalFilePath, newFileName)
 
-	sem.LogHandler().Info(sem.ScenarioId() + ": Storing data to workbook [" + outputPath + "]")
+	sem.LogHandler().Info(sem.Id() + ": Storing data to workbook [" + outputPath + "]")
 	sem.excelDataAdapter.storeAnnealingTableToWorkbook(sem.annealingData)
 	sem.excelDataAdapter.storeTrackingTableToWorkbook(sem.trackingData)
 
-	sem.LogHandler().Debug(sem.ScenarioId() + ": Saving workbook [" + outputPath + "]")
+	sem.LogHandler().Debug(sem.Id() + ": Saving workbook [" + outputPath + "]")
 	sem.excelDataAdapter.saveAndCloseWorkbookAs(outputPath)
 
-	sem.LogHandler().Debug(sem.ScenarioId() + ": Workbook [" + outputPath + "] closed")
+	sem.LogHandler().Debug(sem.Id() + ": Workbook [" + outputPath + "] closed")
 }
 
 func toSafeFileName(possiblyUnsafeFilePath string) (response string) {

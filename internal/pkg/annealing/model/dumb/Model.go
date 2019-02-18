@@ -13,6 +13,7 @@ import (
 
 type Model struct {
 	name.ContainedName
+	name.ContainedIdentifier
 	rand.ContainedRand
 
 	parameters        Parameters

@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type Annealer interface {
@@ -26,7 +27,7 @@ type Observable interface {
 	AddObserver(observer Observer) error
 	Observers() []Observer
 
-	Identifiable
+	name.Identifiable
 	Temperature() float64
 	CoolingFactor() float64
 	MaximumIterations() uint64
@@ -34,11 +35,6 @@ type Observable interface {
 
 	ObservableExplorer() explorer.Observable
 	SetObservableExplorer(explorer explorer.Observable) error
-}
-
-type Identifiable interface {
-	SetId(title string)
-	Id() string
 }
 
 type Cloneable interface {

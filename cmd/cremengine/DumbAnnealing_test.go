@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-const defaultDumbAnnealerTimeout = 5
+const defaultDumbAnnealerTimeout = 10
 
 func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
 	context := appTesting.BinaryTestingContext{

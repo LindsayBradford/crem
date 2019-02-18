@@ -140,11 +140,18 @@ func (runner *Runner) runScenario() error {
 func (runner *Runner) run(runNumber uint64) {
 	annealerCopy := runner.annealer.DeepClone()
 
-	annealerCopy.SetId(runner.generateCloneId(runNumber))
+	runner.assignNewRunId(runNumber, annealerCopy)
 
-	runner.logRunStartMessage(runNumber)
 	annealerCopy.Anneal()
 	runner.logRunFinishedMessage(runNumber)
+}
+
+func (runner *Runner) assignNewRunId(runNumber uint64, annealerCopy annealing.Annealer) {
+	runId := runner.generateCloneId(runNumber)
+	annealerCopy.SetId(runId)
+	annealerCopy.SolutionExplorer().SetId(runId)
+	annealerCopy.SolutionExplorer().Model().SetId(runId)
+	runner.logRunStartMessage(runNumber)
 }
 
 func (runner *Runner) generateCloneId(runNumber uint64) string {

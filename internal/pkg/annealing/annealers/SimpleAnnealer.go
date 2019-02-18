@@ -38,7 +38,7 @@ func (sa *SimpleAnnealer) Initialise() {
 
 func (sa *SimpleAnnealer) SetId(title string) {
 	sa.ContainedObservable.SetId(title)
-	sa.SolutionExplorer().SetScenarioId(title)
+	sa.SolutionExplorer().SetId(title)
 }
 
 func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {

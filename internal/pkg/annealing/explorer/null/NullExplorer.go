@@ -27,8 +27,8 @@ func (e *Explorer) SetObjectiveValue(temperature float64)         {}
 func (e *Explorer) TryRandomChange(temperature float64)           {}
 func (e *Explorer) AcceptLastChange()                             {}
 func (e *Explorer) RevertLastChange()                             {}
-func (e *Explorer) ScenarioId() string                            { return "" }
-func (e *Explorer) SetScenarioId(id string)                       {}
+func (e *Explorer) Id() string                                    { return "" }
+func (e *Explorer) SetId(id string)                               {}
 func (e *Explorer) DeepClone() explorer.Explorer                  { return e }
 func (e *Explorer) CloneObservable() explorer.Observable          { return e }
 func (e *Explorer) Model() model.Model                            { return nil }

@@ -38,6 +38,7 @@ func NewModel() *Model {
 
 type Model struct {
 	name.ContainedName
+	name.ContainedIdentifier
 
 	parameters parameters.Parameters
 
