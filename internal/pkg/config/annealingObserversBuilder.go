@@ -6,9 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
+	baseObserver "github.com/LindsayBradford/crem/internal/pkg/observer"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -39,8 +40,8 @@ func (builder *annealingObserversBuilder) WithLogHandlers(handlers []logging.Log
 	return builder
 }
 
-func (builder *annealingObserversBuilder) Build() ([]annealing.Observer, error) {
-	var observers []annealing.Observer
+func (builder *annealingObserversBuilder) Build() ([]baseObserver.Observer, error) {
+	var observers []baseObserver.Observer
 	if len(builder.config) == 0 {
 		observers = builder.buildDefaultObservers()
 	} else {
@@ -53,11 +54,11 @@ func (builder *annealingObserversBuilder) Build() ([]annealing.Observer, error) 
 	return observers, nil
 }
 
-func (builder *annealingObserversBuilder) buildDefaultObservers() []annealing.Observer {
+func (builder *annealingObserversBuilder) buildDefaultObservers() []baseObserver.Observer {
 	defaultObserver := new(observer.AnnealingMessageObserver).
 		WithLogHandler(builder.defaultLogger()).
 		WithFilter(builder.defaultFilter())
-	return []annealing.Observer{defaultObserver}
+	return []baseObserver.Observer{defaultObserver}
 }
 
 func (builder *annealingObserversBuilder) defaultFilter() *filters.PercentileOfIterationsPerAnnealingFilter {
@@ -69,8 +70,8 @@ func (builder *annealingObserversBuilder) defaultLogger() logging.Logger {
 	return builder.handlers[defaultLoggerIndex]
 }
 
-func (builder *annealingObserversBuilder) buildObservers() []annealing.Observer {
-	observerList := make([]annealing.Observer, len(builder.config))
+func (builder *annealingObserversBuilder) buildObservers() []baseObserver.Observer {
+	observerList := make([]baseObserver.Observer, len(builder.config))
 
 	for index, currConfig := range builder.config {
 		filter := builder.buildFilter(currConfig)
@@ -81,8 +82,8 @@ func (builder *annealingObserversBuilder) buildObservers() []annealing.Observer 
 	return observerList
 }
 
-func buildObserver(observerType AnnealingObserverType, logger logging.Logger, filter filters.Filter) annealing.Observer {
-	var newObserver annealing.Observer
+func buildObserver(observerType AnnealingObserverType, logger logging.Logger, filter filters.Filter) baseObserver.Observer {
+	var newObserver baseObserver.Observer
 	switch observerType {
 	case AttributeObserver:
 		newObserver = new(observer.AnnealingAttributeObserver).

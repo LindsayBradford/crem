@@ -2,7 +2,10 @@
 
 package filters
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
+)
 
 // PercentileOfIterationsPerAnnealingFilter filters FinishedIteration Annealing Event instances at a rate of 1 every
 // percentile number of iterations received. . StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
@@ -51,35 +54,38 @@ const (
 	notFiltered = false
 )
 
-func isGenerallyFilterable(eventType annealing.EventType) bool {
+func isGenerallyFilterable(eventType observer.EventType) bool {
 	switch eventType {
-	case annealing.StartedAnnealing,
-		annealing.FinishedIteration,
-		annealing.Note:
+	case observer.StartedAnnealing,
+		observer.FinishedIteration,
+		observer.Note:
 		return filtered
 	default:
 		return notFiltered
 	}
 }
 
-func isModuloFilterable(eventType annealing.EventType) bool {
+func isModuloFilterable(eventType observer.EventType) bool {
 	switch eventType {
-	case annealing.FinishedIteration,
-		annealing.Note:
+	case observer.FinishedIteration,
+		observer.Note:
 		return filtered
 	default:
 		return notFiltered
 	}
 }
 
-func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event annealing.Event) bool {
+func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event observer.Event) bool {
 	if !isGenerallyFilterable(event.EventType) {
 		return notFiltered
 	}
 
-	if m.generatesEvents && isModuloFilterable(event.EventType) &&
-		event.Annealer.CurrentIteration()%m.iterationModulo == 0 {
-		return notFiltered
+	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+		if m.generatesEvents && isModuloFilterable(event.EventType) &&
+			annealer.CurrentIteration()%m.iterationModulo == 0 {
+			return notFiltered
+		}
 	}
+
 	return filtered
 }

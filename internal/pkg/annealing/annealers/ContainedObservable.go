@@ -3,12 +3,12 @@
 package annealers
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
 
 type ContainedObservable struct {
-	annealing.ContainedEventNotifier
+	observer.ContainedEventNotifier
 
 	explorer.ContainedObservableExplorer
 
@@ -19,11 +19,11 @@ type ContainedObservable struct {
 	currentIteration  uint64
 }
 
-func (co *ContainedObservable) AddObserver(observer annealing.Observer) error {
+func (co *ContainedObservable) AddObserver(observer observer.Observer) error {
 	return co.EventNotifier().AddObserver(observer)
 }
 
-func (co *ContainedObservable) Observers() []annealing.Observer {
+func (co *ContainedObservable) Observers() []observer.Observer {
 	return co.EventNotifier().Observers()
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	errors2 "github.com/pkg/errors"
@@ -26,7 +27,7 @@ type AnnealerBuilder struct {
 
 	defaultLogHandler logging.Logger
 	logHandlers       []logging.Logger
-	observers         []annealing.Observer
+	observers         []observer.Observer
 	annealingExplorer explorer.Explorer
 	annealingModel    model.Model
 }
@@ -171,13 +172,13 @@ func (builder *AnnealerBuilder) buildAnnealerOfType(annealerType AnnealerType) *
 	}
 }
 
-func (builder *AnnealerBuilder) buildEventNotifier() annealing.EventNotifier {
+func (builder *AnnealerBuilder) buildEventNotifier() observer.EventNotifier {
 	eventNotifierType := builder.config.Annealer.EventNotifier
 	switch eventNotifierType {
 	case Sequential, UnspecifiedEventNotifierType:
-		return new(annealing.SynchronousAnnealingEventNotifier)
+		return new(observer.SynchronousAnnealingEventNotifier)
 	case Concurrent:
-		return new(annealing.ConcurrentAnnealingEventNotifier)
+		return new(observer.ConcurrentAnnealingEventNotifier)
 	default:
 		panic("Should not reach here")
 	}

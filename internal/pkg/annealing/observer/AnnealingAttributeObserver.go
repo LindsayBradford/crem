@@ -5,6 +5,7 @@ package observer
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
@@ -24,45 +25,65 @@ func (aao *AnnealingAttributeObserver) WithFilter(Filter filters.Filter) *Anneal
 	return aao
 }
 
-// ObserveAnnealingEvent captures and converts Event instances into a Attributes instance that
+// ObserveEvent captures and converts Event instances into a Attributes instance that
 // captures key attributes associated with the event, and passes them to the Logger for processing.
-func (aao *AnnealingAttributeObserver) ObserveAnnealingEvent(event annealing.Event) {
+func (aao *AnnealingAttributeObserver) ObserveEvent(event observer.Event) {
 	if aao.logHandler.BeingDiscarded(AnnealerLogLevel) || aao.filter.ShouldFilter(event) {
 		return
 	}
 
 	logAttributes := make(logging.Attributes, 0)
-	logAttributes = append(logAttributes, logging.NameValuePair{Name: "Id", Value: event.Annealer.Id()})
+	logAttributes = append(logAttributes, logging.NameValuePair{Name: "Id", Value: event.EventSource.Id()})
 	logAttributes = append(logAttributes, logging.NameValuePair{Name: "Event", Value: event.EventType.String()})
 
+	if observableAnnealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+		aao.observeAnnealingEvent(observableAnnealer, event, logAttributes)
+	} else {
+		aao.observeEvent(event, logAttributes)
+	}
+}
+
+func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer annealing.Observable, event observer.Event, logAttributes logging.Attributes) {
+
+	annealer := wrapAnnealer(observableAnnealer)
+	explorer := wrapSolutionExplorer(observableAnnealer.ObservableExplorer())
+
 	switch event.EventType {
-	case annealing.StartedAnnealing:
+	case observer.StartedAnnealing:
 		logAttributes = append(logAttributes,
-			logging.NameValuePair{Name: "MaximumIterations", Value: event.Annealer.MaximumIterations()},
-			logging.NameValuePair{Name: "Temperature", Value: event.Annealer.Temperature()},
-			logging.NameValuePair{Name: "CoolingFactor", Value: event.Annealer.CoolingFactor()},
+			logging.NameValuePair{Name: "MaximumIterations", Value: annealer.MaximumIterations()},
+			logging.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
+			logging.NameValuePair{Name: "CoolingFactor", Value: annealer.CoolingFactor()},
 		)
-	case annealing.StartedIteration:
+	case observer.StartedIteration:
 		logAttributes = append(logAttributes,
-			logging.NameValuePair{Name: "CurrentIteration", Value: event.Annealer.CurrentIteration()},
-			logging.NameValuePair{Name: "Temperature", Value: event.Annealer.Temperature()},
-			logging.NameValuePair{Name: "ObjectiveValue", Value: event.Annealer.ObservableExplorer().ObjectiveValue()},
+			logging.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
+			logging.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
+			logging.NameValuePair{Name: "ObjectiveValue", Value: explorer.ObjectiveValue()},
 		)
-	case annealing.FinishedIteration:
+	case observer.FinishedIteration:
 		logAttributes = append(logAttributes,
-			logging.NameValuePair{Name: "CurrentIteration", Value: event.Annealer.CurrentIteration()},
-			logging.NameValuePair{Name: "ObjectiveValue", Value: event.Annealer.ObservableExplorer().ObjectiveValue()},
-			logging.NameValuePair{Name: "ChangeInObjectiveValue", Value: event.Annealer.ObservableExplorer().ChangeInObjectiveValue()},
-			logging.NameValuePair{Name: "ChangeIsDesirable", Value: event.Annealer.ObservableExplorer().ChangeIsDesirable()},
-			logging.NameValuePair{Name: "AcceptanceProbability", Value: event.Annealer.ObservableExplorer().AcceptanceProbability()},
-			logging.NameValuePair{Name: "ChangeAccepted", Value: event.Annealer.ObservableExplorer().ChangeAccepted()},
+			logging.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
+			logging.NameValuePair{Name: "ObjectiveValue", Value: explorer.ObjectiveValue()},
+			logging.NameValuePair{Name: "ChangeInObjectiveValue", Value: explorer.ChangeInObjectiveValue()},
+			logging.NameValuePair{Name: "ChangeIsDesirable", Value: explorer.ChangeIsDesirable()},
+			logging.NameValuePair{Name: "AcceptanceProbability", Value: explorer.AcceptanceProbability()},
+			logging.NameValuePair{Name: "ChangeAccepted", Value: explorer.ChangeAccepted()},
 		)
-	case annealing.FinishedAnnealing:
+	case observer.FinishedAnnealing:
 		logAttributes = append(logAttributes,
-			logging.NameValuePair{Name: "CurrentIteration", Value: event.Annealer.CurrentIteration()},
-			logging.NameValuePair{Name: "Temperature", Value: event.Annealer.Temperature()},
+			logging.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
+			logging.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
 		)
-	case annealing.Note:
+	default:
+		// deliberately does nothing extra
+	}
+	aao.logHandler.LogAtLevelWithAttributes(AnnealerLogLevel, logAttributes)
+}
+
+func (aao *AnnealingAttributeObserver) observeEvent(event observer.Event, logAttributes logging.Attributes) {
+	switch event.EventType {
+	case observer.Note:
 		logAttributes = append(logAttributes, logging.NameValuePair{Name: "Note", Value: event.Note})
 	default:
 		// deliberately does nothing extra

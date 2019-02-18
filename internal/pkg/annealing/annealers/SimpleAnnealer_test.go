@@ -6,9 +6,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
 )
@@ -159,7 +159,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[annealing.EventType]uint64)
+	countingObserver.eventCounts = make(map[observer.EventType]uint64)
 
 	observerError = annealer.AddObserver(countingObserver)
 
@@ -169,16 +169,16 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	annealer.Anneal()
 
-	g.Expect(countingObserver.eventCounts[annealing.StartedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[annealing.FinishedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[observer.FinishedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[annealing.StartedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[annealing.FinishedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
@@ -188,7 +188,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	notifier := new(annealing.ConcurrentAnnealingEventNotifier)
+	notifier := new(observer.ConcurrentAnnealingEventNotifier)
 	annealer.SetEventNotifier(notifier)
 	g.Expect(annealer.EventNotifier()).To(Equal(notifier),
 		"Annealer should use the event notifier assigned to it")
@@ -209,7 +209,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
 
 	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[annealing.EventType]uint64)
+	countingObserver.eventCounts = make(map[observer.EventType]uint64)
 
 	observerError = annealer.AddObserver(countingObserver)
 
@@ -223,25 +223,25 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	g.Eventually(
 		func() uint64 {
-			return countingObserver.eventCounts[annealing.FinishedAnnealing]
+			return countingObserver.eventCounts[observer.FinishedAnnealing]
 		}).Should(BeNumerically("==", 1),
 		"Annealer should have posted 1 FinishedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[annealing.StartedAnnealing]).To(BeNumerically("==", 1),
+	g.Expect(countingObserver.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1),
 		"Annealer should have posted 1 StartedAnnealing event")
 
-	g.Expect(countingObserver.eventCounts[annealing.StartedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  StartedIteration event")
 
-	g.Expect(countingObserver.eventCounts[annealing.FinishedIteration]).To(BeNumerically("==", expectedIterations),
+	g.Expect(countingObserver.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations),
 		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
 }
 
 type CountingObserver struct {
-	eventCounts map[annealing.EventType]uint64
+	eventCounts map[observer.EventType]uint64
 }
 
-func (co *CountingObserver) ObserveAnnealingEvent(event annealing.Event) {
+func (co *CountingObserver) ObserveEvent(event observer.Event) {
 	co.eventCounts[event.EventType] += 1
 }
 

@@ -1,6 +1,6 @@
-// Copyright (c) 2018 Australian Rivers Institute.
+// Copyright (c) 2019 Australian Rivers Institute.
 
-package annealing
+package observer
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 type EventNotifier interface {
 	AddObserver(observer Observer) error
 	Observers() []Observer
-	NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType)
+	NotifyObserversOfEvent(event Event)
 }
 
 // EventNotifierContainer  defines an interface embedding an EventNotifier
@@ -54,10 +54,9 @@ func (notifier *SynchronousAnnealingEventNotifier) AddObserver(newObserver Obser
 	return nil
 }
 
-func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType) {
-	event := Event{EventType: eventType, Annealer: annealer}
+func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfEvent(event Event) {
 	for _, currObserver := range notifier.observers {
-		currObserver.ObserveAnnealingEvent(event)
+		currObserver.ObserveEvent(event)
 	}
 }
 
@@ -85,15 +84,14 @@ func (notifier *ConcurrentAnnealingEventNotifier) AddObserver(newObserver Observ
 	go func() {
 		for {
 			newEvent := <-newEventChannel
-			newObserver.ObserveAnnealingEvent(newEvent)
+			newObserver.ObserveEvent(newEvent)
 		}
 	}()
 
 	return nil
 }
 
-func (notifier *ConcurrentAnnealingEventNotifier) NotifyObserversOfAnnealingEvent(annealer Observable, eventType EventType) {
-	event := Event{EventType: eventType, Annealer: annealer}
+func (notifier *ConcurrentAnnealingEventNotifier) NotifyObserversOfEvent(event Event) {
 	for _, observerChannel := range notifier.observerChannels {
 		observerChannel <- event
 	}

@@ -5,12 +5,12 @@ package annealers
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
@@ -18,16 +18,16 @@ import (
 
 type dummyObserver struct{}
 
-func (*dummyObserver) ObserveAnnealingEvent(event annealing.Event) {}
+func (*dummyObserver) ObserveEvent(event observer.Event) {}
 
 func TestBuild_OverridingDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedLogHandler := new(loggers.BareBonesLogger)
 	expectedSolutionExplorer := new(null.Explorer)
-	expectedObservers := []annealing.Observer{new(dummyObserver)}
+	expectedObservers := []observer.Observer{new(dummyObserver)}
 	expectedId := "someId"
-	expectedEventNotifier := new(annealing.ConcurrentAnnealingEventNotifier)
+	expectedEventNotifier := new(observer.ConcurrentAnnealingEventNotifier)
 
 	builder := new(Builder)
 
@@ -95,7 +95,7 @@ func TestBuild_BadInputs(t *testing.T) {
 
 	badLogHandler := logging.Logger(nil)
 	badExplorer := explorer.Explorer(nil)
-	badEventNotifier := annealing.EventNotifier(nil)
+	badEventNotifier := observer.EventNotifier(nil)
 
 	builder := new(Builder)
 

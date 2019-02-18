@@ -28,7 +28,7 @@ func init() {
 
 func (wrapper *FormatWrapper) Initialise() *FormatWrapper {
 	wrapper.MethodFormats = map[string]string{
-		"iD":                defaultStringFormat,
+		"Id":                defaultStringFormat,
 		"Temperature":       defaultFloat64Format,
 		"CoolingFactor":     defaultFloat64Format,
 		"MaximumIterations": defaultUintFormat,

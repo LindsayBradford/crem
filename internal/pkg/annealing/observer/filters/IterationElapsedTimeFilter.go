@@ -4,6 +4,8 @@ package filters
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
+
 	"time"
 )
 
@@ -25,21 +27,22 @@ func (m *IterationElapsedTimeFilter) WithWait(wait time.Duration) *IterationElap
 // ShouldFilter returns true for most FinishedIteration Event instances. Those allowed through to the logger
 // are either 1) the very first or very last event, or 2) the closest FinishedIteration event to have
 // occurred after the wait duration has passed since the last previous event allowed through.
-func (m *IterationElapsedTimeFilter) ShouldFilter(event annealing.Event) bool {
-	if event.EventType != annealing.StartedIteration && event.EventType != annealing.FinishedIteration {
+func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
+	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
 		return false
 	}
 
-	annealer := event.Annealer
-	if event.EventType == annealing.FinishedIteration &&
-		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()) {
-		m.lastTimeAllowed = time.Now()
-		return false
-	}
+	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+		if event.EventType == observer.FinishedIteration &&
+			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()) {
+			m.lastTimeAllowed = time.Now()
+			return false
+		}
 
-	if event.EventType == annealing.FinishedIteration && time.Now().Sub(m.lastTimeAllowed) >= m.waitDuration {
-		m.lastTimeAllowed = m.lastTimeAllowed.Add(m.waitDuration)
-		return false
+		if event.EventType == observer.FinishedIteration && time.Now().Sub(m.lastTimeAllowed) >= m.waitDuration {
+			m.lastTimeAllowed = m.lastTimeAllowed.Add(m.waitDuration)
+			return false
+		}
 	}
 
 	return true

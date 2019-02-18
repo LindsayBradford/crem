@@ -2,7 +2,10 @@
 
 package filters
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
+)
 
 // IterationCountFilter modulates FinishedIteration Annealing Event instances at a rate of 1 every modulo
 // events. StartedIteration events are completely filtered out. All other event types are allowed through to the LogHandler.
@@ -19,16 +22,17 @@ func (m *IterationCountFilter) WithModulo(modulo uint64) *IterationCountFilter {
 // ShouldFilter modulates only FinishedIteration Event instances, and fully filters out all StartedIteration
 // events. Every modulo FinishedIteration events received, one is allowed through to the LogHandler.
 // The very first and very last FinishedIteration events are exceptions, and are also not filtered.
-func (m *IterationCountFilter) ShouldFilter(event annealing.Event) bool {
-	if event.EventType != annealing.StartedIteration && event.EventType != annealing.FinishedIteration {
+func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
+	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
 		return false
 	}
 
-	annealer := event.Annealer
-	if event.EventType == annealing.FinishedIteration &&
-		(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations() ||
-			annealer.CurrentIteration()%m.iterationModulo == 0) {
-		return false
+	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+		if event.EventType == observer.FinishedIteration &&
+			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations() ||
+				annealer.CurrentIteration()%m.iterationModulo == 0) {
+			return false
+		}
 	}
 
 	return true

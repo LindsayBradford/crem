@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/wrapper"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
@@ -22,7 +23,7 @@ type AnnealingObserver struct {
 }
 
 // Allows for the receipt of Event instances, but deliberately takes no action in observer those events.
-func (l *AnnealingObserver) ObserveAnnealingEvent(event annealing.Event) {}
+func (l *AnnealingObserver) ObserveAnnealingEvent(event observer.Event) {}
 
 func wrapAnnealer(eventAnnealer annealing.Observable) *wrapper.FormatWrapper {
 	wrapper := newAnnealerWrapper()

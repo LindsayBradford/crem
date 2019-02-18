@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"
@@ -29,7 +30,7 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.id = "Simple Annealer"
 	sa.temperature = 1
 	sa.currentIteration = 0
-	sa.SetEventNotifier(new(annealing.SynchronousAnnealingEventNotifier))
+	sa.SetEventNotifier(new(observer.SynchronousAnnealingEventNotifier))
 	sa.SetLogHandler(new(loggers.NullLogger))
 	sa.SetSolutionExplorer(null.NullExplorer)
 	sa.parameters.Initialise()
@@ -72,8 +73,9 @@ func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 	return nil
 }
 
-func (sa *SimpleAnnealer) notifyObservers(eventType annealing.EventType) {
-	sa.EventNotifier().NotifyObserversOfAnnealingEvent(sa.CloneObservable(), eventType)
+func (sa *SimpleAnnealer) notifyObservers(eventType observer.EventType) {
+	event := observer.Event{EventType: eventType, EventSource: sa.CloneObservable()}
+	sa.EventNotifier().NotifyObserversOfEvent(event)
 }
 
 func (sa *SimpleAnnealer) CloneObservable() annealing.Observable {
@@ -116,20 +118,20 @@ func (sa *SimpleAnnealer) Anneal() {
 }
 
 func (sa *SimpleAnnealer) annealingStarted() {
-	sa.notifyObservers(annealing.StartedAnnealing)
+	sa.notifyObservers(observer.StartedAnnealing)
 }
 
 func (sa *SimpleAnnealer) iterationStarted() {
 	sa.currentIteration++
-	sa.notifyObservers(annealing.StartedIteration)
+	sa.notifyObservers(observer.StartedIteration)
 }
 
 func (sa *SimpleAnnealer) iterationFinished() {
-	sa.notifyObservers(annealing.FinishedIteration)
+	sa.notifyObservers(observer.FinishedIteration)
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
-	sa.notifyObservers(annealing.FinishedAnnealing)
+	sa.notifyObservers(observer.FinishedAnnealing)
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {

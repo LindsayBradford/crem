@@ -1,15 +1,19 @@
+// Copyright (c) 2019 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package annealing
+package observer
+
+import "github.com/LindsayBradford/crem/pkg/name"
 
 type Observer interface {
-	ObserveAnnealingEvent(event Event)
+	ObserveEvent(event Event)
 }
 
 type Event struct {
-	EventType EventType
-	Annealer  Observable
-	Note      string
+	EventType   EventType
+	EventSource name.Identifiable
+	Note        string
 }
 
 type EventType int

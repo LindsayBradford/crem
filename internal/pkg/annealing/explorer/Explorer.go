@@ -38,7 +38,7 @@ type Observable interface {
 	ChangeAccepted() bool
 }
 
-// Container defines an interface embedding a Model
+// Container defines an interface embedding an Explorer
 type Container interface {
 	SolutionExplorer() Explorer
 	SetSolutionExplorer(explorer Explorer) error

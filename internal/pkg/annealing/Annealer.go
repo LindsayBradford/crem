@@ -5,6 +5,7 @@ package annealing
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -17,17 +18,17 @@ type Annealer interface {
 	logging.Container
 
 	Observable
-	EventNotifierContainer
+	observer.EventNotifierContainer
 
 	Cloneable
 	Anneal()
 }
 
 type Observable interface {
-	AddObserver(observer Observer) error
-	Observers() []Observer
-
 	name.Identifiable
+	AddObserver(observer observer.Observer) error
+	Observers() []observer.Observer
+
 	Temperature() float64
 	CoolingFactor() float64
 	MaximumIterations() uint64

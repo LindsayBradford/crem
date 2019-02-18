@@ -8,6 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	cremerrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
@@ -68,7 +69,7 @@ func (builder *Builder) WithSolutionExplorer(explorer explorer.Explorer) *Builde
 	return builder
 }
 
-func (builder *Builder) WithEventNotifier(delegate annealing.EventNotifier) *Builder {
+func (builder *Builder) WithEventNotifier(delegate observer.EventNotifier) *Builder {
 	annealerBeingBuilt := builder.annealer
 	if err := annealerBeingBuilt.SetEventNotifier(delegate); err != nil {
 		builder.buildErrors.Add(err)
@@ -84,7 +85,7 @@ func (builder *Builder) WithDumbSolutionExplorer() *Builder {
 	return builder
 }
 
-func (builder *Builder) WithObservers(observers ...annealing.Observer) *Builder {
+func (builder *Builder) WithObservers(observers ...observer.Observer) *Builder {
 	annealerBeingBuilt := builder.annealer
 
 	for _, currObserver := range observers {

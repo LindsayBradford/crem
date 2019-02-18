@@ -5,6 +5,7 @@ package observer
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
@@ -26,14 +27,14 @@ func (amo *AnnealingInvariantObserver) WithFilter(filter filters.Filter) *Anneal
 	return amo
 }
 
-func (amo *AnnealingInvariantObserver) ObserveAnnealingEvent(event annealing.Event) {
+func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 	if amo.loopInvariantUpheld(event) {
 		return
 	}
 
 	var builder strings.FluentBuilder
 	builder.Add(
-		"Id [", event.Annealer.Id(), "], ",
+		"Id [", event.EventSource.Id(), "], ",
 		"Event [", event.EventType.String(),
 		"]: Loop Invariant Broken",
 	)
@@ -41,21 +42,24 @@ func (amo *AnnealingInvariantObserver) ObserveAnnealingEvent(event annealing.Eve
 	panic(builder.String())
 }
 
-func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event annealing.Event) bool {
-	switch event.EventType {
-	case annealing.StartedAnnealing:
-		amo.previousObjectiveValue = event.Annealer.ObservableExplorer().ObjectiveValue()
-		return true
-	case annealing.FinishedIteration:
-		var expectedObjectiveValue float64
-		if event.Annealer.ObservableExplorer().ChangeAccepted() {
-			expectedObjectiveValue = amo.previousObjectiveValue + event.Annealer.ObservableExplorer().ChangeInObjectiveValue()
-			amo.previousObjectiveValue = event.Annealer.ObservableExplorer().ObjectiveValue()
-		} else {
-			expectedObjectiveValue = amo.previousObjectiveValue
+func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event observer.Event) bool {
+	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+		switch event.EventType {
+		case observer.StartedAnnealing:
+			amo.previousObjectiveValue = annealer.ObservableExplorer().ObjectiveValue()
+			return true
+		case observer.FinishedIteration:
+			var expectedObjectiveValue float64
+			if annealer.ObservableExplorer().ChangeAccepted() {
+				expectedObjectiveValue = amo.previousObjectiveValue + annealer.ObservableExplorer().ChangeInObjectiveValue()
+				amo.previousObjectiveValue = annealer.ObservableExplorer().ObjectiveValue()
+			} else {
+				expectedObjectiveValue = amo.previousObjectiveValue
+			}
+			return expectedObjectiveValue == annealer.ObservableExplorer().ObjectiveValue()
+		default:
+			return true
 		}
-		return expectedObjectiveValue == event.Annealer.ObservableExplorer().ObjectiveValue()
-	default:
-		return true
 	}
+	return true
 }
