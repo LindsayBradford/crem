@@ -3,7 +3,11 @@
 package observer
 
 import (
+	"strconv"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/attributes"
@@ -86,8 +90,17 @@ func (aao *AnnealingAttributeObserver) observeEvent(event observer.Event, logAtt
 	switch event.EventType {
 	case observer.Note:
 		logAttributes = append(logAttributes, attributes.NameValuePair{Name: "Note", Value: event.Note()})
+	case observer.ManagementAction:
+		action, isAction := event.Source().(action.ManagementAction)
+		if isAction {
+			logAttributes = append(logAttributes,
+				attributes.NameValuePair{Name: "Type", Value: action.Type()},
+				attributes.NameValuePair{Name: "PlanningUnit", Value: action.PlanningUnit()},
+				attributes.NameValuePair{Name: "Active", Value: strconv.FormatBool(action.IsActive())},
+			)
+		}
 	default:
 		// deliberately does nothing extra
 	}
-	aao.logHandler.LogAtLevelWithAttributes(AnnealerLogLevel, logAttributes)
+	aao.logHandler.LogAtLevelWithAttributes(model.LogLevel, logAttributes)
 }

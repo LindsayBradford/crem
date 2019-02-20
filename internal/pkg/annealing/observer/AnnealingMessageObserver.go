@@ -44,9 +44,8 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 
 	if observableAnnealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		amo.observeAnnealingEvent(observableAnnealer, event, &builder)
-	}
-	if _, isModel := event.Source().(model.Model); isModel {
-		amo.observeModelEvent(event, &builder)
+	} else {
+		amo.observeEvent(event, &builder)
 	}
 }
 
@@ -86,7 +85,7 @@ func (amo *AnnealingMessageObserver) observeAnnealingEvent(observableAnnealer an
 	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 }
 
-func (amo *AnnealingMessageObserver) observeModelEvent(event observer.Event, builder *strings.FluentBuilder) {
+func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.Note:
 		builder.Add("[", event.Note(), "]")
