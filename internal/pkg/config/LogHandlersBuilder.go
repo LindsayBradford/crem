@@ -4,6 +4,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -66,6 +67,7 @@ func (builder *LogHandlersBuilder) newHandlerFor(currConfig LoggerConfig) loggin
 		builder.errors.Add(newLogError)
 	} else {
 		ensureSupportForAnnealerLogLevel(newLogger)
+		ensureSupportForModelLogLevel(newLogger)
 	}
 	return newLogger
 }
@@ -78,12 +80,19 @@ func (builder *LogHandlersBuilder) buildDefaultLogHandler() logging.Logger {
 		)
 	}
 	ensureSupportForAnnealerLogLevel(defaultLogger)
+	ensureSupportForModelLogLevel(defaultLogger)
 	return defaultLogger
 }
 
 func ensureSupportForAnnealerLogLevel(handler logging.Logger) {
 	if !handler.SupportsLogLevel(observer.AnnealerLogLevel) {
 		handler.Override(observer.AnnealerLogLevel, logging.STDOUT)
+	}
+}
+
+func ensureSupportForModelLogLevel(handler logging.Logger) {
+	if !handler.SupportsLogLevel(model.LogLevel) {
+		handler.Override(model.LogLevel, logging.DISCARD)
 	}
 }
 

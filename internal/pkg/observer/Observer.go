@@ -24,6 +24,8 @@ const (
 	StartedIteration
 	FinishedIteration
 	FinishedAnnealing
+	ManagementAction
+	DecisionVariable
 	Note
 )
 
@@ -34,6 +36,8 @@ func (eventType EventType) String() string {
 		"StartedIteration",
 		"FinishedIteration",
 		"FinishedAnnealing",
+		"ManagementAction",
+		"DecisionVariable",
 		"Note",
 	}
 

@@ -4,6 +4,7 @@ package observer
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -38,8 +39,9 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 
 	if observableAnnealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
 		amo.observeAnnealingEvent(observableAnnealer, event, &builder)
-	} else {
-		amo.observeEvent(event, &builder)
+	}
+	if _, isModel := event.EventSource.(model.Model); isModel {
+		amo.observeModelEvent(event, &builder)
 	}
 }
 
@@ -79,13 +81,15 @@ func (amo *AnnealingMessageObserver) observeAnnealingEvent(observableAnnealer an
 	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 }
 
-func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
+func (amo *AnnealingMessageObserver) observeModelEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.Note:
 		builder.Add("[", event.Note, "]")
+	case observer.ManagementAction:
+		builder.Add(event.Note)
 	default:
 		// deliberately does nothing extra
 	}
 
-	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+	amo.logHandler.LogAtLevel(model.LogLevel, builder.String())
 }

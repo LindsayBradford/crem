@@ -1,7 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2018 Australian Rivers Institute.
-
 package observer
 
 import (

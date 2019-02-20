@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
@@ -18,6 +19,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
@@ -78,6 +80,8 @@ func (m *Model) ParameterErrors() error {
 }
 
 func (m *Model) Initialise() {
+	m.note("Initialising")
+
 	dataSourcePath := m.deriveDataSourcePath()
 
 	m.dataSet.Load(dataSourcePath)
@@ -97,6 +101,7 @@ func (m *Model) Initialise() {
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
+		action.Subscribe(m)
 		action.Subscribe(m.sedimentLoad)
 		m.managementActions.Add(action)
 	}
@@ -106,10 +111,12 @@ func (m *Model) Initialise() {
 }
 
 func (m *Model) AcceptChange() {
+	m.note("Accepting Change")
 	m.sedimentLoad.Accept()
 }
 
 func (m *Model) RevertChange() {
+	m.note("Reverting Change")
 	m.sedimentLoad.Revert()
 	m.managementActions.UndoLastActivationToggleUnobserved()
 }
@@ -125,8 +132,24 @@ func (m *Model) TearDown() {
 }
 
 func (m *Model) TryRandomChange() {
-	m.note("trying random change")
+	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
+}
+
+func (m *Model) Observe(action action.ManagementAction) {
+	m.noteAppliedManagementAction(action)
+}
+
+func (m *Model) noteAppliedManagementAction(action action.ManagementAction) {
+	var builder strings.FluentBuilder
+	builder.Add("Type [", string(action.Type()),
+		"], ", "PlanningUnit [", action.PlanningUnit(),
+		"], ", "Active [", strconv.FormatBool(action.IsActive()),
+		"]",
+	)
+
+	event := observer.Event{EventType: observer.ManagementAction, EventSource: m, Note: builder.String()}
+	m.EventNotifier().NotifyObserversOfEvent(event)
 }
 
 func (m *Model) note(text string) {

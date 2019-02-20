@@ -2,7 +2,12 @@
 
 package model
 
-import "github.com/LindsayBradford/crem/pkg/name"
+import (
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/name"
+)
+
+const LogLevel logging.Level = "Model"
 
 type Model interface {
 	name.Nameable

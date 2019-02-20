@@ -1,12 +1,19 @@
 ScenarioName = "Test Catchment Annealer - One run"
 
+[[Loggers]]
+Name = "TestLogger"
+[Loggers.LogLevelDestinations]
+#Debug = "StandardOutput"
+Model = "StandardOutput"
+
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+Logger = "TestLogger"
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
 NumberOfIterations = 1
 
 [[AnnealingObservers]]
-Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+Type = "InvariantObserver"
 
 [[Models]]
 Type = "CatchmentModel"
