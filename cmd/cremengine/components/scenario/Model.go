@@ -6,7 +6,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
@@ -19,7 +18,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
@@ -141,20 +139,18 @@ func (m *Model) Observe(action action.ManagementAction) {
 }
 
 func (m *Model) noteAppliedManagementAction(action action.ManagementAction) {
-	var builder strings.FluentBuilder
-	builder.Add("Type [", string(action.Type()),
-		"], ", "PlanningUnit [", action.PlanningUnit(),
-		"], ", "Active [", strconv.FormatBool(action.IsActive()),
-		"]",
-	)
-
-	event := observer.Event{EventType: observer.ManagementAction, EventSource: m, Note: builder.String()}
-	m.EventNotifier().NotifyObserversOfEvent(event)
+	event := observer.NewEvent(observer.ManagementAction).
+		WithId(m.Id()).
+		WithSource(action)
+	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) note(text string) {
-	event := observer.Event{EventType: observer.Note, EventSource: m, Note: text}
-	m.EventNotifier().NotifyObserversOfEvent(event)
+	event := observer.NewEvent(observer.Note).
+		WithId(m.Id()).
+		WithSource(m).
+		WithNote(text)
+	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) capChangeOverRange(value float64) float64 {

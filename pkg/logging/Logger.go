@@ -7,6 +7,7 @@ package logging
 import (
 	"errors"
 
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -22,7 +23,7 @@ type Logger interface {
 	Error(message interface{})
 
 	LogAtLevel(logLevel Level, message interface{})
-	LogAtLevelWithAttributes(logLevel Level, attributes Attributes)
+	LogAtLevelWithAttributes(logLevel Level, attributes attributes.Attributes)
 
 	Initialise()
 

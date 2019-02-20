@@ -80,7 +80,7 @@ func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event observer.E
 		return notFiltered
 	}
 
-	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		if m.generatesEvents && isModuloFilterable(event.EventType) &&
 			annealer.CurrentIteration()%m.iterationModulo == 0 {
 			return notFiltered

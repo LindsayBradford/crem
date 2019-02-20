@@ -3,6 +3,7 @@
 package loggers
 
 import (
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 )
@@ -20,7 +21,7 @@ func (handler *NullLogger) Info(message interface{})                            
 func (handler *NullLogger) Warn(message interface{})                               {}
 func (handler *NullLogger) Error(message interface{})                              {}
 func (handler *NullLogger) LogAtLevel(logLevel logging.Level, message interface{}) {}
-func (handler *NullLogger) LogAtLevelWithAttributes(logLevel logging.Level, attributes logging.Attributes) {
+func (handler *NullLogger) LogAtLevelWithAttributes(logLevel logging.Level, attributes attributes.Attributes) {
 }
 
 func (handler *NullLogger) Initialise()                                                      {}

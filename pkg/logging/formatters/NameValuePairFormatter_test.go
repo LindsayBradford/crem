@@ -7,7 +7,7 @@ package formatters
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 )
 
 type nvpStringer struct{}
@@ -17,7 +17,7 @@ func (s *nvpStringer) String() string {
 }
 
 func ExampleNameValuePairFormatter_Format() {
-	exampleAttributes := logging.Attributes{
+	exampleAttributes := attributes.Attributes{
 		{Name: "One", Value: "valueOne"},
 		{Name: "Two", Value: 42},
 		{Name: "Three", Value: uint64(0)},

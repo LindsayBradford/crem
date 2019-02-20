@@ -5,11 +5,11 @@ package formatters
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 )
 
 func ExampleNullFormatter_Format() {
-	exampleAttributes := logging.Attributes{
+	exampleAttributes := attributes.Attributes{
 		{Name: "NoMatter", Value: "Ignored anyway"},
 	}
 

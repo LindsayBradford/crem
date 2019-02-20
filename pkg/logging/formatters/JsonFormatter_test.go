@@ -5,7 +5,7 @@ package formatters
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 )
 
 type jsonStringer struct{}
@@ -15,7 +15,7 @@ func (s *jsonStringer) String() string {
 }
 
 func ExampleJsonFormatter_Format() {
-	exampleAttributes := logging.Attributes{
+	exampleAttributes := attributes.Attributes{
 		{Name: "One", Value: "valueOne"},
 		{Name: "Two", Value: 42},
 		{Name: "Three", Value: uint64(0)},

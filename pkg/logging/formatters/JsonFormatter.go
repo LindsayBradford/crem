@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
 // JsonFormatter formats a Attributes array into an equivalent JSON encoding.
 type JsonFormatter struct{}
 
-func (formatter *JsonFormatter) Format(attributes logging.Attributes) string {
+func (formatter *JsonFormatter) Format(attributes attributes.Attributes) string {
 	var builder strings.FluentBuilder
 
 	builder.Add("{")

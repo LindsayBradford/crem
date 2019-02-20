@@ -2,7 +2,9 @@
 
 package formatters
 
-import "github.com/LindsayBradford/crem/pkg/logging"
+import (
+	"github.com/LindsayBradford/crem/pkg/attributes"
+)
 
 // nullFormatMessage is the message supplied if the NullFormatter is left as the Formatter of a LogHandler.
 const nullFormatMessage = "No formatter specified. Using the NullFormatter."
@@ -12,6 +14,6 @@ const nullFormatMessage = "No formatter specified. Using the NullFormatter."
 // for the observer to do anything meaningful.
 type NullFormatter struct{}
 
-func (nf *NullFormatter) Format(attributes logging.Attributes) string {
+func (nf *NullFormatter) Format(attributes attributes.Attributes) string {
 	return nullFormatMessage
 }

@@ -32,7 +32,7 @@ func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
 		return false
 	}
 
-	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		if event.EventType == observer.FinishedIteration &&
 			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()) {
 			m.lastTimeAllowed = time.Now()

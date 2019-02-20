@@ -3,6 +3,7 @@
 package loggers
 
 import (
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 )
@@ -56,15 +57,15 @@ func (lb *LoggerBase) Override(logLevel logging.Level, destination logging.Desti
 	lb.destinations.Override(logLevel, destination)
 }
 
-func toLogAttributes(message interface{}) logging.Attributes {
+func toLogAttributes(message interface{}) attributes.Attributes {
 	switch message.(type) {
 	case string:
-		return logging.Attributes{logging.NameValuePair{Name: formatters.MessageNameLabel, Value: message}}
+		return attributes.Attributes{attributes.NameValuePair{Name: formatters.MessageNameLabel, Value: message}}
 	case error:
 		messageAsError, _ := message.(error)
-		return logging.Attributes{logging.NameValuePair{Name: formatters.MessageErrorLabel, Value: messageAsError.Error()}}
-	case logging.Attributes:
-		messageAsAttributes, _ := message.(logging.Attributes)
+		return attributes.Attributes{attributes.NameValuePair{Name: formatters.MessageErrorLabel, Value: messageAsError.Error()}}
+	case attributes.Attributes:
+		messageAsAttributes, _ := message.(attributes.Attributes)
 		return messageAsAttributes
 	default:
 		panic("should not get here")

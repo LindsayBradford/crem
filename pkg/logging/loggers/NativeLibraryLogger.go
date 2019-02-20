@@ -5,6 +5,7 @@ package loggers
 import (
 	"log"
 
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
@@ -59,7 +60,7 @@ func (nll *NativeLibraryLogger) LogAtLevel(logLevel logging.Level, message inter
 	nll.deriveDestination(logLevel).Println("[" + string(logLevel) + "] " + nll.formatter.Format(messageAttributes))
 }
 
-func (nll *NativeLibraryLogger) LogAtLevelWithAttributes(logLevel logging.Level, logAttributes logging.Attributes) {
+func (nll *NativeLibraryLogger) LogAtLevelWithAttributes(logLevel logging.Level, logAttributes attributes.Attributes) {
 	nll.deriveDestination(logLevel).Println("[" + string(logLevel) + "] " + nll.formatter.Format(logAttributes))
 }
 

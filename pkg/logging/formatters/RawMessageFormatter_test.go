@@ -10,13 +10,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	. "github.com/onsi/gomega"
 )
 
 func ExampleRawMessageFormatter_Format() {
 	expectedMessage := "here is an expected message"
-	exampleAttributes := logging.Attributes{
+	exampleAttributes := attributes.Attributes{
 		{Name: "Message", Value: expectedMessage},
 		{Name: "NotAMessage", Value: "who cares?"},
 	}
@@ -33,7 +34,7 @@ func TestRawMessageFormatter_FormatError(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedMessage := "here is an error message"
-	attribsUnderTest := logging.Attributes{
+	attribsUnderTest := attributes.Attributes{
 		{Name: string(logging.ERROR), Value: expectedMessage},
 		{Name: "NotAMessage", Value: "who cares?"},
 	}
@@ -48,7 +49,7 @@ func TestRawMessageFormatter_FormatWarn(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedMessage := "here is a warning message"
-	attribsUnderTest := logging.Attributes{
+	attribsUnderTest := attributes.Attributes{
 		{Name: string(logging.WARN), Value: expectedMessage},
 		{Name: "NotAMessage", Value: "who cares?"},
 	}
@@ -63,7 +64,7 @@ func TestRawMessageFormatter_FormatEmpty(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedMessage := ""
-	attribsUnderTest := logging.Attributes{
+	attribsUnderTest := attributes.Attributes{
 		{Name: "NotAMessage", Value: "who cares?"},
 	}
 

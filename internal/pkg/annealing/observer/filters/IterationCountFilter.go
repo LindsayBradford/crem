@@ -27,7 +27,7 @@ func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
 		return false
 	}
 
-	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		if event.EventType == observer.FinishedIteration &&
 			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations() ||
 				annealer.CurrentIteration()%m.iterationModulo == 0) {

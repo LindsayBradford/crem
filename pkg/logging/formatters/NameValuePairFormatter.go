@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
 // NameValuePairFormatter formats a Attributes array into a string of comma-separated name-value pairs.
 type NameValuePairFormatter struct{}
 
-func (formatter *NameValuePairFormatter) Format(attributes logging.Attributes) string {
+func (formatter *NameValuePairFormatter) Format(attributes attributes.Attributes) string {
 	var builder strings.FluentBuilder
 
 	needsComma := false

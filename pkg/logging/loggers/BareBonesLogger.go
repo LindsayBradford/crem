@@ -6,6 +6,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
@@ -49,7 +50,7 @@ func (bbl *BareBonesLogger) LogAtLevel(logLevel logging.Level, message interface
 	bbl.writeString(logLevel, bbl.formatter.Format(messageAttributes))
 }
 
-func (bbl *BareBonesLogger) LogAtLevelWithAttributes(logLevel logging.Level, logAttributes logging.Attributes) {
+func (bbl *BareBonesLogger) LogAtLevelWithAttributes(logLevel logging.Level, logAttributes attributes.Attributes) {
 	logAttributes = prependLogLevel(logLevel, logAttributes)
 	logAttributes = prependTimestamp(logAttributes)
 	bbl.writeString(logLevel, bbl.formatter.Format(logAttributes))
@@ -65,13 +66,13 @@ func (bbl *BareBonesLogger) deriveDestination(logLevel logging.Level) logging.De
 	return bbl.destinations.Destinations[logLevel]
 }
 
-func prependTimestamp(oldSlice []logging.NameValuePair) []logging.NameValuePair {
+func prependTimestamp(oldSlice []attributes.NameValuePair) []attributes.NameValuePair {
 	timeAsString := time.Now().Format("2006-01-02T15:04:05.999999-07:00")
-	newPair := logging.NameValuePair{Name: "Time", Value: timeAsString}
-	return append([]logging.NameValuePair{newPair}, oldSlice...)
+	newPair := attributes.NameValuePair{Name: "Time", Value: timeAsString}
+	return append([]attributes.NameValuePair{newPair}, oldSlice...)
 }
 
-func prependLogLevel(logLevel logging.Level, oldSlice []logging.NameValuePair) []logging.NameValuePair {
-	newPair := logging.NameValuePair{Name: "Level", Value: string(logLevel)}
-	return append([]logging.NameValuePair{newPair}, oldSlice...)
+func prependLogLevel(logLevel logging.Level, oldSlice []attributes.NameValuePair) []attributes.NameValuePair {
+	newPair := attributes.NameValuePair{Name: "Level", Value: string(logLevel)}
+	return append([]attributes.NameValuePair{newPair}, oldSlice...)
 }

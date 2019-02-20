@@ -34,7 +34,7 @@ func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 
 	var builder strings.FluentBuilder
 	builder.Add(
-		"Id [", event.EventSource.Id(), "], ",
+		"Id [", event.Id(), "], ",
 		"Event [", event.EventType.String(),
 		"]: Loop Invariant Broken",
 	)
@@ -43,7 +43,7 @@ func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 }
 
 func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event observer.Event) bool {
-	if annealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		switch event.EventType {
 		case observer.StartedAnnealing:
 			amo.previousObjectiveValue = annealer.ObservableExplorer().ObjectiveValue()

@@ -74,8 +74,11 @@ func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 }
 
 func (sa *SimpleAnnealer) notifyObservers(eventType observer.EventType) {
-	event := observer.Event{EventType: eventType, EventSource: sa.CloneObservable()}
-	sa.EventNotifier().NotifyObserversOfEvent(event)
+	eventSource := sa.CloneObservable()
+	event := observer.NewEvent(eventType).
+		WithId(sa.Id()).
+		WithSource(eventSource)
+	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) CloneObservable() annealing.Observable {

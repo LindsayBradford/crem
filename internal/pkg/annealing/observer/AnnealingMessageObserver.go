@@ -3,8 +3,11 @@
 package observer
 
 import (
+	"strconv"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -35,12 +38,14 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 	}
 
 	var builder strings.FluentBuilder
-	builder.Add("Id [", event.EventSource.Id(), "], ", "Event [", event.EventType.String(), "]: ")
+	builder.
+		Add("Id [", event.Id(), "],").
+		Add("Event [", event.EventType.String(), "]: ")
 
-	if observableAnnealer, isAnnealer := event.EventSource.(annealing.Observable); isAnnealer {
+	if observableAnnealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		amo.observeAnnealingEvent(observableAnnealer, event, &builder)
 	}
-	if _, isModel := event.EventSource.(model.Model); isModel {
+	if _, isModel := event.Source().(model.Model); isModel {
 		amo.observeModelEvent(event, &builder)
 	}
 }
@@ -84,9 +89,15 @@ func (amo *AnnealingMessageObserver) observeAnnealingEvent(observableAnnealer an
 func (amo *AnnealingMessageObserver) observeModelEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.Note:
-		builder.Add("[", event.Note, "]")
+		builder.Add("[", event.Note(), "]")
 	case observer.ManagementAction:
-		builder.Add(event.Note)
+		action, isAction := event.Source().(action.ManagementAction)
+		if isAction {
+			builder.
+				Add("Type [", string(action.Type()), "], ").
+				Add("Planning Unit [", action.PlanningUnit(), "], ").
+				Add("Active [", strconv.FormatBool(action.IsActive()), "]")
+		}
 	default:
 		// deliberately does nothing extra
 	}
