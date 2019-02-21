@@ -56,6 +56,8 @@ func (vs *VolatileDecisionVariables) Value(name string) float64 {
 type VolatileDecisionVariable struct {
 	actual    DecisionVariableImpl
 	temporary DecisionVariableImpl
+
+	observers []Observer
 }
 
 func (v *VolatileDecisionVariable) Name() string {
@@ -89,8 +91,26 @@ func (v *VolatileDecisionVariable) SetTemporaryValue(value float64) {
 
 func (v *VolatileDecisionVariable) Accept() {
 	v.actual.value = v.temporary.value
+	v.notifyObservers()
 }
 
 func (v *VolatileDecisionVariable) Revert() {
 	v.temporary.value = v.actual.value
+	v.notifyObservers()
+}
+
+func (v *VolatileDecisionVariable) Subscribe(observers ...Observer) {
+	if v.observers == nil {
+		v.observers = make([]Observer, 0)
+	}
+
+	for _, newObserver := range observers {
+		v.observers = append(v.observers, newObserver)
+	}
+}
+
+func (v *VolatileDecisionVariable) notifyObservers() {
+	for _, observer := range v.observers {
+		observer.ObserveDecisionVariable(v)
+	}
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -95,6 +96,7 @@ func (m *Model) Initialise() {
 	}
 
 	m.sedimentLoad = new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
+	m.sedimentLoad.Subscribe(m)
 
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
@@ -150,6 +152,13 @@ func (m *Model) note(text string) {
 		WithId(m.Id()).
 		WithSource(m).
 		WithNote(text)
+	m.EventNotifier().NotifyObserversOfEvent(*event)
+}
+
+func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
+	event := observer.NewEvent(observer.DecisionVariable).
+		WithId(m.Id()).
+		WithSource(variable)
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 

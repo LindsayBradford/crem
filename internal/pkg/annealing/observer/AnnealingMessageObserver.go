@@ -3,11 +3,13 @@
 package observer
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -96,6 +98,13 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 				Add("Type [", string(action.Type()), "], ").
 				Add("Planning Unit [", action.PlanningUnit(), "], ").
 				Add("Active [", strconv.FormatBool(action.IsActive()), "]")
+		}
+	case observer.DecisionVariable:
+		variable, isVariable := event.Source().(variable.DecisionVariable)
+		if isVariable {
+			builder.
+				Add("Name [", variable.Name(), "], ").
+				Add("Value [", fmt.Sprintf("%f", variable.Value()), "]")
 		}
 	default:
 		// deliberately does nothing extra
