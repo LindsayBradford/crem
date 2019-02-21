@@ -39,4 +39,4 @@ Model = "TurbidityModel"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
-MaximumIterations = 300 # 1M
+MaximumIterations = 200 # 1M

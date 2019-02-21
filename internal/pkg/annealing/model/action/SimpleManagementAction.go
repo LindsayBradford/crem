@@ -90,6 +90,6 @@ func (sma *SimpleManagementAction) Subscribe(observers ...Observer) {
 
 func (sma *SimpleManagementAction) notifyObservers() {
 	for _, observer := range sma.observers {
-		observer.Observe(sma)
+		observer.ObserveAction(sma)
 	}
 }

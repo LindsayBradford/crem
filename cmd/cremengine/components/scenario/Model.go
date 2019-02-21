@@ -134,7 +134,7 @@ func (m *Model) TryRandomChange() {
 	m.managementActions.RandomlyToggleOneActivation()
 }
 
-func (m *Model) Observe(action action.ManagementAction) {
+func (m *Model) ObserveAction(action action.ManagementAction) {
 	m.noteAppliedManagementAction(action)
 }
 

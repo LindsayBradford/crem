@@ -3,5 +3,5 @@
 package action
 
 type Observer interface {
-	Observe(action ManagementAction)
+	ObserveAction(action ManagementAction)
 }

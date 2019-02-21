@@ -9,7 +9,7 @@ type spyObserver struct {
 	observationsCounted uint
 }
 
-func (os *spyObserver) Observe(action ManagementAction) {
+func (os *spyObserver) ObserveAction(action ManagementAction) {
 	os.lastObserved = action
 	os.observationsCounted++
 }

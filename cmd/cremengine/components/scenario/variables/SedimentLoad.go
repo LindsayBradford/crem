@@ -40,7 +40,7 @@ func (sl *SedimentLoad) hillSlopeSedimentContribution() float64 {
 	return 0 // TODO: implement
 }
 
-func (sl *SedimentLoad) Observe(action action.ManagementAction) {
+func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
 	sl.actionObserved = action
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
