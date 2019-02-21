@@ -6,6 +6,7 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -28,7 +29,7 @@ func New() *Model {
 	newModel.parameters.Initialise()
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
-	newModel.decisionVariables.SetValue(model.ObjectiveValue, initialValue)
+	newModel.decisionVariables.SetValue(variable.ObjectiveValue, initialValue)
 
 	return newModel
 }
@@ -42,7 +43,7 @@ func (dm *Model) WithParameters(params parameters.Map) *Model {
 	dm.parameters.Merge(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
-	dm.decisionVariables.SetValue(model.ObjectiveValue, initialValue)
+	dm.decisionVariables.SetValue(variable.ObjectiveValue, initialValue)
 
 	return dm
 }
@@ -92,11 +93,11 @@ func (dm *Model) capChangeOverRange(value float64) float64 {
 }
 
 func (dm *Model) objectiveValue() float64 {
-	return dm.decisionVariables.Value(model.ObjectiveValue)
+	return dm.decisionVariables.Value(variable.ObjectiveValue)
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.decisionVariables.Variable(model.ObjectiveValue).SetTemporaryValue(value)
+	dm.decisionVariables.Variable(variable.ObjectiveValue).SetTemporaryValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
@@ -104,14 +105,14 @@ func (dm *Model) SetDecisionVariable(name string, value float64) {
 }
 
 func (dm *Model) AcceptChange() {
-	dm.decisionVariables.Variable(model.ObjectiveValue).Accept()
+	dm.decisionVariables.Variable(variable.ObjectiveValue).Accept()
 }
 
 func (dm *Model) RevertChange() {
-	dm.decisionVariables.Variable(model.ObjectiveValue).Revert()
+	dm.decisionVariables.Variable(variable.ObjectiveValue).Revert()
 }
 
-func (dm *Model) DecisionVariable(name string) model.DecisionVariable {
+func (dm *Model) DecisionVariable(name string) variable.DecisionVariable {
 	return dm.decisionVariables.Variable(name)
 }
 

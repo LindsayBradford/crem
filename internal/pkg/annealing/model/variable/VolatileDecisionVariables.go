@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package model
+package variable
 
 import "github.com/pkg/errors"
 

@@ -5,8 +5,8 @@ package variables
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/pkg/errors"
 )
@@ -14,7 +14,7 @@ import (
 const SedimentLoadVariableName = "SedimentLoad"
 
 type SedimentLoad struct {
-	model.VolatileDecisionVariable
+	variable.VolatileDecisionVariable
 	bankSedimentContribution actions.BankSedimentContribution
 	actionObserved           action.ManagementAction
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -21,8 +22,8 @@ type SimpleExcelModel struct {
 	logging.ContainedLogger
 
 	parameters            Parameters
-	decisionVariables     model.DecisionVariableImplementations
-	tempDecisionVariables model.DecisionVariableImplementations
+	decisionVariables     variable.DecisionVariableImplementations
+	tempDecisionVariables variable.DecisionVariableImplementations
 
 	annealingData *annealingTable
 	trackingData  *trackingTable
@@ -41,16 +42,16 @@ func NewSimpleExcelModel() *SimpleExcelModel {
 }
 
 func (sem *SimpleExcelModel) buildDecisionVariables() {
-	sem.decisionVariables = model.NewDecisionVariableImplementations()
-	sem.tempDecisionVariables = model.NewDecisionVariableImplementations()
+	sem.decisionVariables = variable.NewDecisionVariableImplementations()
+	sem.tempDecisionVariables = variable.NewDecisionVariableImplementations()
 
-	objectiveValueVar := new(model.DecisionVariableImpl)
-	objectiveValueVar.SetName(model.ObjectiveValue)
-	sem.decisionVariables[model.ObjectiveValue] = *objectiveValueVar
+	objectiveValueVar := new(variable.DecisionVariableImpl)
+	objectiveValueVar.SetName(variable.ObjectiveValue)
+	sem.decisionVariables[variable.ObjectiveValue] = *objectiveValueVar
 
-	tempObjectiveValueVar := new(model.DecisionVariableImpl)
-	tempObjectiveValueVar.SetName(model.ObjectiveValue)
-	sem.tempDecisionVariables[model.ObjectiveValue] = *tempObjectiveValueVar
+	tempObjectiveValueVar := new(variable.DecisionVariableImpl)
+	tempObjectiveValueVar.SetName(variable.ObjectiveValue)
+	sem.tempDecisionVariables[variable.ObjectiveValue] = *tempObjectiveValueVar
 }
 
 func (sem *SimpleExcelModel) WithParameters(params parameters.Map) *SimpleExcelModel {
@@ -91,7 +92,7 @@ func (sem *SimpleExcelModel) Initialise() {
 	currentPenalty := sem.deriveTotalPenalty()
 	currentCost := sem.deriveFeatureCost()
 
-	sem.decisionVariables[model.ObjectiveValue].SetValue(currentCost*0.8 + currentPenalty)
+	sem.decisionVariables[variable.ObjectiveValue].SetValue(currentCost*0.8 + currentPenalty)
 
 	sem.LogHandler().Debug(sem.Id() + ": Clearing tracking data from workbook")
 	sem.trackingData = sem.excelDataAdapter.initialiseTrackingTable()
@@ -136,10 +137,10 @@ func (sem *SimpleExcelModel) TryRandomChange() {
 	currentPenalty := sem.deriveTotalPenalty()
 	currentCost := sem.deriveFeatureCost()
 
-	objectiveValue := sem.decisionVariables[model.ObjectiveValue].Value()
+	objectiveValue := sem.decisionVariables[variable.ObjectiveValue].Value()
 	changeInObjectiveValue := (currentCost-previousCost)*0.8 + (currentPenalty - previousPenalty)
 
-	sem.tempDecisionVariables[model.ObjectiveValue].SetValue(objectiveValue + changeInObjectiveValue)
+	sem.tempDecisionVariables[variable.ObjectiveValue].SetValue(objectiveValue + changeInObjectiveValue)
 }
 
 func (sem *SimpleExcelModel) deriveTotalPenalty() float64 {
@@ -169,7 +170,7 @@ func (sem *SimpleExcelModel) AcceptChange() {
 func (sem *SimpleExcelModel) addTrackerData() {
 	newRow := new(trackingData)
 
-	newRow.ObjectiveFunctionChange = sem.DecisionVariableChange(model.ObjectiveValue)
+	newRow.ObjectiveFunctionChange = sem.DecisionVariableChange(variable.ObjectiveValue)
 	newRow.Temperature = sem.explorerData.Temperature
 	newRow.ChangeIsDesirable = sem.explorerData.ChangeIsDesirable
 	newRow.ChangeAccepted = sem.explorerData.ChangeAccepted
@@ -201,7 +202,7 @@ func (sem *SimpleExcelModel) deriveLargePUs() uint64 {
 
 func (sem *SimpleExcelModel) RevertChange() {
 	sem.annealingData.TogglePlanningUnitStatusAtIndex(sem.previousPlanningUnitChanged)
-	sem.copyDecisionVarValueToTemp(model.ObjectiveValue)
+	sem.copyDecisionVarValueToTemp(variable.ObjectiveValue)
 }
 
 func (sem *SimpleExcelModel) copyDecisionVarValueToTemp(varName string) {
@@ -216,7 +217,7 @@ func (sem *SimpleExcelModel) copyTempDecisionVarValueToActual(varName string) {
 	)
 }
 
-func (sem *SimpleExcelModel) DecisionVariable(name string) model.DecisionVariable {
+func (sem *SimpleExcelModel) DecisionVariable(name string) variable.DecisionVariable {
 	return sem.decisionVariables[name]
 }
 

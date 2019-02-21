@@ -3,6 +3,7 @@
 package model
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -44,7 +45,7 @@ func (c *ContainedModel) SetModel(model Model) {
 }
 
 type DecisionVariableContainer interface {
-	DecisionVariable(name string) DecisionVariable
+	DecisionVariable(name string) variable.DecisionVariable
 	DecisionVariableChange(decisionVariableName string) float64
 }
 
@@ -70,12 +71,8 @@ func (nm *nullModel) TearDown()        {}
 func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
-func (nm *nullModel) DecisionVariable(name string) DecisionVariable {
-	newVariable := DecisionVariableImpl{
-		name:  name,
-		value: 0,
-	}
-	return &newVariable
+func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
+	return variable.NewDecisionVariableImpl(name)
 }
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}

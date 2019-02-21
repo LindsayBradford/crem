@@ -2,18 +2,20 @@
 
 package dumb
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+)
 
 type DecisionVariables struct {
-	model.VolatileDecisionVariables
+	variable.VolatileDecisionVariables
 }
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.VolatileDecisionVariables = model.NewVolatileDecisionVariables()
+	dv.VolatileDecisionVariables = variable.NewVolatileDecisionVariables()
 	dv.buildDecisionVariables()
 	return dv
 }
 
 func (dv *DecisionVariables) buildDecisionVariables() {
-	dv.NewForName(model.ObjectiveValue)
+	dv.NewForName(variable.ObjectiveValue)
 }

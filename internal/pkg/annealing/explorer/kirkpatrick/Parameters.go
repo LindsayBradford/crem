@@ -3,7 +3,7 @@
 package kirkpatrick
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
@@ -48,7 +48,7 @@ func (kp *Parameters) buildMetaData() {
 		parameters.MetaData{
 			Key:          DecisionVariableName,
 			Validator:    kp.Parameters.IsString,
-			DefaultValue: model.ObjectiveValue,
+			DefaultValue: variable.ObjectiveValue,
 		},
 	)
 	kp.AddMetaData(

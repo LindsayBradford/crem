@@ -2,18 +2,20 @@
 
 package variables
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+)
 
 const (
 	_ = iota
 )
 
 type DecisionVariables struct {
-	model.VolatileDecisionVariables
+	variable.VolatileDecisionVariables
 }
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.VolatileDecisionVariables = model.NewVolatileDecisionVariables()
+	dv.VolatileDecisionVariables = variable.NewVolatileDecisionVariables()
 	return dv
 }
 
@@ -25,7 +27,7 @@ func (c *ContainedDecisionVariables) DecisionVariables() *DecisionVariables {
 	return &c.decisionVariables
 }
 
-func (c *ContainedDecisionVariables) DecisionVariable(name string) model.DecisionVariable {
+func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.DecisionVariable {
 	return c.decisionVariables.Variable(name)
 }
 

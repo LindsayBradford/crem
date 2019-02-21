@@ -1,6 +1,8 @@
+// Copyright (c) 2019 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package model
+package variable
 
 type DecisionVariables map[string]DecisionVariable
 type DecisionVariableImplementations map[string]DecisionVariableImpl
@@ -14,22 +16,8 @@ type DecisionVariable interface {
 	Value() float64
 }
 
-const NullDecisionVariableName = "NullDecisionVariable"
-
-var NullDecisionVariable = new(nullDecisionVariable)
-
-type nullDecisionVariable struct{}
-
-func (ndv *nullDecisionVariable) Name() string           { return NullDecisionVariableName }
-func (ndv *nullDecisionVariable) SetName(name string)    {}
-func (ndv *nullDecisionVariable) Value() float64         { return 0 }
-func (ndv *nullDecisionVariable) SetValue(value float64) {}
-
-const ObjectiveValue = "ObjectiveValue"
-
-var ObjectiveValueDecisionVariable = &DecisionVariableImpl{
-	name:  ObjectiveValue,
-	value: 0,
+func NewDecisionVariableImpl(name string) DecisionVariableImpl {
+	return DecisionVariableImpl{name: name, value: 0}
 }
 
 type DecisionVariableImpl struct {
