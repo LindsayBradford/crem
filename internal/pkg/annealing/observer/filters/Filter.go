@@ -4,7 +4,13 @@
 package filters
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+)
+
+const (
+	blockAtFilter      = true
+	allowThroughFilter = false
 )
 
 // Filter describes an interface to object that decides on how observer should be filtered
@@ -21,5 +27,9 @@ type NullFilter struct{}
 
 // ShouldFilter always returns false (do not filter the log of events)
 func (nm *NullFilter) ShouldFilter(event observer.Event) bool {
-	return false
+	return allowThroughFilter
+}
+
+func onFirstOrLastIteration(annealer annealing.Observable) bool {
+	return annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()
 }

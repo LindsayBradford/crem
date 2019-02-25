@@ -24,16 +24,20 @@ func (m *IterationCountFilter) WithModulo(modulo uint64) *IterationCountFilter {
 // The very first and very last FinishedIteration events are exceptions, and are also not filtered.
 func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
 	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
-		return false
+		return allowThroughFilter
 	}
 
 	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		if event.EventType == observer.FinishedIteration &&
-			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations() ||
-				annealer.CurrentIteration()%m.iterationModulo == 0) {
-			return false
-		}
+		return m.ShouldFilterAnnealerSource(event, annealer)
 	}
 
-	return true
+	return blockAtFilter
+}
+
+func (m *IterationCountFilter) ShouldFilterAnnealerSource(event observer.Event, annealer annealing.Observable) bool {
+	if event.EventType == observer.FinishedIteration &&
+		(onFirstOrLastIteration(annealer) || annealer.CurrentIteration()%m.iterationModulo == 0) {
+		return allowThroughFilter
+	}
+	return blockAtFilter
 }

@@ -3,6 +3,8 @@
 package filters
 
 import (
+	"fmt"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
@@ -40,8 +42,13 @@ func (m *PercentileOfIterationsPerAnnealingFilter) deriveModuloIfPossible() {
 		if m.percentileToReport == 1 {
 			m.iterationModulo = 1
 		} else {
+			fmt.Printf("maximum iterations = %d\n", m.MaximumIterations)
+			fmt.Printf("percentile to report = %f\n", m.percentileToReport)
+
 			m.iterationModulo = uint64((float64)(m.MaximumIterations) * m.percentileToReport)
 		}
+		fmt.Printf("iteration modulo = %d\n", m.iterationModulo)
+
 	}
 }
 
@@ -56,7 +63,7 @@ const (
 
 func isGenerallyFilterable(eventType observer.EventType) bool {
 	switch eventType {
-	case observer.StartedAnnealing,
+	case observer.StartedIteration,
 		observer.FinishedIteration,
 		observer.Note:
 		return filtered
@@ -77,15 +84,15 @@ func isModuloFilterable(eventType observer.EventType) bool {
 
 func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event observer.Event) bool {
 	if !isGenerallyFilterable(event.EventType) {
-		return notFiltered
+		return allowThroughFilter
 	}
 
 	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
 		if m.generatesEvents && isModuloFilterable(event.EventType) &&
 			annealer.CurrentIteration()%m.iterationModulo == 0 {
-			return notFiltered
+			return allowThroughFilter
 		}
 	}
 
-	return filtered
+	return blockAtFilter
 }

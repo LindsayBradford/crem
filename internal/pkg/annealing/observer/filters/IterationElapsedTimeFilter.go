@@ -29,21 +29,34 @@ func (m *IterationElapsedTimeFilter) WithWait(wait time.Duration) *IterationElap
 // occurred after the wait duration has passed since the last previous event allowed through.
 func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
 	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
-		return false
+		return allowThroughFilter
 	}
 
 	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		if event.EventType == observer.FinishedIteration &&
-			(annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()) {
-			m.lastTimeAllowed = time.Now()
-			return false
-		}
-
-		if event.EventType == observer.FinishedIteration && time.Now().Sub(m.lastTimeAllowed) >= m.waitDuration {
-			m.lastTimeAllowed = m.lastTimeAllowed.Add(m.waitDuration)
-			return false
-		}
+		return m.ShouldFilterAnnealerSource(event, annealer)
 	}
 
-	return true
+	return blockAtFilter
+}
+
+func (m *IterationElapsedTimeFilter) ShouldFilterAnnealerSource(event observer.Event, annealer annealing.Observable) bool {
+	if event.EventType != observer.FinishedIteration {
+		return blockAtFilter
+	}
+
+	if onFirstOrLastIteration(annealer) {
+		m.lastTimeAllowed = time.Now()
+		return allowThroughFilter
+	}
+
+	if m.waitDurationHasElapsed() {
+		m.lastTimeAllowed = m.lastTimeAllowed.Add(m.waitDuration)
+		return allowThroughFilter
+	}
+
+	return blockAtFilter
+}
+
+func (m *IterationElapsedTimeFilter) waitDurationHasElapsed() bool {
+	return time.Now().Sub(m.lastTimeAllowed) >= m.waitDuration
 }
