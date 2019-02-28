@@ -41,7 +41,7 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 
 	var builder strings.FluentBuilder
 	builder.
-		Add("Id [", event.Id(), "],").
+		Add("Id [", event.Id(), "], ").
 		Add("Event [", event.EventType.String(), "]: ")
 
 	if observableAnnealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
