@@ -35,3 +35,11 @@ func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string)
 	decisionVariable := c.decisionVariables.Variable(variableName)
 	return decisionVariable.ChangeInValue()
 }
+
+func (c *ContainedDecisionVariables) Accept() {
+	c.decisionVariables.Accept()
+}
+
+func (c *ContainedDecisionVariables) Revert() {
+	c.decisionVariables.Revert()
+}

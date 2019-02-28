@@ -71,10 +71,12 @@ func (r *RiverBankRestorations) calculateChangeInBufferVegetation(rowNumber uint
 
 func (r *RiverBankRestorations) calculateImplementationCost(rowNumber uint) float64 {
 	riparianRevegetationCostPerKilometer := r.parameters.GetFloat64(parameters.RiparianRevegetationCostPerKilometer)
-	riverLength := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
+	riverLengthInMetres := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
+	riverLengthInKilometres := riverLengthInMetres / 1000
+
 	vegetationChange := r.calculateChangeInBufferVegetation(rowNumber)
 
-	vegetationChangeLengthInKilometres := vegetationChange * riverLength
+	vegetationChangeLengthInKilometres := vegetationChange * riverLengthInKilometres
 
 	implementationCost := vegetationChangeLengthInKilometres * riparianRevegetationCostPerKilometer
 

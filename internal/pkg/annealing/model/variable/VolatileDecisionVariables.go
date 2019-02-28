@@ -10,8 +10,10 @@ func NewVolatileDecisionVariables() VolatileDecisionVariables {
 
 type VolatileDecisionVariables map[string]*VolatileDecisionVariable
 
-func (vs *VolatileDecisionVariables) Add(newVariable *VolatileDecisionVariable) {
-	vs.asMap()[newVariable.Name()] = newVariable
+func (vs *VolatileDecisionVariables) Add(newVariables ...*VolatileDecisionVariable) {
+	for _, newVariable := range newVariables {
+		vs.asMap()[newVariable.Name()] = newVariable
+	}
 }
 
 func (vs *VolatileDecisionVariables) NewForName(name string) {
@@ -51,6 +53,18 @@ func (vs *VolatileDecisionVariables) Value(name string) float64 {
 		panic(variableMissing(name))
 	}
 	return foundEntry.Value()
+}
+
+func (vs *VolatileDecisionVariables) Accept() {
+	for _, variable := range vs.asMap() {
+		variable.Accept()
+	}
+}
+
+func (vs *VolatileDecisionVariables) Revert() {
+	for _, variable := range vs.asMap() {
+		variable.Revert()
+	}
 }
 
 type VolatileDecisionVariable struct {

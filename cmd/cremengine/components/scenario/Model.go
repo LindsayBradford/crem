@@ -48,7 +48,8 @@ type Model struct {
 	managementActions action.ManagementActions
 	variables.ContainedDecisionVariables
 
-	sedimentLoad *variables.SedimentLoad
+	sedimentLoad       *variables.SedimentLoad
+	implementationCost *variables.ImplementationCost
 
 	dataSet *excel.DataSet
 }
@@ -98,26 +99,32 @@ func (m *Model) Initialise() {
 	m.sedimentLoad = new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
 	m.sedimentLoad.Subscribe(m)
 
+	m.implementationCost = new(variables.ImplementationCost).Initialise(csvPlanningUnitTable, m.parameters)
+	m.implementationCost.Subscribe(m)
+
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
-		action.Subscribe(m)
-		action.Subscribe(m.sedimentLoad)
+		action.Subscribe(m, m.sedimentLoad, m.implementationCost)
 		m.managementActions.Add(action)
 	}
 
+	m.DecisionVariables().Add(
+		&m.sedimentLoad.VolatileDecisionVariable,
+		&m.implementationCost.VolatileDecisionVariable,
+	)
+
 	m.managementActions.RandomlyToggleAllActivations()
-	m.DecisionVariables().Add(&m.sedimentLoad.VolatileDecisionVariable)
 }
 
 func (m *Model) AcceptChange() {
 	m.note("Accepting Change")
-	m.sedimentLoad.Accept()
+	m.DecisionVariables().Accept()
 }
 
 func (m *Model) RevertChange() {
 	m.note("Reverting Change")
-	m.sedimentLoad.Revert()
+	m.DecisionVariables().Revert()
 	m.managementActions.UndoLastActivationToggleUnobserved()
 }
 

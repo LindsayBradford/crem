@@ -25,6 +25,7 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
+RiparianRevegetationCostPerKilometer = 1.0 # 24,000 (default)
 DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
 
 [[SolutionExplorers]]
