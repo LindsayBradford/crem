@@ -105,12 +105,12 @@ func (v *VolatileDecisionVariable) SetTemporaryValue(value float64) {
 
 func (v *VolatileDecisionVariable) Accept() {
 	v.actual.value = v.temporary.value
-	v.notifyObservers()
+	v.NotifyObservers()
 }
 
 func (v *VolatileDecisionVariable) Revert() {
 	v.temporary.value = v.actual.value
-	v.notifyObservers()
+	v.NotifyObservers()
 }
 
 func (v *VolatileDecisionVariable) Subscribe(observers ...Observer) {
@@ -123,7 +123,7 @@ func (v *VolatileDecisionVariable) Subscribe(observers ...Observer) {
 	}
 }
 
-func (v *VolatileDecisionVariable) notifyObservers() {
+func (v *VolatileDecisionVariable) NotifyObservers() {
 	for _, observer := range v.observers {
 		observer.ObserveDecisionVariable(v)
 	}

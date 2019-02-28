@@ -41,7 +41,7 @@ func (m *ManagementActions) RandomlyToggleAllActivations() {
 		randomValue := m.RandomNumberGenerator().Intn(2)
 		switch randomValue {
 		case 0:
-			action.ToggleActivation()
+			action.ToggleInitialisingActivation()
 		case 1:
 			// Deliberately does nothing
 		default:

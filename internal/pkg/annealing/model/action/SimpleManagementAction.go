@@ -45,6 +45,11 @@ func (sma *SimpleManagementAction) Type() ManagementActionType {
 	return sma.actionType
 }
 
+func (sma *SimpleManagementAction) ToggleInitialisingActivation() {
+	sma.ToggleActivationUnobserved()
+	sma.notifyInitialisingObservers()
+}
+
 func (sma *SimpleManagementAction) ToggleActivation() {
 	sma.ToggleActivationUnobserved()
 	sma.notifyObservers()
@@ -91,5 +96,11 @@ func (sma *SimpleManagementAction) Subscribe(observers ...Observer) {
 func (sma *SimpleManagementAction) notifyObservers() {
 	for _, observer := range sma.observers {
 		observer.ObserveAction(sma)
+	}
+}
+
+func (sma *SimpleManagementAction) notifyInitialisingObservers() {
+	for _, observer := range sma.observers {
+		observer.ObserveInitialisationAction(sma)
 	}
 }

@@ -19,38 +19,65 @@ type ImplementationCost struct {
 	actionObserved action.ManagementAction
 }
 
-func (sl *ImplementationCost) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
-	sl.SetName(ImplementationCostVariableName)
-	sl.SetValue(sl.deriveInitialImplementationCost())
-	return sl
+func (ic *ImplementationCost) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
+	ic.SetName(ImplementationCostVariableName)
+	ic.SetValue(ic.deriveInitialImplementationCost())
+	return ic
 }
 
-func (sl *ImplementationCost) deriveInitialImplementationCost() float64 {
+func (ic *ImplementationCost) deriveInitialImplementationCost() float64 {
 	return notImplementedCost
 }
 
-func (sl *ImplementationCost) ObserveAction(action action.ManagementAction) {
-	sl.actionObserved = action
-	switch sl.actionObserved.Type() {
+func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
+	ic.actionObserved = action
+	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
-		sl.handleRiverBankRestorationAction()
+		ic.handleRiverBankRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}
 }
 
-func (sl *ImplementationCost) handleRiverBankRestorationAction() {
+func (ic *ImplementationCost) ObserveInitialisationAction(action action.ManagementAction) {
+	ic.actionObserved = action
+	switch ic.actionObserved.Type() {
+	case actions.RiverBankRestorationType:
+		ic.handleInitialisingRiverBankRestorationAction()
+	default:
+		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
+	}
+	ic.NotifyObservers()
+}
+
+func (ic *ImplementationCost) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
-		currentValue := sl.VolatileDecisionVariable.Value()
-		sl.VolatileDecisionVariable.SetTemporaryValue(currentValue - asIsCost + toBeCost)
+		currentValue := ic.VolatileDecisionVariable.Value()
+		ic.VolatileDecisionVariable.SetTemporaryValue(currentValue - asIsCost + toBeCost)
 	}
 
-	implementationCost := sl.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
 
-	switch sl.actionObserved.IsActive() {
+	switch ic.actionObserved.IsActive() {
 	case true:
 		setTempVariable(notImplementedCost, implementationCost)
 	case false:
 		setTempVariable(implementationCost, notImplementedCost)
+	}
+}
+
+func (ic *ImplementationCost) handleInitialisingRiverBankRestorationAction() {
+	setVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.VolatileDecisionVariable.Value()
+		ic.VolatileDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setVariable(notImplementedCost, implementationCost)
+	case false:
+		setVariable(implementationCost, notImplementedCost)
 	}
 }

@@ -48,9 +48,6 @@ type Model struct {
 	managementActions action.ManagementActions
 	variables.ContainedDecisionVariables
 
-	sedimentLoad       *variables.SedimentLoad
-	implementationCost *variables.ImplementationCost
-
 	dataSet *excel.DataSet
 }
 
@@ -96,22 +93,22 @@ func (m *Model) Initialise() {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
 
-	m.sedimentLoad = new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
-	m.sedimentLoad.Subscribe(m)
+	sedimentLoad := new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
+	sedimentLoad.Subscribe(m)
 
-	m.implementationCost = new(variables.ImplementationCost).Initialise(csvPlanningUnitTable, m.parameters)
-	m.implementationCost.Subscribe(m)
+	implementationCost := new(variables.ImplementationCost).Initialise(csvPlanningUnitTable, m.parameters)
+	implementationCost.Subscribe(m)
 
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
-		action.Subscribe(m, m.sedimentLoad, m.implementationCost)
 		m.managementActions.Add(action)
+		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
 	m.DecisionVariables().Add(
-		&m.sedimentLoad.VolatileDecisionVariable,
-		&m.implementationCost.VolatileDecisionVariable,
+		&sedimentLoad.VolatileDecisionVariable,
+		&implementationCost.VolatileDecisionVariable,
 	)
 
 	m.managementActions.RandomlyToggleAllActivations()
@@ -147,6 +144,10 @@ func (m *Model) ObserveAction(action action.ManagementAction) {
 	m.noteAppliedManagementAction(action)
 }
 
+func (m *Model) ObserveInitialisationAction(action action.ManagementAction) {
+	m.noteAppliedManagementAction(action)
+}
+
 func (m *Model) noteAppliedManagementAction(action action.ManagementAction) {
 	event := observer.NewEvent(observer.ManagementAction).
 		WithId(m.Id()).
@@ -171,14 +172,6 @@ func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
 
 func (m *Model) capChangeOverRange(value float64) float64 {
 	return math.Max(0, value)
-}
-
-func (m *Model) objectiveValue() float64 {
-	return m.sedimentLoad.Value()
-}
-
-func (m *Model) setObjectiveValue(value float64) {
-	m.sedimentLoad.SetTemporaryValue(value)
 }
 
 func (m *Model) DeepClone() model.Model {

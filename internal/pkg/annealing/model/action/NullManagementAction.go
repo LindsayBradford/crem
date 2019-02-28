@@ -16,3 +16,4 @@ func (a *Null) ModelVariableValue(variableName ModelVariableName) float64 { retu
 func (a *Null) Subscribe(observers ...Observer)                           {}
 func (a *Null) ToggleActivation()                                         {}
 func (a *Null) ToggleActivationUnobserved()                               {}
+func (a *Null) ToggleInitialisingActivation()                             {}

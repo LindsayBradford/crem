@@ -50,6 +50,17 @@ func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
 	}
 }
 
+func (sl *SedimentLoad) ObserveInitialisationAction(action action.ManagementAction) {
+	sl.actionObserved = action
+	switch sl.actionObserved.Type() {
+	case actions.RiverBankRestorationType:
+		sl.handleInitialisingRiverBankRestorationAction()
+	default:
+		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
+	}
+	sl.NotifyObservers()
+}
+
 func (sl *SedimentLoad) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
@@ -67,5 +78,25 @@ func (sl *SedimentLoad) handleRiverBankRestorationAction() {
 		setTempVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
 	case false:
 		setTempVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
+	}
+}
+
+func (sl *SedimentLoad) handleInitialisingRiverBankRestorationAction() {
+	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
+		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
+		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
+
+		asIsSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(asIsVegetation)
+		toBeSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(toBeVegetation)
+
+		currentValue := sl.VolatileDecisionVariable.Value()
+		sl.VolatileDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
+	}
+
+	switch sl.actionObserved.IsActive() {
+	case true:
+		setVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
+	case false:
+		setVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
 	}
 }
