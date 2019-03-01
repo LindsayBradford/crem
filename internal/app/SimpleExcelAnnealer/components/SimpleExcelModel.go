@@ -22,8 +22,8 @@ type SimpleExcelModel struct {
 	logging.ContainedLogger
 
 	parameters            Parameters
-	decisionVariables     variable.DecisionVariableImplementations
-	tempDecisionVariables variable.DecisionVariableImplementations
+	decisionVariables     variable.SimpleDecisionVariables
+	tempDecisionVariables variable.SimpleDecisionVariables
 
 	annealingData *annealingTable
 	trackingData  *trackingTable
@@ -42,14 +42,14 @@ func NewSimpleExcelModel() *SimpleExcelModel {
 }
 
 func (sem *SimpleExcelModel) buildDecisionVariables() {
-	sem.decisionVariables = variable.NewDecisionVariableImplementations()
-	sem.tempDecisionVariables = variable.NewDecisionVariableImplementations()
+	sem.decisionVariables = variable.NewSimpleDecisionVariables()
+	sem.tempDecisionVariables = variable.NewSimpleDecisionVariables()
 
-	objectiveValueVar := new(variable.DecisionVariableImpl)
+	objectiveValueVar := new(variable.SimpleDecisionVariable)
 	objectiveValueVar.SetName(variable.ObjectiveValue)
 	sem.decisionVariables[variable.ObjectiveValue] = *objectiveValueVar
 
-	tempObjectiveValueVar := new(variable.DecisionVariableImpl)
+	tempObjectiveValueVar := new(variable.SimpleDecisionVariable)
 	tempObjectiveValueVar.SetName(variable.ObjectiveValue)
 	sem.tempDecisionVariables[variable.ObjectiveValue] = *tempObjectiveValueVar
 }

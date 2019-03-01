@@ -4,7 +4,7 @@ package variable
 
 const ObjectiveValue = "ObjectiveValue"
 
-var ObjectiveValueDecisionVariable = &DecisionVariableImpl{
+var ObjectiveValueDecisionVariable = &SimpleDecisionVariable{
 	name:  ObjectiveValue,
 	value: 0,
 }

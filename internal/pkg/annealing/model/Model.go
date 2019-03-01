@@ -72,7 +72,7 @@ func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
-	return variable.NewDecisionVariableImpl(name)
+	return variable.NewSimpleDecisionVariable(name)
 }
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}

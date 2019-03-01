@@ -108,6 +108,8 @@ func TestManagementActions_RandomlyInitialise(t *testing.T) {
 		buildDummyAction("dummy1"),
 		buildDummyAction("dummy2"),
 		buildDummyAction("dummy3"),
+		buildDummyAction("dummy4"),
+		buildDummyAction("dummy5"),
 	}
 
 	for _, action := range dummyActions {
