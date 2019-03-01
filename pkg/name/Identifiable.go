@@ -2,6 +2,7 @@
 
 package name
 
+// Identifiable offers an interface for anything needing an identifier
 type Identifiable interface {
 	SetId(title string)
 	Id() string

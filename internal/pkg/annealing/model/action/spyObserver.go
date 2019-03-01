@@ -4,6 +4,9 @@ package action
 
 var _ Observer = new(spyObserver)
 
+// spyObserver implements the management action Observer interface, offering "test spy" functionality, allowing
+// test frameworks to "spy" on the observation of management action state changes.
+// See: https://martinfowler.com/bliki/TestDouble.html
 type spyObserver struct {
 	lastObserved        ManagementAction
 	observationsCounted uint

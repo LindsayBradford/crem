@@ -15,7 +15,7 @@ func TestManagementActions_Initialise(t *testing.T) {
 
 	// given
 
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 
 	// when
 	actionsUnderTest.Initialise()
@@ -28,7 +28,7 @@ func TestManagementActions_Add(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
 	// when
@@ -66,7 +66,7 @@ func TestManagementActions_RandomlyToggleOneActivation_NonePresent(t *testing.T)
 	g := NewGomegaWithT(t)
 
 	// given
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
 	// when
@@ -81,7 +81,7 @@ func TestManagementActions_RandomlyToggleOneActivation_OnePresent(t *testing.T) 
 	g := NewGomegaWithT(t)
 
 	// given
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
 	dummyAction1 := buildDummyAction("dummy1")
@@ -99,7 +99,7 @@ func TestManagementActions_RandomlyInitialise(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
 	actionSpy := new(spyObserver)
@@ -135,7 +135,7 @@ func TestManagementActions_UndoLastActivationToggleUnobserved(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	actionsUnderTest := new(ManagementActions)
+	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
 	dummyAction := buildDummyAction("dummy")

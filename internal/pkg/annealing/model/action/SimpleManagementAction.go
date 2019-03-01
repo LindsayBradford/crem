@@ -6,6 +6,8 @@ import "github.com/pkg/errors"
 
 var _ ManagementAction = new(SimpleManagementAction)
 
+// SimpleManagementAction is a basic, generally useful implementation of the ManagementAction interface, using a
+// fluent interface for its action construction.
 type SimpleManagementAction struct {
 	planningUnit string
 	actionType   ManagementActionType

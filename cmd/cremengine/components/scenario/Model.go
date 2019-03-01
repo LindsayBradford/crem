@@ -45,7 +45,7 @@ type Model struct {
 
 	parameters parameters.Parameters
 
-	managementActions action.ManagementActions
+	managementActions action.ModelManagementActions
 	variables.ContainedDecisionVariables
 
 	dataSet *excel.DataSet

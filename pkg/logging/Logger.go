@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// loggers package defines loggers responsible for formatters log entries (delegated to Formatter) and delivering
+// logging package defines loggers responsible for formatters log entries (delegated to Formatter) and delivering
 // the formatted entries to whatever log destinations are needed.
 package logging
 

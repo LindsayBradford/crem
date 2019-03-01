@@ -1,5 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
+// name package offers a suite of interfaces and structs, allowing uniform naming/identification of entities.
 package name
 
 // Nameable is an interface for anything needing a name
@@ -8,7 +9,7 @@ type Nameable interface {
 	SetName(name string)
 }
 
-// ContainedName is a struct offering a default implementation of Nameable
+// ContainedName offers a default implementation of Nameable
 type ContainedName struct {
 	name string
 }

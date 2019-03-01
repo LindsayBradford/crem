@@ -2,6 +2,9 @@
 
 package action
 
+// NullManagementAction is a stateless/neutral implementation of the ManagementAction interface, useful for testing
+// scenarios where action state is irrelevant or within scenarios where a Null Pattern for actions makes sense
+// (https://en.wikipedia.org/wiki/Null_object_pattern).
 var NullManagementAction ManagementAction = new(Null)
 
 type Null struct{}
