@@ -1,0 +1,43 @@
+ScenarioName = "Test Catchment Annealer - One run"
+
+[[Loggers]]
+Name = "TestLogger"
+[Loggers.LogLevelDestinations]
+#Debug = "StandardOutput"
+Model = "StandardOutput"
+
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+Logger = "TestLogger"
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 1
+
+[[AnnealingObservers]]
+Type = "InvariantObserver"
+
+[[Models]]
+Type = "CatchmentModel"
+Name = "TurbidityModel"
+[Models.Parameters]
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+RiparianRevegetationCostPerKilometer = 1.0 # 24,000 (default)
+DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
+
+[[SolutionExplorers]]
+Type = "KirkpatrickExplorer"
+Name = "SingleObjectiveExplorer"
+[SolutionExplorers.Parameters]
+DecisionVariable = "SedimentLoad"
+
+[Annealer]
+SolutionExplorer = "SingleObjectiveExplorer"
+Model = "TurbidityModel"
+[Annealer.Parameters]
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
+MaximumIterations = 200 # 1M

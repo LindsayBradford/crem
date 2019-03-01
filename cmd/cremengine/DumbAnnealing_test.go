@@ -11,7 +11,7 @@ import (
 const defaultDumbAnnealerTimeout = 10
 
 func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := appTesting.BinaryTestingContext{
+	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Single run of Dumb Annealer",
 		ExecutablePath:    cremExceutablePath,
@@ -24,7 +24,7 @@ func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
 }
 
 func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
-	context := appTesting.BinaryTestingContext{
+	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Three sequential runs of Dumb Annealer",
 		ExecutablePath:    cremExceutablePath,
@@ -37,7 +37,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 }
 
 func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
-	context := appTesting.BinaryTestingContext{
+	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Three concurrent runs of Dumb Annealer",
 		ExecutablePath:    cremExceutablePath,
@@ -50,7 +50,7 @@ func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
 }
 
 func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
-	context := appTesting.BinaryTestingContext{
+	context := appTesting.BlackboxTestingContext{
 		Name:              "Single run of Kirkpatrick Dumb Annealer",
 		ExecutablePath:    cremExceutablePath,
 		TimeoutSeconds:    defaultDumbAnnealerTimeout,

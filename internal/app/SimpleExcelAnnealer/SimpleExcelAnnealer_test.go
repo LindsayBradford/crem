@@ -38,7 +38,7 @@ func tearDown() {
 }
 
 func TestAnnealerIntegrationOneRun(t *testing.T) {
-	context := appTesting.BinaryTestingContext{
+	context := appTesting.BlackboxTestingContext{
 		Name:           "Single run of CremEngine CatchmentModel",
 		ExecutablePath: exceutablePath,
 		TimeoutSeconds: 20,

@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"testing"
 
+	"github.com/LindsayBradford/crem/pkg/threading"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 )
@@ -14,7 +15,7 @@ import (
 const WithSuccess = 0
 const WithFailure = 1
 
-type BinaryTestingContext struct {
+type BlackboxTestingContext struct {
 	Name              string
 	ExecutablePath    string
 	T                 *testing.T
@@ -23,7 +24,7 @@ type BinaryTestingContext struct {
 	ExpectedErrorCode int
 }
 
-func TestExecutableAgainstConfigFile(tc BinaryTestingContext) {
+func TestExecutableAgainstConfigFile(tc BlackboxTestingContext) {
 	if testing.Short() {
 		tc.T.Skip("skipping " + tc.Name + " in short mode")
 	}
@@ -53,9 +54,26 @@ func buildScenarioArguments(scenarioFilePath string) []string {
 
 type ScenarioFileRunningFunction func(scenarioPath string)
 
-type Context struct {
+type WhiteboxTestingContext struct {
 	Name           string
 	T              *testing.T
 	ConfigFilePath string
 	Runner         ScenarioFileRunningFunction
+}
+
+func (tc *WhiteboxTestingContext) VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic() {
+	if testing.Short() {
+		tc.T.Skip("skipping " + tc.Name + " in short mode")
+	}
+
+	g := NewGomegaWithT(tc.T)
+
+	// given
+	threading.ResetMainThreadChannel()
+
+	// when
+	tc.Runner(tc.ConfigFilePath)
+
+	// then
+	g.Eventually(threading.GetMainThreadChannel()).Should(BeClosed())
 }

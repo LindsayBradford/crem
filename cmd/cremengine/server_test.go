@@ -16,7 +16,7 @@ import (
 )
 
 func TestValidJobsGetRequest_OkResponse(t *testing.T) {
-	context := webTesting.Context{
+	context := webTesting.WhiteboxTestingContext{
 		Name:           "GET /jobs request returns 200 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -25,7 +25,7 @@ func TestValidJobsGetRequest_OkResponse(t *testing.T) {
 	verifyResponseToValidJobsGetRequest(context)
 }
 
-func verifyResponseToValidJobsGetRequest(context webTesting.Context) {
+func verifyResponseToValidJobsGetRequest(context webTesting.WhiteboxTestingContext) {
 
 	g := gomega.NewGomegaWithT(context.T)
 
@@ -43,7 +43,7 @@ func verifyResponseToValidJobsGetRequest(context webTesting.Context) {
 }
 
 func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
-	context := webTesting.Context{
+	context := webTesting.WhiteboxTestingContext{
 		Name:           "POST /jobs request of invalid scenario returns 500 response",
 		T:              t,
 		ConfigFilePath: "testdata/server.toml",
@@ -52,7 +52,7 @@ func TestInvalidValidJobsPostRequest_InternalServerErrorResponse(t *testing.T) {
 	verifyInternalServerErrorResponseToInvalidJobsPostRequest(context)
 }
 
-func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context webTesting.Context) {
+func verifyInternalServerErrorResponseToInvalidJobsPostRequest(context webTesting.WhiteboxTestingContext) {
 
 	g := gomega.NewGomegaWithT(context.T)
 
