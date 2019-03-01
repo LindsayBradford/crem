@@ -2,12 +2,9 @@
 
 package action
 
-var _ ManagementAction = new(SimpleManagementAction)
+import "github.com/pkg/errors"
 
-const (
-	active   = true
-	inactive = false
-)
+var _ ManagementAction = new(SimpleManagementAction)
 
 type SimpleManagementAction struct {
 	planningUnit string
@@ -46,7 +43,10 @@ func (sma *SimpleManagementAction) Type() ManagementActionType {
 }
 
 func (sma *SimpleManagementAction) InitialisingActivation() {
-	sma.activateUnobserved()
+	if sma.isActive {
+		panic(errors.New("InitialisingActivation should not be called on an active action"))
+	}
+	sma.ToggleActivationUnobserved()
 	sma.notifyInitialisingObservers()
 }
 
@@ -57,30 +57,6 @@ func (sma *SimpleManagementAction) ToggleActivation() {
 
 func (sma *SimpleManagementAction) ToggleActivationUnobserved() {
 	sma.isActive = !sma.isActive
-}
-
-func (sma *SimpleManagementAction) Activate() {
-	sma.activateUnobserved()
-	sma.notifyObservers()
-}
-
-func (sma *SimpleManagementAction) activateUnobserved() {
-	if sma.isActive {
-		return
-	}
-	sma.isActive = active
-}
-
-func (sma *SimpleManagementAction) Deactivate() {
-	sma.deactivateUnobserved()
-	sma.notifyObservers()
-}
-
-func (sma *SimpleManagementAction) deactivateUnobserved() {
-	if sma.isActive {
-		return
-	}
-	sma.isActive = active
 }
 
 func (sma *SimpleManagementAction) IsActive() bool {

@@ -36,7 +36,7 @@ func TestSimpleManagementAction_Subscribe(t *testing.T) {
 	g.Expect(len(actionUnderTest.observers)).To(Equal(2))
 }
 
-func TestSimpleManagementAction_Activate(t *testing.T) {
+func TestSimpleManagementAction_ToggleActivation(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -52,50 +52,64 @@ func TestSimpleManagementAction_Activate(t *testing.T) {
 	g.Expect(testSpyOne.LastObserved()).To(BeNil())
 	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
 
-	actionUnderTest.Activate()
-
-	g.Expect(actionUnderTest.IsActive()).To(BeTrue())
-	g.Expect(testSpyOne.LastObserved()).To(Equal(actionUnderTest))
-	g.Expect(testSpyTwo.LastObserved()).To(Equal(actionUnderTest))
-}
-
-func TestSimpleManagementAction_Deactivate(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	// given
-	testSpyOne := new(spyObserver)
-
-	actionUnderTest := NewTestManagementAction()
-
-	// when
-	actionUnderTest.Subscribe(testSpyOne)
-
-	// then
-	g.Expect(testSpyOne.LastObserved()).To(BeNil())
-
-	actionUnderTest.Deactivate()
-
-	g.Expect(testSpyOne.LastObserved()).To(BeNil())
-}
-
-func TestSimpleManagementAction_ToggleActivation(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	// given
-	testSpyOne := new(spyObserver)
-
-	actionUnderTest := NewTestManagementAction()
-
-	// when
-	actionUnderTest.Subscribe(testSpyOne)
-
-	// then
-	g.Expect(testSpyOne.LastObserved()).To(BeNil())
-
 	actionUnderTest.ToggleActivation()
 
 	g.Expect(actionUnderTest.IsActive()).To(BeTrue())
 	g.Expect(testSpyOne.LastObserved()).To(Equal(actionUnderTest))
+	g.Expect(testSpyTwo.LastObserved()).To(Equal(actionUnderTest))
+
+	// when
+	testSpyOne.Reset()
+	testSpyTwo.Reset()
+
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
+
+	actionUnderTest.ToggleActivation()
+
+	// then
+	g.Expect(actionUnderTest.IsActive()).To(BeFalse())
+	g.Expect(testSpyOne.LastObserved()).To(Equal(actionUnderTest))
+	g.Expect(testSpyTwo.LastObserved()).To(Equal(actionUnderTest))
+}
+
+func TestSimpleManagementAction_InitialisingActivation(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	testSpyOne := new(spyObserver)
+	testSpyTwo := new(spyObserver)
+
+	actionUnderTest := NewTestManagementAction()
+
+	// when
+	actionUnderTest.Subscribe(testSpyOne, testSpyTwo)
+
+	// then
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
+
+	actionUnderTest.InitialisingActivation()
+
+	g.Expect(actionUnderTest.IsActive()).To(BeTrue())
+	g.Expect(testSpyOne.LastObserved()).To(Equal(actionUnderTest))
+	g.Expect(testSpyTwo.LastObserved()).To(Equal(actionUnderTest))
+
+	// when
+	testSpyOne.Reset()
+	testSpyTwo.Reset()
+
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
+
+	expectedPanicCall := func() {
+		actionUnderTest.InitialisingActivation()
+	}
+
+	// then
+	g.Expect(expectedPanicCall).To(Panic())
+	g.Expect(testSpyOne.LastObserved()).To(BeNil())
+	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
 }
 
 func TestSimpleManagementAction_ToggleActivationUnobserved(t *testing.T) {
