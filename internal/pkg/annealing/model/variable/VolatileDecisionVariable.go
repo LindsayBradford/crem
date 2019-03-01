@@ -6,7 +6,7 @@ type VolatileDecisionVariable struct {
 	actual    SimpleDecisionVariable
 	temporary SimpleDecisionVariable
 
-	observers []Observer
+	ContainedDecisionVariableObservers
 }
 
 func (v *VolatileDecisionVariable) Name() string {
@@ -46,16 +46,6 @@ func (v *VolatileDecisionVariable) Accept() {
 func (v *VolatileDecisionVariable) Revert() {
 	v.temporary.value = v.actual.value
 	v.NotifyObservers()
-}
-
-func (v *VolatileDecisionVariable) Subscribe(observers ...Observer) {
-	if v.observers == nil {
-		v.observers = make([]Observer, 0)
-	}
-
-	for _, newObserver := range observers {
-		v.observers = append(v.observers, newObserver)
-	}
 }
 
 func (v *VolatileDecisionVariable) NotifyObservers() {
