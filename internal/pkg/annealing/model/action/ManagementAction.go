@@ -13,7 +13,7 @@ type ManagementAction interface {
 
 	Subscribe(observers ...Observer)
 
-	ToggleInitialisingActivation()
+	InitialisingActivation()
 	ToggleActivation()
 	ToggleActivationUnobserved()
 }

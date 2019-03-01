@@ -111,7 +111,7 @@ func (m *Model) Initialise() {
 		&implementationCost.VolatileDecisionVariable,
 	)
 
-	m.managementActions.RandomlyToggleAllActivations()
+	m.managementActions.RandomlyInitialise()
 }
 
 func (m *Model) AcceptChange() {
@@ -144,7 +144,7 @@ func (m *Model) ObserveAction(action action.ManagementAction) {
 	m.noteAppliedManagementAction(action)
 }
 
-func (m *Model) ObserveInitialisationAction(action action.ManagementAction) {
+func (m *Model) ObserveActionInitialising(action action.ManagementAction) {
 	m.noteAppliedManagementAction(action)
 }
 

@@ -14,6 +14,6 @@ func (a *Null) Type() ManagementActionType                                { retu
 func (a *Null) IsActive() bool                                            { return false }
 func (a *Null) ModelVariableValue(variableName ModelVariableName) float64 { return 0 }
 func (a *Null) Subscribe(observers ...Observer)                           {}
+func (a *Null) InitialisingActivation()                                   {}
 func (a *Null) ToggleActivation()                                         {}
 func (a *Null) ToggleActivationUnobserved()                               {}
-func (a *Null) ToggleInitialisingActivation()                             {}

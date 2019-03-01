@@ -50,7 +50,7 @@ func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
 	}
 }
 
-func (sl *SedimentLoad) ObserveInitialisationAction(action action.ManagementAction) {
+func (sl *SedimentLoad) ObserveActionInitialising(action action.ManagementAction) {
 	sl.actionObserved = action
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:

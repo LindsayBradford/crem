@@ -45,8 +45,8 @@ func (sma *SimpleManagementAction) Type() ManagementActionType {
 	return sma.actionType
 }
 
-func (sma *SimpleManagementAction) ToggleInitialisingActivation() {
-	sma.ToggleActivationUnobserved()
+func (sma *SimpleManagementAction) InitialisingActivation() {
+	sma.activateUnobserved()
 	sma.notifyInitialisingObservers()
 }
 
@@ -60,19 +60,27 @@ func (sma *SimpleManagementAction) ToggleActivationUnobserved() {
 }
 
 func (sma *SimpleManagementAction) Activate() {
+	sma.activateUnobserved()
+	sma.notifyObservers()
+}
+
+func (sma *SimpleManagementAction) activateUnobserved() {
 	if sma.isActive {
 		return
 	}
 	sma.isActive = active
-	sma.notifyObservers()
 }
 
 func (sma *SimpleManagementAction) Deactivate() {
-	if !sma.isActive {
+	sma.deactivateUnobserved()
+	sma.notifyObservers()
+}
+
+func (sma *SimpleManagementAction) deactivateUnobserved() {
+	if sma.isActive {
 		return
 	}
-	sma.isActive = inactive
-	sma.notifyObservers()
+	sma.isActive = active
 }
 
 func (sma *SimpleManagementAction) IsActive() bool {
@@ -101,6 +109,6 @@ func (sma *SimpleManagementAction) notifyObservers() {
 
 func (sma *SimpleManagementAction) notifyInitialisingObservers() {
 	for _, observer := range sma.observers {
-		observer.ObserveInitialisationAction(sma)
+		observer.ObserveActionInitialising(sma)
 	}
 }

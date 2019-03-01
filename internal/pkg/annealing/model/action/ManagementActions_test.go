@@ -8,6 +8,8 @@ import (
 	"testing"
 )
 
+const equalTo = "=="
+
 func TestManagementActions_Initialise(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -93,7 +95,7 @@ func TestManagementActions_RandomlyToggleOneActivation_OnePresent(t *testing.T) 
 	g.Expect(dummyAction1.IsActive()).To(BeTrue())
 }
 
-func TestManagementActions_RandomlyToggleAllActivations(t *testing.T) {
+func TestManagementActions_RandomlyInitialise(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -114,7 +116,8 @@ func TestManagementActions_RandomlyToggleAllActivations(t *testing.T) {
 	}
 
 	// when
-	actionsUnderTest.RandomlyToggleAllActivations()
+	actionsUnderTest.RandomlyInitialise()
+	expectedActivations := actionSpy.ObservationsCounted()
 
 	// then
 	var actualActivations uint
@@ -125,7 +128,7 @@ func TestManagementActions_RandomlyToggleAllActivations(t *testing.T) {
 	}
 	t.Log(fmt.Sprintf("%d dummy actions randomly activated", actualActivations))
 
-	g.Expect(actualActivations).To(BeNumerically("==", actionSpy.ObservationsCounted()))
+	g.Expect(actualActivations).To(BeNumerically(equalTo, expectedActivations))
 }
 
 func TestManagementActions_UndoLastActivationToggleUnobserved(t *testing.T) {

@@ -36,12 +36,12 @@ func (m *ManagementActions) pickRandomManagementAction() ManagementAction {
 	return m.actions[randomIndex]
 }
 
-func (m *ManagementActions) RandomlyToggleAllActivations() {
+func (m *ManagementActions) RandomlyInitialise() {
 	for _, action := range m.actions {
 		randomValue := m.RandomNumberGenerator().Intn(2)
 		switch randomValue {
 		case 0:
-			action.ToggleInitialisingActivation()
+			action.InitialisingActivation()
 		case 1:
 			// Deliberately does nothing
 		default:

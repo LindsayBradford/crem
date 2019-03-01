@@ -14,7 +14,7 @@ func (os *spyObserver) ObserveAction(action ManagementAction) {
 	os.observationsCounted++
 }
 
-func (os *spyObserver) ObserveInitialisationAction(action ManagementAction) {
+func (os *spyObserver) ObserveActionInitialising(action ManagementAction) {
 	os.lastObserved = action
 	os.observationsCounted++
 }

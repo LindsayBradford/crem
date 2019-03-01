@@ -39,7 +39,7 @@ func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
 	}
 }
 
-func (ic *ImplementationCost) ObserveInitialisationAction(action action.ManagementAction) {
+func (ic *ImplementationCost) ObserveActionInitialising(action action.ManagementAction) {
 	ic.actionObserved = action
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
