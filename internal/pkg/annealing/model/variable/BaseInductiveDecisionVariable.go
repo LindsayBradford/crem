@@ -6,6 +6,9 @@ import "github.com/LindsayBradford/crem/pkg/name"
 
 var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
 
+// BaseInductiveDecisionVariable offers a simple implementation of the InductiveDecisionVariable interface with
+// the expectation that specific decisions variables will embed this struct to make use of typical
+// InductiveDecisionVariable behaviour.
 type BaseInductiveDecisionVariable struct {
 	name.ContainedName
 
@@ -46,6 +49,8 @@ func (v *BaseInductiveDecisionVariable) RejectInductiveValue() {
 	v.NotifyObservers()
 }
 
+// NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change
+// to any observers watching for state changes to the variable.
 func (v *BaseInductiveDecisionVariable) NotifyObservers() {
 	for _, observer := range v.observers {
 		observer.ObserveDecisionVariable(v)
