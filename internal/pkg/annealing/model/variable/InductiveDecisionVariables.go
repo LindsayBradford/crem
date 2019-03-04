@@ -8,7 +8,7 @@ func NewInductiveDecisionVariables() InductiveDecisionVariables {
 	return make(InductiveDecisionVariables, 1)
 }
 
-// InductiveDecisionVariables offers up a name-indexed collection of BaseInductiveDecisionVariable instances, along with
+// InductiveDecisionVariables offers up a name-indexed collection of InductiveDecisionVariable instances, along with
 // convenience methods for the collection's management.  It is typically expected that a model would contain only a
 // single instance of InductiveDecisionVariables to house all of its decision variables.
 type InductiveDecisionVariables map[string]InductiveDecisionVariable
