@@ -116,12 +116,12 @@ func (m *Model) Initialise() {
 
 func (m *Model) AcceptChange() {
 	m.note("Accepting Change")
-	m.DecisionVariables().Accept()
+	m.DecisionVariables().AcceptAll()
 }
 
 func (m *Model) RevertChange() {
 	m.note("Reverting Change")
-	m.DecisionVariables().Revert()
+	m.DecisionVariables().RejectAll()
 	m.managementActions.UndoLastActivationToggleUnobserved()
 }
 

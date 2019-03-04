@@ -37,9 +37,9 @@ func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string)
 }
 
 func (c *ContainedDecisionVariables) Accept() {
-	c.decisionVariables.Accept()
+	c.decisionVariables.AcceptAll()
 }
 
 func (c *ContainedDecisionVariables) Revert() {
-	c.decisionVariables.Revert()
+	c.decisionVariables.RejectAll()
 }

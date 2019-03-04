@@ -4,6 +4,10 @@ package variable
 
 import "github.com/LindsayBradford/crem/pkg/name"
 
+// InductiveDecisionVariable is a DecisionVariable that allows an 'inductive' value to be temporarily stored
+// and retrieved for the decision variable (typically based based on some management action).
+// The induced value does not become the actual value for the decision variable without being explicitly accepted.
+// The induced value can also be rejected, which sees it revert to the actual value of the variable.
 type InductiveDecisionVariable struct {
 	name.ContainedName
 
