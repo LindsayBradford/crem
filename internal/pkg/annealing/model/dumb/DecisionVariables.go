@@ -7,11 +7,11 @@ import (
 )
 
 type DecisionVariables struct {
-	variable.VolatileDecisionVariables
+	variable.InductiveDecisionVariables
 }
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.VolatileDecisionVariables = variable.NewVolatileDecisionVariables()
+	dv.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
 	dv.buildDecisionVariables()
 	return dv
 }

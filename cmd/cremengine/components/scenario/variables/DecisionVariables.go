@@ -11,11 +11,11 @@ const (
 )
 
 type DecisionVariables struct {
-	variable.VolatileDecisionVariables
+	variable.InductiveDecisionVariables
 }
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.VolatileDecisionVariables = variable.NewVolatileDecisionVariables()
+	dv.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
 	return dv
 }
 
@@ -33,7 +33,7 @@ func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.Deci
 
 func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string) float64 {
 	decisionVariable := c.decisionVariables.Variable(variableName)
-	return decisionVariable.ChangeInValue()
+	return decisionVariable.DifferenceInValues()
 }
 
 func (c *ContainedDecisionVariables) Accept() {

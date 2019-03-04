@@ -97,7 +97,7 @@ func (dm *Model) objectiveValue() float64 {
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).SetTemporaryValue(value)
+	dm.decisionVariables.Variable(variable.ObjectiveValue).SetInductiveValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
@@ -105,11 +105,11 @@ func (dm *Model) SetDecisionVariable(name string, value float64) {
 }
 
 func (dm *Model) AcceptChange() {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).Accept()
+	dm.decisionVariables.Variable(variable.ObjectiveValue).AcceptInductiveValue()
 }
 
 func (dm *Model) RevertChange() {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).Revert()
+	dm.decisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
 }
 
 func (dm *Model) DecisionVariable(name string) variable.DecisionVariable {
@@ -118,7 +118,7 @@ func (dm *Model) DecisionVariable(name string) variable.DecisionVariable {
 
 func (dm *Model) DecisionVariableChange(variableName string) float64 {
 	decisionVariable := dm.decisionVariables.Variable(variableName)
-	difference := decisionVariable.TemporaryValue() - decisionVariable.Value()
+	difference := decisionVariable.InductiveValue() - decisionVariable.Value()
 	return difference
 }
 

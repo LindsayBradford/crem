@@ -107,8 +107,8 @@ func (m *Model) Initialise() {
 	}
 
 	m.DecisionVariables().Add(
-		&sedimentLoad.VolatileDecisionVariable,
-		&implementationCost.VolatileDecisionVariable,
+		&sedimentLoad.InductiveDecisionVariable,
+		&implementationCost.InductiveDecisionVariable,
 	)
 
 	m.managementActions.RandomlyInitialise()

@@ -4,29 +4,29 @@ package variable
 
 import "github.com/pkg/errors"
 
-func NewVolatileDecisionVariables() VolatileDecisionVariables {
-	return make(VolatileDecisionVariables, 1)
+func NewInductiveDecisionVariables() InductiveDecisionVariables {
+	return make(InductiveDecisionVariables, 1)
 }
 
-type VolatileDecisionVariables map[string]*VolatileDecisionVariable
+type InductiveDecisionVariables map[string]*InductiveDecisionVariable
 
-func (vs *VolatileDecisionVariables) Add(newVariables ...*VolatileDecisionVariable) {
+func (vs *InductiveDecisionVariables) Add(newVariables ...*InductiveDecisionVariable) {
 	for _, newVariable := range newVariables {
 		vs.asMap()[newVariable.Name()] = newVariable
 	}
 }
 
-func (vs *VolatileDecisionVariables) NewForName(name string) {
-	newVariable := new(VolatileDecisionVariable)
+func (vs *InductiveDecisionVariables) NewForName(name string) {
+	newVariable := new(InductiveDecisionVariable)
 	newVariable.SetName(name)
 	vs.asMap()[name] = newVariable
 }
 
-func (vs *VolatileDecisionVariables) asMap() VolatileDecisionVariables {
+func (vs *InductiveDecisionVariables) asMap() InductiveDecisionVariables {
 	return *vs
 }
 
-func (vs *VolatileDecisionVariables) SetValue(name string, value float64) {
+func (vs *InductiveDecisionVariables) SetValue(name string, value float64) {
 	foundEntry, present := vs.asMap()[name]
 	if !present {
 		panic(variableMissing(name))
@@ -39,7 +39,7 @@ func variableMissing(name string) error {
 	return errors.New("decision variable[" + name + "] does not exist.")
 }
 
-func (vs *VolatileDecisionVariables) Variable(name string) *VolatileDecisionVariable {
+func (vs *InductiveDecisionVariables) Variable(name string) *InductiveDecisionVariable {
 	foundEntry, present := vs.asMap()[name]
 	if !present {
 		panic(variableMissing(name))
@@ -47,7 +47,7 @@ func (vs *VolatileDecisionVariables) Variable(name string) *VolatileDecisionVari
 	return foundEntry
 }
 
-func (vs *VolatileDecisionVariables) Value(name string) float64 {
+func (vs *InductiveDecisionVariables) Value(name string) float64 {
 	foundEntry, present := vs.asMap()[name]
 	if !present {
 		panic(variableMissing(name))
@@ -55,14 +55,14 @@ func (vs *VolatileDecisionVariables) Value(name string) float64 {
 	return foundEntry.Value()
 }
 
-func (vs *VolatileDecisionVariables) Accept() {
+func (vs *InductiveDecisionVariables) Accept() {
 	for _, variable := range vs.asMap() {
-		variable.Accept()
+		variable.AcceptInductiveValue()
 	}
 }
 
-func (vs *VolatileDecisionVariables) Revert() {
+func (vs *InductiveDecisionVariables) Revert() {
 	for _, variable := range vs.asMap() {
-		variable.Revert()
+		variable.RejectInductiveValue()
 	}
 }

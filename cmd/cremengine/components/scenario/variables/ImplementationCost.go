@@ -15,7 +15,7 @@ const ImplementationCostVariableName = "ImplementationCost"
 const notImplementedCost float64 = 0
 
 type ImplementationCost struct {
-	variable.VolatileDecisionVariable
+	variable.InductiveDecisionVariable
 	actionObserved action.ManagementAction
 }
 
@@ -52,8 +52,8 @@ func (ic *ImplementationCost) ObserveActionInitialising(action action.Management
 
 func (ic *ImplementationCost) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
-		currentValue := ic.VolatileDecisionVariable.Value()
-		ic.VolatileDecisionVariable.SetTemporaryValue(currentValue - asIsCost + toBeCost)
+		currentValue := ic.InductiveDecisionVariable.Value()
+		ic.InductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
@@ -68,8 +68,8 @@ func (ic *ImplementationCost) handleRiverBankRestorationAction() {
 
 func (ic *ImplementationCost) handleInitialisingRiverBankRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
-		currentValue := ic.VolatileDecisionVariable.Value()
-		ic.VolatileDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+		currentValue := ic.InductiveDecisionVariable.Value()
+		ic.InductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
