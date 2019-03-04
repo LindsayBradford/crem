@@ -8,21 +8,21 @@ func NewInductiveDecisionVariables() InductiveDecisionVariables {
 	return make(InductiveDecisionVariables, 1)
 }
 
-// InductiveDecisionVariables offers up a name-indexed collection of InductiveDecisionVariable instances, along with
+// InductiveDecisionVariables offers up a name-indexed collection of BaseInductiveDecisionVariable instances, along with
 // convenience methods for the collection's management.  It is typically expected that a model would contain only a
 // single instance of InductiveDecisionVariables to house all of its decision variables.
-type InductiveDecisionVariables map[string]*InductiveDecisionVariable
+type InductiveDecisionVariables map[string]InductiveDecisionVariable
 
 // Adds a number of InductiveDecisionVariables to the collection
-func (vs *InductiveDecisionVariables) Add(newVariables ...*InductiveDecisionVariable) {
+func (vs *InductiveDecisionVariables) Add(newVariables ...InductiveDecisionVariable) {
 	for _, newVariable := range newVariables {
 		vs.asMap()[newVariable.Name()] = newVariable
 	}
 }
 
-// NewForName creates and adds to its collection, a new InductiveDecisionVariable with the supplied name.
+// NewForName creates and adds to its collection, a new BaseInductiveDecisionVariable with the supplied name.
 func (vs *InductiveDecisionVariables) NewForName(name string) {
-	newVariable := new(InductiveDecisionVariable)
+	newVariable := new(BaseInductiveDecisionVariable)
 	newVariable.SetName(name)
 	vs.asMap()[name] = newVariable
 }
@@ -48,7 +48,7 @@ func variableMissing(name string) error {
 
 // Variable returns a pointer to the variable in its collection with the supplied name.
 // If the collection has no variable for the supplied name, it panics.
-func (vs *InductiveDecisionVariables) Variable(name string) *InductiveDecisionVariable {
+func (vs *InductiveDecisionVariables) Variable(name string) InductiveDecisionVariable {
 	foundEntry, present := vs.asMap()[name]
 	if !present {
 		panic(variableMissing(name))
@@ -66,14 +66,14 @@ func (vs *InductiveDecisionVariables) Value(name string) float64 {
 	return foundEntry.Value()
 }
 
-// AcceptAll accepts the inductive value of all the InductiveDecisionVariable instances in its collection.
+// AcceptAll accepts the inductive value of all the BaseInductiveDecisionVariable instances in its collection.
 func (vs *InductiveDecisionVariables) AcceptAll() {
 	for _, variable := range vs.asMap() {
 		variable.AcceptInductiveValue()
 	}
 }
 
-// RejectAll rejects the inductive value of all the InductiveDecisionVariable instances in its collection.
+// RejectAll rejects the inductive value of all the BaseInductiveDecisionVariable instances in its collection.
 func (vs *InductiveDecisionVariables) RejectAll() {
 	for _, variable := range vs.asMap() {
 		variable.RejectInductiveValue()

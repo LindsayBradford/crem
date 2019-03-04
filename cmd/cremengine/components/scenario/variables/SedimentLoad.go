@@ -14,7 +14,7 @@ import (
 const SedimentLoadVariableName = "SedimentLoad"
 
 type SedimentLoad struct {
-	variable.InductiveDecisionVariable
+	variable.BaseInductiveDecisionVariable
 	bankSedimentContribution actions.BankSedimentContribution
 	actionObserved           action.ManagementAction
 }
@@ -69,8 +69,8 @@ func (sl *SedimentLoad) handleRiverBankRestorationAction() {
 		asIsSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(asIsVegetation)
 		toBeSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(toBeVegetation)
 
-		currentValue := sl.InductiveDecisionVariable.Value()
-		sl.InductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
+		currentValue := sl.BaseInductiveDecisionVariable.Value()
+		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 	}
 
 	switch sl.actionObserved.IsActive() {
@@ -89,8 +89,8 @@ func (sl *SedimentLoad) handleInitialisingRiverBankRestorationAction() {
 		asIsSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(asIsVegetation)
 		toBeSedimentContribution := sl.bankSedimentContribution.SedimentImpactOfRiparianVegetation(toBeVegetation)
 
-		currentValue := sl.InductiveDecisionVariable.Value()
-		sl.InductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
+		currentValue := sl.BaseInductiveDecisionVariable.Value()
+		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 	}
 
 	switch sl.actionObserved.IsActive() {

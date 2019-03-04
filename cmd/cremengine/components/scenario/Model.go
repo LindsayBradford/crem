@@ -107,8 +107,8 @@ func (m *Model) Initialise() {
 	}
 
 	m.DecisionVariables().Add(
-		&sedimentLoad.InductiveDecisionVariable,
-		&implementationCost.InductiveDecisionVariable,
+		sedimentLoad,
+		implementationCost,
 	)
 
 	m.managementActions.RandomlyInitialise()

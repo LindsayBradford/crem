@@ -11,4 +11,5 @@ type DecisionVariables map[string]DecisionVariable
 type DecisionVariable interface {
 	Name() string
 	Value() float64
+	SetValue(value float64)
 }
