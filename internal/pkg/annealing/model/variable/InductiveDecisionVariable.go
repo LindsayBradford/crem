@@ -2,32 +2,28 @@
 
 package variable
 
+import "github.com/LindsayBradford/crem/pkg/name"
+
 type InductiveDecisionVariable struct {
-	actual    SimpleDecisionVariable
-	inductive SimpleDecisionVariable
+	name.ContainedName
+
+	actualValue    float64
+	inductiveValue float64
 
 	ContainedDecisionVariableObservers
 }
 
-func (v *InductiveDecisionVariable) Name() string {
-	return v.actual.name
-}
-
-func (v *InductiveDecisionVariable) SetName(name string) {
-	v.actual.name = name
-}
-
 func (v *InductiveDecisionVariable) Value() float64 {
-	return v.actual.value
+	return v.actualValue
 }
 
 func (v *InductiveDecisionVariable) SetValue(value float64) {
-	v.actual.value = value
-	v.inductive.value = value
+	v.actualValue = value
+	v.inductiveValue = value
 }
 
 func (v *InductiveDecisionVariable) InductiveValue() float64 {
-	return v.inductive.value
+	return v.inductiveValue
 }
 
 func (v *InductiveDecisionVariable) DifferenceInValues() float64 {
@@ -35,16 +31,16 @@ func (v *InductiveDecisionVariable) DifferenceInValues() float64 {
 }
 
 func (v *InductiveDecisionVariable) SetInductiveValue(value float64) {
-	v.inductive.value = value
+	v.inductiveValue = value
 }
 
 func (v *InductiveDecisionVariable) AcceptInductiveValue() {
-	v.actual.value = v.inductive.value
+	v.actualValue = v.inductiveValue
 	v.NotifyObservers()
 }
 
 func (v *InductiveDecisionVariable) RejectInductiveValue() {
-	v.inductive.value = v.actual.value
+	v.inductiveValue = v.actualValue
 	v.NotifyObservers()
 }
 
