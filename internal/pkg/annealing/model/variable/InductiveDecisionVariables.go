@@ -34,36 +34,33 @@ func (vs *InductiveDecisionVariables) asMap() InductiveDecisionVariables {
 // SetValue finds the variable with supplied name in its collection, and sets its value appropriately.
 // If the collection has no variable for the supplied name, it panics.
 func (vs *InductiveDecisionVariables) SetValue(name string, value float64) {
-	foundEntry, present := vs.asMap()[name]
-	if !present {
-		panic(variableMissing(name))
+	if variable, isPresent := vs.asMap()[name]; isPresent {
+		variable.SetValue(value)
+		return
 	}
-	value = foundEntry.Value()
-	foundEntry.SetValue(value)
+	panic(variableMissing(name))
 }
 
 func variableMissing(name string) error {
-	return errors.New("decision variable[" + name + "] does not exist.")
+	return errors.New("decision variable [" + name + "] does not exist.")
 }
 
 // Variable returns a pointer to the variable in its collection with the supplied name.
 // If the collection has no variable for the supplied name, it panics.
 func (vs *InductiveDecisionVariables) Variable(name string) InductiveDecisionVariable {
-	foundEntry, present := vs.asMap()[name]
-	if !present {
-		panic(variableMissing(name))
+	if variable, isPresent := vs.asMap()[name]; isPresent {
+		return variable
 	}
-	return foundEntry
+	panic(variableMissing(name))
 }
 
 // Value returns the value of the variable in its collection with the supplied name.
 // If the collection has no variable for the supplied name, it panics.
 func (vs *InductiveDecisionVariables) Value(name string) float64 {
-	foundEntry, present := vs.asMap()[name]
-	if !present {
-		panic(variableMissing(name))
+	if variable, isPresent := vs.asMap()[name]; isPresent {
+		return variable.Value()
 	}
-	return foundEntry.Value()
+	panic(variableMissing(name))
 }
 
 // DifferenceInValues reports the difference in values of the variable in its collection with the supplied name.
