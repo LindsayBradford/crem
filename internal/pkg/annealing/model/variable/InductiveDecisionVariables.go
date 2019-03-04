@@ -66,6 +66,12 @@ func (vs *InductiveDecisionVariables) Value(name string) float64 {
 	return foundEntry.Value()
 }
 
+// DifferenceInValues reports the difference in values of the variable in its collection with the supplied name.
+func (vs *InductiveDecisionVariables) DifferenceInValues(variableName string) float64 {
+	decisionVariable := vs.Variable(variableName)
+	return decisionVariable.DifferenceInValues()
+}
+
 // AcceptAll accepts the inductive value of all the BaseInductiveDecisionVariable instances in its collection.
 func (vs *InductiveDecisionVariables) AcceptAll() {
 	for _, variable := range vs.asMap() {

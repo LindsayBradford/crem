@@ -32,14 +32,5 @@ func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.Deci
 }
 
 func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string) float64 {
-	decisionVariable := c.decisionVariables.Variable(variableName)
-	return decisionVariable.DifferenceInValues()
-}
-
-func (c *ContainedDecisionVariables) Accept() {
-	c.decisionVariables.AcceptAll()
-}
-
-func (c *ContainedDecisionVariables) Revert() {
-	c.decisionVariables.RejectAll()
+	return c.decisionVariables.DifferenceInValues(variableName)
 }
