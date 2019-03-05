@@ -7,10 +7,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
 // TODO:  This cannot be run concurently as-is.  Needs a closer look at Annealer state cloning.
+
+const decimalPrecisionRequired = 6
 
 type AnnealingInvariantObserver struct {
 	AnnealingObserver
@@ -36,7 +39,7 @@ func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 	builder.
 		Add("Id [", event.Id(), "], ").
 		Add("Event [", event.EventType.String(), "]: ").
-		Add("Loop Invariant Broken")
+		Add("Loop Invariant Broken.")
 	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
 	panic(builder.String())
 }
@@ -55,7 +58,12 @@ func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event observer.Event)
 			} else {
 				expectedObjectiveValue = amo.previousObjectiveValue
 			}
-			return expectedObjectiveValue == annealer.ObservableExplorer().ObjectiveValue()
+
+			roundedExpectedObjectiveValue := math.RoundFloat(expectedObjectiveValue, decimalPrecisionRequired)
+			roundedActualObjectiveValue := math.RoundFloat(annealer.ObservableExplorer().ObjectiveValue(), decimalPrecisionRequired)
+
+			invariantUpheld := roundedExpectedObjectiveValue == roundedActualObjectiveValue
+			return invariantUpheld
 		default:
 			return true
 		}

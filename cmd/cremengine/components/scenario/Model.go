@@ -108,8 +108,7 @@ func (m *Model) Initialise() {
 
 	sedimentVsCost := new(variables.SedimentVsCost).
 		Initialise().
-		WithSedimentLoad(sedimentLoad).
-		WithImplementationCost(implementationCost)
+		ComposedOf(sedimentLoad, implementationCost)
 	sedimentVsCost.Subscribe(m)
 
 	m.DecisionVariables().Add(
