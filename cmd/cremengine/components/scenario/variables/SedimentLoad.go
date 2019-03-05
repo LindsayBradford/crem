@@ -13,6 +13,8 @@ import (
 
 const SedimentLoadVariableName = "SedimentLoad"
 
+var _ variable.DecisionVariable = new(SedimentLoad)
+
 type SedimentLoad struct {
 	variable.BaseInductiveDecisionVariable
 	bankSedimentContribution actions.BankSedimentContribution

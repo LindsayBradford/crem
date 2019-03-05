@@ -106,9 +106,16 @@ func (m *Model) Initialise() {
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
+	sedimentVsCost := new(variables.SedimentVsCost).
+		Initialise().
+		WithSedimentLoad(sedimentLoad).
+		WithImplementationCost(implementationCost)
+	sedimentVsCost.Subscribe(m)
+
 	m.DecisionVariables().Add(
 		sedimentLoad,
 		implementationCost,
+		sedimentVsCost,
 	)
 
 	m.managementActions.RandomlyInitialise()

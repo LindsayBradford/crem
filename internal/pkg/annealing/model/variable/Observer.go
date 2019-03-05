@@ -14,6 +14,10 @@ type ContainedDecisionVariableObservers struct {
 	observers []Observer
 }
 
+func (c *ContainedDecisionVariableObservers) Observers() []Observer {
+	return c.observers
+}
+
 func (c *ContainedDecisionVariableObservers) Subscribe(observers ...Observer) {
 	if c.observers == nil {
 		c.observers = make([]Observer, 0)

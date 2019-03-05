@@ -40,11 +40,17 @@ func (v *BaseInductiveDecisionVariable) SetInductiveValue(value float64) {
 }
 
 func (v *BaseInductiveDecisionVariable) AcceptInductiveValue() {
+	if v.actualValue == v.inductiveValue {
+		return
+	}
 	v.actualValue = v.inductiveValue
 	v.NotifyObservers()
 }
 
 func (v *BaseInductiveDecisionVariable) RejectInductiveValue() {
+	if v.actualValue == v.inductiveValue {
+		return
+	}
 	v.inductiveValue = v.actualValue
 	v.NotifyObservers()
 }
