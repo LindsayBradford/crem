@@ -106,9 +106,16 @@ func (m *Model) Initialise() {
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
-	sedimentVsCost := new(variables.SedimentVsCost).
+	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().
-		ComposedOf(sedimentLoad, implementationCost)
+		WithWeightedVariable(sedimentLoad, 0.667).
+		WithWeightedVariable(implementationCost, 0.333).
+		Build()
+
+	if buildError != nil {
+		panic(buildError)
+	}
+
 	sedimentVsCost.Subscribe(m)
 
 	m.DecisionVariables().Add(

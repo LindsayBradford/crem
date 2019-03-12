@@ -3,7 +3,9 @@
 package variable
 
 import (
+	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/pkg/errors"
 )
 
 var _ InductiveDecisionVariable = new(CompositeInductiveDecisionVariable)
@@ -11,13 +13,12 @@ var _ InductiveDecisionVariable = new(CompositeInductiveDecisionVariable)
 type CompositeInductiveDecisionVariable struct {
 	name.ContainedName
 
-	composedVariables []InductiveDecisionVariable
-
+	weightedVariables map[InductiveDecisionVariable]float64
 	ContainedDecisionVariableObservers
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {
-	v.composedVariables = make([]InductiveDecisionVariable, 0)
+	v.weightedVariables = make(map[InductiveDecisionVariable]float64, 0)
 	return v
 }
 
@@ -26,15 +27,42 @@ func (v *CompositeInductiveDecisionVariable) WithName(name string) *CompositeInd
 	return v
 }
 
-func (v *CompositeInductiveDecisionVariable) ComposedOf(variables ...InductiveDecisionVariable) *CompositeInductiveDecisionVariable {
-	v.composedVariables = append(v.composedVariables, variables...)
+func (v *CompositeInductiveDecisionVariable) WithWeightedVariable(variable InductiveDecisionVariable, weight float64) *CompositeInductiveDecisionVariable {
+	v.weightedVariables[variable] = weight
 	return v
+}
+
+func (v *CompositeInductiveDecisionVariable) Build() (*CompositeInductiveDecisionVariable, error) {
+	errors := new(errors2.CompositeError)
+	if weightError := v.checkWeights(); weightError != nil {
+		errors.Add(weightError)
+	}
+
+	if errors.Size() > 0 {
+		return nil, errors
+	}
+
+	return v, nil
+}
+
+func (v *CompositeInductiveDecisionVariable) checkWeights() error {
+	overallWeight := float64(0)
+
+	for _, weight := range v.weightedVariables {
+		overallWeight += weight
+	}
+
+	if overallWeight == 1 {
+		return nil
+	}
+
+	return errors.New("Variable weights do not add to one.")
 }
 
 func (v *CompositeInductiveDecisionVariable) Value() float64 {
 	value := float64(0)
-	for _, variable := range v.composedVariables {
-		value = value + variable.Value()
+	for variable, weight := range v.weightedVariables {
+		value = value + weight*variable.Value()
 	}
 	return value
 }
@@ -44,11 +72,11 @@ func (v *CompositeInductiveDecisionVariable) SetValue(value float64) {
 }
 
 func (v *CompositeInductiveDecisionVariable) InductiveValue() float64 {
-	inductiveValue := float64(0)
-	for _, variable := range v.composedVariables {
-		inductiveValue = inductiveValue + variable.InductiveValue()
+	value := float64(0)
+	for variable, weight := range v.weightedVariables {
+		value = value + weight*variable.InductiveValue()
 	}
-	return inductiveValue
+	return value
 }
 
 func (v *CompositeInductiveDecisionVariable) SetInductiveValue(value float64) {
@@ -56,14 +84,14 @@ func (v *CompositeInductiveDecisionVariable) SetInductiveValue(value float64) {
 }
 
 func (v *CompositeInductiveDecisionVariable) AcceptInductiveValue() {
-	for _, variable := range v.composedVariables {
+	for variable := range v.weightedVariables {
 		variable.AcceptInductiveValue()
 	}
 	v.NotifyObservers()
 }
 
 func (v *CompositeInductiveDecisionVariable) RejectInductiveValue() {
-	for _, variable := range v.composedVariables {
+	for variable := range v.weightedVariables {
 		variable.RejectInductiveValue()
 	}
 	v.NotifyObservers()

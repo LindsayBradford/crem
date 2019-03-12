@@ -16,5 +16,6 @@ type SedimentVsCost struct {
 
 func (sc *SedimentVsCost) Initialise() *SedimentVsCost {
 	sc.SetName(SedimentVsCostName)
+	sc.CompositeInductiveDecisionVariable.Initialise()
 	return sc
 }
