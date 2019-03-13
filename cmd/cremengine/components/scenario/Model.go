@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
@@ -19,6 +20,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
@@ -119,7 +121,11 @@ func (m *Model) Initialise() {
 		panic(buildError)
 	}
 
-	m.ObserveDecisionVariableWithNote(sedimentVsCost, "test note")
+	noteBuilder := new(strings.FluentBuilder).
+		Add(sedimentLoad.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
+		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationWeight, 'f', 3, 64))
+
+	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
 
 	sedimentVsCost.Subscribe(m)
 
