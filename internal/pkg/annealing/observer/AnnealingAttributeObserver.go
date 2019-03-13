@@ -8,6 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/attributes"
@@ -97,6 +98,24 @@ func (aao *AnnealingAttributeObserver) observeEvent(event observer.Event, logAtt
 				attributes.NameValuePair{Name: "Type", Value: action.Type()},
 				attributes.NameValuePair{Name: "PlanningUnit", Value: action.PlanningUnit()},
 				attributes.NameValuePair{Name: "Active", Value: strconv.FormatBool(action.IsActive())},
+			)
+		}
+		if event.HasNote() {
+			logAttributes = append(logAttributes,
+				attributes.NameValuePair{Name: "Note", Value: event.Note()},
+			)
+		}
+	case observer.DecisionVariable:
+		variable, isVariable := event.Source().(variable.DecisionVariable)
+		if isVariable {
+			logAttributes = append(logAttributes,
+				attributes.NameValuePair{Name: "Name", Value: variable.Name()},
+				attributes.NameValuePair{Name: "Value", Value: variable.Value()},
+			)
+		}
+		if event.HasNote() {
+			logAttributes = append(logAttributes,
+				attributes.NameValuePair{Name: "Note", Value: event.Note()},
 			)
 		}
 	default:

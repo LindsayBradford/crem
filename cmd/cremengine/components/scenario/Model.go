@@ -119,6 +119,8 @@ func (m *Model) Initialise() {
 		panic(buildError)
 	}
 
+	m.ObserveDecisionVariableWithNote(sedimentVsCost, "test note")
+
 	sedimentVsCost.Subscribe(m)
 
 	m.DecisionVariables().Add(
@@ -183,6 +185,14 @@ func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithSource(variable)
+	m.EventNotifier().NotifyObserversOfEvent(*event)
+}
+
+func (m *Model) ObserveDecisionVariableWithNote(variable variable.DecisionVariable, note string) {
+	event := observer.NewEvent(observer.DecisionVariable).
+		WithId(m.Id()).
+		WithSource(variable).
+		WithNote(note)
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 

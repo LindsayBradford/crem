@@ -99,12 +99,18 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 				Add("Planning Unit [", action.PlanningUnit(), "], ").
 				Add("Active [", strconv.FormatBool(action.IsActive()), "]")
 		}
+		if event.HasNote() {
+			builder.Add(", Note [", event.Note(), "]")
+		}
 	case observer.DecisionVariable:
 		variable, isVariable := event.Source().(variable.DecisionVariable)
 		if isVariable {
 			builder.
 				Add("Name [", variable.Name(), "], ").
 				Add("Value [", fmt.Sprintf("%f", variable.Value()), "]")
+		}
+		if event.HasNote() {
+			builder.Add(", Note [", event.Note(), "]")
 		}
 	default:
 		// deliberately does nothing extra

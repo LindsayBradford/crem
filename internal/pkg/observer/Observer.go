@@ -50,7 +50,15 @@ func (e *Event) WithNote(text string) *Event {
 }
 
 func (e *Event) Note() string {
-	return e.Attribute(noteTextKey).(string)
+	note := e.Attribute(noteTextKey)
+	if note == nil {
+		return ""
+	}
+	return note.(string)
+}
+
+func (e *Event) HasNote() bool {
+	return e.Attribute(noteTextKey) != nil
 }
 
 func (e *Event) WithAttribute(name string, value interface{}) *Event {
