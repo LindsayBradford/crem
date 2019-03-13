@@ -106,10 +106,13 @@ func (m *Model) Initialise() {
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
+	const sedimentWeight = 0.667
+	const implementationWeight = 0.333
+
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().
-		WithWeightedVariable(sedimentLoad, 0.667).
-		WithWeightedVariable(implementationCost, 0.333).
+		WithWeightedVariable(sedimentLoad, sedimentWeight).
+		WithWeightedVariable(implementationCost, implementationWeight).
 		Build()
 
 	if buildError != nil {

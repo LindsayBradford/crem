@@ -3,6 +3,8 @@
 package variable
 
 import (
+	"math"
+
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -45,6 +47,22 @@ func (v *CompositeInductiveDecisionVariable) Build() (*CompositeInductiveDecisio
 	return v, nil
 }
 
+func (v *CompositeInductiveDecisionVariable) vectorLengthOfVariableValues() float64 {
+	var summedSquares float64
+	for variable := range v.weightedVariables {
+		summedSquares += math.Pow(variable.Value(), 2)
+	}
+	return math.Sqrt(summedSquares)
+}
+
+func (v *CompositeInductiveDecisionVariable) vectorLengthOfVariableInductiveValues() float64 {
+	var summedSquares float64
+	for variable := range v.weightedVariables {
+		summedSquares += math.Pow(variable.InductiveValue(), 2)
+	}
+	return math.Sqrt(summedSquares)
+}
+
 func (v *CompositeInductiveDecisionVariable) checkWeights() error {
 	overallWeight := float64(0)
 
@@ -62,7 +80,11 @@ func (v *CompositeInductiveDecisionVariable) checkWeights() error {
 func (v *CompositeInductiveDecisionVariable) Value() float64 {
 	value := float64(0)
 	for variable, weight := range v.weightedVariables {
-		value = value + weight*variable.Value()
+		variableValue := variable.Value()
+		// https://en.wikipedia.org/wiki/Feature_scaling#Scaling_to_unit_length
+		scaledVariableValue := variableValue / v.vectorLengthOfVariableValues()
+		weightedScaledValue := scaledVariableValue * weight
+		value += weightedScaledValue
 	}
 	return value
 }
@@ -74,7 +96,11 @@ func (v *CompositeInductiveDecisionVariable) SetValue(value float64) {
 func (v *CompositeInductiveDecisionVariable) InductiveValue() float64 {
 	value := float64(0)
 	for variable, weight := range v.weightedVariables {
-		value = value + weight*variable.InductiveValue()
+		variableValue := variable.InductiveValue()
+		// https://en.wikipedia.org/wiki/Feature_scaling#Scaling_to_unit_length
+		scaledVariableValue := variableValue / v.vectorLengthOfVariableInductiveValues()
+		weightedScaledValue := scaledVariableValue * weight
+		value += weightedScaledValue
 	}
 	return value
 }
