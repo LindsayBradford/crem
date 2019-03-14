@@ -2,7 +2,10 @@
 
 package variable
 
-import "github.com/LindsayBradford/crem/pkg/name"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/pkg/name"
+)
 
 var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
 
@@ -61,4 +64,12 @@ func (v *BaseInductiveDecisionVariable) NotifyObservers() {
 	for _, observer := range v.observers {
 		observer.ObserveDecisionVariable(v)
 	}
+}
+
+func (v *BaseInductiveDecisionVariable) ObserveAction(action action.ManagementAction) {
+	// deliberately does nothing
+}
+
+func (v *BaseInductiveDecisionVariable) ObserveActionInitialising(action action.ManagementAction) {
+	// deliberately does nothing
 }

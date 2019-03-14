@@ -28,6 +28,11 @@ func (sl *SedimentLoad) Initialise(planningUnitTable *tables.CsvTable, parameter
 	return sl
 }
 
+func (sl *SedimentLoad) WithObservers(observers ...variable.Observer) *SedimentLoad {
+	sl.Subscribe(observers...)
+	return sl
+}
+
 func (sl *SedimentLoad) deriveInitialSedimentLoad() float64 {
 	return sl.bankSedimentContribution.OriginalSedimentContribution() +
 		sl.gullySedimentContribution() +

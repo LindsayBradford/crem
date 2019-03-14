@@ -3,6 +3,7 @@
 package variables
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 )
 
@@ -18,4 +19,17 @@ func (sc *SedimentVsCost) Initialise() *SedimentVsCost {
 	sc.SetName(SedimentVsCostName)
 	sc.CompositeInductiveDecisionVariable.Initialise()
 	return sc
+}
+
+func (sc *SedimentVsCost) WithObservers(observers ...variable.Observer) *SedimentVsCost {
+	sc.Subscribe(observers...)
+	return sc
+}
+
+func (sc *SedimentVsCost) ObserveActionInitialising(action action.ManagementAction) {
+	// deliberately does nothing
+}
+
+func (sc *SedimentVsCost) ObserveAction(action action.ManagementAction) {
+	// deliberately does nothing
 }

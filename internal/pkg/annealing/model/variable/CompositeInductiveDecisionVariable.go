@@ -5,6 +5,7 @@ package variable
 import (
 	"math"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -133,4 +134,12 @@ func (v *CompositeInductiveDecisionVariable) NotifyObservers() {
 	for _, observer := range v.Observers() {
 		observer.ObserveDecisionVariable(v)
 	}
+}
+
+func (v *CompositeInductiveDecisionVariable) ObserveAction(action action.ManagementAction) {
+	// deliberately does nothing
+}
+
+func (v *CompositeInductiveDecisionVariable) ObserveActionInitialising(action action.ManagementAction) {
+	// deliberately does nothing
 }

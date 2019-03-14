@@ -2,6 +2,8 @@
 
 package variable
 
+import "github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+
 // InductiveDecisionVariable is a DecisionVariable that allows an 'inductive' value to be temporarily stored
 // and retrieved for the decision variable (typically based based on some management action change).
 // The induced value does not become the actual value for the decision variable without being explicitly accepted.
@@ -28,4 +30,6 @@ type InductiveDecisionVariable interface {
 
 	// Rejects the inductive value of the variable, resetting the inductive value to the variable's actual value.
 	RejectInductiveValue()
+
+	action.Observer
 }

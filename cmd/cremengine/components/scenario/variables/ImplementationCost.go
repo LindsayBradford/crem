@@ -25,6 +25,11 @@ func (ic *ImplementationCost) Initialise(planningUnitTable *tables.CsvTable, par
 	return ic
 }
 
+func (ic *ImplementationCost) WithObservers(observers ...variable.Observer) *ImplementationCost {
+	ic.Subscribe(observers...)
+	return ic
+}
+
 func (ic *ImplementationCost) deriveInitialImplementationCost() float64 {
 	return notImplementedCost
 }

@@ -81,6 +81,16 @@ func (m *Model) ParameterErrors() error {
 func (m *Model) Initialise() {
 	m.note("Initialising")
 
+	planningUnitTable := m.fetchPlanningUnitTable()
+	m.buildCoreDecisionVariables(planningUnitTable)
+	m.buildManagementActions(planningUnitTable)
+
+	m.buildSedimentVsCostDecisionVariable()
+
+	m.managementActions.RandomlyInitialise()
+}
+
+func (m *Model) fetchPlanningUnitTable() *tables.CsvTable {
 	dataSourcePath := m.deriveDataSourcePath()
 
 	m.dataSet.Load(dataSourcePath)
@@ -94,25 +104,46 @@ func (m *Model) Initialise() {
 	if !ok {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
+	return csvPlanningUnitTable
+}
 
-	sedimentLoad := new(variables.SedimentLoad).Initialise(csvPlanningUnitTable, m.parameters)
-	sedimentLoad.Subscribe(m)
+func (m *Model) buildCoreDecisionVariables(planningUnitTable *tables.CsvTable) {
+	sedimentLoad := new(variables.SedimentLoad).
+		Initialise(planningUnitTable, m.parameters).
+		WithObservers(m)
 
-	implementationCost := new(variables.ImplementationCost).Initialise(csvPlanningUnitTable, m.parameters)
-	implementationCost.Subscribe(m)
+	implementationCost := new(variables.ImplementationCost).
+		Initialise(planningUnitTable, m.parameters).
+		WithObservers(m)
+
+	m.DecisionVariables().Add(
+		sedimentLoad,
+		implementationCost,
+	)
+}
+
+func (m *Model) buildManagementActions(planningUnitTable *tables.CsvTable) {
+	sedimentLoad := m.DecisionVariables().Variable(variables.SedimentLoadVariableName)
+	implementationCost := m.DecisionVariables().Variable(variables.ImplementationCostVariableName)
 
 	// TODO: Create other sediment management actions
-	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(csvPlanningUnitTable, m.parameters)
+	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
+}
+
+func (m *Model) buildSedimentVsCostDecisionVariable() {
+	sedimentLoad := m.DecisionVariables().Variable(variables.SedimentLoadVariableName)
+	implementationCost := m.DecisionVariables().Variable(variables.ImplementationCostVariableName)
 
 	const sedimentWeight = 0.667
 	const implementationWeight = 0.333
 
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().
+		WithObservers(m).
 		WithWeightedVariable(sedimentLoad, sedimentWeight).
 		WithWeightedVariable(implementationCost, implementationWeight).
 		Build()
@@ -127,15 +158,7 @@ func (m *Model) Initialise() {
 
 	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
 
-	sedimentVsCost.Subscribe(m)
-
-	m.DecisionVariables().Add(
-		sedimentLoad,
-		implementationCost,
-		sedimentVsCost,
-	)
-
-	m.managementActions.RandomlyInitialise()
+	m.DecisionVariables().Add(sedimentVsCost)
 }
 
 func (m *Model) AcceptChange() {
