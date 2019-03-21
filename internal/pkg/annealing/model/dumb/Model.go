@@ -13,9 +13,9 @@ import (
 )
 
 type Model struct {
-	name.ContainedName
-	name.ContainedIdentifier
-	rand.ContainedRand
+	name.NameContainer
+	name.IdentifiableContainer
+	rand.RandContainer
 
 	parameters        Parameters
 	decisionVariables DecisionVariables

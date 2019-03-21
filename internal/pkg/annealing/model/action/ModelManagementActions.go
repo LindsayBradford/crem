@@ -11,7 +11,7 @@ import (
 type ModelManagementActions struct {
 	lastApplied ManagementAction
 	actions     []ManagementAction
-	rand.ContainedRand
+	rand.RandContainer
 }
 
 func (m *ModelManagementActions) Initialise() {

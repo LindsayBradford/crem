@@ -41,8 +41,8 @@ func NewModel() *Model {
 }
 
 type Model struct {
-	name.ContainedName
-	name.ContainedIdentifier
+	name.NameContainer
+	name.IdentifiableContainer
 	observer.ContainedEventNotifier
 
 	parameters parameters.Parameters

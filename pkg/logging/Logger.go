@@ -5,8 +5,6 @@
 package logging
 
 import (
-	"errors"
-
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -39,25 +37,8 @@ type Logger interface {
 	Override(logLevel Level, destination Destination)
 }
 
-// Container defines an interface for users wishing to embed a Logger.
+// LoggerContainer defines an interface for users wishing to embed a Logger.
 type Container interface {
-	SetLogHandler(logger Logger) error
+	SetLogHandler(logger Logger)
 	LogHandler() Logger
-}
-
-// ContainedLogger is a struct offering a default implementation of Container
-type ContainedLogger struct {
-	logHandler Logger
-}
-
-func (cl *ContainedLogger) SetLogHandler(logHandler Logger) error {
-	if logHandler == nil {
-		return errors.New("invalid attempt to set log handler to nil value")
-	}
-	cl.logHandler = logHandler
-	return nil
-}
-
-func (cl *ContainedLogger) LogHandler() Logger {
-	return cl.logHandler
 }

@@ -18,16 +18,16 @@ type Container interface {
 	SetRandomNumberGenerator(generator *Rand)
 }
 
-// ContainedRand offers a struct implementing the Container interface.
-type ContainedRand struct {
+// RandContainer offers a struct implementing the Container interface.
+type RandContainer struct {
 	rand Rand
 }
 
-func (g *ContainedRand) RandomNumberGenerator() *Rand {
+func (g *RandContainer) RandomNumberGenerator() *Rand {
 	return &g.rand
 }
 
-func (g *ContainedRand) SetRandomNumberGenerator(generator *Rand) {
+func (g *RandContainer) SetRandomNumberGenerator(generator *Rand) {
 	g.rand = *generator
 }
 

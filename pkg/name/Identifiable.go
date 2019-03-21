@@ -8,15 +8,15 @@ type Identifiable interface {
 	Id() string
 }
 
-// ContainedIdentifier is a struct offering a default implementation of Identifiable
-type ContainedIdentifier struct {
+// IdentifiableContainer is a struct offering a default implementation of Identifiable
+type IdentifiableContainer struct {
 	id string
 }
 
-func (n *ContainedIdentifier) Id() string {
+func (n *IdentifiableContainer) Id() string {
 	return n.id
 }
 
-func (n *ContainedIdentifier) SetId(id string) {
+func (n *IdentifiableContainer) SetId(id string) {
 	n.id = id
 }

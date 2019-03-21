@@ -11,15 +11,15 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
 type SimpleExcelModel struct {
-	name.ContainedName
-	name.ContainedIdentifier
-	logging.ContainedLogger
+	name.NameContainer
+	name.IdentifiableContainer
+	loggers.LoggerContainer
 
 	parameters            Parameters
 	decisionVariables     variable.SimpleDecisionVariables
@@ -245,7 +245,7 @@ type ExplorerData struct {
 }
 
 type annealingTable struct {
-	rand.ContainedRand
+	rand.RandContainer
 	rows []annealingData
 }
 

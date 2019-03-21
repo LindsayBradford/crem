@@ -36,8 +36,8 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 		"Annealer should have built with current iteration of 0")
 
 	g.Expect(
-		annealer.LogHandler()).To(Equal(loggers.DefaultNullLogger),
-		"Annealer should have built with NullLogger")
+		annealer.LogHandler()).To(Equal(loggers.NewNullLogger()),
+		"Annealer should have built with DefaultNullLogger")
 
 	g.Expect(
 		annealer.SolutionExplorer()).To(Equal(null.NullExplorer),
@@ -79,11 +79,10 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	g.Expect(annealer.CoolingFactor()).To(BeNumerically("==", 1),
 		"Annealer should have ignored crap CoolingFactor set attempt")
 
-	logHandlerErr := annealer.SetLogHandler(nil)
+	annealer.SetLogHandler(nil)
 
-	g.Expect(logHandlerErr).To(Not(BeNil()))
-	g.Expect(annealer.LogHandler()).To(Equal(loggers.DefaultNullLogger),
-		"Annealer should have ignored crap Logger set attempt")
+	g.Expect(annealer.LogHandler()).To(Equal(loggers.NewNullLogger()),
+		"Annealer should have forced nil Logger set attempt to DefaultNullLogger")
 
 	explorerErr := annealer.SetSolutionExplorer(nil)
 
@@ -300,9 +299,8 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 
 	expectedLogHandler := new(DummyLogHandler)
 
-	logHandlerErr := annealer.SetLogHandler(expectedLogHandler)
+	annealer.SetLogHandler(expectedLogHandler)
 
-	g.Expect(logHandlerErr).To(BeNil())
 	g.Expect(annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler),
 		"Annealer should have accepted DummyLogHandler as new logger")
 }

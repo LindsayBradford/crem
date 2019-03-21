@@ -45,9 +45,7 @@ func (builder *Builder) WithId(title string) *Builder {
 
 func (builder *Builder) WithLogHandler(logHandler logging.Logger) *Builder {
 	annealerBeingBuilt := builder.annealer
-	if logHandlerError := annealerBeingBuilt.SetLogHandler(logHandler); logHandlerError != nil {
-		builder.buildErrors.Add(logHandlerError)
-	}
+	annealerBeingBuilt.SetLogHandler(logHandler)
 	return builder
 }
 

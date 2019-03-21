@@ -1,3 +1,5 @@
+// Copyright (c) 2019 Australian Rivers Institute.
+
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 
 package loggers
@@ -8,7 +10,9 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 )
 
-var DefaultNullLogger = new(NullLogger)
+func NewNullLogger() logging.Logger {
+	return new(NullLogger)
+}
 
 type NullLogger struct{}
 

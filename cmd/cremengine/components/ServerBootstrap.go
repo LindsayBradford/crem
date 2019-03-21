@@ -10,7 +10,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/excel"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
@@ -19,7 +18,7 @@ import (
 const defaultLoggerIndex = 0
 
 var (
-	ServerLogger logging.Logger = loggers.DefaultNullLogger
+	ServerLogger = loggers.NewNullLogger()
 
 	cremServerStatus = admin.ServiceStatus{
 		ServiceName: config.ShortApplicationName,

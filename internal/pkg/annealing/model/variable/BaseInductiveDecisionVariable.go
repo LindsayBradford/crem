@@ -13,7 +13,7 @@ var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
 // the expectation that specific decisions variables will embed this struct to make use of typical
 // InductiveDecisionVariable behaviour.
 type BaseInductiveDecisionVariable struct {
-	name.ContainedName
+	name.NameContainer
 
 	actualValue    float64
 	inductiveValue float64

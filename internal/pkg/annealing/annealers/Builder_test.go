@@ -109,7 +109,7 @@ func TestBuild_BadInputs(t *testing.T) {
 		Build()
 
 	g.Expect(
-		err.Size()).To(BeNumerically(">", 4), "Annealer should have built with errors")
+		err.Size()).To(BeNumerically(">", 3), "Annealer should have built with errors")
 
 	t.Log(err)
 

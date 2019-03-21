@@ -38,13 +38,13 @@ type Observable interface {
 	ChangeAccepted() bool
 }
 
-// Container defines an interface embedding an Explorer
+// LoggerContainer defines an interface embedding an Explorer
 type Container interface {
 	SolutionExplorer() Explorer
 	SetSolutionExplorer(explorer Explorer) error
 }
 
-// ContainedExplorer is a struct offering a default implementation of Container
+// ContainedExplorer is a struct offering a default implementation of LoggerContainer
 type ContainedExplorer struct {
 	explorer Explorer
 }
@@ -61,13 +61,13 @@ func (e *ContainedExplorer) SetSolutionExplorer(explorer Explorer) error {
 	return nil
 }
 
-// Container defines an interface embedding a Model
+// LoggerContainer defines an interface embedding a Model
 type ObservableContainer interface {
 	ObservableExplorer() Observable
 	SetObservableExplorer(explorer Observable) error
 }
 
-// ContainedExplorer is a struct offering a default implementation of Container
+// ContainedExplorer is a struct offering a default implementation of LoggerContainer
 type ContainedObservableExplorer struct {
 	explorer Observable
 }

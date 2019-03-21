@@ -25,22 +25,22 @@ type Model interface {
 	DeepClone() Model
 }
 
-// Container defines an interface embedding a Model
+// LoggerContainer defines an interface embedding a Model
 type Container interface {
 	Model() Model
 	SetModel(model Model)
 }
 
-// ContainedModel is a struct offering a default implementation of Container
-type ContainedModel struct {
+// ModelContainer is a struct offering a default implementation of LoggerContainer
+type ModelContainer struct {
 	model Model
 }
 
-func (c *ContainedModel) Model() Model {
+func (c *ModelContainer) Model() Model {
 	return c.model
 }
 
-func (c *ContainedModel) SetModel(model Model) {
+func (c *ModelContainer) SetModel(model Model) {
 	c.model = model
 }
 
@@ -57,8 +57,8 @@ func NewNullModel() *nullModel {
 }
 
 type nullModel struct {
-	name.ContainedName
-	name.ContainedIdentifier
+	name.NameContainer
+	name.IdentifiableContainer
 }
 
 func (nm *nullModel) WithName(name string) *nullModel {

@@ -9,15 +9,15 @@ type Nameable interface {
 	SetName(name string)
 }
 
-// ContainedName offers a default implementation of Nameable
-type ContainedName struct {
+// LoggerContainer offers a default implementation of Nameable
+type NameContainer struct {
 	name string
 }
 
-func (n *ContainedName) Name() string {
+func (n *NameContainer) Name() string {
 	return n.name
 }
 
-func (n *ContainedName) SetName(name string) {
+func (n *NameContainer) SetName(name string) {
 	n.name = name
 }

@@ -10,16 +10,16 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
-	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type Explorer struct {
-	name.ContainedName
-	name.ContainedIdentifier
-	model.ContainedModel
-	rand.ContainedRand
-	logging.ContainedLogger
+	name.NameContainer
+	name.IdentifiableContainer
+	model.ModelContainer
+	rand.RandContainer
+	loggers.LoggerContainer
 
 	scenarioId string
 

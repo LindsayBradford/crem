@@ -14,7 +14,7 @@ import (
 var _ InductiveDecisionVariable = new(CompositeInductiveDecisionVariable)
 
 type CompositeInductiveDecisionVariable struct {
-	name.ContainedName
+	name.NameContainer
 
 	weightedVariables map[InductiveDecisionVariable]float64
 	ContainedDecisionVariableObservers

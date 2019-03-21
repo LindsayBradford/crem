@@ -13,7 +13,7 @@ import (
 var NullExplorer = new(Explorer)
 
 type Explorer struct {
-	name.ContainedName
+	name.NameContainer
 }
 
 func (e *Explorer) WithName(name string) *Explorer {
@@ -33,7 +33,7 @@ func (e *Explorer) DeepClone() explorer.Explorer                  { return e }
 func (e *Explorer) CloneObservable() explorer.Observable          { return e }
 func (e *Explorer) Model() model.Model                            { return nil }
 func (e *Explorer) SetModel(model model.Model)                    {}
-func (e *Explorer) SetLogHandler(logHandler logging.Logger) error { return nil }
+func (e *Explorer) SetLogHandler(logHandler logging.Logger)       {}
 func (e *Explorer) LogHandler() logging.Logger                    { return nil }
 func (e *Explorer) SetRandomNumberGenerator(generator *rand.Rand) {}
 func (e *Explorer) RandomNumberGenerator() *rand.Rand             { return nil }

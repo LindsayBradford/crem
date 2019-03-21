@@ -8,7 +8,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"
 
@@ -17,9 +16,9 @@ import (
 
 type SimpleAnnealer struct {
 	explorer.ContainedExplorer
-	model.ContainedModel
+	model.ModelContainer
 
-	logging.ContainedLogger
+	loggers.LoggerContainer
 
 	parameters Parameters
 
