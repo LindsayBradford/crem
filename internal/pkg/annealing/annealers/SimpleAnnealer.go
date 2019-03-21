@@ -30,9 +30,9 @@ func (sa *SimpleAnnealer) Initialise() {
 	sa.id = "Simple Annealer"
 	sa.temperature = 1
 	sa.currentIteration = 0
-	sa.SetEventNotifier(new(observer.SynchronousAnnealingEventNotifier))
-	sa.SetLogHandler(new(loggers.NullLogger))
 	sa.SetSolutionExplorer(null.NullExplorer)
+	sa.SetLogHandler(new(loggers.NullLogger))
+	sa.SetEventNotifier(new(observer.SynchronousAnnealingEventNotifier))
 	sa.parameters.Initialise()
 	sa.assignStateFromParameters()
 }
@@ -89,18 +89,7 @@ func (sa *SimpleAnnealer) CloneObservable() annealing.Observable {
 }
 
 func (sa *SimpleAnnealer) Anneal() {
-	sa.SolutionExplorer().SetLogHandler(sa.LogHandler())
-
-	defer func() {
-		if r := recover(); r != nil {
-			baseError, ok := r.(error)
-			if ok {
-				wrappingError := errors.Wrap(baseError, "annealing function failed")
-				panic(wrappingError)
-			}
-			panic(r)
-		}
-	}()
+	defer sa.handlePanicRecovery()
 
 	sa.SolutionExplorer().Initialise()
 	defer sa.SolutionExplorer().TearDown()
@@ -118,6 +107,16 @@ func (sa *SimpleAnnealer) Anneal() {
 	}
 
 	sa.annealingFinished()
+}
+
+func (sa *SimpleAnnealer) handlePanicRecovery() {
+	if r := recover(); r != nil {
+		if rAsError, isError := r.(error); isError {
+			wrappingError := errors.Wrap(rAsError, "annealing function failed")
+			panic(wrappingError)
+		}
+		panic(r)
+	}
 }
 
 func (sa *SimpleAnnealer) annealingStarted() {

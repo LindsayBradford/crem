@@ -50,7 +50,7 @@ type Model struct {
 	managementActions action.ModelManagementActions
 	variables.ContainedDecisionVariables
 
-	dataSet *excel.DataSet
+	inputDataSet *excel.DataSet
 }
 
 func (m *Model) WithName(name string) *Model {
@@ -59,7 +59,7 @@ func (m *Model) WithName(name string) *Model {
 }
 
 func (m *Model) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *Model {
-	m.dataSet = excel.NewDataSet("CatchmentDataSet", wrapper)
+	m.inputDataSet = excel.NewDataSet("CatchmentDataSet", wrapper)
 	return m
 }
 
@@ -93,9 +93,9 @@ func (m *Model) Initialise() {
 func (m *Model) fetchPlanningUnitTable() *tables.CsvTable {
 	dataSourcePath := m.deriveDataSourcePath()
 
-	m.dataSet.Load(dataSourcePath)
+	m.inputDataSet.Load(dataSourcePath)
 
-	planningUnitTable, tableError := m.dataSet.Table(PlanningUnitsTableName)
+	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
 	if tableError != nil {
 		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
 	}

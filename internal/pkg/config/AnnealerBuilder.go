@@ -79,9 +79,9 @@ func (builder *AnnealerBuilder) Build() (annealing.Annealer, logging.Logger, err
 	newAnnealer, baseBuildError :=
 		builder.buildAnnealerOfType(annealerConfig.Type).
 			WithId(builder.config.ScenarioName).
+			WithSolutionExplorer(builder.annealingExplorer).
 			WithParameters(annealerConfig.Parameters).
 			WithLogHandler(builder.defaultLogHandler).
-			WithSolutionExplorer(builder.annealingExplorer).
 			WithEventNotifier(builder.buildEventNotifier()).
 			WithObservers(builder.observers...).
 			Build()
@@ -135,16 +135,20 @@ func (builder *AnnealerBuilder) buildModel() {
 	myModelName := builder.config.Annealer.Model
 	newModel, buildErrors := builder.modelsBuilder.Build(myModelName)
 
+	if buildErrors != nil {
+		builder.wrapModelBuildErrors(buildErrors)
+	}
+
 	if loggingModel, isLogger := newModel.(logging.Container); isLogger {
 		loggingModel.SetLogHandler(builder.defaultLogHandler)
 	}
 
-	if buildErrors != nil {
-		newError := errors2.Wrap(buildErrors, "building model from config")
-		builder.errors.Add(newError)
-	}
-
 	builder.annealingModel = newModel
+}
+
+func (builder *AnnealerBuilder) wrapModelBuildErrors(buildErrors error) {
+	buildWrappingError := errors2.Wrap(buildErrors, "building model from config")
+	builder.errors.Add(buildWrappingError)
 }
 
 func (builder *AnnealerBuilder) buildSolutionExplorer() {
@@ -152,11 +156,15 @@ func (builder *AnnealerBuilder) buildSolutionExplorer() {
 	newExplorer, buildErrors := builder.explorersBuilder.Build(myExplorerName)
 
 	if buildErrors != nil {
-		newError := errors2.Wrap(buildErrors, "building explorer from config")
-		builder.errors.Add(newError)
-	} else {
-		newExplorer.SetModel(builder.annealingModel)
+		buildWrappingError := errors2.Wrap(buildErrors, "building explorer from config")
+		builder.errors.Add(buildWrappingError)
 	}
+
+	if loggingExplorer, isLogger := newExplorer.(logging.Container); isLogger {
+		loggingExplorer.SetLogHandler(builder.defaultLogHandler)
+	}
+
+	newExplorer.SetModel(builder.annealingModel)
 
 	builder.annealingExplorer = newExplorer
 }

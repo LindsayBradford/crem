@@ -45,8 +45,8 @@ func (builder *Builder) WithId(title string) *Builder {
 
 func (builder *Builder) WithLogHandler(logHandler logging.Logger) *Builder {
 	annealerBeingBuilt := builder.annealer
-	if err := annealerBeingBuilt.SetLogHandler(logHandler); err != nil {
-		builder.buildErrors.Add(err)
+	if logHandlerError := annealerBeingBuilt.SetLogHandler(logHandler); logHandlerError != nil {
+		builder.buildErrors.Add(logHandlerError)
 	}
 	return builder
 }
@@ -63,8 +63,8 @@ func (builder *Builder) WithParameters(params parameters.Map) *Builder {
 
 func (builder *Builder) WithSolutionExplorer(explorer explorer.Explorer) *Builder {
 	annealerBeingBuilt := builder.annealer
-	if err := annealerBeingBuilt.SetSolutionExplorer(explorer); err != nil {
-		builder.buildErrors.Add(err)
+	if explorerError := annealerBeingBuilt.SetSolutionExplorer(explorer); explorerError != nil {
+		builder.buildErrors.Add(explorerError)
 	}
 	return builder
 }

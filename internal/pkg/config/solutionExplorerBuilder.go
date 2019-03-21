@@ -85,7 +85,7 @@ func (builder *solutionExplorerBuilder) Build(explorerName string) (explorer.Exp
 	}
 
 	if builder.errors.Size() > 0 {
-		return nil, builder.errors
+		return null.NullExplorer, builder.errors
 	}
 
 	return myExplorer, nil
