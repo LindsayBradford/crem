@@ -19,6 +19,7 @@ type CallableRunner interface {
 type Runner struct {
 	annealer   annealing.Annealer
 	logHandler logging.Logger
+	saver      CallableSaver
 
 	name              string
 	operationType     string
@@ -38,7 +39,15 @@ func (runner *Runner) ForAnnealer(annealer annealing.Annealer) *Runner {
 
 	runner.logHandler = annealer.LogHandler()
 	runner.annealer = annealer
+	runner.saver = new(Saver)
 
+	return runner
+}
+
+func (runner *Runner) WithSaver(saver CallableSaver) *Runner {
+	saver.SetLogHandler(runner.annealer.LogHandler())
+	runner.saver = saver
+	runner.annealer.AddObserver(saver)
 	return runner
 }
 

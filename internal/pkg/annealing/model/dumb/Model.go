@@ -5,6 +5,7 @@ package dumb
 import (
 	"math"
 
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
@@ -17,19 +18,22 @@ type Model struct {
 	name.IdentifiableContainer
 	rand.RandContainer
 
-	parameters        Parameters
-	decisionVariables DecisionVariables
+	parameters Parameters
+	variables.ContainedDecisionVariables
 }
 
 func New() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 
-	newModel.decisionVariables.Initialise()
+	newModel.DecisionVariables()
 	newModel.parameters.Initialise()
 
+	newModel.ContainedDecisionVariables.Initialise()
+	newModel.ContainedDecisionVariables.NewForName(variable.ObjectiveValue)
+
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
-	newModel.decisionVariables.SetValue(variable.ObjectiveValue, initialValue)
+	newModel.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)
 
 	return newModel
 }
@@ -43,7 +47,7 @@ func (dm *Model) WithParameters(params parameters.Map) *Model {
 	dm.parameters.Merge(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
-	dm.decisionVariables.SetValue(variable.ObjectiveValue, initialValue)
+	dm.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)
 
 	return dm
 }
@@ -93,33 +97,23 @@ func (dm *Model) capChangeOverRange(value float64) float64 {
 }
 
 func (dm *Model) objectiveValue() float64 {
-	return dm.decisionVariables.Value(variable.ObjectiveValue)
+	return dm.ContainedDecisionVariables.Value(variable.ObjectiveValue)
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).SetInductiveValue(value)
+	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).SetInductiveValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
-	dm.decisionVariables.SetValue(name, value)
+	dm.ContainedDecisionVariables.SetValue(name, value)
 }
 
 func (dm *Model) AcceptChange() {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).AcceptInductiveValue()
+	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).AcceptInductiveValue()
 }
 
 func (dm *Model) RevertChange() {
-	dm.decisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
-}
-
-func (dm *Model) DecisionVariable(name string) variable.DecisionVariable {
-	return dm.decisionVariables.Variable(name)
-}
-
-func (dm *Model) DecisionVariableChange(variableName string) float64 {
-	decisionVariable := dm.decisionVariables.Variable(variableName)
-	difference := decisionVariable.InductiveValue() - decisionVariable.Value()
-	return difference
+	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
 }
 
 func (dm *Model) DeepClone() model.Model {

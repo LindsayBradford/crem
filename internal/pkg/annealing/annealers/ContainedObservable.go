@@ -4,6 +4,7 @@ package annealers
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
 
@@ -17,6 +18,8 @@ type ContainedObservable struct {
 	coolingFactor     float64
 	maximumIterations uint64
 	currentIteration  uint64
+
+	solution solution.Solution
 }
 
 func (co *ContainedObservable) AddObserver(observer observer.Observer) error {
@@ -49,4 +52,8 @@ func (co *ContainedObservable) MaximumIterations() uint64 {
 
 func (co *ContainedObservable) CurrentIteration() uint64 {
 	return co.currentIteration
+}
+
+func (co *ContainedObservable) Solution() solution.Solution {
+	return co.solution
 }

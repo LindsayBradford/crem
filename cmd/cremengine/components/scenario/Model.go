@@ -35,7 +35,7 @@ func NewModel() *Model {
 
 	newModel.parameters.Initialise()
 	newModel.managementActions.Initialise()
-	newModel.DecisionVariables().Initialise()
+	newModel.ContainedDecisionVariables.Initialise()
 
 	return newModel
 }
@@ -116,15 +116,15 @@ func (m *Model) buildCoreDecisionVariables(planningUnitTable *tables.CsvTable) {
 		Initialise(planningUnitTable, m.parameters).
 		WithObservers(m)
 
-	m.DecisionVariables().Add(
+	m.ContainedDecisionVariables.Add(
 		sedimentLoad,
 		implementationCost,
 	)
 }
 
 func (m *Model) buildManagementActions(planningUnitTable *tables.CsvTable) {
-	sedimentLoad := m.DecisionVariables().Variable(variables.SedimentLoadVariableName)
-	implementationCost := m.DecisionVariables().Variable(variables.ImplementationCostVariableName)
+	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
+	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(planningUnitTable, m.parameters)
@@ -135,8 +135,8 @@ func (m *Model) buildManagementActions(planningUnitTable *tables.CsvTable) {
 }
 
 func (m *Model) buildSedimentVsCostDecisionVariable() {
-	sedimentLoad := m.DecisionVariables().Variable(variables.SedimentLoadVariableName)
-	implementationCost := m.DecisionVariables().Variable(variables.ImplementationCostVariableName)
+	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
+	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	const sedimentWeight = 0.667
 	const implementationWeight = 0.333
@@ -158,17 +158,17 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 
 	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
 
-	m.DecisionVariables().Add(sedimentVsCost)
+	m.ContainedDecisionVariables.Add(sedimentVsCost)
 }
 
 func (m *Model) AcceptChange() {
 	m.note("Accepting Change")
-	m.DecisionVariables().AcceptAll()
+	m.ContainedDecisionVariables.AcceptAll()
 }
 
 func (m *Model) RevertChange() {
 	m.note("Reverting Change")
-	m.DecisionVariables().RejectAll()
+	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.UndoLastActivationToggleUnobserved()
 }
 

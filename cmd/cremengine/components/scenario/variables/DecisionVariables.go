@@ -11,26 +11,29 @@ const (
 )
 
 type DecisionVariables struct {
-	variable.InductiveDecisionVariables
-}
-
-func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
-	return dv
 }
 
 type ContainedDecisionVariables struct {
-	decisionVariables DecisionVariables
+	variable.InductiveDecisionVariables
 }
 
-func (c *ContainedDecisionVariables) DecisionVariables() *DecisionVariables {
-	return &c.decisionVariables
+func (c *ContainedDecisionVariables) Initialise() {
+	c.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
+}
+
+func (c *ContainedDecisionVariables) DecisionVariables() *variable.DecisionVariables {
+	inductiveVariables := c.InductiveDecisionVariables
+	vanillaVariables := make(variable.DecisionVariables, 0)
+	for _, inductiveVariable := range inductiveVariables {
+		vanillaVariables[inductiveVariable.Name()] = inductiveVariable
+	}
+	return &vanillaVariables
 }
 
 func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.DecisionVariable {
-	return c.decisionVariables.Variable(name)
+	return c.InductiveDecisionVariables.Variable(name)
 }
 
 func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string) float64 {
-	return c.decisionVariables.DifferenceInValues(variableName)
+	return c.InductiveDecisionVariables.DifferenceInValues(variableName)
 }

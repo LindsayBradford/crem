@@ -14,6 +14,7 @@ var NullExplorer = new(Explorer)
 
 type Explorer struct {
 	name.NameContainer
+	name.IdentifiableContainer
 }
 
 func (e *Explorer) WithName(name string) *Explorer {
@@ -27,11 +28,9 @@ func (e *Explorer) SetObjectiveValue(temperature float64)         {}
 func (e *Explorer) TryRandomChange(temperature float64)           {}
 func (e *Explorer) AcceptLastChange()                             {}
 func (e *Explorer) RevertLastChange()                             {}
-func (e *Explorer) Id() string                                    { return "" }
-func (e *Explorer) SetId(id string)                               {}
 func (e *Explorer) DeepClone() explorer.Explorer                  { return e }
 func (e *Explorer) CloneObservable() explorer.Observable          { return e }
-func (e *Explorer) Model() model.Model                            { return nil }
+func (e *Explorer) Model() model.Model                            { return model.NullModel }
 func (e *Explorer) SetModel(model model.Model)                    {}
 func (e *Explorer) SetLogHandler(logHandler logging.Logger)       {}
 func (e *Explorer) LogHandler() logging.Logger                    { return nil }

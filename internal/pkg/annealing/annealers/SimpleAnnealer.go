@@ -7,7 +7,9 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"
 
@@ -72,6 +74,10 @@ func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
 	return nil
 }
 
+func (sa *SimpleAnnealer) Model() model.Model {
+	return sa.SolutionExplorer().Model()
+}
+
 func (sa *SimpleAnnealer) notifyObservers(eventType observer.EventType) {
 	eventSource := sa.CloneObservable()
 	event := observer.NewEvent(eventType).
@@ -132,7 +138,33 @@ func (sa *SimpleAnnealer) iterationFinished() {
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
+	sa.solution = *sa.fetchFinalModelSolution()
 	sa.notifyObservers(observer.FinishedAnnealing)
+}
+
+func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
+	modelSolution := new(solution.Solution)
+	modelSolution.Id = sa.id
+
+	sa.addDecisionVariables(modelSolution)
+
+	return modelSolution
+}
+
+func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution) {
+	modelSolution.DecisionVariables = make(attributes.Attributes, 0)
+
+	if sa.Model().DecisionVariables() == nil {
+		return
+	}
+
+	for _, variable := range *sa.Model().DecisionVariables() {
+		newPair := attributes.NameValuePair{
+			Name:  variable.Name(),
+			Value: variable.Value(),
+		}
+		modelSolution.DecisionVariables = append(modelSolution.DecisionVariables, newPair)
+	}
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {

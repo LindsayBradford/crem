@@ -5,6 +5,7 @@ package annealing
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -36,6 +37,7 @@ type Observable interface {
 
 	ObservableExplorer() explorer.Observable
 	SetObservableExplorer(explorer explorer.Observable) error
+	Solution() solution.Solution
 }
 
 type Cloneable interface {
