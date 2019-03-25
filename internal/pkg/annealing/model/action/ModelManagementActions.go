@@ -68,3 +68,15 @@ func (m *ModelManagementActions) RandomlyInitialise() {
 func (m *ModelManagementActions) UndoLastActivationToggleUnobserved() {
 	m.lastApplied.ToggleActivationUnobserved()
 }
+
+func (m *ModelManagementActions) ActiveActions() []ManagementAction {
+	activeActions := make([]ManagementAction, 0)
+
+	for _, action := range m.actions {
+		if action.IsActive() {
+			activeActions = append(activeActions, action)
+		}
+	}
+
+	return activeActions
+}

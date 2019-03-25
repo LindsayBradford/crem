@@ -134,6 +134,10 @@ func (m *Model) buildManagementActions(planningUnitTable *tables.CsvTable) {
 	}
 }
 
+func (m *Model) ActiveManagementActions() []action.ManagementAction {
+	return m.managementActions.ActiveActions()
+}
+
 func (m *Model) buildSedimentVsCostDecisionVariable() {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)

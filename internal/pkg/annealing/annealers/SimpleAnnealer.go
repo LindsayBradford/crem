@@ -143,17 +143,15 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
-	modelSolution := new(solution.Solution)
-	modelSolution.Id = sa.id
+	modelSolution := solution.NewSolution(sa.id)
 
 	sa.addDecisionVariables(modelSolution)
+	sa.addPlanningUnitManagementActionMap(modelSolution)
 
 	return modelSolution
 }
 
 func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution) {
-	modelSolution.DecisionVariables = make(attributes.Attributes, 0)
-
 	if sa.Model().DecisionVariables() == nil {
 		return
 	}
@@ -164,6 +162,14 @@ func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution)
 			Value: variable.Value(),
 		}
 		modelSolution.DecisionVariables = append(modelSolution.DecisionVariables, newPair)
+	}
+}
+
+func (sa *SimpleAnnealer) addPlanningUnitManagementActionMap(modelSolution *solution.Solution) {
+	for _, action := range sa.Model().ActiveManagementActions() {
+		planningUnit := solution.PlanningUnitId(action.PlanningUnit())
+		actionType := solution.ManagementActionType(action.Type())
+		modelSolution.PlanningUnitManagementActionsMap[planningUnit] = append(modelSolution.PlanningUnitManagementActionsMap[planningUnit], actionType)
 	}
 }
 

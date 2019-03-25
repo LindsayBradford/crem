@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -104,6 +105,8 @@ func (sem *SimpleExcelModel) TearDown() {
 	sem.saveDataToWorkbookAndClose()
 	sem.excelDataAdapter.destroyExcelHandler()
 }
+
+func (sem *SimpleExcelModel) ActiveManagementActions() []action.ManagementAction { return nil }
 
 func (sem *SimpleExcelModel) saveDataToWorkbookAndClose() {
 	newFileName := toSafeFileName(sem.Id())

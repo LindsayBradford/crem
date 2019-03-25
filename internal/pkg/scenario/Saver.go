@@ -40,6 +40,7 @@ func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 
 	modelSolutionAsJson := s.toJson(&modelSolution)
 
+	s.LogHandler().Debug("JSON Encoding of solution after annealing finished:")
 	s.LogHandler().Debug(modelSolutionAsJson)
 
 	// TODO: actaully save the solution state
@@ -52,5 +53,4 @@ func (s *Saver) toJson(structure *solution.Solution) string {
 		return "{}"
 	}
 	return string(structureJson)
-
 }

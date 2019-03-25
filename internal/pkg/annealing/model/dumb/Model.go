@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -115,6 +116,8 @@ func (dm *Model) AcceptChange() {
 func (dm *Model) RevertChange() {
 	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
 }
+
+func (dm *Model) ActiveManagementActions() []action.ManagementAction { return nil }
 
 func (dm *Model) DeepClone() model.Model {
 	clone := *dm
