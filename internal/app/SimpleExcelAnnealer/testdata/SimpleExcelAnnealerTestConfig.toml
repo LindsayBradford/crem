@@ -1,4 +1,4 @@
-ScenarioName = "Simple Excel Annealer Test Config "
+ScenarioName = "Simple Excel Annealer Test Config"
 RunNumber = 10
 MaximumConcurrentRunNumber = 6
 #CpuProfilePath = "testdata/cpuProfileData.dat"

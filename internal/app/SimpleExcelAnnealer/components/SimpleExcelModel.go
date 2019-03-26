@@ -46,13 +46,11 @@ func (sem *SimpleExcelModel) buildDecisionVariables() {
 	sem.decisionVariables = variable.NewSimpleDecisionVariables()
 	sem.tempDecisionVariables = variable.NewSimpleDecisionVariables()
 
-	objectiveValueVar := new(variable.SimpleDecisionVariable)
-	objectiveValueVar.SetName(variable.ObjectiveValue)
-	sem.decisionVariables[variable.ObjectiveValue] = *objectiveValueVar
+	objectiveValueVar := variable.NewSimpleDecisionVariable(variable.ObjectiveValue)
+	sem.decisionVariables[variable.ObjectiveValue] = &objectiveValueVar
 
-	tempObjectiveValueVar := new(variable.SimpleDecisionVariable)
-	tempObjectiveValueVar.SetName(variable.ObjectiveValue)
-	sem.tempDecisionVariables[variable.ObjectiveValue] = *tempObjectiveValueVar
+	tempObjectiveValueVar := variable.NewSimpleDecisionVariable(variable.ObjectiveValue)
+	sem.tempDecisionVariables[variable.ObjectiveValue] = &tempObjectiveValueVar
 }
 
 func (sem *SimpleExcelModel) WithParameters(params parameters.Map) *SimpleExcelModel {
