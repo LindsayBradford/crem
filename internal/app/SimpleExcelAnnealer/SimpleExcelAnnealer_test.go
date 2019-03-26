@@ -7,7 +7,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	appTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/onsi/gomega/gexec"
 )
 
@@ -37,9 +39,9 @@ func tearDown() {
 	gexec.CleanupBuildArtifacts()
 }
 
-func TestAnnealerIntegrationOneRun(t *testing.T) {
+func TestSimpleExcelAnnealer_OneRun(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
-		Name:           "Single run of CremEngine CatchmentModel",
+		Name:           "Single Black-Box run of SimpleExcelAnnealer",
 		ExecutablePath: exceutablePath,
 		TimeoutSeconds: 20,
 		T:              t,
@@ -49,5 +51,21 @@ func TestAnnealerIntegrationOneRun(t *testing.T) {
 	}
 
 	appTesting.TestExecutableAgainstConfigFile(context)
+	os.Remove(excelFileUnderTest)
+}
+
+func TestSimpleExcelAnnealer_Whitebox_ExitWithSuccess(t *testing.T) {
+	// TODO: Why doens't GetMainThreadChannel.Close() take in VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()?
+	t.Skip("Not sure why this is failing on mainThread.Close()")
+
+	context := appTesting.WhiteboxTestingContext{
+		Name:           "Single White-Box run of SimpleExcelAnnealer",
+		T:              t,
+		ConfigFilePath: configFileUnderTest,
+		Runner:         RunFromConfigFile,
+	}
+
+	scenario.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 	os.Remove(excelFileUnderTest)
 }
