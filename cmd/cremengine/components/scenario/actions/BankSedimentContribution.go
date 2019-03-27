@@ -30,13 +30,13 @@ type sedimentTracker struct {
 }
 
 type BankSedimentContribution struct {
-	planningUnitTable *tables.CsvTable
+	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
 	contributionMap map[planningUnitId]sedimentTracker
 }
 
-func (bsc *BankSedimentContribution) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) {
+func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
 	bsc.planningUnitTable = planningUnitTable
 	bsc.parameters = parameters
 	bsc.populateContributionMap()

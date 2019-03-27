@@ -238,7 +238,6 @@ func deleteTempCsvFile(tempFileName string) {
 
 func (eda *ExcelDataAdapter) saveAndCloseWorkbookAs(filePath string) {
 	eda.oleWrapper(func() {
-
 		defer func() {
 			if r := recover(); r != nil {
 				eda.excelHandler.Destroy()

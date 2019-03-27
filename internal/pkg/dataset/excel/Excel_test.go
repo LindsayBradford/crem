@@ -35,6 +35,7 @@ func setup() {
 
 func tearDown() {
 	ole.CoUninitialize()
+	// threading.GetMainThreadChannel().Close()
 }
 
 func callOnMainThread(function threading.MainThreadFunction) {

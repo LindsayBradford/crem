@@ -90,8 +90,8 @@ func TestBankSedimentContribution_OriginalSedimentContribution(t *testing.T) {
 	g.Expect(actualOriginalSedimentContribution).To(BeNumerically(equalTo, expectedFullSedimentContribution))
 }
 
-func buildTestTable() *tables.CsvTable {
-	newTable := new(tables.CsvTable)
+func buildTestTable() tables.CsvTable {
+	newTable := new(tables.CsvTableImpl)
 	newTable.SetColumnAndRowSize(expectedColumnNumber, expectedRowNumber)
 
 	for currentRow := uint(0); currentRow < expectedRowNumber; currentRow++ {

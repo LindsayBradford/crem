@@ -26,15 +26,18 @@ func TestDataSet_NewDataSet(t *testing.T) {
 func TestDataSet_Load(t *testing.T) {
 	g := NewGomegaWithT(t)
 
+	// given
 	workingDirectory, _ := os.Getwd()
-	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "testExcelDataSet.xlsx")
+	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "testExcelDataSetLoad.xlsx")
 	dataSetUnderTest := NewDataSet("testExcelDataSet", callOnMainThread)
 
+	// when
 	var loadError error
 	loadDataSetCall := func() {
 		loadError = dataSetUnderTest.Load(testFixtureAbsolutePath)
 	}
 
+	// then
 	g.Expect(loadDataSetCall).To(Not(Panic()), "DataSet Load of good file path should not panic")
 	g.Expect(loadError).To(BeNil(), "DataSet Load  to good file path should not return an error ")
 	g.Expect(dataSetUnderTest.Tables()).To(Not(BeNil()), "DataSet Load to good file path should return tables")
@@ -55,7 +58,7 @@ func TestDataSet_Load(t *testing.T) {
 	g.Expect(tables).To(HaveKey("testCsvTable"), "Loaded dataset has table 'testCsvTable'")
 
 	testCsvTable := dataSetUnderTest.Tables()["testCsvTable"]
-	typedCsvTable, _ := testCsvTable.(*tables2.CsvTable)
+	typedCsvTable, _ := testCsvTable.(tables2.CsvTable)
 	g.Expect(typedCsvTable.Header()).To(ContainElement("StringColumn"), "Loaded dataset has table 'testCsvTable'")
 
 	g.Expect(typedCsvTable.Cell(0, 0)).To(BeNumerically("==", 1), "Loaded dataset has table 'testAscTable'")
@@ -66,4 +69,28 @@ func TestDataSet_Load(t *testing.T) {
 	actualCsvCols, actualCsvRows := typedCsvTable.ColumnAndRowSize()
 	g.Expect(actualCsvCols).To(BeNumerically("==", 4))
 	g.Expect(actualCsvRows).To(BeNumerically("==", 5))
+}
+
+func TestDataSet_SaveAs(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	workingDirectory, _ := os.Getwd()
+	testSaveFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "testExcelDataSetSave.xlsx")
+	testLoadFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "testExcelDataSetLoad.xlsx")
+	dataSetUnderTest := NewDataSet("testExcelDataSet", callOnMainThread)
+
+	dataSetUnderTest.Load(testLoadFixtureAbsolutePath)
+
+	// when
+	var saveError error
+	saveAsDataSetCall := func() {
+		saveError = dataSetUnderTest.SaveAs(testSaveFixtureAbsolutePath)
+	}
+
+	// then
+	g.Expect(saveAsDataSetCall).To(Not(Panic()), "DataSet Save of good file path should not panic")
+	g.Expect(saveError).To(BeNil(), "DataSet Save to good file path should not return an error ")
+
+	os.Remove(testSaveFixtureAbsolutePath)
 }

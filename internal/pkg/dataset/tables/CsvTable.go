@@ -2,18 +2,27 @@
 
 package tables
 
+import "github.com/LindsayBradford/crem/internal/pkg/dataset"
+
+var _ CsvTable = new(CsvTableImpl)
+
+type CsvTable interface {
+	dataset.Table
+	Header() CsvHeader
+	SetHeader(header CsvHeader)
+}
+
 type CsvHeader []string
 
-// var _ dataset.Table = (*CsvTable)(nil)
-type CsvTable struct {
+type CsvTableImpl struct {
 	baseTable
 	header CsvHeader
 }
 
-func (ct *CsvTable) Header() CsvHeader {
+func (ct *CsvTableImpl) Header() CsvHeader {
 	return ct.header
 }
 
-func (ct *CsvTable) SetHeader(header CsvHeader) {
+func (ct *CsvTableImpl) SetHeader(header CsvHeader) {
 	ct.header = header
 }

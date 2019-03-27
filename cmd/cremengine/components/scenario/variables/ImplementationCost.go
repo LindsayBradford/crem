@@ -19,7 +19,7 @@ type ImplementationCost struct {
 	actionObserved action.ManagementAction
 }
 
-func (ic *ImplementationCost) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
+func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	return ic

@@ -17,17 +17,18 @@ func NewDataSet(name string, oleWrapper threading.MainThreadFunctionWrapper) *Da
 }
 
 type headerCellDetail struct {
-	row   uint
-	col   uint
-	label string
+	row      uint
+	labelCol uint
+	valueCol uint
+	label    string
 }
 
-var nColsCellDetail = headerCellDetail{1, 2, "ncols"}
-var nRowsCellDetail = headerCellDetail{2, 2, "nrows"}
-var xllCornerCellDetail = headerCellDetail{3, 2, "xllcorner"}
-var yllCornerCellDetail = headerCellDetail{4, 2, "yllcorner"}
-var cellSizeCellDetail = headerCellDetail{5, 2, "cellsize"}
-var noDataCellDetail = headerCellDetail{6, 2, "NODATA_value"}
+var nColsCellDetail = headerCellDetail{1, 1, 2, "ncols"}
+var nRowsCellDetail = headerCellDetail{2, 1, 2, "nrows"}
+var xllCornerCellDetail = headerCellDetail{3, 1, 2, "xllcorner"}
+var yllCornerCellDetail = headerCellDetail{4, 1, 2, "yllcorner"}
+var cellSizeCellDetail = headerCellDetail{5, 1, 2, "cellsize"}
+var noDataCellDetail = headerCellDetail{6, 1, 2, "NODATA_value"}
 
 const ascRowOffset = uint(7)
 const ascColOffset = uint(1)
@@ -61,30 +62,30 @@ func (ds *DataSet) loadExcelFileIntoDataSet(excelFilePath string) {
 	defer workbooks.Release()
 
 	workbook := workbooks.Open(excelFilePath)
-	ds.processWorkbook(workbook)
+	ds.loadWorkbook(workbook)
 
 	workbook.SetProperty("Saved", true)
 	workbook.Close(false)
 }
 
-func (ds *DataSet) processWorkbook(workbook excel.Workbook) {
+func (ds *DataSet) loadWorkbook(workbook excel.Workbook) {
 	ws := workbook.Worksheets()
 	for i := uint(1); i <= ws.Count(); i++ {
-		ds.processWorksheet(ws.Item(i))
+		ds.loadWorksheet(ws.Item(i))
 	}
 	ws.Release()
 }
 
-func (ds *DataSet) processWorksheet(sheet excel.Worksheet) {
+func (ds *DataSet) loadWorksheet(sheet excel.Worksheet) {
 	if isAscSheet(sheet) {
-		ds.processAscWorksheet(sheet)
+		ds.loadAscWorksheet(sheet)
 	} else {
-		ds.processCsvWorksheet(sheet)
+		ds.loadCsvWorksheet(sheet)
 	}
 }
 
 func isAscSheet(sheet excel.Worksheet) bool {
-	noDataCell := sheet.Cells(noDataCellDetail.row, noDataCellDetail.col-1)
+	noDataCell := sheet.Cells(noDataCellDetail.row, noDataCellDetail.valueCol-1)
 	defer noDataCell.Release()
 
 	if value, isString := noDataCell.Value().(string); isString {
@@ -95,8 +96,8 @@ func isAscSheet(sheet excel.Worksheet) bool {
 	return false
 }
 
-func (ds *DataSet) processAscWorksheet(sheet excel.Worksheet) {
-	newAscTable := new(tables.AscTable)
+func (ds *DataSet) loadAscWorksheet(sheet excel.Worksheet) {
+	newAscTable := new(tables.AscTableImpl)
 
 	newAScHeader := buildAscHeader(sheet)
 	newAscTable.SetHeader(newAScHeader)
@@ -119,7 +120,7 @@ func buildAscHeader(sheet excel.Worksheet) tables.AscHeader {
 }
 
 func retrieveHeaderValue(detail headerCellDetail, sheet excel.Worksheet) float64 {
-	headerCell := sheet.Cells(detail.row, detail.col)
+	headerCell := sheet.Cells(detail.row, detail.valueCol)
 	defer headerCell.Release()
 
 	if valueAsDecimal, isDecimal := headerCell.Value().(float64); isDecimal {
@@ -129,7 +130,7 @@ func retrieveHeaderValue(detail headerCellDetail, sheet excel.Worksheet) float64
 	panic(detail.label + " value not retrievable")
 }
 
-func buildAscCellData(table *tables.AscTable, sheet excel.Worksheet) {
+func buildAscCellData(table *tables.AscTableImpl, sheet excel.Worksheet) {
 	table.SetName(sheet.Name())
 	table.SetColumnAndRowSize(table.Header().NumCols, table.Header().NumRows)
 
@@ -142,8 +143,8 @@ func buildAscCellData(table *tables.AscTable, sheet excel.Worksheet) {
 	}
 }
 
-func (ds *DataSet) processCsvWorksheet(sheet excel.Worksheet) {
-	newCsvTable := new(tables.CsvTable)
+func (ds *DataSet) loadCsvWorksheet(sheet excel.Worksheet) {
+	newCsvTable := new(tables.CsvTableImpl)
 
 	newCsvHeader := buildCsvHeader(sheet)
 	newCsvTable.SetHeader(newCsvHeader)
@@ -167,7 +168,7 @@ func buildCsvHeader(sheet excel.Worksheet) tables.CsvHeader {
 	return newCsvHeader
 }
 
-func buildCsvCellData(table *tables.CsvTable, sheet excel.Worksheet) {
+func buildCsvCellData(table tables.CsvTable, sheet excel.Worksheet) {
 	table.SetName(sheet.Name())
 	colCount := excel.ColumnCount(sheet)
 	rowCount := excel.RowCount(sheet)
@@ -181,4 +182,139 @@ func buildCsvCellData(table *tables.CsvTable, sheet excel.Worksheet) {
 			cell.Release()
 		}
 	}
+}
+
+func (ds *DataSet) SaveAs(excelFilePath string) error {
+	ds.oleWrapper(func() {
+		ds.saveDataSetIntoExcelFile(excelFilePath)
+	})
+
+	return nil
+}
+
+func (ds *DataSet) saveDataSetIntoExcelFile(excelFilePath string) {
+	workbooks := ds.excelHandler.Workbooks()
+	defer workbooks.Release()
+
+	workbook := workbooks.Add()
+	defer workbook.Release()
+
+	ds.storeToWorkbook(workbook)
+	ds.saveAndCloseWorkbookAs(workbook, excelFilePath)
+}
+
+func (ds *DataSet) storeToWorkbook(workbook excel.Workbook) {
+	worksheets := workbook.Worksheets()
+	defer worksheets.Release()
+
+	for _, table := range ds.Tables() {
+		ds.storeTableToWorksheets(table, worksheets)
+	}
+
+	ds.removeEmptyDefaultWorksheet(worksheets)
+}
+
+func (ds *DataSet) removeEmptyDefaultWorksheet(worksheets excel.Worksheets) {
+	originalWorksheet := worksheets.Item(1)
+	defer originalWorksheet.Release()
+
+	originalWorksheet.Delete()
+}
+
+func (ds *DataSet) storeTableToWorksheets(table dataset.Table, worksheets excel.Worksheets) {
+	newWorksheet := worksheets.Add()
+	defer newWorksheet.Release()
+
+	newWorksheet.SetName(table.Name())
+
+	if ascTable, isAscTable := table.(tables.AscTable); isAscTable {
+		ds.storeAscTableToWorksheet(ascTable, newWorksheet)
+	}
+	if csvTable, isCsvTable := table.(tables.CsvTable); isCsvTable {
+		ds.storeCsvTableToWorksheet(csvTable, newWorksheet)
+	}
+
+	excel.MoveWorksheetToLastInWorksheets(newWorksheet, worksheets)
+	excel.AutoFitColumns(newWorksheet)
+}
+
+func (ds *DataSet) storeAscTableToWorksheet(table tables.AscTable, worksheet excel.Worksheet) {
+	ds.storeAscHeaderToWorksheet(table, worksheet)
+	ds.storeAscTableContentToWorksheet(table, worksheet)
+}
+
+func (ds *DataSet) storeAscHeaderToWorksheet(table tables.AscTable, worksheet excel.Worksheet) {
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, nColsCellDetail)
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, nRowsCellDetail)
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, xllCornerCellDetail)
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, yllCornerCellDetail)
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, cellSizeCellDetail)
+	ds.storeAscHeaderCellToWorksheet(worksheet, table, noDataCellDetail)
+}
+
+func (ds *DataSet) storeAscHeaderCellToWorksheet(worksheet excel.Worksheet, table tables.AscTable, header headerCellDetail) {
+	headerNameCell := worksheet.Cells(header.row, header.labelCol)
+	defer headerNameCell.Release()
+	headerNameCell.SetValue(header.label)
+
+	headerValueCell := worksheet.Cells(header.row, header.valueCol)
+	defer headerValueCell.Release()
+	headerValueCell.SetValue(fieldForHeaderCellDetail(header, table.Header()))
+}
+
+func fieldForHeaderCellDetail(detail headerCellDetail, header tables.AscHeader) interface{} {
+	switch detail {
+	case nColsCellDetail:
+		return header.NumCols
+	case nRowsCellDetail:
+		return header.NumRows
+	case xllCornerCellDetail:
+		return header.XllCorner
+	case yllCornerCellDetail:
+		return header.YllCorner
+	case cellSizeCellDetail:
+		return header.CellSize
+	case noDataCellDetail:
+		return header.NoDataValue
+	}
+	return nil
+}
+
+func (ds *DataSet) storeAscTableContentToWorksheet(table tables.AscTable, worksheet excel.Worksheet) {
+	colSize, rowSize := table.ColumnAndRowSize()
+
+	for col := uint(0); col < colSize; col++ {
+		for row := uint(0); row < rowSize; row++ {
+			cell := worksheet.Cells(row+ascRowOffset, col+ascColOffset)
+			cell.SetValue(table.Cell(col, row))
+			cell.Release()
+		}
+	}
+}
+
+func (ds *DataSet) storeCsvTableToWorksheet(table tables.CsvTable, worksheet excel.Worksheet) {
+	colCount, rowCount := table.ColumnAndRowSize()
+
+	const worksheetHeaderRow = 1
+
+	header := table.Header()
+	for col := uint(0); col < colCount; col++ {
+		cell := worksheet.Cells(worksheetHeaderRow, col+csvColOffset)
+		cell.SetValue(header[col])
+		cell.Release()
+	}
+
+	for col := uint(0); col < colCount; col++ {
+		for row := uint(0); row < rowCount; row++ {
+			cell := worksheet.Cells(row+csvRowOffset, col+csvColOffset)
+			cell.SetValue(table.Cell(col, row))
+			cell.Release()
+		}
+	}
+}
+
+func (ds *DataSet) saveAndCloseWorkbookAs(workbook excel.Workbook, filePath string) {
+	workbook.SaveAs(filePath)
+	workbook.SetProperty("Saved", true)
+	workbook.Close(false)
 }

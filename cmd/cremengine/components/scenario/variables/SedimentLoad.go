@@ -21,7 +21,7 @@ type SedimentLoad struct {
 	actionObserved           action.ManagementAction
 }
 
-func (sl *SedimentLoad) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
+func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
 	sl.SetName(SedimentLoadVariableName)
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
 	sl.SetValue(sl.deriveInitialSedimentLoad())

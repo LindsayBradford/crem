@@ -90,7 +90,7 @@ func (m *Model) Initialise() {
 	m.managementActions.RandomlyInitialise()
 }
 
-func (m *Model) fetchPlanningUnitTable() *tables.CsvTable {
+func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
 	dataSourcePath := m.deriveDataSourcePath()
 
 	m.inputDataSet.Load(dataSourcePath)
@@ -100,14 +100,14 @@ func (m *Model) fetchPlanningUnitTable() *tables.CsvTable {
 		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
 	}
 
-	csvPlanningUnitTable, ok := planningUnitTable.(*tables.CsvTable)
+	csvPlanningUnitTable, ok := planningUnitTable.(tables.CsvTable)
 	if !ok {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
 	return csvPlanningUnitTable
 }
 
-func (m *Model) buildCoreDecisionVariables(planningUnitTable *tables.CsvTable) {
+func (m *Model) buildCoreDecisionVariables(planningUnitTable tables.CsvTable) {
 	sedimentLoad := new(variables.SedimentLoad).
 		Initialise(planningUnitTable, m.parameters).
 		WithObservers(m)
@@ -122,7 +122,7 @@ func (m *Model) buildCoreDecisionVariables(planningUnitTable *tables.CsvTable) {
 	)
 }
 
-func (m *Model) buildManagementActions(planningUnitTable *tables.CsvTable) {
+func (m *Model) buildManagementActions(planningUnitTable tables.CsvTable) {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 

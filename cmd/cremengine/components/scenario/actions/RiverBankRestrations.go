@@ -12,13 +12,13 @@ import (
 const defaultRevegetationProportion = float64(1)
 
 type RiverBankRestorations struct {
-	planningUnitTable *tables.CsvTable
+	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
 	actionMap map[planningUnitId]*RiverBankRestoration
 }
 
-func (r *RiverBankRestorations) Initialise(planningUnitTable *tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
+func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
 	r.planningUnitTable = planningUnitTable
 	r.parameters = parameters
 	r.createManagementActions()

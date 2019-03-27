@@ -2,6 +2,8 @@
 
 package dataset
 
+type TableType int
+
 type Table interface {
 	Name() string
 	SetName(name string)
