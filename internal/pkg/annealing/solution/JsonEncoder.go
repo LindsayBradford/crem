@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -49,13 +48,6 @@ func (je JsonEncoder) encodeMarshaled(marshaledSolution []byte, outputPath strin
 }
 
 func (je JsonEncoder) deriveOutputPath(solution *Solution) (outputPath string) {
-	safeIdBasedFileName := toSafeFileName(solution.Id)
+	safeIdBasedFileName := solution.FileNameSafeId() + ".json"
 	return path.Join(je.outputPath, safeIdBasedFileName)
-}
-
-func toSafeFileName(possiblyUnsafeFilePath string) (response string) {
-	response = strings.Replace(possiblyUnsafeFilePath, " ", "", -1)
-	response = strings.Replace(response, "/", "_of_", -1)
-	response = response + ".json"
-	return response
 }

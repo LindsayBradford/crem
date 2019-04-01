@@ -3,6 +3,8 @@
 package solution
 
 import (
+	"strings"
+
 	"github.com/LindsayBradford/crem/pkg/attributes"
 )
 
@@ -25,4 +27,10 @@ type Solution struct {
 	Id                               string
 	DecisionVariables                attributes.Attributes
 	PlanningUnitManagementActionsMap map[PlanningUnitId]ManagementActions
+}
+
+func (s Solution) FileNameSafeId() string {
+	safeId := strings.Replace(s.Id, " ", "", -1)
+	safeId = strings.Replace(safeId, "/", "_of_", -1)
+	return safeId
 }

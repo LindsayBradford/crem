@@ -81,10 +81,21 @@ func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 
 	s.debugLogSolutionInJson(modelSolution)
 
-	// TODO: save to alternate format than json
-
 	s.ensureOutputPathIsUsable()
+	// s.jsonEncode(modelSolution)
+	s.csvEncode(modelSolution)
+}
+
+func (s *Saver) jsonEncode(modelSolution solution.Solution) {
 	jsonEncoder := new(solution.JsonEncoder).
+		WithOutputPath(s.outputPath)
+	if encodingError := jsonEncoder.Encode(&modelSolution); encodingError != nil {
+		s.LogHandler().Error(encodingError)
+	}
+}
+
+func (s *Saver) csvEncode(modelSolution solution.Solution) {
+	jsonEncoder := new(solution.CsvEncoder).
 		WithOutputPath(s.outputPath)
 	if encodingError := jsonEncoder.Encode(&modelSolution); encodingError != nil {
 		s.LogHandler().Error(encodingError)
