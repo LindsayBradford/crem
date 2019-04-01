@@ -1,4 +1,6 @@
 ScenarioName = "Test Catchment Annealer - One run"
+RunNumber=3
+OutputPath="testdata/solutions"
 
 [[Loggers]]
 Name = "TestLogger"

@@ -45,13 +45,16 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 		return nil, buildError
 	}
 
+	saver := scenario.NewSaver().
+		WithOutputPath(scenarioConfig.OutputPath)
+
 	var runner scenario.CallableRunner
 
 	runner = new(scenario.Runner).
 		ForAnnealer(newAnnealer).
 		WithName(scenarioConfig.ScenarioName).
 		WithRunNumber(scenarioConfig.RunNumber).
-		WithSaver(new(scenario.Saver)).
+		WithSaver(saver).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	return runner, nil

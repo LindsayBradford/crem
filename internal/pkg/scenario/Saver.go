@@ -3,14 +3,17 @@
 package scenario
 
 import (
-	"encoding/json"
+	"os"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+	"github.com/pkg/errors"
 )
+
+const defaultOutputPath = "solutions"
 
 type CallableSaver interface {
 	observer.Observer
@@ -19,6 +22,44 @@ type CallableSaver interface {
 
 type Saver struct {
 	loggers.LoggerContainer
+	outputPath string
+}
+
+func NewSaver() *Saver {
+	saver := new(Saver).WithOutputPath(defaultOutputPath)
+	return saver
+}
+
+func (s *Saver) WithOutputPath(outputPath string) *Saver {
+	if outputPath == "" {
+		outputPath = defaultOutputPath
+	}
+
+	s.outputPath = outputPath
+	return s
+}
+
+func (s *Saver) ensureOutputPathIsUsable() {
+
+	if fileInfo, err := os.Stat(s.outputPath); err == nil {
+		s.ensureExistingOutputPathIsUsable(fileInfo)
+	} else if os.IsNotExist(err) {
+		s.createOutputPath()
+	} else {
+		panic(errors.Wrap(err, "scenario saver cannot get file info of output path"))
+	}
+}
+
+func (s *Saver) ensureExistingOutputPathIsUsable(fileInfo os.FileInfo) {
+	if !fileInfo.IsDir() {
+		panic(errors.New("scenario saver output path specified not a directory"))
+	}
+}
+
+func (s *Saver) createOutputPath() {
+	if mkDirError := os.MkdirAll(s.outputPath, os.ModePerm); mkDirError != nil {
+		panic(errors.New("scenario saver failed making output path specified"))
+	}
 }
 
 func (s *Saver) ObserveEvent(event observer.Event) {
@@ -38,19 +79,32 @@ func (s *Saver) observeAnnealingEvent(annealer annealing.Observable, event obser
 func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 	modelSolution := annealer.Solution()
 
-	modelSolutionAsJson := s.toJson(&modelSolution)
+	s.debugLogSolutionInJson(modelSolution)
 
+	// TODO: save to alternate format than json
+
+	s.ensureOutputPathIsUsable()
+	jsonEncoder := new(solution.JsonEncoder).
+		WithOutputPath(s.outputPath)
+	if encodingError := jsonEncoder.Encode(&modelSolution); encodingError != nil {
+		s.LogHandler().Error(encodingError)
+	}
+}
+
+func (s *Saver) debugLogSolutionInJson(modelSolution solution.Solution) {
 	s.LogHandler().Debug("JSON Encoding of solution after annealing finished:")
-	s.LogHandler().Debug(modelSolutionAsJson)
 
-	// TODO: actaully save the solution state
+	modelSolutionAsJson := s.toJson(&modelSolution)
+	s.LogHandler().Debug(modelSolutionAsJson)
 }
 
 func (s *Saver) toJson(structure *solution.Solution) string {
-	structureJson, err := json.MarshalIndent(structure, "", "  ")
-	if err != nil {
-		s.LogHandler().LogAtLevel(logging.ERROR, err)
-		return "{}"
+	marshaler := new(solution.JsonMarshaler)
+	solutionAsJson, marshalError := marshaler.Marshal(structure)
+
+	if marshalError != nil {
+		panic(errors.Wrap(marshalError, "failed marshalling solution to JSON"))
 	}
-	return string(structureJson)
+
+	return string(solutionAsJson)
 }

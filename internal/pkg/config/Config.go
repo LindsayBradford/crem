@@ -59,6 +59,7 @@ type CREMConfig struct {
 	RunNumber                  uint64
 	MaximumConcurrentRunNumber uint64
 	CpuProfilePath             string
+	OutputPath                 string
 
 	Annealer           AnnealingConfig
 	Loggers            []LoggerConfig
