@@ -82,8 +82,8 @@ func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 	s.debugLogSolutionInJson(modelSolution)
 
 	s.ensureOutputPathIsUsable()
-	s.jsonEncode(modelSolution)
-	// s.csvEncode(modelSolution)
+	// s.jsonEncode(modelSolution)
+	s.csvEncode(modelSolution)
 }
 
 func (s *Saver) jsonEncode(modelSolution solution.Solution) {

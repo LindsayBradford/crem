@@ -14,9 +14,12 @@ import (
 const (
 	decisionVariableHeading = "DecisionVariable"
 	valueHeading            = "Value"
+	unitOfMeasureHeading    = "UnitOfMeasure"
 	separator               = ", "
 	newline                 = "\n"
 )
+
+var headings = []string{decisionVariableHeading, valueHeading, unitOfMeasureHeading}
 
 type CsvDecisionVariableMarshaler struct{}
 
@@ -26,7 +29,7 @@ func (cm *CsvDecisionVariableMarshaler) Marshal(solution *Solution) ([]byte, err
 
 func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables []variable.DecisionVariable) ([]byte, error) {
 	builder := new(strings.FluentBuilder)
-	builder.Add(join(decisionVariableHeading, valueHeading)).Add(newline)
+	builder.Add(join(headings...)).Add(newline)
 
 	for _, variable := range variables {
 		joinedAttributes := join(variable.Name(), toString(variable.Value()), variable.UnitOfMeasure().String())
