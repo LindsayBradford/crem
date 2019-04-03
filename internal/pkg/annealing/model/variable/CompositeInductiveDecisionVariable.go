@@ -147,6 +147,5 @@ func (v *CompositeInductiveDecisionVariable) ObserveActionInitialising(action ac
 }
 
 func (v *CompositeInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
-	newValueAndMeasure := valueAndMeasure{Name: v.Name(), Value: v.Value(), Measure: v.unitOfMeasure}
-	return json.Marshal(newValueAndMeasure)
+	return json.Marshal(MakeEncodeable(v))
 }

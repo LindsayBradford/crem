@@ -26,15 +26,8 @@ type BaseInductiveDecisionVariable struct {
 	ContainedUnitOfMeasure
 }
 
-type valueAndMeasure struct {
-	Name    string
-	Value   float64
-	Measure UnitOfMeasure `json:"UnitOfMeasure"`
-}
-
 func (v *BaseInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
-	newValueAndMeasure := valueAndMeasure{Name: v.Name(), Value: v.Value(), Measure: v.UnitOfMeasure()}
-	return json.Marshal(newValueAndMeasure)
+	return json.Marshal(MakeEncodeable(v))
 }
 
 func (v *BaseInductiveDecisionVariable) Value() float64 {

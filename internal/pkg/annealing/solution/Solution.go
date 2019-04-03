@@ -12,7 +12,7 @@ func NewSolution(id string) *Solution {
 	newSolution := new(Solution)
 
 	newSolution.Id = id
-	newSolution.DecisionVariables = make([]variable.DecisionVariable, 0)
+	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
 	newSolution.PlanningUnitManagementActionsMap = make(map[PlanningUnitId]ManagementActions, 0)
 
 	return newSolution
@@ -25,7 +25,7 @@ type ManagementActions []ManagementActionType
 
 type Solution struct {
 	Id                               string
-	DecisionVariables                []variable.DecisionVariable
+	DecisionVariables                variable.EncodeableDecisionVariables
 	PlanningUnitManagementActionsMap map[PlanningUnitId]ManagementActions
 }
 

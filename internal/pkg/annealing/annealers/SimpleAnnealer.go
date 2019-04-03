@@ -3,6 +3,8 @@
 package annealers
 
 import (
+	"sort"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
@@ -156,12 +158,13 @@ func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution)
 		return
 	}
 
-	solutionVariables := make([]variable.DecisionVariable, 0)
+	solutionVariables := make(variable.EncodeableDecisionVariables, 0)
 
-	for _, variable := range *sa.Model().DecisionVariables() {
-		solutionVariables = append(solutionVariables, variable)
+	for _, rawVariable := range *sa.Model().DecisionVariables() {
+		solutionVariables = append(solutionVariables, variable.MakeEncodeable(rawVariable))
 	}
 
+	sort.Sort(solutionVariables)
 	modelSolution.DecisionVariables = solutionVariables
 }
 

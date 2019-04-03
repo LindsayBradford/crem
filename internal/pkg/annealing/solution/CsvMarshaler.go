@@ -11,15 +11,17 @@ import (
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
+// https://tools.ietf.org/html/rfc4180
+
 const (
-	decisionVariableHeading = "DecisionVariable"
-	valueHeading            = "Value"
-	unitOfMeasureHeading    = "UnitOfMeasure"
-	separator               = ", "
-	newline                 = "\n"
+	nameHeading          = "Name"
+	valueHeading         = "Value"
+	unitOfMeasureHeading = "UnitOfMeasure"
+	separator            = ", "
+	newline              = "\n"
 )
 
-var headings = []string{decisionVariableHeading, valueHeading, unitOfMeasureHeading}
+var headings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
 
 type CsvDecisionVariableMarshaler struct{}
 
@@ -27,17 +29,25 @@ func (cm *CsvDecisionVariableMarshaler) Marshal(solution *Solution) ([]byte, err
 	return cm.marshalDecisionVariables(solution.DecisionVariables)
 }
 
-func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables []variable.DecisionVariable) ([]byte, error) {
+func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables variable.EncodeableDecisionVariables) ([]byte, error) {
 	builder := new(strings.FluentBuilder)
 	builder.Add(join(headings...)).Add(newline)
 
 	for _, variable := range variables {
-		joinedAttributes := join(variable.Name(), toString(variable.Value()), variable.UnitOfMeasure().String())
+		joinedAttributes := join(
+			variable.Name,
+			toString(variable.Value),
+			variable.Measure.String(),
+		)
 		builder.Add(joinedAttributes).Add(newline)
 	}
 
 	variableAsBytes := ([]byte)(builder.String())
 	return variableAsBytes, nil
+}
+
+func quote(textToQuote string) string {
+	return "\"" + textToQuote + "\""
 }
 
 func join(entries ...string) string {
@@ -56,9 +66,9 @@ func (cm *CsvManagementActionMarshaler) Marshal(solution *Solution) ([]byte, err
 
 func (cm *CsvManagementActionMarshaler) marshalManagementActions(planningUnitActions map[PlanningUnitId]ManagementActions) ([]byte, error) {
 	builder := new(strings.FluentBuilder)
-	headings := cm.buildHeadings(planningUnitActions)
+	csvHeadings := cm.buildHeadings(planningUnitActions)
 
-	joinedHeadings := join(headings...)
+	joinedHeadings := join(csvHeadings...)
 	builder.Add(joinedHeadings).Add(newline)
 
 	sortedKeys := cm.sortPlanningUnitKeys(planningUnitActions) // TODO: sometimes missing a key if no actions active for PU
@@ -87,7 +97,6 @@ func (cm *CsvManagementActionMarshaler) marshalManagementActions(planningUnitAct
 
 		joinedActions := join(values...)
 		builder.Add(joinedActions).Add(newline)
-
 	}
 
 	variableAsBytes := ([]byte)(builder.String())
