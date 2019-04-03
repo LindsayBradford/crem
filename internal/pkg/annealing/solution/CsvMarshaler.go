@@ -7,7 +7,7 @@ import (
 	"sort"
 	strings2 "strings"
 
-	"github.com/LindsayBradford/crem/pkg/attributes"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
@@ -24,13 +24,13 @@ func (cm *CsvDecisionVariableMarshaler) Marshal(solution *Solution) ([]byte, err
 	return cm.marshalDecisionVariables(solution.DecisionVariables)
 }
 
-func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables attributes.Attributes) ([]byte, error) {
+func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables []variable.DecisionVariable) ([]byte, error) {
 	builder := new(strings.FluentBuilder)
 	builder.Add(join(decisionVariableHeading, valueHeading)).Add(newline)
 
-	for _, pair := range variables {
-		joinedPair := join(pair.Name, toString(pair.Value))
-		builder.Add(joinedPair).Add(newline)
+	for _, variable := range variables {
+		joinedAttributes := join(variable.Name(), toString(variable.Value()), variable.UnitOfMeasure().String())
+		builder.Add(joinedAttributes).Add(newline)
 	}
 
 	variableAsBytes := ([]byte)(builder.String())

@@ -3,6 +3,8 @@
 package variable
 
 import (
+	"encoding/json"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -18,7 +20,21 @@ type BaseInductiveDecisionVariable struct {
 	actualValue    float64
 	inductiveValue float64
 
+	unitOfMeasure UnitOfMeasure
+
 	ContainedDecisionVariableObservers
+	ContainedUnitOfMeasure
+}
+
+type valueAndMeasure struct {
+	Name    string
+	Value   float64
+	Measure UnitOfMeasure `json:"UnitOfMeasure"`
+}
+
+func (v *BaseInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
+	newValueAndMeasure := valueAndMeasure{Name: v.Name(), Value: v.Value(), Measure: v.UnitOfMeasure()}
+	return json.Marshal(newValueAndMeasure)
 }
 
 func (v *BaseInductiveDecisionVariable) Value() float64 {

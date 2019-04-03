@@ -3,6 +3,7 @@
 package variable
 
 import (
+	"encoding/json"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
@@ -18,6 +19,7 @@ type CompositeInductiveDecisionVariable struct {
 
 	weightedVariables map[InductiveDecisionVariable]float64
 	ContainedDecisionVariableObservers
+	ContainedUnitOfMeasure
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {
@@ -142,4 +144,9 @@ func (v *CompositeInductiveDecisionVariable) ObserveAction(action action.Managem
 
 func (v *CompositeInductiveDecisionVariable) ObserveActionInitialising(action action.ManagementAction) {
 	// deliberately does nothing
+}
+
+func (v *CompositeInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
+	newValueAndMeasure := valueAndMeasure{Name: v.Name(), Value: v.Value(), Measure: v.unitOfMeasure}
+	return json.Marshal(newValueAndMeasure)
 }

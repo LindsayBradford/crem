@@ -31,7 +31,7 @@ func (vs *InductiveDecisionVariables) asMap() InductiveDecisionVariables {
 	return *vs
 }
 
-// SetValue finds the variable with supplied name in its collection, and sets its value appropriately.
+// SetValue finds the variable with supplied name in its collection, and sets its Value appropriately.
 // If the collection has no variable for the supplied name, it panics.
 func (vs *InductiveDecisionVariables) SetValue(name string, value float64) {
 	if variable, isPresent := vs.asMap()[name]; isPresent {
@@ -54,7 +54,7 @@ func (vs *InductiveDecisionVariables) Variable(name string) InductiveDecisionVar
 	panic(variableMissing(name))
 }
 
-// Value returns the value of the variable in its collection with the supplied name.
+// Value returns the Value of the variable in its collection with the supplied name.
 // If the collection has no variable for the supplied name, it panics.
 func (vs *InductiveDecisionVariables) Value(name string) float64 {
 	if variable, isPresent := vs.asMap()[name]; isPresent {
@@ -69,14 +69,14 @@ func (vs *InductiveDecisionVariables) DifferenceInValues(variableName string) fl
 	return decisionVariable.DifferenceInValues()
 }
 
-// AcceptAll accepts the inductive value of all the BaseInductiveDecisionVariable instances in its collection.
+// AcceptAll accepts the inductive Value of all the BaseInductiveDecisionVariable instances in its collection.
 func (vs *InductiveDecisionVariables) AcceptAll() {
 	for _, variable := range vs.asMap() {
 		variable.AcceptInductiveValue()
 	}
 }
 
-// RejectAll rejects the inductive value of all the BaseInductiveDecisionVariable instances in its collection.
+// RejectAll rejects the inductive Value of all the BaseInductiveDecisionVariable instances in its collection.
 func (vs *InductiveDecisionVariables) RejectAll() {
 	for _, variable := range vs.asMap() {
 		variable.RejectInductiveValue()

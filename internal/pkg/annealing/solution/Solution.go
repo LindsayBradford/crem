@@ -5,14 +5,14 @@ package solution
 import (
 	"strings"
 
-	"github.com/LindsayBradford/crem/pkg/attributes"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 )
 
 func NewSolution(id string) *Solution {
 	newSolution := new(Solution)
 
 	newSolution.Id = id
-	newSolution.DecisionVariables = make(attributes.Attributes, 0)
+	newSolution.DecisionVariables = make([]variable.DecisionVariable, 0)
 	newSolution.PlanningUnitManagementActionsMap = make(map[PlanningUnitId]ManagementActions, 0)
 
 	return newSolution
@@ -25,7 +25,7 @@ type ManagementActions []ManagementActionType
 
 type Solution struct {
 	Id                               string
-	DecisionVariables                attributes.Attributes
+	DecisionVariables                []variable.DecisionVariable
 	PlanningUnitManagementActionsMap map[PlanningUnitId]ManagementActions
 }
 

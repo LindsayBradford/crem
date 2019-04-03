@@ -15,6 +15,7 @@ func NewSimpleDecisionVariable(name string) SimpleDecisionVariable {
 type SimpleDecisionVariable struct {
 	name  string
 	value float64
+	ContainedUnitOfMeasure
 }
 
 func (dvi *SimpleDecisionVariable) Name() string           { return dvi.name }

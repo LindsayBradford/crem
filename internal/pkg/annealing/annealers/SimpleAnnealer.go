@@ -6,10 +6,10 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
-	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/pkg/errors"
 
@@ -156,13 +156,13 @@ func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution)
 		return
 	}
 
+	solutionVariables := make([]variable.DecisionVariable, 0)
+
 	for _, variable := range *sa.Model().DecisionVariables() {
-		newPair := attributes.NameValuePair{
-			Name:  variable.Name(),
-			Value: variable.Value(),
-		}
-		modelSolution.DecisionVariables = append(modelSolution.DecisionVariables, newPair)
+		solutionVariables = append(solutionVariables, variable)
 	}
+
+	modelSolution.DecisionVariables = solutionVariables
 }
 
 func (sa *SimpleAnnealer) addPlanningUnitManagementActionMap(modelSolution *solution.Solution) {
