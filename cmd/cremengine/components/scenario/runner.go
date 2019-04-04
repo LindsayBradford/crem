@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -46,6 +47,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 	}
 
 	saver := scenario.NewSaver().
+		WithOutputType(configOutputTypeToSolutionOutputType(scenarioConfig.OutputType)).
 		WithOutputPath(scenarioConfig.OutputPath)
 
 	var runner scenario.CallableRunner
@@ -58,6 +60,10 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	return runner, nil
+}
+
+func configOutputTypeToSolutionOutputType(outputType config.ScenarioOutputType) solution.OutputType {
+	return solution.OutputType(outputType.String())
 }
 
 func buildCatchmentModelRegistration() config.ModelRegistration {

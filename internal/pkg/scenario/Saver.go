@@ -22,12 +22,18 @@ type CallableSaver interface {
 
 type Saver struct {
 	loggers.LoggerContainer
+	outputType solution.OutputType
 	outputPath string
 }
 
 func NewSaver() *Saver {
 	saver := new(Saver).WithOutputPath(defaultOutputPath)
 	return saver
+}
+
+func (s *Saver) WithOutputType(outputType solution.OutputType) *Saver {
+	s.outputType = outputType
+	return s
 }
 
 func (s *Saver) WithOutputPath(outputPath string) *Saver {
@@ -40,7 +46,6 @@ func (s *Saver) WithOutputPath(outputPath string) *Saver {
 }
 
 func (s *Saver) ensureOutputPathIsUsable() {
-
 	if fileInfo, err := os.Stat(s.outputPath); err == nil {
 		s.ensureExistingOutputPathIsUsable(fileInfo)
 	} else if os.IsNotExist(err) {
@@ -78,26 +83,18 @@ func (s *Saver) observeAnnealingEvent(annealer annealing.Observable, event obser
 
 func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 	modelSolution := annealer.Solution()
-
 	s.debugLogSolutionInJson(modelSolution)
-
 	s.ensureOutputPathIsUsable()
-	// s.jsonEncode(modelSolution)
-	s.csvEncode(modelSolution)
+	s.encode(modelSolution)
 }
 
-func (s *Saver) jsonEncode(modelSolution solution.Solution) {
-	jsonEncoder := new(solution.JsonEncoder).
-		WithOutputPath(s.outputPath)
-	if encodingError := jsonEncoder.Encode(&modelSolution); encodingError != nil {
-		s.LogHandler().Error(encodingError)
-	}
-}
+func (s *Saver) encode(modelSolution solution.Solution) {
+	encoder := new(solution.Builder).
+		ForOutputType(s.outputType).
+		WithOutputPath(s.outputPath).
+		Build()
 
-func (s *Saver) csvEncode(modelSolution solution.Solution) {
-	jsonEncoder := new(solution.CsvEncoder).
-		WithOutputPath(s.outputPath)
-	if encodingError := jsonEncoder.Encode(&modelSolution); encodingError != nil {
+	if encodingError := encoder.Encode(&modelSolution); encodingError != nil {
 		s.LogHandler().Error(encodingError)
 	}
 }

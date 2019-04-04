@@ -51,6 +51,34 @@ type BaseConfig struct {
 	FilePath string
 }
 
+type ScenarioOutputType struct {
+	value string
+}
+
+func (sot *ScenarioOutputType) String() string {
+	return sot.value
+}
+
+var (
+	CsvOutput  = ScenarioOutputType{"CSV"}
+	JsonOutput = ScenarioOutputType{"JSON"}
+)
+
+func (sot *ScenarioOutputType) UnmarshalText(text []byte) error {
+	context := unmarshalContext{
+		configKey: "OutputType",
+		validValues: []string{
+			CsvOutput.value, JsonOutput.value,
+		},
+		textToValidate: string(text),
+		assignmentFunction: func() {
+			sot.value = string(text)
+		},
+	}
+
+	return processUnmarshalContext(context)
+}
+
 type CREMConfig struct {
 	BaseConfig
 
@@ -60,6 +88,7 @@ type CREMConfig struct {
 	MaximumConcurrentRunNumber uint64
 	CpuProfilePath             string
 	OutputPath                 string
+	OutputType                 ScenarioOutputType
 
 	Annealer           AnnealingConfig
 	Loggers            []LoggerConfig
