@@ -11,12 +11,14 @@ import (
 	"testing"
 )
 
+const defaultCatchmentModelAnnealerTimeout = 10
+
 func TestCremEngine_ScenarioOneRunBlackbox_ExitWithSuccess(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Single run of CremEngine CatchmentModel",
 		ExecutablePath:    cremExceutablePath,
-		TimeoutSeconds:    defaultDumbAnnealerTimeout,
+		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/CatchmentConfig-BlackBox-OneRun.toml",
 		ExpectedErrorCode: appTesting.WithSuccess,
 	}
@@ -29,7 +31,7 @@ func TestCremEngine_ScenarioBadInputsBlackbox_ExitWithError(t *testing.T) {
 		T:                 t,
 		Name:              "Attempted run of CremEngine CatchmentModel with bad inputs",
 		ExecutablePath:    cremExceutablePath,
-		TimeoutSeconds:    defaultDumbAnnealerTimeout,
+		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/CatchmentConfig-BadInputs.toml",
 		ExpectedErrorCode: appTesting.WithFailure,
 	}

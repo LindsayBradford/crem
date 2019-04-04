@@ -11,6 +11,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -105,6 +106,8 @@ func (sem *SimpleExcelModel) TearDown() {
 }
 
 func (sem *SimpleExcelModel) ActiveManagementActions() []action.ManagementAction { return nil }
+
+func (sem *SimpleExcelModel) PlanningUnits() solution.PlanningUnitIds { return nil }
 
 func (sem *SimpleExcelModel) saveDataToWorkbookAndClose() {
 	newFileName := toSafeFileName(sem.Id())

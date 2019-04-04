@@ -148,6 +148,7 @@ func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
 	modelSolution := solution.NewSolution(sa.id)
 
 	sa.addDecisionVariables(modelSolution)
+	sa.addPlanningUnits(modelSolution)
 	sa.addPlanningUnitManagementActionMap(modelSolution)
 
 	return modelSolution
@@ -168,11 +169,18 @@ func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution)
 	modelSolution.DecisionVariables = solutionVariables
 }
 
+func (sa *SimpleAnnealer) addPlanningUnits(modelSolution *solution.Solution) {
+	if sa.Model().PlanningUnits() == nil {
+		return
+	}
+	modelSolution.PlanningUnits = sa.Model().PlanningUnits()
+}
+
 func (sa *SimpleAnnealer) addPlanningUnitManagementActionMap(modelSolution *solution.Solution) {
 	for _, action := range sa.Model().ActiveManagementActions() {
 		planningUnit := solution.PlanningUnitId(action.PlanningUnit())
 		actionType := solution.ManagementActionType(action.Type())
-		modelSolution.PlanningUnitManagementActionsMap[planningUnit] = append(modelSolution.PlanningUnitManagementActionsMap[planningUnit], actionType)
+		modelSolution.ActiveManagementActions[planningUnit] = append(modelSolution.ActiveManagementActions[planningUnit], actionType)
 	}
 }
 

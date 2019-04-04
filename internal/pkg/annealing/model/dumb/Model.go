@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -118,6 +119,7 @@ func (dm *Model) RevertChange() {
 }
 
 func (dm *Model) ActiveManagementActions() []action.ManagementAction { return nil }
+func (dm *Model) PlanningUnits() solution.PlanningUnitIds            { return nil }
 
 func (dm *Model) DeepClone() model.Model {
 	clone := *dm

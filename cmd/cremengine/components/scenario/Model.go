@@ -15,6 +15,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
@@ -48,6 +49,7 @@ type Model struct {
 	parameters parameters.Parameters
 
 	managementActions action.ModelManagementActions
+	planningUnitTable tables.CsvTable
 	variables.ContainedDecisionVariables
 
 	inputDataSet *excel.DataSet
@@ -81,9 +83,10 @@ func (m *Model) ParameterErrors() error {
 func (m *Model) Initialise() {
 	m.note("Initialising")
 
-	planningUnitTable := m.fetchPlanningUnitTable()
-	m.buildCoreDecisionVariables(planningUnitTable)
-	m.buildManagementActions(planningUnitTable)
+	m.planningUnitTable = m.fetchPlanningUnitTable()
+
+	m.buildCoreDecisionVariables()
+	m.buildManagementActions()
 
 	m.buildSedimentVsCostDecisionVariable()
 
@@ -107,13 +110,13 @@ func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
 	return csvPlanningUnitTable
 }
 
-func (m *Model) buildCoreDecisionVariables(planningUnitTable tables.CsvTable) {
+func (m *Model) buildCoreDecisionVariables() {
 	sedimentLoad := new(variables.SedimentLoad).
-		Initialise(planningUnitTable, m.parameters).
+		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
 	implementationCost := new(variables.ImplementationCost).
-		Initialise(planningUnitTable, m.parameters).
+		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
 	m.ContainedDecisionVariables.Add(
@@ -122,12 +125,12 @@ func (m *Model) buildCoreDecisionVariables(planningUnitTable tables.CsvTable) {
 	)
 }
 
-func (m *Model) buildManagementActions(planningUnitTable tables.CsvTable) {
+func (m *Model) buildManagementActions() {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	// TODO: Create other sediment management actions
-	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(planningUnitTable, m.parameters)
+	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
@@ -136,6 +139,20 @@ func (m *Model) buildManagementActions(planningUnitTable tables.CsvTable) {
 
 func (m *Model) ActiveManagementActions() []action.ManagementAction {
 	return m.managementActions.ActiveActions()
+}
+
+func (m *Model) PlanningUnits() solution.PlanningUnitIds {
+	_, rows := m.planningUnitTable.ColumnAndRowSize()
+	planningUnits := make(solution.PlanningUnitIds, rows)
+
+	for row := uint(0); row < rows; row++ {
+		planningUnit := m.planningUnitTable.CellFloat64(0, row)
+		planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
+		planningUnitId := solution.PlanningUnitId(planningUnitAsString)
+		planningUnits[row] = solution.PlanningUnitId(planningUnitId)
+	}
+
+	return planningUnits
 }
 
 func (m *Model) buildSedimentVsCostDecisionVariable() {

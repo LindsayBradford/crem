@@ -5,6 +5,7 @@ package model
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -26,6 +27,7 @@ type Model interface {
 	DeepClone() Model
 
 	ActiveManagementActions() []action.ManagementAction
+	PlanningUnits() solution.PlanningUnitIds
 }
 
 // LoggerContainer defines an interface embedding a Model
@@ -84,4 +86,5 @@ func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}
 func (nm *nullModel) ActiveManagementActions() []action.ManagementAction         { return nil }
+func (nm *nullModel) PlanningUnits() solution.PlanningUnitIds                    { return nil }
 func (nm *nullModel) DeepClone() Model                                           { return nm }

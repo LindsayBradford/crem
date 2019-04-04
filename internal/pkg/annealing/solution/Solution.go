@@ -13,20 +13,23 @@ func NewSolution(id string) *Solution {
 
 	newSolution.Id = id
 	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
-	newSolution.PlanningUnitManagementActionsMap = make(map[PlanningUnitId]ManagementActions, 0)
+	newSolution.ActiveManagementActions = make(map[PlanningUnitId]ManagementActions, 0)
 
 	return newSolution
 }
 
 type PlanningUnitId string
+type PlanningUnitIds []PlanningUnitId
+
 type ManagementActionType string
 
 type ManagementActions []ManagementActionType
 
 type Solution struct {
-	Id                               string
-	DecisionVariables                variable.EncodeableDecisionVariables
-	PlanningUnitManagementActionsMap map[PlanningUnitId]ManagementActions
+	Id                      string
+	DecisionVariables       variable.EncodeableDecisionVariables
+	PlanningUnits           PlanningUnitIds `json:"-"`
+	ActiveManagementActions map[PlanningUnitId]ManagementActions
 }
 
 func (s Solution) FileNameSafeId() string {

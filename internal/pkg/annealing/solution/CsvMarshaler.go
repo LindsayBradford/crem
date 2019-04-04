@@ -4,7 +4,6 @@ package solution
 
 import (
 	"fmt"
-	"sort"
 	strings2 "strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
@@ -21,7 +20,13 @@ const (
 	newline              = "\n"
 )
 
-var headings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
+var variableHeadings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
+
+const (
+	planningUnitHeading = "PlanningUnit"
+	inactiveActionValue = "0"
+	activeActionValue   = "1"
+)
 
 type CsvDecisionVariableMarshaler struct{}
 
@@ -30,24 +35,28 @@ func (cm *CsvDecisionVariableMarshaler) Marshal(solution *Solution) ([]byte, err
 }
 
 func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables variable.EncodeableDecisionVariables) ([]byte, error) {
-	builder := new(strings.FluentBuilder)
-	builder.Add(join(headings...)).Add(newline)
-
-	for _, variable := range variables {
-		joinedAttributes := join(
-			variable.Name,
-			toString(variable.Value),
-			variable.Measure.String(),
-		)
-		builder.Add(joinedAttributes).Add(newline)
-	}
-
-	variableAsBytes := ([]byte)(builder.String())
-	return variableAsBytes, nil
+	csvStringAsBytes := ([]byte)(cm.decisionVariablesToCsvString(variables))
+	return csvStringAsBytes, nil
 }
 
-func quote(textToQuote string) string {
-	return "\"" + textToQuote + "\""
+func (cm *CsvDecisionVariableMarshaler) decisionVariablesToCsvString(variables variable.EncodeableDecisionVariables) string {
+	builder := new(strings.FluentBuilder)
+	builder.Add(join(variableHeadings...)).Add(newline)
+
+	for _, variable := range variables {
+		joinedVariableAttributes := joinAttributes(variable)
+		builder.Add(joinedVariableAttributes).Add(newline)
+	}
+
+	return builder.String()
+}
+
+func joinAttributes(variable variable.EncodeableDecisionVariable) string {
+	return join(
+		variable.Name,
+		toString(variable.Value),
+		variable.Measure.String(),
+	)
 }
 
 func join(entries ...string) string {
@@ -61,73 +70,82 @@ func toString(value interface{}) string {
 type CsvManagementActionMarshaler struct{}
 
 func (cm *CsvManagementActionMarshaler) Marshal(solution *Solution) ([]byte, error) {
-	return cm.marshalManagementActions(solution.PlanningUnitManagementActionsMap)
+	return cm.marshalManagementActions(solution)
 }
 
-func (cm *CsvManagementActionMarshaler) marshalManagementActions(planningUnitActions map[PlanningUnitId]ManagementActions) ([]byte, error) {
+func (cm *CsvManagementActionMarshaler) marshalManagementActions(solution *Solution) ([]byte, error) {
+	csvStringAsBytes := ([]byte)(cm.csvEncodeManagementActions(solution))
+	return csvStringAsBytes, nil
+}
+
+func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *Solution) string {
 	builder := new(strings.FluentBuilder)
-	csvHeadings := cm.buildHeadings(planningUnitActions)
 
-	joinedHeadings := join(csvHeadings...)
-	builder.Add(joinedHeadings).Add(newline)
+	headings := csvEncodeActionHeadings(solution.ActiveManagementActions)
+	builder.Add(join(headings...)).Add(newline)
 
-	sortedKeys := cm.sortPlanningUnitKeys(planningUnitActions) // TODO: sometimes missing a key if no actions active for PU
-
-	for _, sortedKey := range sortedKeys {
-		typedKey := PlanningUnitId(sortedKey)
-
-		values := make([]string, len(headings))
-		values[0] = sortedKey
-
-		actions := planningUnitActions[typedKey]
-
-		for headingIndex, heading := range headings {
-			if heading == "PlanningUnit" {
-				continue
-			}
-			actionValue := 0
-			for _, action := range actions {
-				actionAsString := string(action)
-				if heading == actionAsString {
-					actionValue = 1
-				}
-			}
-			values[headingIndex] = toString(actionValue)
-		}
-
-		joinedActions := join(values...)
-		builder.Add(joinedActions).Add(newline)
+	for _, planningUnit := range solution.PlanningUnits {
+		actionRowValues := cm.buildActionCsvValuesForPlanningUnit(headings, planningUnit, solution)
+		builder.Add(join(actionRowValues...)).Add(newline)
 	}
 
-	variableAsBytes := ([]byte)(builder.String())
-	return variableAsBytes, nil
+	return builder.String()
 }
 
-func (cm *CsvManagementActionMarshaler) sortPlanningUnitKeys(planningUnitActions map[PlanningUnitId]ManagementActions) []string {
-	sortedKeys := make([]string, 0)
-	for key := range planningUnitActions {
-		sortedKeys = append(sortedKeys, string(key))
-	}
-	sort.Strings(sortedKeys)
-	return sortedKeys
-}
+func csvEncodeActionHeadings(planningUnitActions map[PlanningUnitId]ManagementActions) []string {
+	headings := make([]string, 1)
+	headings[0] = planningUnitHeading
 
-func (cm *CsvManagementActionMarshaler) buildHeadings(planningUnitActions map[PlanningUnitId]ManagementActions) []string {
-	headings := make([]string, 0)
-
-	headingsAdded := make(map[string]bool, 0)
-
-	headings = append(headings, "PlanningUnit")
-
+	headingsAdded := make(map[ManagementActionType]bool, 0)
 	for _, actions := range planningUnitActions {
 		for _, action := range actions {
-			actionAsString := string(action)
-			if _, hasEntry := headingsAdded[string(actionAsString)]; !hasEntry {
-				headings = append(headings, actionAsString)
-				headingsAdded[actionAsString] = true
+			if _, hasEntry := headingsAdded[action]; !hasEntry {
+				headings = append(headings, string(action))
+				headingsAdded[action] = true
 			}
 		}
 	}
 
 	return headings
+}
+
+func (cm *CsvManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
+	actionHeadings []string, planningUnit PlanningUnitId, solution *Solution) []string {
+
+	values := make([]string, len(actionHeadings))
+
+	values[0] = string(planningUnit)
+
+	if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
+		for headingIndex, csvHeading := range actionHeadings {
+			if shouldSkipColumnWith(csvHeading) {
+				continue
+			}
+
+			actionValue := inactiveActionValue
+			for _, action := range activeActions {
+				if actionMatchesColumnNamed(action, csvHeading) {
+					actionValue = activeActionValue
+				}
+			}
+
+			values[headingIndex] = actionValue
+		}
+	} else {
+		for headingIndex, csvHeading := range actionHeadings {
+			if shouldSkipColumnWith(csvHeading) {
+				continue
+			}
+			values[headingIndex] = inactiveActionValue
+		}
+	}
+	return values
+}
+
+func shouldSkipColumnWith(csvHeading string) bool {
+	return csvHeading == planningUnitHeading
+}
+
+func actionMatchesColumnNamed(action ManagementActionType, csvHeading string) bool {
+	return string(action) == csvHeading
 }
