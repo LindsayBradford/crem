@@ -23,6 +23,7 @@ func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, para
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure("Dollars ($)")
+	ic.SetPrecision(2)
 	return ic
 }
 

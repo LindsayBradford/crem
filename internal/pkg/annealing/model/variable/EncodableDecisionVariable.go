@@ -2,6 +2,8 @@
 
 package variable
 
+import "github.com/LindsayBradford/crem/pkg/math"
+
 type EncodeableDecisionVariables []EncodeableDecisionVariable
 
 func (v EncodeableDecisionVariables) Len() int {
@@ -25,7 +27,7 @@ type EncodeableDecisionVariable struct {
 func MakeEncodeable(variable DecisionVariable) EncodeableDecisionVariable {
 	return EncodeableDecisionVariable{
 		Name:    variable.Name(),
-		Value:   variable.Value(),
+		Value:   math.RoundFloat(variable.Value(), int(variable.Precision())),
 		Measure: variable.UnitOfMeasure(),
 	}
 }

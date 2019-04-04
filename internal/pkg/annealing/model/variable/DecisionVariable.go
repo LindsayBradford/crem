@@ -22,4 +22,5 @@ type DecisionVariable interface {
 	SetValue(value float64)
 
 	UnitOfMeasureContainer
+	PrecisionContainer
 }

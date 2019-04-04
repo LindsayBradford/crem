@@ -24,6 +24,7 @@ type BaseInductiveDecisionVariable struct {
 
 	ContainedDecisionVariableObservers
 	ContainedUnitOfMeasure
+	ContainedPrecision
 }
 
 func (v *BaseInductiveDecisionVariable) MarshalJSON() ([]byte, error) {

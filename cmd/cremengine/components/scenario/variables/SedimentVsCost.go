@@ -18,6 +18,7 @@ type SedimentVsCost struct {
 func (sc *SedimentVsCost) Initialise() *SedimentVsCost {
 	sc.SetName(SedimentVsCostName)
 	sc.SetUnitOfMeasure("Not Applicable (NA)")
+	sc.SetPrecision(6)
 	sc.CompositeInductiveDecisionVariable.Initialise()
 	return sc
 }

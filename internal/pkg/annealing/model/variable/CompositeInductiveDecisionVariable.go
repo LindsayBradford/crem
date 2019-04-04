@@ -20,6 +20,7 @@ type CompositeInductiveDecisionVariable struct {
 	weightedVariables map[InductiveDecisionVariable]float64
 	ContainedDecisionVariableObservers
 	ContainedUnitOfMeasure
+	ContainedPrecision
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {

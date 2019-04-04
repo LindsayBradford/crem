@@ -24,6 +24,7 @@ type SedimentLoad struct {
 func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
 	sl.SetName(SedimentLoadVariableName)
 	sl.SetUnitOfMeasure("Tonnes per Year (t/y)")
+	sl.SetPrecision(3)
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
 	sl.SetValue(sl.deriveInitialSedimentLoad())
 	return sl
