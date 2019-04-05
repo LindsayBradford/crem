@@ -2,15 +2,14 @@
 
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
-package solution
+package csv
 
 import (
 	"fmt"
 	strings2 "strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
@@ -34,7 +33,7 @@ const (
 
 type CsvDecisionVariableMarshaler struct{}
 
-func (cm *CsvDecisionVariableMarshaler) Marshal(solution *Solution) ([]byte, error) {
+func (cm *CsvDecisionVariableMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
 	return cm.marshalDecisionVariables(solution.DecisionVariables)
 }
 
@@ -73,16 +72,16 @@ func toString(value interface{}) string {
 
 type CsvManagementActionMarshaler struct{}
 
-func (cm *CsvManagementActionMarshaler) Marshal(solution *Solution) ([]byte, error) {
+func (cm *CsvManagementActionMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
 	return cm.marshalManagementActions(solution)
 }
 
-func (cm *CsvManagementActionMarshaler) marshalManagementActions(solution *Solution) ([]byte, error) {
+func (cm *CsvManagementActionMarshaler) marshalManagementActions(solution *solution.Solution) ([]byte, error) {
 	csvStringAsBytes := ([]byte)(cm.csvEncodeManagementActions(solution))
 	return csvStringAsBytes, nil
 }
 
-func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *Solution) string {
+func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *solution.Solution) string {
 	builder := new(strings.FluentBuilder)
 
 	headings := csvEncodeActionHeadings(solution.ActiveManagementActions)
@@ -96,11 +95,11 @@ func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *Sol
 	return builder.String()
 }
 
-func csvEncodeActionHeadings(planningUnitActions map[PlanningUnitId]ManagementActions) []string {
+func csvEncodeActionHeadings(planningUnitActions map[solution.PlanningUnitId]solution.ManagementActions) []string {
 	headings := make([]string, 1)
 	headings[0] = planningUnitHeading
 
-	headingsAdded := make(map[ManagementActionType]bool, 0)
+	headingsAdded := make(map[solution.ManagementActionType]bool, 0)
 	for _, actions := range planningUnitActions {
 		for _, action := range actions {
 			if _, hasEntry := headingsAdded[action]; !hasEntry {
@@ -114,7 +113,7 @@ func csvEncodeActionHeadings(planningUnitActions map[PlanningUnitId]ManagementAc
 }
 
 func (cm *CsvManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
-	actionHeadings []string, planningUnit PlanningUnitId, solution *Solution) []string {
+	actionHeadings []string, planningUnit solution.PlanningUnitId, solution *solution.Solution) []string {
 
 	values := make([]string, len(actionHeadings))
 
@@ -150,6 +149,6 @@ func shouldSkipColumnWith(csvHeading string) bool {
 	return csvHeading == planningUnitHeading
 }
 
-func actionMatchesColumnNamed(action ManagementActionType, csvHeading string) bool {
+func actionMatchesColumnNamed(action solution.ManagementActionType, csvHeading string) bool {
 	return string(action) == csvHeading
 }

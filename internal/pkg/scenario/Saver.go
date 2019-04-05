@@ -7,6 +7,8 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
@@ -22,7 +24,7 @@ type CallableSaver interface {
 
 type Saver struct {
 	loggers.LoggerContainer
-	outputType solution.OutputType
+	outputType encoding.OutputType
 	outputPath string
 }
 
@@ -31,7 +33,7 @@ func NewSaver() *Saver {
 	return saver
 }
 
-func (s *Saver) WithOutputType(outputType solution.OutputType) *Saver {
+func (s *Saver) WithOutputType(outputType encoding.OutputType) *Saver {
 	s.outputType = outputType
 	return s
 }
@@ -89,7 +91,7 @@ func (s *Saver) saveModelSolution(annealer annealing.Observable) {
 }
 
 func (s *Saver) encode(modelSolution solution.Solution) {
-	encoder := new(solution.Builder).
+	encoder := new(encoding.Builder).
 		ForOutputType(s.outputType).
 		WithOutputPath(s.outputPath).
 		Build()
@@ -107,7 +109,7 @@ func (s *Saver) debugLogSolutionInJson(modelSolution solution.Solution) {
 }
 
 func (s *Saver) toJson(structure *solution.Solution) string {
-	marshaler := new(solution.JsonMarshaler)
+	marshaler := new(json.JsonMarshaler)
 	solutionAsJson, marshalError := marshaler.Marshal(structure)
 
 	if marshalError != nil {

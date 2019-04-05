@@ -1,6 +1,11 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package solution
+package encoding
+
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
+)
 
 type OutputType string
 
@@ -31,9 +36,9 @@ func (b *Builder) Build() Encoder {
 	case NoOutput:
 		return NullEncoder
 	case CsvOutput:
-		return new(CsvEncoder).WithOutputPath(b.outputPath)
+		return new(csv.CsvEncoder).WithOutputPath(b.outputPath)
 	case JsonOutput:
-		return new(JsonEncoder).WithOutputPath(b.outputPath)
+		return new(json.JsonEncoder).WithOutputPath(b.outputPath)
 	default:
 		return NullEncoder
 	}

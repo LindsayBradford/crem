@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -62,8 +62,8 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 	return runner, nil
 }
 
-func configOutputTypeToSolutionOutputType(outputType config.ScenarioOutputType) solution.OutputType {
-	return solution.OutputType(outputType.String())
+func configOutputTypeToSolutionOutputType(outputType config.ScenarioOutputType) encoding.OutputType {
+	return encoding.OutputType(outputType.String())
 }
 
 func buildCatchmentModelRegistration() config.ModelRegistration {

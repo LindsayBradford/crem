@@ -1,12 +1,15 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package solution
+// Copyright (c) 2019 Australian Rivers Institute.
+
+package json
 
 import (
 	"bufio"
 	"os"
 	"path"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/pkg/errors"
 )
 
@@ -20,7 +23,7 @@ func (je *JsonEncoder) WithOutputPath(outputPath string) *JsonEncoder {
 	return je
 }
 
-func (je JsonEncoder) Encode(solution *Solution) error {
+func (je JsonEncoder) Encode(solution *solution.Solution) error {
 	marshaledSolution, marshalError := je.marshaler.Marshal(solution)
 	if marshalError != nil {
 		return errors.Wrap(marshalError, "json marshaling of solution")
@@ -47,7 +50,7 @@ func (je JsonEncoder) encodeMarshaled(marshaledSolution []byte, outputPath strin
 	return nil
 }
 
-func (je JsonEncoder) deriveOutputPath(solution *Solution) (outputPath string) {
+func (je JsonEncoder) deriveOutputPath(solution *solution.Solution) (outputPath string) {
 	safeIdBasedFileName := solution.FileNameSafeId() + ".json"
 	return path.Join(je.outputPath, safeIdBasedFileName)
 }
