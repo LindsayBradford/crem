@@ -106,5 +106,16 @@ func AutoFitColumns(worksheet Worksheet) {
 func ClearUsedRange(worksheet Worksheet) {
 	usedRange := worksheet.UsedRange()
 	defer usedRange.Release()
+
 	usedRange.Clear()
+}
+
+func ActivateFirstWorksheet(workbook Workbook) {
+	worksheets := workbook.Worksheets()
+	defer worksheets.Release()
+
+	firstWorksheet := worksheets.Item(1)
+	defer firstWorksheet.Release()
+
+	firstWorksheet.Activate()
 }

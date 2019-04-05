@@ -17,6 +17,7 @@ type Worksheet interface {
 	Cells(rowIndex uint, columnIndex uint) (cell Cell)
 	QueryTables() QueryTables
 	MoveToAfterWorksheet(worksheet Worksheet)
+	Activate()
 	Release()
 }
 
@@ -39,6 +40,10 @@ func (ws *WorksheetImpl) SetName(name string) {
 
 func (ws *WorksheetImpl) Delete() {
 	ws.call("Delete")
+}
+
+func (ws *WorksheetImpl) Activate() {
+	ws.call("Activate")
 }
 
 func (ws *WorksheetImpl) UsedRange() Range {

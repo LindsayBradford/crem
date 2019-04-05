@@ -52,7 +52,8 @@ type Model struct {
 	planningUnitTable tables.CsvTable
 	variables.ContainedDecisionVariables
 
-	inputDataSet *excel.DataSet
+	oleFunctionWrapper threading.MainThreadFunctionWrapper
+	inputDataSet       excel.DataSet
 }
 
 func (m *Model) WithName(name string) *Model {
@@ -61,7 +62,7 @@ func (m *Model) WithName(name string) *Model {
 }
 
 func (m *Model) WithOleFunctionWrapper(wrapper threading.MainThreadFunctionWrapper) *Model {
-	m.inputDataSet = excel.NewDataSet("CatchmentDataSet", wrapper)
+	m.oleFunctionWrapper = wrapper
 	return m
 }
 
@@ -82,6 +83,8 @@ func (m *Model) ParameterErrors() error {
 
 func (m *Model) Initialise() {
 	m.note("Initialising")
+
+	m.inputDataSet = *excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
 
 	m.planningUnitTable = m.fetchPlanningUnitTable()
 
@@ -200,7 +203,7 @@ func (m *Model) deriveDataSourcePath() string {
 }
 
 func (m *Model) TearDown() {
-	//  TODO: Do I need to do any special shutdown behaviour?
+	m.inputDataSet.Teardown()
 }
 
 func (m *Model) TryRandomChange() {

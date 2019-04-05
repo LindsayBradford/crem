@@ -27,6 +27,8 @@ func (e *Encoder) WithOutputPath(outputPath string) *Encoder {
 
 func (e Encoder) Encode(solution *solution.Solution) error {
 	dataSet := excel.NewDataSet(solution.FileNameSafeId(), threading.GetMainThreadChannel().Call)
+	defer dataSet.Teardown()
+
 	if marshalError := e.marshaler.Marshal(solution, dataSet); marshalError != nil {
 		return errors.Wrap(marshalError, fileType+" marshaling of solution")
 	}

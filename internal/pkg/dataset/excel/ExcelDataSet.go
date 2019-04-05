@@ -212,6 +212,7 @@ func (ds *DataSet) storeToWorkbook(workbook excel.Workbook) {
 	}
 
 	ds.removeEmptyDefaultWorksheet(worksheets)
+	excel.ActivateFirstWorksheet(workbook)
 }
 
 func (ds *DataSet) removeEmptyDefaultWorksheet(worksheets excel.Worksheets) {
@@ -317,4 +318,8 @@ func (ds *DataSet) saveAndCloseWorkbookAs(workbook excel.Workbook, filePath stri
 	workbook.SaveAs(filePath)
 	workbook.SetProperty("Saved", true)
 	workbook.Close(false)
+}
+
+func (ds *DataSet) Teardown() {
+	ds.excelHandler.Destroy()
 }
