@@ -5,6 +5,7 @@ package excel
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 
 	"github.com/go-ole/go-ole"
 )
@@ -67,6 +68,10 @@ func (wb *WorkbookImpl) Save() {
 }
 
 func (wb *WorkbookImpl) SaveAs(newFileName string) {
+	if !filepath.IsAbs(newFileName) {
+		panic(errors.New("cannot save-as workbook to relative path [" + newFileName + "]"))
+	}
+
 	wb.call("SaveAs", newFileName)
 }
 

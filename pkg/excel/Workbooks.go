@@ -4,6 +4,7 @@ package excel
 
 import (
 	"errors"
+	"path/filepath"
 
 	"github.com/go-ole/go-ole"
 )
@@ -41,6 +42,10 @@ func (books *WorkbooksImpl) Add() (workbook Workbook) {
 }
 
 func (books *WorkbooksImpl) Open(filePath string) (workbook Workbook) {
+	if !filepath.IsAbs(filePath) {
+		panic(errors.New("cannot open workbook with relative path [" + filePath + "]"))
+	}
+
 	defer func() {
 		if r := recover(); r != nil {
 			panic(errors.New("cannot open file [" + filePath + "]"))
