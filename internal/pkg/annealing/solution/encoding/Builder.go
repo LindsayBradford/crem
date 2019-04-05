@@ -4,16 +4,17 @@ package encoding
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 )
 
 type OutputType string
 
 const (
-	NoOutput   = ""
-	CsvOutput  = "CSV"
-	JsonOutput = "JSON"
-	// ExcelType
+	UndefinedOutput = ""
+	CsvOutput       = "CSV"
+	JsonOutput      = "JSON"
+	ExcelOutput     = "EXCEL"
 )
 
 type Builder struct {
@@ -33,12 +34,12 @@ func (b *Builder) WithOutputPath(outputPath string) *Builder {
 
 func (b *Builder) Build() Encoder {
 	switch b.outputType {
-	case NoOutput:
-		return NullEncoder
-	case CsvOutput:
-		return new(csv.CsvEncoder).WithOutputPath(b.outputPath)
+	case UndefinedOutput, CsvOutput:
+		return new(csv.Encoder).WithOutputPath(b.outputPath)
 	case JsonOutput:
-		return new(json.JsonEncoder).WithOutputPath(b.outputPath)
+		return new(json.Encoder).WithOutputPath(b.outputPath)
+	case ExcelOutput:
+		return new(excel.Encoder).WithOutputPath(b.outputPath)
 	default:
 		return NullEncoder
 	}

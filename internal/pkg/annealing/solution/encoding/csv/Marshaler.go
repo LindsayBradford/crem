@@ -1,7 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package csv
 
 import (
@@ -31,18 +29,18 @@ const (
 	activeActionValue   = "1"
 )
 
-type CsvDecisionVariableMarshaler struct{}
+type DecisionVariableMarshaler struct{}
 
-func (cm *CsvDecisionVariableMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
+func (cm *DecisionVariableMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
 	return cm.marshalDecisionVariables(solution.DecisionVariables)
 }
 
-func (cm *CsvDecisionVariableMarshaler) marshalDecisionVariables(variables variable.EncodeableDecisionVariables) ([]byte, error) {
+func (cm *DecisionVariableMarshaler) marshalDecisionVariables(variables variable.EncodeableDecisionVariables) ([]byte, error) {
 	csvStringAsBytes := ([]byte)(cm.decisionVariablesToCsvString(variables))
 	return csvStringAsBytes, nil
 }
 
-func (cm *CsvDecisionVariableMarshaler) decisionVariablesToCsvString(variables variable.EncodeableDecisionVariables) string {
+func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(variables variable.EncodeableDecisionVariables) string {
 	builder := new(strings.FluentBuilder)
 	builder.Add(join(variableHeadings...)).Add(newline)
 
@@ -70,21 +68,21 @@ func toString(value interface{}) string {
 	return fmt.Sprintf("%v", value)
 }
 
-type CsvManagementActionMarshaler struct{}
+type ManagementActionMarshaler struct{}
 
-func (cm *CsvManagementActionMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
+func (cm *ManagementActionMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
 	return cm.marshalManagementActions(solution)
 }
 
-func (cm *CsvManagementActionMarshaler) marshalManagementActions(solution *solution.Solution) ([]byte, error) {
+func (cm *ManagementActionMarshaler) marshalManagementActions(solution *solution.Solution) ([]byte, error) {
 	csvStringAsBytes := ([]byte)(cm.csvEncodeManagementActions(solution))
 	return csvStringAsBytes, nil
 }
 
-func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *solution.Solution) string {
+func (cm *ManagementActionMarshaler) csvEncodeManagementActions(solution *solution.Solution) string {
 	builder := new(strings.FluentBuilder)
 
-	headings := csvEncodeActionHeadings(solution.ActiveManagementActions)
+	headings := csvEncodeActionHeadings(solution)
 	builder.Add(join(headings...)).Add(newline)
 
 	for _, planningUnit := range solution.PlanningUnits {
@@ -95,24 +93,16 @@ func (cm *CsvManagementActionMarshaler) csvEncodeManagementActions(solution *sol
 	return builder.String()
 }
 
-func csvEncodeActionHeadings(planningUnitActions map[solution.PlanningUnitId]solution.ManagementActions) []string {
+func csvEncodeActionHeadings(solution *solution.Solution) []string {
 	headings := make([]string, 1)
 	headings[0] = planningUnitHeading
 
-	headingsAdded := make(map[solution.ManagementActionType]bool, 0)
-	for _, actions := range planningUnitActions {
-		for _, action := range actions {
-			if _, hasEntry := headingsAdded[action]; !hasEntry {
-				headings = append(headings, string(action))
-				headingsAdded[action] = true
-			}
-		}
-	}
+	headings = append(headings, solution.ActiveActionsAsStrings()...)
 
 	return headings
 }
 
-func (cm *CsvManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
+func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
 	actionHeadings []string, planningUnit solution.PlanningUnitId, solution *solution.Solution) []string {
 
 	values := make([]string, len(actionHeadings))

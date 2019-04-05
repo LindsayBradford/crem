@@ -109,7 +109,7 @@ func (s *Saver) debugLogSolutionInJson(modelSolution solution.Solution) {
 }
 
 func (s *Saver) toJson(structure *solution.Solution) string {
-	marshaler := new(json.JsonMarshaler)
+	marshaler := new(json.Marshaler)
 	solutionAsJson, marshalError := marshaler.Marshal(structure)
 
 	if marshalError != nil {

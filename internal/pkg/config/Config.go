@@ -60,15 +60,16 @@ func (sot *ScenarioOutputType) String() string {
 }
 
 var (
-	CsvOutput  = ScenarioOutputType{"CSV"}
-	JsonOutput = ScenarioOutputType{"JSON"}
+	CsvOutput   = ScenarioOutputType{"CSV"}
+	JsonOutput  = ScenarioOutputType{"JSON"}
+	ExcelOutput = ScenarioOutputType{"EXCEL"}
 )
 
 func (sot *ScenarioOutputType) UnmarshalText(text []byte) error {
 	context := unmarshalContext{
 		configKey: "OutputType",
 		validValues: []string{
-			CsvOutput.value, JsonOutput.value,
+			CsvOutput.value, JsonOutput.value, ExcelOutput.value,
 		},
 		textToValidate: string(text),
 		assignmentFunction: func() {

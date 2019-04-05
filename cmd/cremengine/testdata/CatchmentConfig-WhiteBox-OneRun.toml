@@ -1,12 +1,12 @@
 ScenarioName = "Test Catchment Annealer - One run"
 RunNumber=3
 OutputPath="testdata/solutions"
-OutputType="JSON"  # "" (default) | "CSV" | "JSON"
+OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 
 [[Loggers]]
 Name = "TestLogger"
 [Loggers.LogLevelDestinations]
-Debug = "StandardOutput"
+#Debug = "StandardOutput"
 Model = "StandardOutput"
 
 [[AnnealingObservers]]
