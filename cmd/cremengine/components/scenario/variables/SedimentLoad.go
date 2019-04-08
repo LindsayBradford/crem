@@ -17,15 +17,17 @@ var _ variable.DecisionVariable = new(SedimentLoad)
 
 type SedimentLoad struct {
 	variable.BaseInductiveDecisionVariable
-	bankSedimentContribution actions.BankSedimentContribution
-	actionObserved           action.ManagementAction
+	bankSedimentContribution  actions.BankSedimentContribution
+	gullySedimentContribution actions.GullySedimentContribution
+	actionObserved            action.ManagementAction
 }
 
-func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
+func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
 	sl.SetName(SedimentLoadVariableName)
 	sl.SetUnitOfMeasure("Tonnes per Year (t/y)")
 	sl.SetPrecision(3)
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
+	sl.gullySedimentContribution.Initialise(gulliesTable, parameters)
 	sl.SetValue(sl.deriveInitialSedimentLoad())
 	return sl
 }
@@ -37,12 +39,8 @@ func (sl *SedimentLoad) WithObservers(observers ...variable.Observer) *SedimentL
 
 func (sl *SedimentLoad) deriveInitialSedimentLoad() float64 {
 	return sl.bankSedimentContribution.OriginalSedimentContribution() +
-		sl.gullySedimentContribution() +
+		sl.gullySedimentContribution.OriginalSedimentContribution() +
 		sl.hillSlopeSedimentContribution()
-}
-
-func (sl *SedimentLoad) gullySedimentContribution() float64 {
-	return 0 // TODO: implement
 }
 
 func (sl *SedimentLoad) hillSlopeSedimentContribution() float64 {
@@ -54,6 +52,8 @@ func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
 		sl.handleRiverBankRestorationAction()
+	case actions.GullyRestorationType:
+		sl.handleGullyRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}
@@ -64,6 +64,8 @@ func (sl *SedimentLoad) ObserveActionInitialising(action action.ManagementAction
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
 		sl.handleInitialisingRiverBankRestorationAction()
+	case actions.GullyRestorationType:
+		sl.handleInitialisingGullyRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
 	}
@@ -107,5 +109,45 @@ func (sl *SedimentLoad) handleInitialisingRiverBankRestorationAction() {
 		setVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
 	case false:
 		setVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
+	}
+}
+
+func (sl *SedimentLoad) handleGullyRestorationAction() {
+	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
+		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
+		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)
+
+		asIsSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(asIsVolume)
+		toBeSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(toBeVolume)
+
+		currentValue := sl.BaseInductiveDecisionVariable.Value()
+		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
+	}
+
+	switch sl.actionObserved.IsActive() {
+	case true:
+		setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
+	case false:
+		setVariable(actions.ActionedGullyVolume, actions.OriginalGullyVolume)
+	}
+}
+
+func (sl *SedimentLoad) handleInitialisingGullyRestorationAction() {
+	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
+		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
+		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)
+
+		asIsSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(asIsVolume)
+		toBeSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(toBeVolume)
+
+		currentValue := sl.BaseInductiveDecisionVariable.Value()
+		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
+	}
+
+	switch sl.actionObserved.IsActive() {
+	case true:
+		setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
+	case false:
+		setVariable(actions.ActionedGullyVolume, actions.OriginalGullyVolume)
 	}
 }

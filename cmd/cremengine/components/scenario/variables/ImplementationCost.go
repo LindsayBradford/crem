@@ -41,6 +41,8 @@ func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
 		ic.handleRiverBankRestorationAction()
+	case actions.GullyRestorationType:
+		ic.handleGullyRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}
@@ -51,6 +53,8 @@ func (ic *ImplementationCost) ObserveActionInitialising(action action.Management
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
 		ic.handleInitialisingRiverBankRestorationAction()
+	case actions.GullyRestorationType:
+		ic.handleInitialisingGullyRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
 	}
@@ -80,6 +84,38 @@ func (ic *ImplementationCost) handleInitialisingRiverBankRestorationAction() {
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setVariable(notImplementedCost, implementationCost)
+	case false:
+		setVariable(implementationCost, notImplementedCost)
+	}
+}
+
+func (ic *ImplementationCost) handleGullyRestorationAction() {
+	setTempVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.BaseInductiveDecisionVariable.Value()
+		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setTempVariable(notImplementedCost, implementationCost)
+	case false:
+		setTempVariable(implementationCost, notImplementedCost)
+	}
+}
+
+func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
+	setVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.BaseInductiveDecisionVariable.Value()
+		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
 
 	switch ic.actionObserved.IsActive() {
 	case true:

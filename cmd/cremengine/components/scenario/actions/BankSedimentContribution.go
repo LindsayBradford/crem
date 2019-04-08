@@ -22,6 +22,11 @@ const (
 	riparianBufferAreaIndex = 10
 )
 
+func Float64ToPlanningUnitId(value float64) planningUnitId {
+	valueAsString := strconv.FormatFloat(value, 'g', -1, 64)
+	return planningUnitId(valueAsString)
+}
+
 type planningUnitId string
 
 type sedimentTracker struct {
@@ -53,8 +58,7 @@ func (bsc *BankSedimentContribution) populateContributionMap() {
 
 func (bsc *BankSedimentContribution) populateContributionMapEntry(rowNumber uint) {
 	planningUnit := bsc.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
-	planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
-	mapKey := planningUnitId(planningUnitAsString)
+	mapKey := Float64ToPlanningUnitId(planningUnit)
 
 	bsc.contributionMap[mapKey] = sedimentTracker{
 		partialSedimentContribution:      bsc.partialBankSedimentContribution(rowNumber),

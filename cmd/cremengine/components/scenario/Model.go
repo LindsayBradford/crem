@@ -28,6 +28,7 @@ import (
 
 const (
 	PlanningUnitsTableName = "PlanningUnits"
+	GulliesTableName       = "Gullies"
 )
 
 func NewModel() *Model {
@@ -49,7 +50,10 @@ type Model struct {
 	parameters parameters.Parameters
 
 	managementActions action.ModelManagementActions
+
 	planningUnitTable tables.CsvTable
+	gulliesTable      tables.CsvTable
+
 	variables.ContainedDecisionVariables
 
 	oleFunctionWrapper threading.MainThreadFunctionWrapper
@@ -86,7 +90,12 @@ func (m *Model) Initialise() {
 
 	m.inputDataSet = *excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
 
+	dataSourcePath := m.deriveDataSourcePath()
+
+	m.inputDataSet.Load(dataSourcePath)
+
 	m.planningUnitTable = m.fetchPlanningUnitTable()
+	m.gulliesTable = m.fetchGulliesTable()
 
 	m.buildCoreDecisionVariables()
 	m.buildManagementActions()
@@ -97,9 +106,6 @@ func (m *Model) Initialise() {
 }
 
 func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
-	dataSourcePath := m.deriveDataSourcePath()
-
-	m.inputDataSet.Load(dataSourcePath)
 
 	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
 	if tableError != nil {
@@ -113,9 +119,23 @@ func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
 	return csvPlanningUnitTable
 }
 
+func (m *Model) fetchGulliesTable() tables.CsvTable {
+
+	gulliesTable, tableError := m.inputDataSet.Table(GulliesTableName)
+	if tableError != nil {
+		panic(errors.New("Expected data set supplied to have a [" + GulliesTableName + "] table"))
+	}
+
+	csvGulliesTable, ok := gulliesTable.(tables.CsvTable)
+	if !ok {
+		panic(errors.New("Expected data set table [" + GulliesTableName + "] to be a CSV type"))
+	}
+	return csvGulliesTable
+}
+
 func (m *Model) buildCoreDecisionVariables() {
 	sedimentLoad := new(variables.SedimentLoad).
-		Initialise(m.planningUnitTable, m.parameters).
+		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
 	implementationCost := new(variables.ImplementationCost).
@@ -135,6 +155,12 @@ func (m *Model) buildManagementActions() {
 	// TODO: Create other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
+		m.managementActions.Add(action)
+		action.Subscribe(m, sedimentLoad, implementationCost)
+	}
+
+	gullyRestorations := new(actions.GullyRestorations).Initialise(m.gulliesTable, m.parameters)
+	for _, action := range gullyRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}

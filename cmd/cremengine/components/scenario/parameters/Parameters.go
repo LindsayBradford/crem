@@ -20,6 +20,7 @@ const (
 	DataSourcePath              string = "DataSourcePath"
 
 	RiparianRevegetationCostPerKilometer string = "RiparianRevegetationCostPerKilometer"
+	GullyRestorationCostPerKilometer     string = "GullyRestorationCostPerKilometer"
 )
 
 type Parameters struct {
@@ -86,7 +87,7 @@ func (p *Parameters) buildMetaData() {
 		parameters.MetaData{
 			Key:          YearsOfErosion,
 			Validator:    p.IsNonNegativeInteger,
-			DefaultValue: 100,
+			DefaultValue: int64(100),
 		},
 	)
 
@@ -103,6 +104,14 @@ func (p *Parameters) buildMetaData() {
 			Key:          RiparianRevegetationCostPerKilometer,
 			Validator:    p.IsDecimal,
 			DefaultValue: float64(24000),
+		},
+	)
+
+	p.AddMetaData(
+		parameters.MetaData{
+			Key:          GullyRestorationCostPerKilometer,
+			Validator:    p.IsDecimal,
+			DefaultValue: float64(44000),
 		},
 	)
 }
