@@ -134,7 +134,7 @@ func (m *Model) fetchGulliesTable() tables.CsvTable {
 }
 
 func (m *Model) buildCoreDecisionVariables() {
-	sedimentLoad := new(variables.SedimentLoad).
+	sedimentLoad := new(variables.SedimentProduction).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
@@ -149,7 +149,7 @@ func (m *Model) buildCoreDecisionVariables() {
 }
 
 func (m *Model) buildManagementActions() {
-	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
+	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	// TODO: Create other sediment management actions
@@ -185,11 +185,11 @@ func (m *Model) PlanningUnits() solution.PlanningUnitIds {
 }
 
 func (m *Model) buildSedimentVsCostDecisionVariable() {
-	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentLoadVariableName)
+	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	const sedimentWeight = 0.667
-	const implementationWeight = 0.333
+	const sedimentWeight = 0.5
+	const implementationWeight = 0.5
 
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().

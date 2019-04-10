@@ -29,6 +29,7 @@ GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
 RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
+GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
 
 [[SolutionExplorers]]
@@ -43,4 +44,4 @@ Model = "TurbidityModel"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.99  # 0.99
-MaximumIterations = 1000 # 1M
+MaximumIterations = 5000 # 1M

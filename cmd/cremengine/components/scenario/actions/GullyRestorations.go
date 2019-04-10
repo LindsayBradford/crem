@@ -43,6 +43,7 @@ func (g *GullyRestorations) createManagementAction(planningUnit planningUnitId) 
 	g.actionMap[planningUnit] =
 		new(GullyRestoration).
 			WithGullyRestorationType().
+			WithPlanningUnit(string(planningUnit)).
 			WithOriginalGullyVolume(originalGullyVolume).
 			WithActionedGullyVolume(actionedGullyVolume).
 			WithImplementationCost(costInDollars)

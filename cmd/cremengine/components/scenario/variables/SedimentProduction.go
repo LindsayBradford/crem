@@ -11,19 +11,19 @@ import (
 	"github.com/pkg/errors"
 )
 
-const SedimentLoadVariableName = "SedimentLoad"
+const SedimentProductionVariableName = "SedimentProduction"
 
-var _ variable.DecisionVariable = new(SedimentLoad)
+var _ variable.DecisionVariable = new(SedimentProduction)
 
-type SedimentLoad struct {
+type SedimentProduction struct {
 	variable.BaseInductiveDecisionVariable
 	bankSedimentContribution  actions.BankSedimentContribution
 	gullySedimentContribution actions.GullySedimentContribution
 	actionObserved            action.ManagementAction
 }
 
-func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentLoad {
-	sl.SetName(SedimentLoadVariableName)
+func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
+	sl.SetName(SedimentProductionVariableName)
 	sl.SetUnitOfMeasure("Tonnes per Year (t/y)")
 	sl.SetPrecision(3)
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
@@ -32,22 +32,22 @@ func (sl *SedimentLoad) Initialise(planningUnitTable tables.CsvTable, gulliesTab
 	return sl
 }
 
-func (sl *SedimentLoad) WithObservers(observers ...variable.Observer) *SedimentLoad {
+func (sl *SedimentProduction) WithObservers(observers ...variable.Observer) *SedimentProduction {
 	sl.Subscribe(observers...)
 	return sl
 }
 
-func (sl *SedimentLoad) deriveInitialSedimentLoad() float64 {
+func (sl *SedimentProduction) deriveInitialSedimentLoad() float64 {
 	return sl.bankSedimentContribution.OriginalSedimentContribution() +
 		sl.gullySedimentContribution.OriginalSedimentContribution() +
 		sl.hillSlopeSedimentContribution()
 }
 
-func (sl *SedimentLoad) hillSlopeSedimentContribution() float64 {
+func (sl *SedimentProduction) hillSlopeSedimentContribution() float64 {
 	return 0 // TODO: implement
 }
 
-func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
+func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
 	sl.actionObserved = action
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
@@ -59,7 +59,7 @@ func (sl *SedimentLoad) ObserveAction(action action.ManagementAction) {
 	}
 }
 
-func (sl *SedimentLoad) ObserveActionInitialising(action action.ManagementAction) {
+func (sl *SedimentProduction) ObserveActionInitialising(action action.ManagementAction) {
 	sl.actionObserved = action
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
@@ -72,7 +72,7 @@ func (sl *SedimentLoad) ObserveActionInitialising(action action.ManagementAction
 	sl.NotifyObservers()
 }
 
-func (sl *SedimentLoad) handleRiverBankRestorationAction() {
+func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
@@ -92,7 +92,7 @@ func (sl *SedimentLoad) handleRiverBankRestorationAction() {
 	}
 }
 
-func (sl *SedimentLoad) handleInitialisingRiverBankRestorationAction() {
+func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
@@ -112,7 +112,7 @@ func (sl *SedimentLoad) handleInitialisingRiverBankRestorationAction() {
 	}
 }
 
-func (sl *SedimentLoad) handleGullyRestorationAction() {
+func (sl *SedimentProduction) handleGullyRestorationAction() {
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)
@@ -132,7 +132,7 @@ func (sl *SedimentLoad) handleGullyRestorationAction() {
 	}
 }
 
-func (sl *SedimentLoad) handleInitialisingGullyRestorationAction() {
+func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)

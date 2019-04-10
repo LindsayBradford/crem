@@ -32,7 +32,7 @@ DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
 Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
 [SolutionExplorers.Parameters]
-DecisionVariable = "SedimentLoad"
+DecisionVariable = "SedimentProduction"
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"
