@@ -24,7 +24,7 @@ type SedimentProduction struct {
 
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
 	sl.SetName(SedimentProductionVariableName)
-	sl.SetUnitOfMeasure("Tonnes per Year (t/y)")
+	sl.SetUnitOfMeasure(variable.TonnesPerYear)
 	sl.SetPrecision(3)
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
 	sl.gullySedimentContribution.Initialise(gulliesTable, parameters)

@@ -22,7 +22,7 @@ type ImplementationCost struct {
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
-	ic.SetUnitOfMeasure("Dollars ($)")
+	ic.SetUnitOfMeasure(variable.Dollars)
 	ic.SetPrecision(2)
 	return ic
 }

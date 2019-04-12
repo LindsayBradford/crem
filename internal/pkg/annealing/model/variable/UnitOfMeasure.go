@@ -4,6 +4,12 @@ package variable
 
 type UnitOfMeasure string
 
+const (
+	NotApplicable UnitOfMeasure = "Not Applicable (NA)"
+	TonnesPerYear UnitOfMeasure = "Tonnes per Year (t/y)"
+	Dollars       UnitOfMeasure = "Dollars ($)"
+)
+
 func (uom UnitOfMeasure) String() string {
 	return string(uom)
 }
