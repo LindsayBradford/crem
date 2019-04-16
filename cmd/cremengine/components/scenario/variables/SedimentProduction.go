@@ -8,6 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/pkg/assert/release"
 	"github.com/pkg/errors"
 )
 
@@ -17,9 +18,11 @@ var _ variable.DecisionVariable = new(SedimentProduction)
 
 type SedimentProduction struct {
 	variable.BaseInductiveDecisionVariable
+
 	bankSedimentContribution  actions.BankSedimentContribution
 	gullySedimentContribution actions.GullySedimentContribution
-	actionObserved            action.ManagementAction
+
+	actionObserved action.ManagementAction
 }
 
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
@@ -104,12 +107,8 @@ func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 	}
 
-	switch sl.actionObserved.IsActive() {
-	case true:
-		setVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
-	case false:
-		setVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
-	}
+	assert.That(sl.actionObserved.IsActive()).WithFailureMessage("initialising action should always be active").Holds()
+	setVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
 }
 
 func (sl *SedimentProduction) handleGullyRestorationAction() {
@@ -144,10 +143,6 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 	}
 
-	switch sl.actionObserved.IsActive() {
-	case true:
-		setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
-	case false:
-		setVariable(actions.ActionedGullyVolume, actions.OriginalGullyVolume)
-	}
+	assert.That(sl.actionObserved.IsActive()).WithFailureMessage("initialising action should always be active").Holds()
+	setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
 }
