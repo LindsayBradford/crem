@@ -4,15 +4,15 @@ package assert
 
 import "github.com/pkg/errors"
 
-type Assertion struct {
+type RuntimeAssertion struct {
 	condition      bool
 	failureMessage string
 }
 
 const defaultFailureMessage = "assertion failed"
 
-func That(condition bool) *Assertion {
-	assertion := new(Assertion)
+func That(condition bool) *RuntimeAssertion {
+	assertion := new(RuntimeAssertion)
 
 	assertion.condition = condition
 	assertion.failureMessage = defaultFailureMessage
@@ -20,12 +20,12 @@ func That(condition bool) *Assertion {
 	return assertion
 }
 
-func (a *Assertion) WithFailureMessage(failureMessage string) *Assertion {
+func (a *RuntimeAssertion) WithFailureMessage(failureMessage string) *RuntimeAssertion {
 	a.failureMessage = failureMessage
 	return a
 }
 
-func (a *Assertion) Holds() {
+func (a *RuntimeAssertion) Holds() {
 	if !a.condition {
 		panic(errors.New(a.failureMessage))
 	}

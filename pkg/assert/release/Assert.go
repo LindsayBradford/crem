@@ -7,16 +7,16 @@ package assert
 // on a source-file by source-file basis.
 // NOTE: Revisit Goland 2019.1 conditional test compilation WRT assertions.
 
-type Assertion struct{}
+type RuntimeAssertion struct{}
 
-var nullAssertion = new(Assertion)
+var nullAssertion = new(RuntimeAssertion)
 
-func That(condition bool) *Assertion {
+func That(condition bool) *RuntimeAssertion {
 	return nullAssertion
 }
 
-func (a *Assertion) WithFailureMessage(messageOnFailure string) *Assertion {
+func (a *RuntimeAssertion) WithFailureMessage(messageOnFailure string) *RuntimeAssertion {
 	return nullAssertion
 }
 
-func (a *Assertion) Holds() {}
+func (a *RuntimeAssertion) Holds() {}
