@@ -8,6 +8,10 @@ package action
 // model decision variables.
 type ManagementActionType string
 
+func (t ManagementActionType) String() string {
+	return string(t)
+}
+
 // ModelVariableName identifies a particular model variable value that a management action modifies when its
 // activation status changes.
 type ModelVariableName string

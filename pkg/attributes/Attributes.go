@@ -16,6 +16,20 @@ func (a *Attributes) Value(name string) interface{} {
 	return nil
 }
 
+func (a Attributes) Entries(entries ...string) Attributes {
+	slice := make(Attributes, 0)
+
+	for _, attribute := range a {
+		for _, entry := range entries {
+			if attribute.Name == entry {
+				slice = append(slice, attribute)
+			}
+		}
+	}
+
+	return slice
+}
+
 // NameValuePair is a struct allowing some Name as text to be associated with a matching Value of any type.
 type NameValuePair struct {
 	Name  string

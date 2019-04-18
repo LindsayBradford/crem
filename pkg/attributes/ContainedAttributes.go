@@ -14,3 +14,7 @@ func (ca *ContainedAttributes) AddAttribute(name string, value interface{}) {
 	newEntry := NameValuePair{Name: name, Value: value}
 	ca.attributes = append(ca.attributes, newEntry)
 }
+
+func (ca *ContainedAttributes) Entries(entries ...string) Attributes {
+	return ca.attributes.Entries(entries...)
+}

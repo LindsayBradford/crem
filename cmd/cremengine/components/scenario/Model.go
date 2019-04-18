@@ -248,29 +248,31 @@ func (m *Model) ObserveActionInitialising(action action.ManagementAction) {
 func (m *Model) noteAppliedManagementAction(action action.ManagementAction) {
 	event := observer.NewEvent(observer.ManagementAction).
 		WithId(m.Id()).
-		WithSource(action)
+		WithAttribute("Type", action.Type()).
+		WithAttribute("PlanningUnit", action.PlanningUnit()).
+		WithAttribute("IsActive", action.IsActive())
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) note(text string) {
 	event := observer.NewEvent(observer.Note).
-		WithId(m.Id()).
-		WithSource(m).
-		WithNote(text)
+		WithId(m.Id()).WithNote(text)
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
-		WithSource(variable)
+		WithAttribute("Name", variable.Name()).
+		WithAttribute("Value", variable.Value())
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) ObserveDecisionVariableWithNote(variable variable.DecisionVariable, note string) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
-		WithSource(variable).
+		WithAttribute("Name", variable.Name()).
+		WithAttribute("Value", variable.Value()).
 		WithNote(note)
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }

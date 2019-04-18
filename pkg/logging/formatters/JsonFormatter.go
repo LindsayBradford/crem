@@ -4,10 +4,18 @@ package formatters
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/strings"
+)
+
+const (
+	escapedQuote = "\""
+	nullString   = "null"
+	comma        = ", "
+	colon        = ": "
+	openBracket  = "{"
+	closeBracket = "}"
 )
 
 // JsonFormatter formats a Attributes array into an equivalent JSON encoding.
@@ -16,38 +24,37 @@ type JsonFormatter struct{}
 func (formatter *JsonFormatter) Format(attributes attributes.Attributes) string {
 	var builder strings.FluentBuilder
 
-	builder.Add("{")
-	needsComma := false
+	builder.Add(openBracket)
 
+	needsComma := false
 	for _, attribute := range attributes {
 		if !needsComma {
 			needsComma = true
 		} else {
-			builder.Add(", ")
+			builder.Add(comma)
 		}
 
-		builder.Add("\"", attribute.Name, "\": ", jsonValueToString(attribute.Value))
+		builder.
+			Add(escapedQuote, attribute.Name, escapedQuote).
+			Add(colon, jsonValueToString(attribute.Value))
 	}
 
-	builder.Add("}")
+	builder.Add(closeBracket)
+
 	return builder.String()
 }
 
 func jsonValueToString(value interface{}) string {
-	switch value.(type) {
-	case bool:
-		return strconv.FormatBool(value.(bool))
-	case int:
-		return strconv.Itoa(value.(int))
-	case uint64:
-		return strconv.FormatUint(value.(uint64), 10)
-	case float64:
-		return strconv.FormatFloat(value.(float64), 'g', -1, 64)
-	case string:
-		return "\"" + value.(string) + "\""
-	case fmt.Stringer:
-		typeConvertedValue := value.(fmt.Stringer)
-		return "\"" + typeConvertedValue.String() + "\""
+	if r := recover(); r != nil {
+		return nullString
 	}
-	return "null"
+
+	switch value.(type) {
+	case string, fmt.Stringer:
+		return escapedQuote + strings.Convert(value) + escapedQuote
+	default:
+		return strings.Convert(value)
+	}
+
+	return nullString
 }

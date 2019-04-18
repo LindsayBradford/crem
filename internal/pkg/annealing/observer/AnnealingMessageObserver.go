@@ -3,13 +3,8 @@
 package observer
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -92,23 +87,19 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 	case observer.Note:
 		builder.Add("[", event.Note(), "]")
 	case observer.ManagementAction:
-		action, isAction := event.Source().(action.ManagementAction)
-		if isAction {
-			builder.
-				Add("Type [", string(action.Type()), "], ").
-				Add("Planning Unit [", action.PlanningUnit(), "], ").
-				Add("Active [", strconv.FormatBool(action.IsActive()), "]")
-		}
+		builder.
+			Add("Type [", format(event, "Type"), "], ").
+			Add("Planning Unit [", format(event, "PlanningUnit"), "], ").
+			Add("Active [", format(event, "IsActive"), "]")
+
 		if event.HasNote() {
 			builder.Add(", Note [", event.Note(), "]")
 		}
 	case observer.DecisionVariable:
-		variable, isVariable := event.Source().(variable.DecisionVariable)
-		if isVariable {
-			builder.
-				Add("Name [", variable.Name(), "], ").
-				Add("Value [", fmt.Sprintf("%f", variable.Value()), "]")
-		}
+		builder.
+			Add("Name [", format(event, "Name"), "], ").
+			Add("Value [", format(event, "Value"), "], ")
+
 		if event.HasNote() {
 			builder.Add(", Note [", event.Note(), "]")
 		}
@@ -117,4 +108,8 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 	}
 
 	amo.logHandler.LogAtLevel(model.LogLevel, builder.String())
+}
+
+func format(event observer.Event, attributeName string) string {
+	return strings.Convert(event.Attribute(attributeName))
 }

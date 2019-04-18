@@ -4,10 +4,13 @@ package formatters
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/strings"
+)
+
+const (
+	equals = "="
 )
 
 // NameValuePairFormatter formats a Attributes array into a string of comma-separated name-value pairs.
@@ -22,28 +25,24 @@ func (formatter *NameValuePairFormatter) Format(attributes attributes.Attributes
 		if !needsComma {
 			needsComma = true
 		} else {
-			builder.Add(", ")
+			builder.Add(comma)
 		}
-		builder.Add(attribute.Name, "=", nvpValueToString(attribute.Value))
+		builder.Add(attribute.Name, equals, nvpValueToString(attribute.Value))
 	}
 	return builder.String()
 }
 
 func nvpValueToString(value interface{}) string {
-	switch value.(type) {
-	case bool:
-		return strconv.FormatBool(value.(bool))
-	case int:
-		return strconv.Itoa(value.(int))
-	case uint64:
-		return strconv.FormatUint(value.(uint64), 10)
-	case float64:
-		return strconv.FormatFloat(value.(float64), 'g', -1, 64)
-	case string:
-		return "\"" + value.(string) + "\""
-	case fmt.Stringer:
-		typeConvertedValue := value.(fmt.Stringer)
-		return "\"" + typeConvertedValue.String() + "\""
+	if r := recover(); r != nil {
+		return nullString
 	}
-	return "null"
+
+	switch value.(type) {
+	case string, fmt.Stringer:
+		return escapedQuote + strings.Convert(value) + escapedQuote
+	default:
+		return strings.Convert(value)
+	}
+
+	return nullString
 }
