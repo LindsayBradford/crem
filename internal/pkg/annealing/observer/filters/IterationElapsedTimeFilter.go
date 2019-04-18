@@ -3,7 +3,6 @@
 package filters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 
 	"time"
@@ -32,19 +31,15 @@ func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
 		return allowThroughFilter
 	}
 
-	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		return m.ShouldFilterAnnealerSource(event, annealer)
-	}
-
-	return blockAtFilter
+	return m.ShouldFilterAnnealerSource(event)
 }
 
-func (m *IterationElapsedTimeFilter) ShouldFilterAnnealerSource(event observer.Event, annealer annealing.Observable) bool {
+func (m *IterationElapsedTimeFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
 	if event.EventType != observer.FinishedIteration {
 		return blockAtFilter
 	}
 
-	if onFirstOrLastIteration(annealer) {
+	if eventOnnFirstOrLastIteration(event) {
 		m.lastTimeAllowed = time.Now()
 		return allowThroughFilter
 	}

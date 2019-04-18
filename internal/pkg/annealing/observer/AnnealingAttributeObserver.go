@@ -53,10 +53,12 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer 
 	switch event.EventType {
 	case observer.StartedAnnealing:
 		logAttributes = append(logAttributes,
-			attributes.NameValuePair{Name: "MaximumIterations", Value: annealer.MaximumIterations()},
-			attributes.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
-			attributes.NameValuePair{Name: "CoolingFactor", Value: annealer.CoolingFactor()},
-		)
+			event.AttributesNamed("MaximumIterations", "Temperature", "CoolingFactor")...)
+		// logAttributes = append(logAttributes,
+		// 	attributes.NameValuePair{Name: "MaximumIterations", Value: annealer.MaximumIterations()},
+		// 	attributes.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
+		// 	attributes.NameValuePair{Name: "CoolingFactor", Value: annealer.CoolingFactor()},
+		// )
 	case observer.StartedIteration:
 		logAttributes = append(logAttributes,
 			attributes.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
@@ -73,10 +75,7 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer 
 			attributes.NameValuePair{Name: "ChangeAccepted", Value: explorer.ChangeAccepted()},
 		)
 	case observer.FinishedAnnealing:
-		logAttributes = append(logAttributes,
-			attributes.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
-			attributes.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
-		)
+		logAttributes = event.AllAttributes()
 	default:
 		// deliberately does nothing extra
 	}
@@ -86,11 +85,11 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer 
 func (aao *AnnealingAttributeObserver) observeEvent(event observer.Event, logAttributes attributes.Attributes) {
 	switch event.EventType {
 	case observer.Note:
-		logAttributes = append(logAttributes, event.Entries("Note")...)
+		logAttributes = append(logAttributes, event.AttributesNamed("Note")...)
 	case observer.ManagementAction:
-		logAttributes = append(logAttributes, event.Entries("Type", "PlanningUnit", "Active", "Note")...)
+		logAttributes = append(logAttributes, event.AttributesNamed("Type", "PlanningUnit", "Active", "Note")...)
 	case observer.DecisionVariable:
-		logAttributes = append(logAttributes, event.Entries("Name", "Value", "Note")...)
+		logAttributes = append(logAttributes, event.AttributesNamed("Name", "Value", "Note")...)
 	default:
 		// deliberately does nothing extra
 	}

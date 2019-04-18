@@ -255,8 +255,7 @@ func (m *Model) noteAppliedManagementAction(action action.ManagementAction) {
 }
 
 func (m *Model) note(text string) {
-	event := observer.NewEvent(observer.Note).
-		WithId(m.Id()).WithNote(text)
+	event := observer.NewEvent(observer.Note).WithId(m.Id()).WithNote(text)
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 

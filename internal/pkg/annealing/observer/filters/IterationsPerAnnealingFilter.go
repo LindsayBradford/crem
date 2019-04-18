@@ -5,7 +5,6 @@ package filters
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
 
@@ -87,11 +86,11 @@ func (m *PercentileOfIterationsPerAnnealingFilter) ShouldFilter(event observer.E
 		return allowThroughFilter
 	}
 
-	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		if m.generatesEvents && isModuloFilterable(event.EventType) &&
-			annealer.CurrentIteration()%m.iterationModulo == 0 {
-			return allowThroughFilter
-		}
+	currentIteration := event.Attribute("CurrentIteration").(uint64)
+
+	if m.generatesEvents && isModuloFilterable(event.EventType) &&
+		currentIteration%m.iterationModulo == 0 {
+		return allowThroughFilter
 	}
 
 	return blockAtFilter

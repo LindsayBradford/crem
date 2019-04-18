@@ -15,6 +15,10 @@ func (ca *ContainedAttributes) AddAttribute(name string, value interface{}) {
 	ca.attributes = append(ca.attributes, newEntry)
 }
 
-func (ca *ContainedAttributes) Entries(entries ...string) Attributes {
+func (ca *ContainedAttributes) AttributesNamed(entries ...string) Attributes {
 	return ca.attributes.Entries(entries...)
+}
+
+func (ca *ContainedAttributes) AllAttributes() Attributes {
+	return ca.attributes
 }

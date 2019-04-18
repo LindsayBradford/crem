@@ -4,7 +4,6 @@
 package filters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
 
@@ -30,6 +29,9 @@ func (nm *NullFilter) ShouldFilter(event observer.Event) bool {
 	return allowThroughFilter
 }
 
-func onFirstOrLastIteration(annealer annealing.Observable) bool {
-	return annealer.CurrentIteration() == 1 || annealer.CurrentIteration() == annealer.MaximumIterations()
+func eventOnnFirstOrLastIteration(event observer.Event) bool {
+	currentIteration := event.Attribute("CurrentIteration").(uint64)
+	maximumIteratons := event.Attribute("MaximumIterations").(uint64)
+
+	return currentIteration == 1 || currentIteration == maximumIteratons
 }

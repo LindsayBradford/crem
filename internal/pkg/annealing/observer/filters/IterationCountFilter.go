@@ -3,7 +3,6 @@
 package filters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 )
 
@@ -27,16 +26,13 @@ func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
 		return allowThroughFilter
 	}
 
-	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		return m.ShouldFilterAnnealerSource(event, annealer)
-	}
-
-	return blockAtFilter
+	return m.ShouldFilterAnnealerSource(event)
 }
 
-func (m *IterationCountFilter) ShouldFilterAnnealerSource(event observer.Event, annealer annealing.Observable) bool {
+func (m *IterationCountFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
+	currentIteration := event.Attribute("CurrentIteration").(uint64)
 	if event.EventType == observer.FinishedIteration &&
-		(onFirstOrLastIteration(annealer) || annealer.CurrentIteration()%m.iterationModulo == 0) {
+		(eventOnnFirstOrLastIteration(event) || currentIteration%m.iterationModulo == 0) {
 		return allowThroughFilter
 	}
 	return blockAtFilter

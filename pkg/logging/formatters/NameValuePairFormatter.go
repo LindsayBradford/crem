@@ -3,14 +3,19 @@
 package formatters
 
 import (
-	"fmt"
-
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
 const (
 	equals = "="
+)
+
+var (
+	nvpConverter = strings.NewConverter().
+		WithFloatingPointPrecision(6).
+		NotPaddingZeros().
+		QuotingStrings()
 )
 
 // NameValuePairFormatter formats a Attributes array into a string of comma-separated name-value pairs.
@@ -37,12 +42,5 @@ func nvpValueToString(value interface{}) string {
 		return nullString
 	}
 
-	switch value.(type) {
-	case string, fmt.Stringer:
-		return escapedQuote + strings.Convert(value) + escapedQuote
-	default:
-		return strings.Convert(value)
-	}
-
-	return nullString
+	return nvpConverter.Convert(value)
 }

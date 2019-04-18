@@ -80,21 +80,6 @@ func (sa *SimpleAnnealer) Model() model.Model {
 	return sa.SolutionExplorer().Model()
 }
 
-func (sa *SimpleAnnealer) notifyObservers(eventType observer.EventType) {
-	eventSource := sa.CloneObservable()
-	event := observer.NewEvent(eventType).
-		WithId(sa.Id()).
-		WithSource(eventSource)
-	sa.EventNotifier().NotifyObserversOfEvent(*event)
-}
-
-func (sa *SimpleAnnealer) CloneObservable() annealing.Observable {
-	observable := sa.ContainedObservable
-	explorerClone := sa.SolutionExplorer().CloneObservable()
-	observable.SetObservableExplorer(explorerClone)
-	return &observable
-}
-
 func (sa *SimpleAnnealer) Anneal() {
 	defer sa.handlePanicRecovery()
 
@@ -127,21 +112,54 @@ func (sa *SimpleAnnealer) handlePanicRecovery() {
 }
 
 func (sa *SimpleAnnealer) annealingStarted() {
-	sa.notifyObservers(observer.StartedAnnealing)
+	event := observer.NewEvent(observer.StartedAnnealing).
+		WithId(sa.Id()).
+		WithAttribute("MaximumIterations", sa.maximumIterations).
+		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
+		WithAttribute("Temperature", sa.temperature).
+		WithAttribute("CoolingFactor", sa.coolingFactor)
+
+	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) iterationStarted() {
 	sa.currentIteration++
-	sa.notifyObservers(observer.StartedIteration)
+
+	event := observer.NewEvent(observer.StartedIteration).
+		WithId(sa.Id()).
+		WithAttribute("CurrentIteration", sa.currentIteration).
+		WithAttribute("MaximumIterations", sa.maximumIterations).
+		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
+		WithAttribute("Temperature", sa.temperature)
+
+	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) iterationFinished() {
-	sa.notifyObservers(observer.FinishedIteration)
+	event := observer.NewEvent(observer.FinishedIteration).
+		WithId(sa.Id()).
+		WithAttribute("CurrentIteration", sa.currentIteration).
+		WithAttribute("MaximumIterations", sa.maximumIterations).
+		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
+		WithAttribute("ChangeInObjectiveValue", sa.SolutionExplorer().ChangeInObjectiveValue()).
+		WithAttribute("ChangeIsDesirable", sa.SolutionExplorer().ChangeIsDesirable()).
+		WithAttribute("AcceptanceProbability", sa.SolutionExplorer().AcceptanceProbability()).
+		WithAttribute("ChangeAccepted", sa.SolutionExplorer().ChangeAccepted())
+
+	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
 	sa.solution = *sa.fetchFinalModelSolution()
-	sa.notifyObservers(observer.FinishedAnnealing)
+
+	event := observer.NewEvent(observer.FinishedAnnealing).
+		WithId(sa.Id()).
+		WithAttribute("CurrentIteration", sa.currentIteration).
+		WithAttribute("MaximumIterations", sa.maximumIterations).
+		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
+		WithAttribute("Temperature", sa.temperature)
+
+	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
