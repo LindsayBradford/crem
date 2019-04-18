@@ -16,8 +16,8 @@ const (
 )
 
 type Event struct {
-	EventType  EventType
-	attributes attributes.Attributes
+	EventType EventType
+	attributes.ContainedAttributes
 }
 
 func NewEvent(eventType EventType) *Event {
@@ -64,15 +64,6 @@ func (e *Event) HasNote() bool {
 func (e *Event) WithAttribute(name string, value interface{}) *Event {
 	e.AddAttribute(name, value)
 	return e
-}
-
-func (e *Event) Attribute(name string) interface{} {
-	return e.attributes.Value(name)
-}
-
-func (e *Event) AddAttribute(name string, value interface{}) {
-	newEntry := attributes.NameValuePair{Name: name, Value: value}
-	e.attributes = append(e.attributes, newEntry)
 }
 
 type EventType int
