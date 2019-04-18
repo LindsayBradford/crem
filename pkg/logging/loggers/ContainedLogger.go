@@ -4,18 +4,18 @@ package loggers
 
 import "github.com/LindsayBradford/crem/pkg/logging"
 
-// LoggerContainer is a struct offering a default container implementation of a Log Handler
-type LoggerContainer struct {
+// ContainedLogger is a struct offering a default container implementation of a Log Handler
+type ContainedLogger struct {
 	logHandler logging.Logger
 }
 
-func (c *LoggerContainer) SetLogHandler(logHandler logging.Logger) {
+func (c *ContainedLogger) SetLogHandler(logHandler logging.Logger) {
 	if logHandler == nil {
 		logHandler = NewNullLogger()
 	}
 	c.logHandler = logHandler
 }
 
-func (c *LoggerContainer) LogHandler() logging.Logger {
+func (c *ContainedLogger) LogHandler() logging.Logger {
 	return c.logHandler
 }

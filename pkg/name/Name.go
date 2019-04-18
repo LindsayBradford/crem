@@ -9,7 +9,7 @@ type Nameable interface {
 	SetName(name string)
 }
 
-// LoggerContainer offers a default implementation of Nameable
+// ContainedLogger offers a default implementation of Nameable
 type NameContainer struct {
 	name string
 }

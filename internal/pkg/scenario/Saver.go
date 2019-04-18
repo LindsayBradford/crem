@@ -23,7 +23,7 @@ type CallableSaver interface {
 }
 
 type Saver struct {
-	loggers.LoggerContainer
+	loggers.ContainedLogger
 	outputType encoding.OutputType
 	outputPath string
 }

@@ -17,9 +17,9 @@ import (
 type Explorer struct {
 	name.NameContainer
 	name.IdentifiableContainer
-	model.ModelContainer
+	model.ContainedModel
 	rand.RandContainer
-	loggers.LoggerContainer
+	loggers.ContainedLogger
 
 	scenarioId string
 

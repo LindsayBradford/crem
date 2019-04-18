@@ -21,7 +21,7 @@ import (
 type SimpleExcelModel struct {
 	name.NameContainer
 	name.IdentifiableContainer
-	loggers.LoggerContainer
+	loggers.ContainedLogger
 
 	parameters            Parameters
 	decisionVariables     variable.SimpleDecisionVariables

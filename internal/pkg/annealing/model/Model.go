@@ -30,22 +30,22 @@ type Model interface {
 	PlanningUnits() solution.PlanningUnitIds
 }
 
-// LoggerContainer defines an interface embedding a Model
+// ContainedLogger defines an interface embedding a Model
 type Container interface {
 	Model() Model
 	SetModel(model Model)
 }
 
-// ModelContainer is a struct offering a default implementation of LoggerContainer
-type ModelContainer struct {
+// ContainedModel is a struct offering a default implementation of ContainedLogger
+type ContainedModel struct {
 	model Model
 }
 
-func (c *ModelContainer) Model() Model {
+func (c *ContainedModel) Model() Model {
 	return c.model
 }
 
-func (c *ModelContainer) SetModel(model Model) {
+func (c *ContainedModel) SetModel(model Model) {
 	c.model = model
 }
 

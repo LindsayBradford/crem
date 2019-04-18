@@ -20,9 +20,9 @@ import (
 
 type SimpleAnnealer struct {
 	explorer.ContainedExplorer
-	model.ModelContainer
+	model.ContainedModel
 
-	loggers.LoggerContainer
+	loggers.ContainedLogger
 
 	parameters Parameters
 

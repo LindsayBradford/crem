@@ -37,7 +37,7 @@ type Logger interface {
 	Override(logLevel Level, destination Destination)
 }
 
-// LoggerContainer defines an interface for users wishing to embed a Logger.
+// ContainedLogger defines an interface for users wishing to embed a Logger.
 type Container interface {
 	SetLogHandler(logger Logger)
 	LogHandler() Logger
