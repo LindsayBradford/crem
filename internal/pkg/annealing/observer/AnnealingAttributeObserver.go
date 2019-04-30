@@ -47,33 +47,18 @@ func (aao *AnnealingAttributeObserver) ObserveEvent(event observer.Event) {
 
 func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer annealing.Observable, event observer.Event, logAttributes attributes.Attributes) {
 
-	annealer := wrapAnnealer(observableAnnealer)
-	explorer := wrapSolutionExplorer(observableAnnealer.ObservableExplorer())
-
 	switch event.EventType {
 	case observer.StartedAnnealing:
 		logAttributes = append(logAttributes,
 			event.AttributesNamed("MaximumIterations", "Temperature", "CoolingFactor")...)
-		// logAttributes = append(logAttributes,
-		// 	attributes.NameValuePair{Name: "MaximumIterations", Value: annealer.MaximumIterations()},
-		// 	attributes.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
-		// 	attributes.NameValuePair{Name: "CoolingFactor", Value: annealer.CoolingFactor()},
-		// )
 	case observer.StartedIteration:
 		logAttributes = append(logAttributes,
-			attributes.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
-			attributes.NameValuePair{Name: "Temperature", Value: annealer.Temperature()},
-			attributes.NameValuePair{Name: "ObjectiveValue", Value: explorer.ObjectiveValue()},
-		)
+			event.AttributesNamed("CurrentIteration", "Temperature", "ObjectiveValue")...)
 	case observer.FinishedIteration:
 		logAttributes = append(logAttributes,
-			attributes.NameValuePair{Name: "CurrentIteration", Value: annealer.CurrentIteration()},
-			attributes.NameValuePair{Name: "ObjectiveValue", Value: explorer.ObjectiveValue()},
-			attributes.NameValuePair{Name: "ChangeInObjectiveValue", Value: explorer.ChangeInObjectiveValue()},
-			attributes.NameValuePair{Name: "ChangeIsDesirable", Value: explorer.ChangeIsDesirable()},
-			attributes.NameValuePair{Name: "AcceptanceProbability", Value: explorer.AcceptanceProbability()},
-			attributes.NameValuePair{Name: "ChangeAccepted", Value: explorer.ChangeAccepted()},
-		)
+			event.AttributesNamed(
+				"CurrentIteration", "ObjectiveValue", "ChangeInObjectiveValue",
+				"ChangeIsDesirable", "AcceptanceProbability", "ChangeAccepted")...)
 	case observer.FinishedAnnealing:
 		logAttributes = event.AllAttributes()
 	default:
