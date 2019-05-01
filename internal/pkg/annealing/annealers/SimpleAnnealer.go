@@ -3,22 +3,22 @@
 package annealers
 
 import (
-	"sort"
-
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 )
 
 type SimpleAnnealer struct {
+	name.IdentifiableContainer
+
 	explorer.ContainedExplorer
 	model.ContainedModel
 
@@ -26,22 +26,35 @@ type SimpleAnnealer struct {
 
 	parameters Parameters
 
-	ContainedObservable
+	observer.ContainedEventNotifier
+
+	explorer.ContainedObservableExplorer
+
+	temperature   float64
+	coolingFactor float64
+
+	maximumIterations uint64
+	currentIteration  uint64
+
+	solution solution.Solution
 }
 
 func (sa *SimpleAnnealer) Initialise() {
-	sa.id = "Simple Annealer"
-	sa.temperature = 1
-	sa.currentIteration = 0
 	sa.SetSolutionExplorer(null.NullExplorer)
 	sa.SetLogHandler(new(loggers.NullLogger))
 	sa.SetEventNotifier(new(observer.SynchronousAnnealingEventNotifier))
+
+	sa.SetId("Simple Annealer")
+
+	sa.temperature = 1
+	sa.currentIteration = 0
+
 	sa.parameters.Initialise()
 	sa.assignStateFromParameters()
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
-	sa.ContainedObservable.SetId(title)
+	sa.IdentifiableContainer.SetId(title)
 	sa.SolutionExplorer().SetId(title)
 }
 
@@ -163,43 +176,10 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
-	modelSolution := solution.NewSolution(sa.id)
-
-	sa.addDecisionVariables(modelSolution)
-	sa.addPlanningUnits(modelSolution)
-	sa.addPlanningUnitManagementActionMap(modelSolution)
-
-	return modelSolution
-}
-
-func (sa *SimpleAnnealer) addDecisionVariables(modelSolution *solution.Solution) {
-	if sa.Model().DecisionVariables() == nil {
-		return
-	}
-
-	solutionVariables := make(variable.EncodeableDecisionVariables, 0)
-
-	for _, rawVariable := range *sa.Model().DecisionVariables() {
-		solutionVariables = append(solutionVariables, variable.MakeEncodeable(rawVariable))
-	}
-
-	sort.Sort(solutionVariables)
-	modelSolution.DecisionVariables = solutionVariables
-}
-
-func (sa *SimpleAnnealer) addPlanningUnits(modelSolution *solution.Solution) {
-	if sa.Model().PlanningUnits() == nil {
-		return
-	}
-	modelSolution.PlanningUnits = sa.Model().PlanningUnits()
-}
-
-func (sa *SimpleAnnealer) addPlanningUnitManagementActionMap(modelSolution *solution.Solution) {
-	for _, action := range sa.Model().ActiveManagementActions() {
-		planningUnit := solution.PlanningUnitId(action.PlanningUnit())
-		actionType := solution.ManagementActionType(action.Type())
-		modelSolution.ActiveManagementActions[planningUnit] = append(modelSolution.ActiveManagementActions[planningUnit], actionType)
-	}
+	return new(SolutionBuilder).
+		WithId(sa.Id()).
+		ForModel(sa.SolutionExplorer().Model()).
+		Build()
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {
@@ -212,4 +192,32 @@ func (sa *SimpleAnnealer) checkIfDone() bool {
 
 func (sa *SimpleAnnealer) cooldown() {
 	sa.temperature *= sa.parameters.GetFloat64(CoolingFactor)
+}
+
+func (co *SimpleAnnealer) AddObserver(observer observer.Observer) error {
+	return co.EventNotifier().AddObserver(observer)
+}
+
+func (co *SimpleAnnealer) Observers() []observer.Observer {
+	return co.EventNotifier().Observers()
+}
+
+func (co *SimpleAnnealer) Temperature() float64 {
+	return co.temperature
+}
+
+func (co *SimpleAnnealer) CoolingFactor() float64 {
+	return co.coolingFactor
+}
+
+func (co *SimpleAnnealer) MaximumIterations() uint64 {
+	return co.maximumIterations
+}
+
+func (co *SimpleAnnealer) CurrentIteration() uint64 {
+	return co.currentIteration
+}
+
+func (co *SimpleAnnealer) Solution() solution.Solution {
+	return co.solution
 }
