@@ -9,29 +9,39 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const equalTo = "=="
+
 func TestWorksheets_Add(t *testing.T) {
 	g := NewGomegaWithT(t)
+
+	// given
 
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
 	defer workbooksUnderTest.Release()
 
 	workbook := workbooksUnderTest.Add()
 	defer workbook.Close()
+
 	worksheets := workbook.Worksheets()
 	defer worksheets.Release()
 
 	originalWorksheetCount := worksheets.Count()
 
-	g.Expect(originalWorksheetCount).To(BeNumerically("==", uint(1)), "Original Worksheets count should be 1")
+	// when
 
 	var newWorksheet Worksheet
 	addWorksheetCall := func() {
 		newWorksheet = worksheets.Add()
 	}
 
-	g.Expect(addWorksheetCall).To(Not(Panic()), "Worksheets Add should not panic")
+	// then
+
+	expectedWorksheetCount := originalWorksheetCount + 1
+
+	g.Expect(addWorksheetCall).To(Not(Panic()))
+
 	newWorksheetCount := worksheets.Count()
 
-	g.Expect(newWorksheetCount).To(BeNumerically("==", originalWorksheetCount+uint(1)), "Worksheets add should increment count")
+	g.Expect(newWorksheetCount).To(BeNumerically(equalTo, expectedWorksheetCount))
 	newWorksheet.Release()
 }
