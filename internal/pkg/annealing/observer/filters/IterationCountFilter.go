@@ -31,7 +31,7 @@ func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
 
 func (m *IterationCountFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
 	currentIteration := event.Attribute("CurrentIteration").(uint64)
-	if event.EventType == observer.FinishedIteration &&
+	if (event.EventType == observer.FinishedIteration || event.EventType == observer.StartedIteration) &&
 		(eventOnnFirstOrLastIteration(event) || currentIteration%m.iterationModulo == 0) {
 		return allowThroughFilter
 	}

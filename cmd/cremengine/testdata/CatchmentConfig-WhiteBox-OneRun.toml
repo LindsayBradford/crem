@@ -1,5 +1,5 @@
 ScenarioName = "Test Catchment Annealer - One run"
-RunNumber=3
+RunNumber=1
 OutputPath="testdata/solutions"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 
@@ -37,11 +37,11 @@ Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
 [SolutionExplorers.Parameters]
 DecisionVariable = "SedimentVsCost"
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.99  # 0.99
-MaximumIterations = 5000 # 1M
+MaximumIterations = 5_000 # 1M

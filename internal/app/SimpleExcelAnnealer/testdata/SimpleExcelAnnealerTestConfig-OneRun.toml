@@ -19,12 +19,13 @@ Penalty = 100.5 # 100.0
 [[SolutionExplorers]]
 Type = "SimpleExcelExplorer"
 Name = "Flexinator"
+[SolutionExplorers.Parameters]
+StartingTemperature = 50.0 #50
+CoolingFactor =  0.995  # 0.995
 
 [Annealer]
 Type = "ElapsedTimeTracking"  # "ElapsedTimeTracking" (default) | "Simple"
 SolutionExplorer = "Flexinator"
 Model = "Flexinatee"
 [Annealer.Parameters]
-StartingTemperature = 50.0 #50
-CoolingFactor =  0.995  # 0.995
 MaximumIterations = 2_000 # 2000

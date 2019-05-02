@@ -28,9 +28,6 @@ type SimpleAnnealer struct {
 
 	observer.ContainedEventNotifier
 
-	temperature   float64
-	coolingFactor float64
-
 	maximumIterations uint64
 	currentIteration  uint64
 }
@@ -42,7 +39,6 @@ func (sa *SimpleAnnealer) Initialise() {
 
 	sa.SetId("Simple Annealer")
 
-	sa.temperature = 1
 	sa.currentIteration = 0
 
 	sa.parameters.Initialise()
@@ -61,8 +57,6 @@ func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 }
 
 func (sa *SimpleAnnealer) assignStateFromParameters() {
-	sa.SetTemperature(sa.parameters.GetFloat64(StartingTemperature))
-	sa.coolingFactor = sa.parameters.GetFloat64(CoolingFactor)
 	sa.maximumIterations = uint64(sa.parameters.GetInt64(MaximumIterations))
 }
 
@@ -75,14 +69,6 @@ func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {
 	explorerClone := sa.SolutionExplorer().DeepClone()
 	clone.SetSolutionExplorer(explorerClone)
 	return &clone
-}
-
-func (sa *SimpleAnnealer) SetTemperature(temperature float64) error {
-	if temperature <= 0 {
-		return errors.New("invalid attempt to set annealer temperature to value <= 0")
-	}
-	sa.temperature = temperature
-	return nil
 }
 
 func (sa *SimpleAnnealer) Model() model.Model {
@@ -100,10 +86,10 @@ func (sa *SimpleAnnealer) Anneal() {
 	for done := sa.initialDoneValue(); !done; {
 		sa.iterationStarted()
 
-		sa.SolutionExplorer().TryRandomChange(sa.temperature)
+		sa.SolutionExplorer().TryRandomChange()
 
 		sa.iterationFinished()
-		sa.cooldown()
+		sa.SolutionExplorer().CoolDown()
 		done = sa.checkIfDone()
 	}
 
@@ -124,7 +110,6 @@ func (sa *SimpleAnnealer) annealingStarted() {
 	event := observer.NewEvent(observer.StartedAnnealing).
 		WithId(sa.Id()).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
-		WithAttribute("CoolingFactor", sa.coolingFactor).
 		JoiningAttributes(
 			sa.SolutionExplorer().AttributesForEventType(observer.StartedAnnealing),
 		)
@@ -186,24 +171,12 @@ func (sa *SimpleAnnealer) checkIfDone() bool {
 	return sa.currentIteration >= uint64(sa.parameters.GetInt64(MaximumIterations))
 }
 
-func (sa *SimpleAnnealer) cooldown() {
-	sa.temperature *= sa.parameters.GetFloat64(CoolingFactor)
-}
-
 func (sa *SimpleAnnealer) AddObserver(observer observer.Observer) error {
 	return sa.EventNotifier().AddObserver(observer)
 }
 
 func (sa *SimpleAnnealer) Observers() []observer.Observer {
 	return sa.EventNotifier().Observers()
-}
-
-func (sa *SimpleAnnealer) Temperature() float64 {
-	return sa.temperature
-}
-
-func (sa *SimpleAnnealer) CoolingFactor() float64 {
-	return sa.coolingFactor
 }
 
 func (sa *SimpleAnnealer) MaximumIterations() uint64 {

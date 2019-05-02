@@ -73,7 +73,7 @@ func isGenerallyFilterable(eventType observer.EventType) bool {
 
 func isModuloFilterable(eventType observer.EventType) bool {
 	switch eventType {
-	case observer.FinishedIteration,
+	case observer.StartedIteration, observer.FinishedIteration,
 		observer.Note:
 		return filtered
 	default:

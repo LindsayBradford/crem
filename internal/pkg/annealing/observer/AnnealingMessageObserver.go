@@ -42,10 +42,14 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 		Add("Id [", event.Id(), "], ").
 		Add("Event [", event.EventType.String(), "]: ")
 
-	amo.observeEvent(event, &builder)
+	if event.EventType.IsAnnealingState() {
+		amo.observeAnnealerEvent(event, &builder)
+	} else {
+		amo.observeEvent(event, &builder)
+	}
 }
 
-func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
+func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.StartedAnnealing:
 		builder.
@@ -71,6 +75,15 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").
 			Add("Objective value [", format(event, "ObjectiveValue"), "], ").
 			Add("Temperature [", format(event, "Temperature"), "]")
+	default:
+		// deliberately does nothing extra
+	}
+
+	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+}
+
+func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
+	switch event.EventType {
 	case observer.Note:
 		builder.Add("[", event.Note(), "]")
 	case observer.ManagementAction:

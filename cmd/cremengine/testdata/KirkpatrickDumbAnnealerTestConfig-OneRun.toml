@@ -21,11 +21,11 @@ Type = "KirkpatrickExplorer"
 Name = "DerpaDaExBurba"
 [SolutionExplorers.Parameters]
 OptimisationDirection = "Mimimising"
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.95  # 0.99
 
 [Annealer]
 SolutionExplorer = "DerpaDaExBurba"
 Model = "DumbAndMostlyVanillaModel"
 [Annealer.Parameters]
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.95  # 0.99
 MaximumIterations = 2_000 # 1M

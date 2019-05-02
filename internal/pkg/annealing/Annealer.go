@@ -24,9 +24,6 @@ type Annealer interface {
 	AddObserver(observer observer.Observer) error
 	Observers() []observer.Observer
 
-	Temperature() float64
-	CoolingFactor() float64
-
 	MaximumIterations() uint64
 	CurrentIteration() uint64
 

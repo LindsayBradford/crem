@@ -27,7 +27,7 @@ func (e *Explorer) WithName(name string) *Explorer {
 func (e *Explorer) Initialise()                           {}
 func (e *Explorer) TearDown()                             {}
 func (e *Explorer) SetObjectiveValue(temperature float64) {}
-func (e *Explorer) TryRandomChange(temperature float64)   {}
+func (e *Explorer) TryRandomChange()                      {}
 func (e *Explorer) AcceptLastChange()                     {}
 func (e *Explorer) RevertLastChange()                     {}
 func (e *Explorer) AttributesForEventType(eventType observer.EventType) attributes.Attributes {
@@ -41,8 +41,5 @@ func (e *Explorer) LogHandler() logging.Logger                    { return nil }
 func (e *Explorer) SetRandomNumberGenerator(generator *rand.Rand) {}
 func (e *Explorer) RandomNumberGenerator() *rand.Rand             { return nil }
 
-func (e *Explorer) ObjectiveValue() float64         { return 0 }
-func (e *Explorer) ChangeInObjectiveValue() float64 { return 0 }
-func (e *Explorer) AcceptanceProbability() float64  { return 0 }
-func (e *Explorer) ChangeIsDesirable() bool         { return false }
-func (e *Explorer) ChangeAccepted() bool            { return false }
+func (e *Explorer) ChangeAccepted() bool { return false }
+func (e *Explorer) CoolDown()            {}

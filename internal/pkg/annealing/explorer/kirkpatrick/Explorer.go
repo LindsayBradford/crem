@@ -13,6 +13,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"github.com/pkg/errors"
 )
 
 type Explorer struct {
@@ -32,7 +33,9 @@ type Explorer struct {
 	changeIsDesirable     bool
 	changeAccepted        bool
 	objectiveValueChange  float64
-	temperature           float64
+
+	temperature   float64
+	coolingFactor float64
 }
 
 func New() *Explorer {
@@ -68,9 +71,21 @@ func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
 	ke.parameters.Merge(params)
 
 	ke.setOptimisationDirectionFromParams()
+
+	ke.SetTemperature(ke.parameters.GetFloat64(StartingTemperature))
+	ke.coolingFactor = ke.parameters.GetFloat64(CoolingFactor)
+
 	ke.checkDecisionVariableFromParams()
 
 	return ke
+}
+
+func (ke *Explorer) SetTemperature(temperature float64) error {
+	if temperature <= 0 {
+		return errors.New("invalid attempt to set annealer temperature to value <= 0")
+	}
+	ke.temperature = temperature
+	return nil
 }
 
 func (ke *Explorer) setOptimisationDirectionFromParams() {
@@ -100,23 +115,22 @@ func (ke *Explorer) ObjectiveValue() float64 {
 	return variable.Value()
 }
 
-func (ke *Explorer) TryRandomChange(temperature float64) {
+func (ke *Explorer) TryRandomChange() {
 	ke.Model().TryRandomChange()
-	ke.defaultAcceptOrRevertChange(temperature)
+	ke.defaultAcceptOrRevertChange()
 }
 
-func (ke *Explorer) defaultAcceptOrRevertChange(annealingTemperature float64) {
-	ke.AcceptOrRevertChange(annealingTemperature, ke.AcceptLastChange, ke.RevertLastChange)
+func (ke *Explorer) defaultAcceptOrRevertChange() {
+	ke.AcceptOrRevertChange(ke.AcceptLastChange, ke.RevertLastChange)
 }
 
-func (ke *Explorer) AcceptOrRevertChange(annealingTemperature float64, acceptFunction func(), revertFunction func()) {
-	ke.SetTemperature(annealingTemperature)
+func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
 	if ke.ChangeTriedIsDesirable() {
 		ke.SetAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
 		absoluteChangeInObjectiveValue := math.Abs(ke.ChangeInObjectiveValue())
-		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / annealingTemperature)
+		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
 		ke.SetAcceptanceProbability(probabilityToAcceptBadChange)
 
 		randomValue := ke.RandomNumberGenerator().Float64Unitary()
@@ -174,10 +188,6 @@ func (ke *Explorer) Temperature() float64 {
 	return ke.temperature
 }
 
-func (ke *Explorer) SetTemperature(temperature float64) {
-	ke.temperature = temperature
-}
-
 func (ke *Explorer) ChangeIsDesirable() bool {
 	return ke.changeIsDesirable
 }
@@ -216,7 +226,9 @@ func (ke *Explorer) AttributesForEventType(eventType observer.EventType) attribu
 		Add("Temperature", ke.temperature)
 
 	switch eventType {
-	case observer.StartedAnnealing, observer.StartedIteration, observer.FinishedAnnealing:
+	case observer.StartedAnnealing:
+		return baseAttributes.Add("CoolingFactor", ke.coolingFactor)
+	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes
 	case observer.FinishedIteration:
 		return baseAttributes.
@@ -227,4 +239,8 @@ func (ke *Explorer) AttributesForEventType(eventType observer.EventType) attribu
 	default:
 		return nil
 	}
+}
+
+func (ke *Explorer) CoolDown() {
+	ke.temperature *= ke.coolingFactor
 }

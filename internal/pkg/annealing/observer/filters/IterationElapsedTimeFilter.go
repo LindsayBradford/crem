@@ -35,7 +35,7 @@ func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
 }
 
 func (m *IterationElapsedTimeFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
-	if event.EventType != observer.FinishedIteration {
+	if event.EventType != observer.FinishedIteration && event.EventType != observer.StartedIteration {
 		return blockAtFilter
 	}
 

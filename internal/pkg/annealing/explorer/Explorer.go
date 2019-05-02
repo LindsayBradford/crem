@@ -27,8 +27,9 @@ type Explorer interface {
 	Initialise()
 	TearDown()
 
-	TryRandomChange(temperature float64)
+	TryRandomChange()
 
+	CoolDown()
 	AttributesForEventType(eventType observer.EventType) attributes.Attributes
 }
 

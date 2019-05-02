@@ -48,9 +48,9 @@ func (see *SimpleExcelExplorer) DeepClone() explorer.Explorer {
 	return &clone
 }
 
-func (see *SimpleExcelExplorer) TryRandomChange(temperature float64) {
+func (see *SimpleExcelExplorer) TryRandomChange() {
 	see.Model().TryRandomChange()
-	see.Explorer.AcceptOrRevertChange(temperature, see.AcceptLastChange, see.RevertLastChange)
+	see.Explorer.AcceptOrRevertChange(see.AcceptLastChange, see.RevertLastChange)
 }
 
 func (see *SimpleExcelExplorer) AcceptLastChange() {

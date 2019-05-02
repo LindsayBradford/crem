@@ -9,8 +9,11 @@ import (
 )
 
 const (
-	DecisionVariableName  = "DecisionVariable"
-	OptimisationDirection = "OptimisationDirection"
+	_                            = iota
+	CoolingFactor         string = "CoolingFactor"
+	StartingTemperature   string = "StartingTemperature"
+	DecisionVariableName         = "DecisionVariable"
+	OptimisationDirection        = "OptimisationDirection"
 )
 
 type optimisationDirection int
@@ -44,6 +47,20 @@ func (kp *Parameters) Initialise() *Parameters {
 }
 
 func (kp *Parameters) buildMetaData() {
+	kp.AddMetaData(
+		parameters.MetaData{
+			Key:          StartingTemperature,
+			Validator:    kp.IsNonNegativeDecimal,
+			DefaultValue: float64(0),
+		},
+	)
+	kp.AddMetaData(
+		parameters.MetaData{
+			Key:          CoolingFactor,
+			Validator:    kp.IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(1.0),
+		},
+	)
 	kp.AddMetaData(
 		parameters.MetaData{
 			Key:          DecisionVariableName,

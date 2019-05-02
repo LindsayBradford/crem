@@ -34,14 +34,6 @@ func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 		"Annealer should have built with default annealer type")
 
 	g.Expect(
-		annealerUnderTest.Temperature()).To(BeNumerically("==", 10),
-		"Annealer should have built with config supplied Temperature")
-
-	g.Expect(
-		annealerUnderTest.CoolingFactor()).To(BeNumerically("==", 0.99),
-		"Annealer should have built with config supplied CoolingFactor")
-
-	g.Expect(
 		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
 		"Annealer should have built with config supplied MaximumIterations")
 
@@ -77,14 +69,6 @@ func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
 		"Annealer should have built with default annealer type")
-
-	g.Expect(
-		annealerUnderTest.Temperature()).To(BeNumerically("==", 10),
-		"Annealer should have built with config supplied Temperature")
-
-	g.Expect(
-		annealerUnderTest.CoolingFactor()).To(BeNumerically("==", 0.99),
-		"Annealer should have built with config supplied CoolingFactor")
 
 	g.Expect(
 		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
@@ -283,14 +267,6 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g.Expect(
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
 		"Annealer should have built with config supplied annealer type")
-
-	g.Expect(
-		annealerUnderTest.Temperature()).To(BeNumerically("==", 50),
-		"Annealer should have built with config supplied Temperature")
-
-	g.Expect(
-		annealerUnderTest.CoolingFactor()).To(BeNumerically("==", 0.995),
-		"Annealer should have built with config supplied CoolingFactor")
 
 	g.Expect(
 		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 2000),

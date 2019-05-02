@@ -5,11 +5,12 @@ Name = "hurrDurr"
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
 Name = "validConfig"
+[SolutionExplorers.Parameters]
+StartingTemperature = 10.0
+CoolingFactor =  0.99
 
 [Annealer]
 SolutionExplorer = "validConfig"
 Model = "hurrDurr"
 [Annealer.Parameters]
-StartingTemperature = 10.0
-CoolingFactor =  0.99
 MaximumIterations = 5

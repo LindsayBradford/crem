@@ -14,9 +14,7 @@ func TestAnneal(t *testing.T) {
 	builder := new(Builder)
 
 	params := parameters.Map{
-		StartingTemperature: float64(10),
-		CoolingFactor:       0.997,
-		MaximumIterations:   int64(10000),
+		MaximumIterations: int64(10000),
 	}
 
 	annealer, _ := builder.

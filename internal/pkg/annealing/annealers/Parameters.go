@@ -5,10 +5,8 @@ package annealers
 import "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 
 const (
-	_                          = iota
-	CoolingFactor       string = "CoolingFactor"
-	MaximumIterations   string = "MaximumIterations"
-	StartingTemperature string = "StartingTemperature"
+	_                        = iota
+	MaximumIterations string = "MaximumIterations"
 )
 
 type Parameters struct {
@@ -25,25 +23,9 @@ func (p *Parameters) Initialise() *Parameters {
 func (p *Parameters) buildMetaData() {
 	p.AddMetaData(
 		parameters.MetaData{
-			Key:          StartingTemperature,
-			Validator:    p.IsNonNegativeDecimal,
-			DefaultValue: float64(0),
-		},
-	)
-
-	p.AddMetaData(
-		parameters.MetaData{
 			Key:          MaximumIterations,
 			Validator:    p.IsNonNegativeInteger,
 			DefaultValue: int64(0),
-		},
-	)
-
-	p.AddMetaData(
-		parameters.MetaData{
-			Key:          CoolingFactor,
-			Validator:    p.IsDecimalBetweenZeroAndOne,
-			DefaultValue: float64(1.0),
 		},
 	)
 }

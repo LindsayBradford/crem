@@ -13,11 +13,12 @@ Name = "HurrDurr"
 [[SolutionExplorers]]
 Type = "DumbExplorer"
 Name = "HurrDurrLookin"
+[SolutionExplorers.Parameters]
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
 
 [Annealer]
 SolutionExplorer = "HurrDurrLookin"
 Model = "HurrDurr"
 [Annealer.Parameters]
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.99  # 0.99
 MaximumIterations = 1_000_000 # 1M

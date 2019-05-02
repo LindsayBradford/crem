@@ -32,9 +32,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	builder := new(Builder)
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000.0,
-		CoolingFactor:       0.5,
-		MaximumIterations:   int64(5000),
+		MaximumIterations: int64(5000),
 	}
 
 	annealer, _ := builder.
@@ -46,14 +44,6 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 		WithEventNotifier(expectedEventNotifier).
 		WithObservers(expectedObservers...).
 		Build()
-
-	g.Expect(
-		annealer.Temperature()).To(BeNumerically("==", expectedParams[StartingTemperature]),
-		"Annealer should have built with supplied Temperature")
-
-	g.Expect(
-		annealer.CoolingFactor()).To(BeNumerically("==", expectedParams[CoolingFactor]),
-		"Annealer should have built with supplied Cooling Factor")
 
 	g.Expect(
 		annealer.MaximumIterations()).To(BeNumerically("==", expectedParams[MaximumIterations]),
@@ -88,9 +78,7 @@ func TestBuild_BadInputs(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	badParams := parameters.Map{
-		StartingTemperature: -1,
-		CoolingFactor:       1.00000001,
-		MaximumIterations:   -1,
+		MaximumIterations: -1,
 	}
 
 	badLogHandler := logging.Logger(nil)

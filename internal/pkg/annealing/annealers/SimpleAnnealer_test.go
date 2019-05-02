@@ -20,14 +20,6 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 	annealer.Initialise()
 
 	g.Expect(
-		annealer.Temperature()).To(BeIdenticalTo(float64(1)),
-		"Annealer should have built with default Temperature of 1")
-
-	g.Expect(
-		annealer.CoolingFactor()).To(BeIdenticalTo(float64(1)),
-		"Annealer should have built with default Cooling Factor of 1")
-
-	g.Expect(
 		annealer.MaximumIterations()).To(BeZero(),
 		"Annealer should have built with default iterations of 0")
 
@@ -65,20 +57,6 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	tempErr := annealer.SetTemperature(-1)
-
-	g.Expect(tempErr).To(Not(BeNil()))
-	g.Expect(
-		annealer.Temperature()).To(BeNumerically("==", 1),
-		"Annealer should have ignored crap Temperature set attempt")
-
-	coolingFactorParam := parameters.Map{CoolingFactor: 1.5}
-	coolingFactorErr := annealer.SetParameters(coolingFactorParam)
-
-	g.Expect(coolingFactorErr).To(Not(BeNil()))
-	g.Expect(annealer.CoolingFactor()).To(BeNumerically("==", 1),
-		"Annealer should have ignored crap CoolingFactor set attempt")
-
 	annealer.SetLogHandler(nil)
 
 	g.Expect(annealer.LogHandler()).To(Equal(loggers.NewNullLogger()),
@@ -100,18 +78,13 @@ func TestSimpleAnnealer_Errors(t *testing.T) {
 func TestSimpleAnnealer_Anneal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	const startTemperature float64 = 1000.0
-	const coolingFactor float64 = 0.5
 	const iterations uint64 = 3
-	const expectedEndTemperature = ((startTemperature * coolingFactor) * coolingFactor) * coolingFactor
 
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
 	expectedParams := parameters.Map{
-		StartingTemperature: startTemperature,
-		CoolingFactor:       coolingFactor,
-		MaximumIterations:   int64(iterations),
+		MaximumIterations: int64(iterations),
 	}
 
 	annealer.SetParameters(expectedParams)
@@ -120,19 +93,11 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 		annealer.CurrentIteration()).To(BeZero(),
 		"Annealer should have started with current iteration of 0")
 
-	g.Expect(
-		annealer.Temperature()).To(BeNumerically("==", startTemperature),
-		"Annealer should have started with expected start temperature")
-
 	annealer.Anneal()
 
 	g.Expect(
 		annealer.CurrentIteration()).To(BeNumerically("==", iterations),
 		"Annealer should have ended with current iteration = max iterations")
-
-	g.Expect(
-		annealer.Temperature()).To(BeNumerically("==", expectedEndTemperature),
-		"Annealer should have ended with temperature modified by cooling factor * iterations")
 }
 
 func TestSimpleAnnealer_AddObserver(t *testing.T) {
@@ -144,9 +109,7 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	const expectedIterations = uint64(3)
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000.0,
-		CoolingFactor:       0.5,
-		MaximumIterations:   int64(expectedIterations),
+		MaximumIterations: int64(expectedIterations),
 	}
 
 	annealer.SetParameters(expectedParams)
@@ -195,9 +158,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 	const expectedIterations = uint64(3)
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000.0,
-		CoolingFactor:       0.5,
-		MaximumIterations:   int64(expectedIterations),
+		MaximumIterations: int64(expectedIterations),
 	}
 
 	annealer.SetParameters(expectedParams)
@@ -253,9 +214,7 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 	const expectedTryCount = uint64(3)
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000.0,
-		CoolingFactor:       0.5,
-		MaximumIterations:   int64(expectedTryCount),
+		MaximumIterations: int64(expectedTryCount),
 	}
 
 	annealer.SetParameters(expectedParams)
@@ -279,7 +238,7 @@ type TryCountingSolutionExplorer struct {
 	changesTried uint64
 }
 
-func (tcse *TryCountingSolutionExplorer) TryRandomChange(temperature float64) {
+func (tcse *TryCountingSolutionExplorer) TryRandomChange() {
 	tcse.changesTried += 1
 }
 
@@ -290,9 +249,7 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 	annealer.Initialise()
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000.0,
-		CoolingFactor:       0.5,
-		MaximumIterations:   int64(3),
+		MaximumIterations: int64(3),
 	}
 
 	annealer.SetParameters(expectedParams)
@@ -312,9 +269,7 @@ func TestSimpleAnnealer_BadParameters(t *testing.T) {
 	annealer.Initialise()
 
 	expectedParams := parameters.Map{
-		StartingTemperature: 1000,
-		CoolingFactor:       true,
-		MaximumIterations:   "nope, not even close",
+		MaximumIterations: "nope, not even close",
 	}
 
 	expectedLogHandler := new(DummyLogHandler)
@@ -357,6 +312,6 @@ type flawedExplorer struct {
 	null.Explorer
 }
 
-func (fe *flawedExplorer) TryRandomChange(temperature float64) {
+func (fe *flawedExplorer) TryRandomChange() {
 	panic(errors.New("gotta panic"))
 }
