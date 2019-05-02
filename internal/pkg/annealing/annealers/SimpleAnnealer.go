@@ -33,8 +33,6 @@ type SimpleAnnealer struct {
 
 	maximumIterations uint64
 	currentIteration  uint64
-
-	solution solution.Solution
 }
 
 func (sa *SimpleAnnealer) Initialise() {
@@ -161,14 +159,13 @@ func (sa *SimpleAnnealer) iterationFinished() {
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
-	sa.solution = *sa.fetchFinalModelSolution()
-
 	event := observer.NewEvent(observer.FinishedAnnealing).
 		WithId(sa.Id()).
 		WithAttribute("CurrentIteration", sa.currentIteration).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
 		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
-		WithAttribute("Temperature", sa.temperature)
+		WithAttribute("Temperature", sa.temperature).
+		WithAttribute("Solution", *sa.fetchFinalModelSolution())
 
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
@@ -192,30 +189,26 @@ func (sa *SimpleAnnealer) cooldown() {
 	sa.temperature *= sa.parameters.GetFloat64(CoolingFactor)
 }
 
-func (co *SimpleAnnealer) AddObserver(observer observer.Observer) error {
-	return co.EventNotifier().AddObserver(observer)
+func (sa *SimpleAnnealer) AddObserver(observer observer.Observer) error {
+	return sa.EventNotifier().AddObserver(observer)
 }
 
-func (co *SimpleAnnealer) Observers() []observer.Observer {
-	return co.EventNotifier().Observers()
+func (sa *SimpleAnnealer) Observers() []observer.Observer {
+	return sa.EventNotifier().Observers()
 }
 
-func (co *SimpleAnnealer) Temperature() float64 {
-	return co.temperature
+func (sa *SimpleAnnealer) Temperature() float64 {
+	return sa.temperature
 }
 
-func (co *SimpleAnnealer) CoolingFactor() float64 {
-	return co.coolingFactor
+func (sa *SimpleAnnealer) CoolingFactor() float64 {
+	return sa.coolingFactor
 }
 
-func (co *SimpleAnnealer) MaximumIterations() uint64 {
-	return co.maximumIterations
+func (sa *SimpleAnnealer) MaximumIterations() uint64 {
+	return sa.maximumIterations
 }
 
-func (co *SimpleAnnealer) CurrentIteration() uint64 {
-	return co.currentIteration
-}
-
-func (co *SimpleAnnealer) Solution() solution.Solution {
-	return co.solution
+func (sa *SimpleAnnealer) CurrentIteration() uint64 {
+	return sa.currentIteration
 }

@@ -5,7 +5,6 @@ package annealing
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -30,8 +29,6 @@ type Annealer interface {
 
 	MaximumIterations() uint64
 	CurrentIteration() uint64
-
-	Solution() solution.Solution
 
 	Cloneable
 	Anneal()

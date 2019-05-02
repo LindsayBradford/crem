@@ -5,7 +5,6 @@ package scenario
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
@@ -70,24 +69,18 @@ func (s *Saver) createOutputPath() {
 }
 
 func (s *Saver) ObserveEvent(event observer.Event) {
-	if observableAnnealer, isAnnealer := event.Source().(annealing.Annealer); isAnnealer {
-		s.observeAnnealingEvent(observableAnnealer, event)
-	}
-}
-
-func (s *Saver) observeAnnealingEvent(annealer annealing.Annealer, event observer.Event) {
 	if event.EventType != observer.FinishedAnnealing {
 		return
 	}
 
-	s.saveModelSolution(annealer)
+	solution := event.Attribute("Solution").(solution.Solution)
+	s.save(solution)
 }
 
-func (s *Saver) saveModelSolution(annealer annealing.Annealer) {
-	modelSolution := annealer.Solution()
-	s.debugLogSolutionInJson(modelSolution)
+func (s *Saver) save(solution solution.Solution) {
+	s.debugLogSolutionInJson(solution)
 	s.ensureOutputPathIsUsable()
-	s.encode(modelSolution)
+	s.encode(solution)
 }
 
 func (s *Saver) encode(modelSolution solution.Solution) {
