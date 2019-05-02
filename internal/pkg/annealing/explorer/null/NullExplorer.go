@@ -29,7 +29,6 @@ func (e *Explorer) TryRandomChange(temperature float64)           {}
 func (e *Explorer) AcceptLastChange()                             {}
 func (e *Explorer) RevertLastChange()                             {}
 func (e *Explorer) DeepClone() explorer.Explorer                  { return e }
-func (e *Explorer) CloneObservable() explorer.Observable          { return e }
 func (e *Explorer) Model() model.Model                            { return model.NullModel }
 func (e *Explorer) SetModel(model model.Model)                    {}
 func (e *Explorer) SetLogHandler(logHandler logging.Logger)       {}

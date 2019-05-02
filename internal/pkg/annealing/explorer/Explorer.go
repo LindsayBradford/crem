@@ -19,22 +19,19 @@ type Explorer interface {
 	model.Container
 	rand.Container
 
-	Observable
 	logging.Container
+
+	ObjectiveValue() float64
+	ChangeInObjectiveValue() float64
+	AcceptanceProbability() float64
+	ChangeIsDesirable() bool
+	ChangeAccepted() bool
 
 	DeepClone() Explorer
 	Initialise()
 	TearDown()
 
 	TryRandomChange(temperature float64)
-}
-
-type Observable interface {
-	ObjectiveValue() float64
-	ChangeInObjectiveValue() float64
-	AcceptanceProbability() float64
-	ChangeIsDesirable() bool
-	ChangeAccepted() bool
 }
 
 // Container defines an interface embedding an Explorer
