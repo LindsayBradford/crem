@@ -30,6 +30,15 @@ func (a Attributes) Entries(entries ...string) Attributes {
 	return slice
 }
 
+func (a Attributes) Add(name string, value interface{}) Attributes {
+	newEntry := NameValuePair{Name: name, Value: value}
+	return append(a, newEntry)
+}
+
+func (a Attributes) Join(attributes Attributes) Attributes {
+	return append(a, attributes...)
+}
+
 // NameValuePair is a struct allowing some Name as text to be associated with a matching Value of any type.
 type NameValuePair struct {
 	Name  string

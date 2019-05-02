@@ -66,6 +66,11 @@ func (e *Event) WithAttribute(name string, value interface{}) *Event {
 	return e
 }
 
+func (e *Event) JoiningAttributes(newAttributes attributes.Attributes) *Event {
+	e.ContainedAttributes.JoiningAttributes(newAttributes)
+	return e
+}
+
 type EventType int
 
 const (

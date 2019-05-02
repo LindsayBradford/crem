@@ -124,9 +124,10 @@ func (sa *SimpleAnnealer) annealingStarted() {
 	event := observer.NewEvent(observer.StartedAnnealing).
 		WithId(sa.Id()).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
-		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
-		WithAttribute("Temperature", sa.temperature).
-		WithAttribute("CoolingFactor", sa.coolingFactor)
+		WithAttribute("CoolingFactor", sa.coolingFactor).
+		JoiningAttributes(
+			sa.SolutionExplorer().AttributesForEventType(observer.StartedAnnealing),
+		)
 
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
@@ -138,8 +139,9 @@ func (sa *SimpleAnnealer) iterationStarted() {
 		WithId(sa.Id()).
 		WithAttribute("CurrentIteration", sa.currentIteration).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
-		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
-		WithAttribute("Temperature", sa.temperature)
+		JoiningAttributes(
+			sa.SolutionExplorer().AttributesForEventType(observer.StartedIteration),
+		)
 
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
@@ -149,11 +151,9 @@ func (sa *SimpleAnnealer) iterationFinished() {
 		WithId(sa.Id()).
 		WithAttribute("CurrentIteration", sa.currentIteration).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
-		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
-		WithAttribute("ChangeInObjectiveValue", sa.SolutionExplorer().ChangeInObjectiveValue()).
-		WithAttribute("ChangeIsDesirable", sa.SolutionExplorer().ChangeIsDesirable()).
-		WithAttribute("AcceptanceProbability", sa.SolutionExplorer().AcceptanceProbability()).
-		WithAttribute("ChangeAccepted", sa.SolutionExplorer().ChangeAccepted())
+		JoiningAttributes(
+			sa.SolutionExplorer().AttributesForEventType(observer.FinishedIteration),
+		)
 
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
@@ -163,8 +163,9 @@ func (sa *SimpleAnnealer) annealingFinished() {
 		WithId(sa.Id()).
 		WithAttribute("CurrentIteration", sa.currentIteration).
 		WithAttribute("MaximumIterations", sa.maximumIterations).
-		WithAttribute("ObjectiveValue", sa.SolutionExplorer().ObjectiveValue()).
-		WithAttribute("Temperature", sa.temperature).
+		JoiningAttributes(
+			sa.SolutionExplorer().AttributesForEventType(observer.FinishedAnnealing),
+		).
 		WithAttribute("Solution", *sa.fetchFinalModelSolution())
 
 	sa.EventNotifier().NotifyObserversOfEvent(*event)

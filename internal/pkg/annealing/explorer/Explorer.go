@@ -6,7 +6,9 @@ import (
 	"errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -21,17 +23,13 @@ type Explorer interface {
 
 	logging.Container
 
-	ObjectiveValue() float64
-	ChangeInObjectiveValue() float64
-	AcceptanceProbability() float64
-	ChangeIsDesirable() bool
-	ChangeAccepted() bool
-
 	DeepClone() Explorer
 	Initialise()
 	TearDown()
 
 	TryRandomChange(temperature float64)
+
+	AttributesForEventType(eventType observer.EventType) attributes.Attributes
 }
 
 // Container defines an interface embedding an Explorer

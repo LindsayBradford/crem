@@ -11,8 +11,11 @@ func (ca *ContainedAttributes) Attribute(name string) interface{} {
 }
 
 func (ca *ContainedAttributes) AddAttribute(name string, value interface{}) {
-	newEntry := NameValuePair{Name: name, Value: value}
-	ca.attributes = append(ca.attributes, newEntry)
+	ca.attributes = ca.attributes.Add(name, value)
+}
+
+func (ca *ContainedAttributes) JoiningAttributes(newAttributes Attributes) {
+	ca.attributes = ca.attributes.Join(newAttributes)
 }
 
 func (ca *ContainedAttributes) AttributesNamed(entries ...string) Attributes {

@@ -8,7 +8,9 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -206,4 +208,23 @@ func (ke *Explorer) AcceptanceProbability() float64 {
 
 func (ke *Explorer) SetAcceptanceProbability(probability float64) {
 	ke.acceptanceProbability = math.Min(explorer.Guaranteed, probability)
+}
+
+func (ke *Explorer) AttributesForEventType(eventType observer.EventType) attributes.Attributes {
+	baseAttributes := new(attributes.Attributes).
+		Add("ObjectiveValue", ke.ObjectiveValue()).
+		Add("Temperature", ke.temperature)
+
+	switch eventType {
+	case observer.StartedAnnealing, observer.StartedIteration, observer.FinishedAnnealing:
+		return baseAttributes
+	case observer.FinishedIteration:
+		return baseAttributes.
+			Add("ChangeInObjectiveValue", ke.objectiveValueChange).
+			Add("ChangeIsDesirable", ke.changeIsDesirable).
+			Add("AcceptanceProbability", ke.acceptanceProbability).
+			Add("ChangeAccepted", ke.changeAccepted)
+	default:
+		return nil
+	}
 }
