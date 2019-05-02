@@ -70,12 +70,12 @@ func (s *Saver) createOutputPath() {
 }
 
 func (s *Saver) ObserveEvent(event observer.Event) {
-	if observableAnnealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
+	if observableAnnealer, isAnnealer := event.Source().(annealing.Annealer); isAnnealer {
 		s.observeAnnealingEvent(observableAnnealer, event)
 	}
 }
 
-func (s *Saver) observeAnnealingEvent(annealer annealing.Observable, event observer.Event) {
+func (s *Saver) observeAnnealingEvent(annealer annealing.Annealer, event observer.Event) {
 	if event.EventType != observer.FinishedAnnealing {
 		return
 	}
@@ -83,7 +83,7 @@ func (s *Saver) observeAnnealingEvent(annealer annealing.Observable, event obser
 	s.saveModelSolution(annealer)
 }
 
-func (s *Saver) saveModelSolution(annealer annealing.Observable) {
+func (s *Saver) saveModelSolution(annealer annealing.Annealer) {
 	modelSolution := annealer.Solution()
 	s.debugLogSolutionInJson(modelSolution)
 	s.ensureOutputPathIsUsable()

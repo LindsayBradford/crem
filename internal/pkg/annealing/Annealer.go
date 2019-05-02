@@ -14,30 +14,27 @@ import (
 type Annealer interface {
 	Initialise()
 
+	name.Identifiable
+
 	parameters.Container
 	explorer.Container
 	logging.Container
 
-	Observable
 	observer.EventNotifierContainer
 
-	Cloneable
-	Anneal()
-}
-
-type Observable interface {
-	name.Identifiable
 	AddObserver(observer observer.Observer) error
 	Observers() []observer.Observer
 
 	Temperature() float64
 	CoolingFactor() float64
+
 	MaximumIterations() uint64
 	CurrentIteration() uint64
 
-	ObservableExplorer() explorer.Observable
-	SetObservableExplorer(explorer explorer.Observable) error
 	Solution() solution.Solution
+
+	Cloneable
+	Anneal()
 }
 
 type Cloneable interface {

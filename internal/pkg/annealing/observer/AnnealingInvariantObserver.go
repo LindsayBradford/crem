@@ -3,7 +3,6 @@
 package observer
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -45,28 +44,30 @@ func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 }
 
 func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event observer.Event) bool {
-	if annealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		switch event.EventType {
-		case observer.StartedAnnealing:
-			amo.previousObjectiveValue = annealer.ObservableExplorer().ObjectiveValue()
-			return true
-		case observer.FinishedIteration:
-			var expectedObjectiveValue float64
-			if annealer.ObservableExplorer().ChangeAccepted() {
-				expectedObjectiveValue = amo.previousObjectiveValue + annealer.ObservableExplorer().ChangeInObjectiveValue()
-				amo.previousObjectiveValue = annealer.ObservableExplorer().ObjectiveValue()
-			} else {
-				expectedObjectiveValue = amo.previousObjectiveValue
-			}
+	switch event.EventType {
+	case observer.StartedAnnealing:
+		amo.previousObjectiveValue = event.Attribute("ObjectiveValue").(float64)
+		return true
+	case observer.FinishedIteration:
+		actualObjectiveValue := event.Attribute("ObjectiveValue").(float64)
+		changeInObjectiveValue := event.Attribute("ChangeInObjectiveValue").(float64)
+		changeAccepted := event.Attribute("ChangeAccepted").(bool)
 
-			roundedExpectedObjectiveValue := math.RoundFloat(expectedObjectiveValue, decimalPrecisionRequired)
-			roundedActualObjectiveValue := math.RoundFloat(annealer.ObservableExplorer().ObjectiveValue(), decimalPrecisionRequired)
+		var expectedObjectiveValue float64
 
-			invariantUpheld := roundedExpectedObjectiveValue == roundedActualObjectiveValue
-			return invariantUpheld
-		default:
-			return true
+		if changeAccepted {
+			expectedObjectiveValue = amo.previousObjectiveValue + changeInObjectiveValue
+			amo.previousObjectiveValue = actualObjectiveValue
+		} else {
+			expectedObjectiveValue = amo.previousObjectiveValue
 		}
+
+		roundedExpectedObjectiveValue := math.RoundFloat(expectedObjectiveValue, decimalPrecisionRequired)
+		roundedActualObjectiveValue := math.RoundFloat(actualObjectiveValue, decimalPrecisionRequired)
+
+		invariantUpheld := roundedExpectedObjectiveValue == roundedActualObjectiveValue
+		return invariantUpheld
+	default:
+		return true
 	}
-	return true
 }

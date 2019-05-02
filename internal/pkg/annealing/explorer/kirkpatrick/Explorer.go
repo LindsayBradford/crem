@@ -6,7 +6,6 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/observable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -17,6 +16,7 @@ import (
 type Explorer struct {
 	name.NameContainer
 	name.IdentifiableContainer
+
 	model.ContainedModel
 	rand.RandContainer
 	loggers.ContainedLogger
@@ -26,7 +26,11 @@ type Explorer struct {
 	parameters            Parameters
 	optimisationDirection optimisationDirection
 
-	observable.ContainedObservable
+	acceptanceProbability float64
+	changeIsDesirable     bool
+	changeAccepted        bool
+	objectiveValueChange  float64
+	temperature           float64
 }
 
 func New() *Explorer {
@@ -159,13 +163,47 @@ func (ke *Explorer) DeepClone() explorer.Explorer {
 	return &clone
 }
 
-func (ke *Explorer) CloneObservable() explorer.Observable {
-	observable := ke.ContainedObservable
-	observable.SetObjectiveValue(ke.ObjectiveValue())
-	return &observable
-}
-
 func (ke *Explorer) TearDown() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
 	ke.Model().TearDown()
+}
+
+func (ke *Explorer) Temperature() float64 {
+	return ke.temperature
+}
+
+func (ke *Explorer) SetTemperature(temperature float64) {
+	ke.temperature = temperature
+}
+
+func (ke *Explorer) ChangeIsDesirable() bool {
+	return ke.changeIsDesirable
+}
+
+func (ke *Explorer) SetChangeIsDesirable(changeIsDesirable bool) {
+	ke.changeIsDesirable = changeIsDesirable
+}
+
+func (ke *Explorer) ChangeInObjectiveValue() float64 {
+	return ke.objectiveValueChange
+}
+
+func (ke *Explorer) SetChangeInObjectiveValue(change float64) {
+	ke.objectiveValueChange = change
+}
+
+func (ke *Explorer) ChangeAccepted() bool {
+	return ke.changeAccepted
+}
+
+func (ke *Explorer) SetChangeAccepted(changeAccepted bool) {
+	ke.changeAccepted = changeAccepted
+}
+
+func (ke *Explorer) AcceptanceProbability() float64 {
+	return ke.acceptanceProbability
+}
+
+func (ke *Explorer) SetAcceptanceProbability(probability float64) {
+	ke.acceptanceProbability = math.Min(explorer.Guaranteed, probability)
 }

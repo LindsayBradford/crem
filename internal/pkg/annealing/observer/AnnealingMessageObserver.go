@@ -61,7 +61,7 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 	case observer.FinishedIteration:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Objective value [", format(event, "ObjectiveValue"), "]").
+			Add("Objective value [", format(event, "ObjectiveValue"), "], ").
 			Add("Change [", format(event, "ChangeInObjectiveValue"), "], ").
 			Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
 			Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").

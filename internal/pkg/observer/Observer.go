@@ -97,3 +97,7 @@ func (eventType EventType) String() string {
 
 	return labels[eventType]
 }
+
+func (eventType EventType) IsAnnealingState() bool {
+	return eventType >= StartedAnnealing && eventType <= FinishedAnnealing
+}

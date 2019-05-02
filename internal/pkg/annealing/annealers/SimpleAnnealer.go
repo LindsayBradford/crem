@@ -28,8 +28,6 @@ type SimpleAnnealer struct {
 
 	observer.ContainedEventNotifier
 
-	explorer.ContainedObservableExplorer
-
 	temperature   float64
 	coolingFactor float64
 

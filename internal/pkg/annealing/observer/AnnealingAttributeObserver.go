@@ -3,7 +3,6 @@
 package observer
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
@@ -38,15 +37,14 @@ func (aao *AnnealingAttributeObserver) ObserveEvent(event observer.Event) {
 	logAttributes = append(logAttributes, attributes.NameValuePair{Name: "Id", Value: event.Id()})
 	logAttributes = append(logAttributes, attributes.NameValuePair{Name: "Event", Value: event.EventType.String()})
 
-	if observableAnnealer, isAnnealer := event.Source().(annealing.Observable); isAnnealer {
-		aao.observeAnnealingEvent(observableAnnealer, event, logAttributes)
+	if event.EventType.IsAnnealingState() {
+		aao.observeAnnealingEvent(event, logAttributes)
 	} else {
 		aao.observeEvent(event, logAttributes)
 	}
 }
 
-func (aao *AnnealingAttributeObserver) observeAnnealingEvent(observableAnnealer annealing.Observable, event observer.Event, logAttributes attributes.Attributes) {
-
+func (aao *AnnealingAttributeObserver) observeAnnealingEvent(event observer.Event, logAttributes attributes.Attributes) {
 	switch event.EventType {
 	case observer.StartedAnnealing:
 		logAttributes = append(logAttributes,
