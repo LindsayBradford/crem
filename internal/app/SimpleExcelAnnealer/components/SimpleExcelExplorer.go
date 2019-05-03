@@ -30,11 +30,6 @@ func (see *SimpleExcelExplorer) WithModel(model model.Model) *SimpleExcelExplore
 	return see
 }
 
-func (see *SimpleExcelExplorer) WithScenarioId(id string) *SimpleExcelExplorer {
-	see.Explorer.WithId(id)
-	return see
-}
-
 func (see *SimpleExcelExplorer) WithParameters(params parameters.Map) *SimpleExcelExplorer {
 	see.Explorer.WithParameters(params)
 	return see

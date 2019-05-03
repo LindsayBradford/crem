@@ -62,11 +62,6 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 	return ke
 }
 
-func (ke *Explorer) WithId(id string) *Explorer {
-	ke.SetId(id)
-	return ke
-}
-
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
 	ke.parameters.Merge(params)
 
@@ -126,12 +121,12 @@ func (ke *Explorer) defaultAcceptOrRevertChange() {
 
 func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
 	if ke.ChangeTriedIsDesirable() {
-		ke.SetAcceptanceProbability(explorer.Guaranteed)
+		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
 		absoluteChangeInObjectiveValue := math.Abs(ke.ChangeInObjectiveValue())
 		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
-		ke.SetAcceptanceProbability(probabilityToAcceptBadChange)
+		ke.setAcceptanceProbability(probabilityToAcceptBadChange)
 
 		randomValue := ke.RandomNumberGenerator().Float64Unitary()
 		if probabilityToAcceptBadChange > randomValue {
@@ -156,19 +151,18 @@ func (ke *Explorer) ChangeTriedIsDesirable() bool {
 
 func (ke *Explorer) changeInObjectiveValue() float64 {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	change := ke.Model().DecisionVariableChange(decisionVariableName)
-	ke.SetChangeInObjectiveValue(change)
-	return change
+	ke.objectiveValueChange = ke.Model().DecisionVariableChange(decisionVariableName)
+	return ke.objectiveValueChange
 }
 
 func (ke *Explorer) AcceptLastChange() {
 	ke.Model().AcceptChange()
-	ke.SetChangeAccepted(true)
+	ke.changeAccepted = true
 }
 
 func (ke *Explorer) RevertLastChange() {
 	ke.Model().RevertChange()
-	ke.SetChangeAccepted(false)
+	ke.changeAccepted = false
 }
 
 func (ke *Explorer) DeepClone() explorer.Explorer {
@@ -200,23 +194,15 @@ func (ke *Explorer) ChangeInObjectiveValue() float64 {
 	return ke.objectiveValueChange
 }
 
-func (ke *Explorer) SetChangeInObjectiveValue(change float64) {
-	ke.objectiveValueChange = change
-}
-
 func (ke *Explorer) ChangeAccepted() bool {
 	return ke.changeAccepted
-}
-
-func (ke *Explorer) SetChangeAccepted(changeAccepted bool) {
-	ke.changeAccepted = changeAccepted
 }
 
 func (ke *Explorer) AcceptanceProbability() float64 {
 	return ke.acceptanceProbability
 }
 
-func (ke *Explorer) SetAcceptanceProbability(probability float64) {
+func (ke *Explorer) setAcceptanceProbability(probability float64) {
 	ke.acceptanceProbability = math.Min(explorer.Guaranteed, probability)
 }
 
