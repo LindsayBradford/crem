@@ -236,9 +236,8 @@ func (ke *Explorer) AttributesForEventType(eventType observer.EventType) attribu
 			Add("ChangeIsDesirable", ke.changeIsDesirable).
 			Add("AcceptanceProbability", ke.acceptanceProbability).
 			Add("ChangeAccepted", ke.changeAccepted)
-	default:
-		return nil
 	}
+	return nil
 }
 
 func (ke *Explorer) CoolDown() {

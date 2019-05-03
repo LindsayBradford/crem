@@ -7,9 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
-	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/attributes"
-	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -19,9 +17,6 @@ type Explorer interface {
 	name.Nameable
 	name.Identifiable
 	model.Container
-	rand.Container
-
-	logging.Container
 
 	DeepClone() Explorer
 	Initialise()
