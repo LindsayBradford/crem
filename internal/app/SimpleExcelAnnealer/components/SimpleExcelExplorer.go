@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 )
 
@@ -66,11 +67,12 @@ func (see *SimpleExcelExplorer) simpleExcelModel() *SimpleExcelModel {
 }
 
 func (see *SimpleExcelExplorer) buildExplorerData() ExplorerData {
-	data := ExplorerData{
-		Temperature:           see.Temperature(),
-		ChangeIsDesirable:     see.ChangeIsDesirable(),
-		ChangeAccepted:        see.ChangeAccepted(),
-		AcceptanceProbability: see.AcceptanceProbability(),
+	finishedIterationAttributes := see.EventAttributes(observer.FinishedIteration)
+
+	return ExplorerData{
+		Temperature:           finishedIterationAttributes.Value(explorer.Temperature).(float64),
+		ChangeIsDesirable:     finishedIterationAttributes.Value(explorer.ChangeIsDesirable).(bool),
+		ChangeAccepted:        finishedIterationAttributes.Value(explorer.ChangeAccepted).(bool),
+		AcceptanceProbability: finishedIterationAttributes.Value(explorer.AcceptanceProbability).(float64),
 	}
-	return data
 }

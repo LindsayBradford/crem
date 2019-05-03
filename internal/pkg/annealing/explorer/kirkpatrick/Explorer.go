@@ -28,6 +28,7 @@ type Explorer struct {
 
 	parameters            Parameters
 	optimisationDirection optimisationDirection
+	objectiveVariableName string
 
 	acceptanceProbability float64
 	changeIsDesirable     bool
@@ -58,7 +59,6 @@ func (ke *Explorer) WithName(name string) *Explorer {
 
 func (ke *Explorer) WithModel(model model.Model) *Explorer {
 	ke.SetModel(model)
-
 	return ke
 }
 
@@ -98,6 +98,7 @@ func (ke *Explorer) checkDecisionVariableFromParams() {
 	}()
 
 	ke.Model().DecisionVariable(decisionVariableName)
+	ke.objectiveVariableName = decisionVariableName
 }
 
 func (ke *Explorer) ParameterErrors() error {
@@ -105,8 +106,7 @@ func (ke *Explorer) ParameterErrors() error {
 }
 
 func (ke *Explorer) ObjectiveValue() float64 {
-	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	variable := ke.Model().DecisionVariable(decisionVariableName)
+	variable := ke.Model().DecisionVariable(ke.objectiveVariableName)
 	return variable.Value()
 }
 
@@ -120,11 +120,11 @@ func (ke *Explorer) defaultAcceptOrRevertChange() {
 }
 
 func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
-	if ke.ChangeTriedIsDesirable() {
+	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
-		absoluteChangeInObjectiveValue := math.Abs(ke.ChangeInObjectiveValue())
+		absoluteChangeInObjectiveValue := math.Abs(ke.objectiveValueChange)
 		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
 		ke.setAcceptanceProbability(probabilityToAcceptBadChange)
 
@@ -137,21 +137,18 @@ func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction f
 	}
 }
 
-func (ke *Explorer) ChangeTriedIsDesirable() bool {
+func (ke *Explorer) changeTriedIsDesirable() bool {
 	switch ke.optimisationDirection {
 	case Minimising:
-		ke.SetChangeIsDesirable(ke.changeInObjectiveValue() <= 0)
-		return ke.ChangeIsDesirable()
+		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() <= 0
 	case Maximising:
-		ke.SetChangeIsDesirable(ke.changeInObjectiveValue() >= 0)
-		return ke.ChangeIsDesirable()
+		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() >= 0
 	}
-	return false
+	return ke.changeIsDesirable
 }
 
-func (ke *Explorer) changeInObjectiveValue() float64 {
-	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-	ke.objectiveValueChange = ke.Model().DecisionVariableChange(decisionVariableName)
+func (ke *Explorer) calculateChangeInObjectiveValue() float64 {
+	ke.objectiveValueChange = ke.Model().DecisionVariableChange(ke.objectiveVariableName)
 	return ke.objectiveValueChange
 }
 
@@ -178,50 +175,26 @@ func (ke *Explorer) TearDown() {
 	ke.Model().TearDown()
 }
 
-func (ke *Explorer) Temperature() float64 {
-	return ke.temperature
-}
-
-func (ke *Explorer) ChangeIsDesirable() bool {
-	return ke.changeIsDesirable
-}
-
-func (ke *Explorer) SetChangeIsDesirable(changeIsDesirable bool) {
-	ke.changeIsDesirable = changeIsDesirable
-}
-
-func (ke *Explorer) ChangeInObjectiveValue() float64 {
-	return ke.objectiveValueChange
-}
-
-func (ke *Explorer) ChangeAccepted() bool {
-	return ke.changeAccepted
-}
-
-func (ke *Explorer) AcceptanceProbability() float64 {
-	return ke.acceptanceProbability
-}
-
 func (ke *Explorer) setAcceptanceProbability(probability float64) {
 	ke.acceptanceProbability = math.Min(explorer.Guaranteed, probability)
 }
 
-func (ke *Explorer) AttributesForEventType(eventType observer.EventType) attributes.Attributes {
+func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	baseAttributes := new(attributes.Attributes).
-		Add("ObjectiveValue", ke.ObjectiveValue()).
-		Add("Temperature", ke.temperature)
+		Add(explorer.ObjectiveValue, ke.ObjectiveValue()).
+		Add(explorer.Temperature, ke.temperature)
 
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes.Add("CoolingFactor", ke.coolingFactor)
+		return baseAttributes.Add(explorer.CoolingFactor, ke.coolingFactor)
 	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes
 	case observer.FinishedIteration:
 		return baseAttributes.
-			Add("ChangeInObjectiveValue", ke.objectiveValueChange).
-			Add("ChangeIsDesirable", ke.changeIsDesirable).
-			Add("AcceptanceProbability", ke.acceptanceProbability).
-			Add("ChangeAccepted", ke.changeAccepted)
+			Add(explorer.ChangeInObjectiveValue, ke.objectiveValueChange).
+			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
+			Add(explorer.AcceptanceProbability, ke.acceptanceProbability).
+			Add(explorer.ChangeAccepted, ke.changeAccepted)
 	}
 	return nil
 }

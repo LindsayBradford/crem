@@ -9,11 +9,18 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+)
+
+const (
+	Id               = "Id"
+	Solution         = "Solution"
+	CurrentIteration = "CurrentIteration"
 )
 
 type SimpleAnnealer struct {
@@ -107,53 +114,52 @@ func (sa *SimpleAnnealer) handlePanicRecovery() {
 }
 
 func (sa *SimpleAnnealer) annealingStarted() {
-	event := observer.NewEvent(observer.StartedAnnealing).
-		WithId(sa.Id()).
-		WithAttribute("MaximumIterations", sa.maximumIterations).
-		JoiningAttributes(
-			sa.SolutionExplorer().AttributesForEventType(observer.StartedAnnealing),
-		)
-
+	event := sa.newEvent(observer.StartedAnnealing)
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) iterationStarted() {
 	sa.currentIteration++
-
-	event := observer.NewEvent(observer.StartedIteration).
-		WithId(sa.Id()).
-		WithAttribute("CurrentIteration", sa.currentIteration).
-		WithAttribute("MaximumIterations", sa.maximumIterations).
-		JoiningAttributes(
-			sa.SolutionExplorer().AttributesForEventType(observer.StartedIteration),
-		)
-
+	event := sa.newEvent(observer.StartedIteration)
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) iterationFinished() {
-	event := observer.NewEvent(observer.FinishedIteration).
-		WithId(sa.Id()).
-		WithAttribute("CurrentIteration", sa.currentIteration).
-		WithAttribute("MaximumIterations", sa.maximumIterations).
-		JoiningAttributes(
-			sa.SolutionExplorer().AttributesForEventType(observer.FinishedIteration),
-		)
-
+	event := sa.newEvent(observer.FinishedIteration)
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
 func (sa *SimpleAnnealer) annealingFinished() {
-	event := observer.NewEvent(observer.FinishedAnnealing).
-		WithId(sa.Id()).
-		WithAttribute("CurrentIteration", sa.currentIteration).
-		WithAttribute("MaximumIterations", sa.maximumIterations).
-		JoiningAttributes(
-			sa.SolutionExplorer().AttributesForEventType(observer.FinishedAnnealing),
-		).
-		WithAttribute("Solution", *sa.fetchFinalModelSolution())
-
+	event := sa.newEvent(observer.FinishedAnnealing)
 	sa.EventNotifier().NotifyObserversOfEvent(*event)
+}
+
+func (sa *SimpleAnnealer) newEvent(eventType observer.EventType) *observer.Event {
+	return observer.NewEvent(eventType).JoiningAttributes(sa.EventAttributes(eventType))
+}
+
+func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attributes.Attributes {
+	baseAttributes := new(attributes.Attributes).
+		Add(Id, sa.Id()).
+		Add(MaximumIterations, sa.maximumIterations).
+		Join(
+			sa.SolutionExplorer().EventAttributes(eventType),
+		)
+
+	switch eventType {
+	case observer.StartedAnnealing:
+		return baseAttributes
+	case observer.StartedIteration, observer.FinishedIteration:
+		return baseAttributes.
+			Add(CurrentIteration, sa.currentIteration)
+	case observer.FinishedAnnealing:
+		return baseAttributes.
+			Add(CurrentIteration, sa.currentIteration).
+			Add(Solution, *sa.fetchFinalModelSolution())
+	}
+
+	return nil
+
 }
 
 func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
@@ -177,12 +183,4 @@ func (sa *SimpleAnnealer) AddObserver(observer observer.Observer) error {
 
 func (sa *SimpleAnnealer) Observers() []observer.Observer {
 	return sa.EventNotifier().Observers()
-}
-
-func (sa *SimpleAnnealer) MaximumIterations() uint64 {
-	return sa.maximumIterations
-}
-
-func (sa *SimpleAnnealer) CurrentIteration() uint64 {
-	return sa.currentIteration
 }

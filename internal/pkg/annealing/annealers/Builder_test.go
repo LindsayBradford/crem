@@ -16,6 +16,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const equalTo = "=="
+
 type dummyObserver struct{}
 
 func (*dummyObserver) ObserveEvent(event observer.Event) {}
@@ -45,33 +47,23 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 		WithObservers(expectedObservers...).
 		Build()
 
-	g.Expect(
-		annealer.MaximumIterations()).To(BeNumerically("==", expectedParams[MaximumIterations]),
-		"Annealer should have built with supplied Iterations")
+	annealerAttributes := annealer.EventAttributes(observer.FinishedAnnealing)
 
-	g.Expect(
-		annealer.CurrentIteration()).To(BeZero(),
-		"Annealer should have built with current iteration of 0")
+	actualMaximumIterations := annealerAttributes.Value(MaximumIterations).(uint64)
+	g.Expect(actualMaximumIterations).To(BeNumerically(equalTo, expectedParams[MaximumIterations]))
 
-	g.Expect(
-		annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler),
-		"Annealer should have built with supplied Logger")
+	actualCurrentIteration := annealerAttributes.Value(CurrentIteration).(uint64)
+	g.Expect(actualCurrentIteration).To(BeZero())
 
-	g.Expect(
-		annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer),
-		"Annealer should have built with supplied Explorer")
+	g.Expect(annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler))
 
-	g.Expect(
-		annealer.Observers()).To(Equal(expectedObservers),
-		"Annealer should have built with supplied Observers")
+	g.Expect(annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer))
 
-	g.Expect(
-		annealer.EventNotifier()).To(Equal(expectedEventNotifier),
-		"Annealer should have built with supplied EventNotifier")
+	g.Expect(annealer.Observers()).To(Equal(expectedObservers))
 
-	g.Expect(
-		annealer.Id()).To(Equal(expectedId),
-		"Annealer should have built with supplied Id")
+	g.Expect(annealer.EventNotifier()).To(Equal(expectedEventNotifier))
+
+	g.Expect(annealer.Id()).To(Equal(expectedId))
 }
 
 func TestBuild_BadInputs(t *testing.T) {

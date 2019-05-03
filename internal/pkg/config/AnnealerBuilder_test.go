@@ -10,81 +10,77 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
+	observer2 "github.com/LindsayBradford/crem/internal/pkg/observer"
 	. "github.com/onsi/gomega"
 )
+
+const equalTo = "=="
 
 func TestAnnealerBuilder_MinimalDumbValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/DumbAnnealerMinimalValidConfig.toml")
-	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
+	g.Expect(retrieveError).To(BeNil())
 
 	builderUnderTest := new(AnnealerBuilder)
 
 	annealerUnderTest, logHandler, buildError :=
 		builderUnderTest.WithConfig(configUnderTest).Build()
 
-	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
-	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
+	g.Expect(buildError).To(BeNil())
+	g.Expect(logHandler).To(Not(BeNil()))
 
 	dummyAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
 
-	g.Expect(
-		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
-		"Annealer should have built with default annealer type")
+	g.Expect(annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer))
 
-	g.Expect(
-		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
-		"Annealer should have built with config supplied MaximumIterations")
+	annealerAttributes := annealerUnderTest.EventAttributes(observer2.FinishedAnnealing)
+	actualMaximumIterations := annealerAttributes.Value(annealers.MaximumIterations).(uint64)
+
+	g.Expect(actualMaximumIterations).To(BeNumerically(equalTo, 5))
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
-	g.Expect(
-		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
-		"Annealer should have built with config supplied Explorer")
+	g.Expect(solutionExplorerUnderTest.Name()).To(Equal("validConfig"))
 
 	dummyExplorer := kirkpatrick.New()
 
-	g.Expect(
-		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
-		"Annealer should have built with config supplied Explorer")
+	g.Expect(solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer))
 }
 
 func TestAnnealerBuilder_MinimalNullValidConfig(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	configUnderTest, retrieveError := RetrieveCremFromFile("testdata/NullAnnealerMinimalValidConfig.toml")
-	g.Expect(retrieveError).To(BeNil(), "Config retrieval should not have failed.")
+	g.Expect(retrieveError).To(BeNil())
 
 	builderUnderTest := new(AnnealerBuilder)
 
 	annealerUnderTest, logHandler, buildError :=
 		builderUnderTest.WithConfig(configUnderTest).Build()
 
-	g.Expect(buildError).To(BeNil(), "Annealer build should not have failed.")
-	g.Expect(logHandler).To(Not(BeNil()), "Annealer build should have returned a valid logHandler.")
+	g.Expect(buildError).To(BeNil())
+	g.Expect(logHandler).To(Not(BeNil()))
 
 	dummyAnnealer := new(annealers.SimpleAnnealer)
 
 	g.Expect(
-		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
-		"Annealer should have built with default annealer type")
+		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer))
 
-	g.Expect(
-		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 5),
-		"Annealer should have built with config supplied MaximumIterations")
+	annealerAttributes := annealerUnderTest.EventAttributes(observer2.FinishedAnnealing)
+	actualMaximumIterations := annealerAttributes.Value(annealers.MaximumIterations).(uint64)
+
+	g.Expect(actualMaximumIterations).To(BeNumerically(equalTo, 5))
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
 	g.Expect(
-		solutionExplorerUnderTest.Name()).To(Equal("validConfig"),
-		"Annealer should have built with config supplied Explorer")
+		solutionExplorerUnderTest.Name()).To(Equal("validConfig"))
 
 	dummyExplorer := null.NullExplorer
 
 	g.Expect(
-		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer),
-		"Annealer should have built with config supplied Explorer")
+		solutionExplorerUnderTest).To(BeAssignableToTypeOf(dummyExplorer))
 }
 
 func TestAnnealerBuilder_DumbAnnealerInvalidAnnealerTypeConfig(t *testing.T) {
@@ -268,37 +264,31 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 		annealerUnderTest).To(BeAssignableToTypeOf(dummyAnnealer),
 		"Annealer should have built with config supplied annealer type")
 
-	g.Expect(
-		annealerUnderTest.MaximumIterations()).To(BeNumerically("==", 2000),
-		"Annealer should have built with config supplied MaximumIterations")
+	annealerAttributes := annealerUnderTest.EventAttributes(observer2.FinishedAnnealing)
+	actualMaximumIterations := annealerAttributes.Value(annealers.MaximumIterations).(uint64)
+
+	expectedMaximumIterations := 2000
+	g.Expect(actualMaximumIterations).To(BeNumerically(equalTo, expectedMaximumIterations))
 
 	solutionExplorerUnderTest := annealerUnderTest.SolutionExplorer()
 
-	g.Expect(
-		solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"),
-		"Annealer should have built with config supplied Explorer")
+	g.Expect(solutionExplorerUnderTest.Name()).To(Equal("DoraTheExplorer"))
 
 	explorer := new(kirkpatrick.Explorer)
 
-	g.Expect(
-		solutionExplorerUnderTest).To(BeAssignableToTypeOf(explorer),
-		"Annealer should have built with config supplied Explorer")
+	g.Expect(solutionExplorerUnderTest).To(BeAssignableToTypeOf(explorer))
 
 	actualObservers := annealerUnderTest.Observers()
 
-	g.Expect(
-		len(actualObservers)).To(BeNumerically("==", 3),
-		"Annealer should have built with config supplied annealing observers")
+	g.Expect(len(actualObservers)).To(BeNumerically(equalTo, 3))
 
 	dummyMessageObserver := new(observer.AnnealingMessageObserver)
 
-	g.Expect(actualObservers[0]).To(BeAssignableToTypeOf(dummyMessageObserver),
-		"Annealer should have built with config supplied annealing message observer")
+	g.Expect(actualObservers[0]).To(BeAssignableToTypeOf(dummyMessageObserver))
 
 	dummyAttributeObserver := new(observer.AnnealingAttributeObserver)
 
-	g.Expect(actualObservers[1]).To(BeAssignableToTypeOf(dummyAttributeObserver),
-		"Annealer should have built with config supplied annealing attribute observer")
+	g.Expect(actualObservers[1]).To(BeAssignableToTypeOf(dummyAttributeObserver))
 }
 
 type TestRegistereableExplorer struct {

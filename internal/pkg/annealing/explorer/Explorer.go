@@ -13,6 +13,18 @@ import (
 
 const Guaranteed = 1
 
+const (
+	ObjectiveValue         = "ObjectiveValue"
+	ChangeInObjectiveValue = "ChangeInObjectiveValue"
+	ChangeIsDesirable      = "ChangeIsDesirable"
+
+	Temperature   = "Temperature"
+	CoolingFactor = "CoolingFactor"
+
+	AcceptanceProbability = "AcceptanceProbability"
+	ChangeAccepted        = "ChangeAccepted"
+)
+
 type Explorer interface {
 	name.Nameable
 	name.Identifiable
@@ -25,7 +37,7 @@ type Explorer interface {
 	TryRandomChange()
 
 	CoolDown()
-	AttributesForEventType(eventType observer.EventType) attributes.Attributes
+	EventAttributes(eventType observer.EventType) attributes.Attributes
 }
 
 // Container defines an interface embedding an Explorer

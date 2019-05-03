@@ -27,7 +27,7 @@ func (e *Explorer) Initialise()                  {}
 func (e *Explorer) TearDown()                    {}
 
 func (e *Explorer) TryRandomChange() {}
-func (e *Explorer) AttributesForEventType(eventType observer.EventType) attributes.Attributes {
+func (e *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	return nil
 }
 func (e *Explorer) CoolDown() {}

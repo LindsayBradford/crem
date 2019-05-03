@@ -19,25 +19,19 @@ func TestSimpleAnnealer_Initialise(t *testing.T) {
 	annealer := new(SimpleAnnealer)
 	annealer.Initialise()
 
-	g.Expect(
-		annealer.MaximumIterations()).To(BeZero(),
-		"Annealer should have built with default iterations of 0")
+	annealerAttributes := annealer.EventAttributes(observer.FinishedAnnealing)
 
-	g.Expect(
-		annealer.CurrentIteration()).To(BeZero(),
-		"Annealer should have built with current iteration of 0")
+	actualMaximumIterations := annealerAttributes.Value(MaximumIterations).(uint64)
+	g.Expect(actualMaximumIterations).To(BeZero())
 
-	g.Expect(
-		annealer.LogHandler()).To(Equal(loggers.NewNullLogger()),
-		"Annealer should have built with DefaultNullLogger")
+	actualCurrentIteration := annealerAttributes.Value(CurrentIteration).(uint64)
+	g.Expect(actualCurrentIteration).To(BeZero())
 
-	g.Expect(
-		annealer.SolutionExplorer()).To(Equal(null.NullExplorer),
-		"Annealer should have built with Null Solution Explorer")
+	g.Expect(annealer.LogHandler()).To(Equal(loggers.NewNullLogger()))
 
-	g.Expect(
-		annealer.Observers()).To(BeNil(),
-		"Annealer should have built with no AnnealerObservers")
+	g.Expect(annealer.SolutionExplorer()).To(Equal(null.NullExplorer))
+
+	g.Expect(annealer.Observers()).To(BeNil())
 }
 
 func TestSimpleAnnealer_DeepClone(t *testing.T) {
@@ -48,7 +42,7 @@ func TestSimpleAnnealer_DeepClone(t *testing.T) {
 
 	actualClone := annealer.DeepClone()
 
-	g.Expect(actualClone).To(Equal(annealer), "Deep clone of annealer should equal it")
+	g.Expect(actualClone).To(Equal(annealer))
 }
 
 func TestSimpleAnnealer_Errors(t *testing.T) {
@@ -89,15 +83,16 @@ func TestSimpleAnnealer_Anneal(t *testing.T) {
 
 	annealer.SetParameters(expectedParams)
 
-	g.Expect(
-		annealer.CurrentIteration()).To(BeZero(),
-		"Annealer should have started with current iteration of 0")
+	beforeAttributes := annealer.EventAttributes(observer.FinishedAnnealing)
+	actualBeforeCurrentIteration := beforeAttributes.Value(CurrentIteration).(uint64)
+	g.Expect(actualBeforeCurrentIteration).To(BeZero())
 
 	annealer.Anneal()
 
-	g.Expect(
-		annealer.CurrentIteration()).To(BeNumerically("==", iterations),
-		"Annealer should have ended with current iteration = max iterations")
+	afterAttributes := annealer.EventAttributes(observer.FinishedAnnealing)
+	actualAfterCurrentIteration := afterAttributes.Value(CurrentIteration).(uint64)
+
+	g.Expect(actualAfterCurrentIteration).To(BeNumerically("==", iterations))
 }
 
 func TestSimpleAnnealer_AddObserver(t *testing.T) {
@@ -114,34 +109,26 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 
 	annealer.SetParameters(expectedParams)
 
-	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
+	g.Expect(annealer.Observers()).To(BeNil())
 
 	observerError := annealer.AddObserver(nil)
 
 	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
 
-	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[observer.EventType]uint64)
+	counter := new(CountingObserver)
+	counter.eventCounts = make(map[observer.EventType]uint64)
 
-	observerError = annealer.AddObserver(countingObserver)
+	observerError = annealer.AddObserver(counter)
 
 	g.Expect(observerError).To(BeNil())
-	g.Expect(annealer.Observers()).To(ContainElement(countingObserver),
-		"Annealer should have accepted CountingObserver as new AnnealerObserver")
+	g.Expect(annealer.Observers()).To(ContainElement(counter))
 
 	annealer.Anneal()
 
-	g.Expect(countingObserver.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1),
-		"Annealer should have posted 1 StartedAnnealing event")
-
-	g.Expect(countingObserver.eventCounts[observer.FinishedAnnealing]).To(BeNumerically("==", 1),
-		"Annealer should have posted 1 FinishedAnnealing event")
-
-	g.Expect(countingObserver.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations),
-		"Annealer should have posted <expectedIterations> of  StartedIteration event")
-
-	g.Expect(countingObserver.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations),
-		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
+	g.Expect(counter.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1))
+	g.Expect(counter.eventCounts[observer.FinishedAnnealing]).To(BeNumerically("==", 1))
+	g.Expect(counter.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations))
+	g.Expect(counter.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations))
 }
 
 func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
@@ -152,8 +139,7 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	notifier := new(observer.ConcurrentAnnealingEventNotifier)
 	annealer.SetEventNotifier(notifier)
-	g.Expect(annealer.EventNotifier()).To(Equal(notifier),
-		"Annealer should use the event notifier assigned to it")
+	g.Expect(annealer.EventNotifier()).To(Equal(notifier))
 
 	const expectedIterations = uint64(3)
 
@@ -163,19 +149,18 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	annealer.SetParameters(expectedParams)
 
-	g.Expect(annealer.Observers()).To(BeNil(), "Annealer should start with no observers")
+	g.Expect(annealer.Observers()).To(BeNil())
 
 	observerError := annealer.AddObserver(nil)
-	g.Expect(observerError).To(Not(BeNil()), "Annealer should have raised an error on adding nil AnnealerObserver")
+	g.Expect(observerError).To(Not(BeNil()))
 
-	countingObserver := new(CountingObserver)
-	countingObserver.eventCounts = make(map[observer.EventType]uint64)
+	counter := new(CountingObserver)
+	counter.eventCounts = make(map[observer.EventType]uint64)
 
-	observerError = annealer.AddObserver(countingObserver)
+	observerError = annealer.AddObserver(counter)
 
 	g.Expect(observerError).To(BeNil())
-	g.Expect(annealer.Observers()).To(ContainElement(countingObserver),
-		"Annealer should have accepted CountingObserver as new AnnealerObserver")
+	g.Expect(annealer.Observers()).To(ContainElement(counter))
 
 	annealer.Anneal()
 
@@ -183,18 +168,12 @@ func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
 
 	g.Eventually(
 		func() uint64 {
-			return countingObserver.eventCounts[observer.FinishedAnnealing]
-		}).Should(BeNumerically("==", 1),
-		"Annealer should have posted 1 FinishedAnnealing event")
+			return counter.eventCounts[observer.FinishedAnnealing]
+		}).Should(BeNumerically("==", 1))
 
-	g.Expect(countingObserver.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1),
-		"Annealer should have posted 1 StartedAnnealing event")
-
-	g.Expect(countingObserver.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations),
-		"Annealer should have posted <expectedIterations> of  StartedIteration event")
-
-	g.Expect(countingObserver.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations),
-		"Annealer should have posted <expectedIterations> of  FinishedIteration event")
+	g.Expect(counter.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1))
+	g.Expect(counter.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations))
+	g.Expect(counter.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations))
 }
 
 type CountingObserver struct {
@@ -224,13 +203,11 @@ func TestSimpleAnnealer_SetSolutionExplorer(t *testing.T) {
 	explorerErr := annealer.SetSolutionExplorer(expectedSolutionExplorer)
 
 	g.Expect(explorerErr).To(BeNil())
-	g.Expect(annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer),
-		"Annealer should have accepted CountingObserver as new Explorer")
+	g.Expect(annealer.SolutionExplorer()).To(BeIdenticalTo(expectedSolutionExplorer))
 
 	annealer.Anneal()
 
-	g.Expect(expectedSolutionExplorer.changesTried).To(BeNumerically("==", expectedTryCount),
-		"Annealer should have tried same number of changes as iterations")
+	g.Expect(expectedSolutionExplorer.changesTried).To(BeNumerically("==", expectedTryCount))
 }
 
 type TryCountingSolutionExplorer struct {
@@ -258,8 +235,7 @@ func TestSimpleAnnealer_SetLogHandler(t *testing.T) {
 
 	annealer.SetLogHandler(expectedLogHandler)
 
-	g.Expect(annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler),
-		"Annealer should have accepted DummyLogHandler as new logger")
+	g.Expect(annealer.LogHandler()).To(BeIdenticalTo(expectedLogHandler))
 }
 
 func TestSimpleAnnealer_BadParameters(t *testing.T) {
