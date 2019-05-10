@@ -85,7 +85,7 @@ func TestBankSedimentContribution_OriginalSedimentContribution(t *testing.T) {
 
 	// then
 	partialSedimentContribution := contributionUnderTest.contributionMap["0"].partialSedimentContribution
-	fullSedimentContribution := partialSedimentContribution * contributionUnderTest.SedimentImpactOfRiparianVegetation(expectedRiparianVegetationProportion)
+	fullSedimentContribution := partialSedimentContribution * contributionUnderTest.adjustedProportionOfIntactVegetation(expectedRiparianVegetationProportion)
 	expectedFullSedimentContribution := fullSedimentContribution * expectedRowNumber
 	g.Expect(actualOriginalSedimentContribution).To(BeNumerically(equalTo, expectedFullSedimentContribution))
 }

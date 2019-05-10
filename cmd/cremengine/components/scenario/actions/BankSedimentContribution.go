@@ -8,6 +8,7 @@ import (
 
 	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 )
 
 const (
@@ -22,12 +23,9 @@ const (
 	riparianBufferAreaIndex = 10
 )
 
-func Float64ToPlanningUnitId(value float64) planningUnitId {
-	valueAsString := strconv.FormatFloat(value, 'g', -1, 64)
-	return planningUnitId(valueAsString)
+func Float64ToPlanningUnitId(value float64) string {
+	return strconv.FormatFloat(value, 'g', -1, 64)
 }
-
-type planningUnitId string
 
 type sedimentTracker struct {
 	partialSedimentContribution      float64
@@ -38,7 +36,7 @@ type BankSedimentContribution struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	contributionMap map[planningUnitId]sedimentTracker
+	contributionMap map[string]sedimentTracker
 }
 
 func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
@@ -49,7 +47,7 @@ func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTabl
 
 func (bsc *BankSedimentContribution) populateContributionMap() {
 	_, rowCount := bsc.planningUnitTable.ColumnAndRowSize()
-	bsc.contributionMap = make(map[planningUnitId]sedimentTracker, rowCount)
+	bsc.contributionMap = make(map[string]sedimentTracker, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		bsc.populateContributionMapEntry(row)
@@ -97,14 +95,33 @@ func (bsc *BankSedimentContribution) originalIntactRiparianVegetation(rowNumber 
 
 func (bsc *BankSedimentContribution) OriginalSedimentContribution() float64 {
 	sedimentContribution := float64(0)
-	for _, tracker := range bsc.contributionMap {
-		originalVegetation := tracker.originalIntactRiparianVegetation
-		sedimentContribution += tracker.partialSedimentContribution *
-			bsc.SedimentImpactOfRiparianVegetation(originalVegetation)
+	for planningUnit := range bsc.contributionMap {
+		sedimentContribution += bsc.OriginalPlanningUnitSedimentContribution(planningUnit)
 	}
 	return sedimentContribution
 }
 
-func (bsc *BankSedimentContribution) SedimentImpactOfRiparianVegetation(proportionOfIntactVegetation float64) float64 {
+func (bsc *BankSedimentContribution) OriginalPlanningUnitSedimentContribution(id string) float64 {
+	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[id]
+	assert.That(planningUnitIsPresent).Holds()
+
+	originalVegetation := planningUnitSedimentTracker.originalIntactRiparianVegetation
+	sedimentContribution :=
+		planningUnitSedimentTracker.partialSedimentContribution * bsc.adjustedProportionOfIntactVegetation(originalVegetation)
+
+	return sedimentContribution
+}
+
+func (bsc *BankSedimentContribution) PlanningUnitSedimentContribution(planningUnit string, proportionOfIntactVegetation float64) float64 {
+	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[planningUnit]
+	assert.That(planningUnitIsPresent).Holds()
+
+	sedimentContribution :=
+		planningUnitSedimentTracker.partialSedimentContribution * bsc.adjustedProportionOfIntactVegetation(proportionOfIntactVegetation)
+
+	return sedimentContribution
+}
+
+func (bsc *BankSedimentContribution) adjustedProportionOfIntactVegetation(proportionOfIntactVegetation float64) float64 {
 	return 1 - 0.95*proportionOfIntactVegetation //TODO: Why a 5% dampener here?  Nothing in documentation. Should it be a parameter?
 }

@@ -15,7 +15,7 @@ type RiverBankRestorations struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	actionMap map[planningUnitId]*RiverBankRestoration
+	actionMap map[string]*RiverBankRestoration
 }
 
 func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
@@ -26,13 +26,13 @@ func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, pa
 	return r
 }
 
-func (r *RiverBankRestorations) ManagementActions() map[planningUnitId]*RiverBankRestoration {
+func (r *RiverBankRestorations) ManagementActions() map[string]*RiverBankRestoration {
 	return r.actionMap
 }
 
 func (r *RiverBankRestorations) createManagementActions() {
 	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
-	r.actionMap = make(map[planningUnitId]*RiverBankRestoration, rowCount)
+	r.actionMap = make(map[string]*RiverBankRestoration, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		r.createManagementAction(row)
@@ -43,13 +43,12 @@ func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 
 	planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
-	mapKey := planningUnitId(planningUnitAsString)
 
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
 
-	r.actionMap[mapKey] =
+	r.actionMap[planningUnitAsString] =
 		new(RiverBankRestoration).
 			WithPlanningUnit(planningUnitAsString).
 			WithRiverBankRestorationType().
