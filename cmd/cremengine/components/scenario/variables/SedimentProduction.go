@@ -120,7 +120,7 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 
-		sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
 	}
 
 	switch sl.actionObserved.IsActive() {
@@ -144,7 +144,7 @@ func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 
-		sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
 	}
 
 	assert.That(sl.actionObserved.IsActive()).WithFailureMessage("initialising action should always be active").Holds()
@@ -162,8 +162,7 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 
-		planningUnit := sl.actionObserved.PlanningUnit()
-		sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
 	}
 
 	switch sl.actionObserved.IsActive() {
@@ -185,12 +184,16 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
 
-		planningUnit := sl.actionObserved.PlanningUnit()
-		sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
 	}
 
 	assert.That(sl.actionObserved.IsActive()).Holds()
 	setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
+}
+
+func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSedimentContribution float64, toBeSedimentContribution float64) {
+	planningUnit := sl.actionObserved.PlanningUnit()
+	sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
 }
 
 func (sl *SedimentProduction) ValuesPerPlanningUnit() map[string]float64 {
@@ -198,10 +201,13 @@ func (sl *SedimentProduction) ValuesPerPlanningUnit() map[string]float64 {
 }
 
 func (sl *SedimentProduction) RejectInductiveValue() {
+	sl.rejectPlanningUnitChange()
+	sl.BaseInductiveDecisionVariable.RejectInductiveValue()
+}
+
+func (sl *SedimentProduction) rejectPlanningUnitChange() {
 	change := sl.BaseInductiveDecisionVariable.DifferenceInValues()
 	planningUnit := sl.actionObserved.PlanningUnit()
 
 	sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - change
-
-	sl.BaseInductiveDecisionVariable.RejectInductiveValue()
 }

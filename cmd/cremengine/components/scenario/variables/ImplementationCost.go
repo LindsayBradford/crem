@@ -17,6 +17,8 @@ const notImplementedCost float64 = 0
 type ImplementationCost struct {
 	variable.BaseInductiveDecisionVariable
 	actionObserved action.ManagementAction
+
+	valuePerPlanningUnit map[string]float64
 }
 
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
@@ -33,6 +35,7 @@ func (ic *ImplementationCost) WithObservers(observers ...variable.Observer) *Imp
 }
 
 func (ic *ImplementationCost) deriveInitialImplementationCost() float64 {
+	ic.valuePerPlanningUnit = make(map[string]float64, 0)
 	return notImplementedCost
 }
 
@@ -65,6 +68,7 @@ func (ic *ImplementationCost) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
 		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
@@ -81,6 +85,7 @@ func (ic *ImplementationCost) handleInitialisingRiverBankRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
 		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.RiverBankRestorationCost)
@@ -97,6 +102,8 @@ func (ic *ImplementationCost) handleGullyRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
 		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
@@ -113,6 +120,7 @@ func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
 		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
@@ -123,4 +131,25 @@ func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
 	case false:
 		setVariable(implementationCost, notImplementedCost)
 	}
+}
+
+func (ic *ImplementationCost) acceptPlanningUnitChange(asIsSedimentContribution float64, toBeSedimentContribution float64) {
+	planningUnit := ic.actionObserved.PlanningUnit()
+	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+}
+
+func (ic *ImplementationCost) ValuesPerPlanningUnit() map[string]float64 {
+	return ic.valuePerPlanningUnit
+}
+
+func (ic *ImplementationCost) RejectInductiveValue() {
+	ic.rejectPlanningUnitChange()
+	ic.BaseInductiveDecisionVariable.RejectInductiveValue()
+}
+
+func (ic *ImplementationCost) rejectPlanningUnitChange() {
+	change := ic.BaseInductiveDecisionVariable.DifferenceInValues()
+	planningUnit := ic.actionObserved.PlanningUnit()
+
+	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - change
 }
