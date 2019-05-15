@@ -2,7 +2,11 @@
 
 package variable
 
-import "github.com/LindsayBradford/crem/pkg/math"
+import (
+	"sort"
+
+	"github.com/LindsayBradford/crem/pkg/math"
+)
 
 type EncodeableDecisionVariables []EncodeableDecisionVariable
 
@@ -24,6 +28,18 @@ type PlanningUnitValue struct {
 }
 
 type PlanningUnitValues []PlanningUnitValue
+
+func (v PlanningUnitValues) Len() int {
+	return len(v)
+}
+
+func (v PlanningUnitValues) Swap(i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+
+func (v PlanningUnitValues) Less(i, j int) bool {
+	return v[i].PlanningUnit < v[j].PlanningUnit
+}
 
 type EncodeableDecisionVariable struct {
 	Name                 string
@@ -57,6 +73,8 @@ func encodeValuesPerPlanningUnit(variable DecisionVariable) PlanningUnitValues {
 		}
 		values = append(values, newValue)
 	}
+
+	sort.Sort(values)
 
 	return values
 }
