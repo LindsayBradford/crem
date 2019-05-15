@@ -14,13 +14,12 @@ func NewSolution(id string) *Solution {
 
 	newSolution.Id = id
 	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
-	newSolution.ActiveManagementActions = make(map[PlanningUnitId]ManagementActions, 0)
+	newSolution.ActiveManagementActions = make(map[string]ManagementActions, 0)
 
 	return newSolution
 }
 
-type PlanningUnitId string
-type PlanningUnitIds []PlanningUnitId
+type PlanningUnitIds []string
 
 type ManagementActionType string
 
@@ -42,7 +41,7 @@ type Solution struct {
 	Id                      string
 	DecisionVariables       variable.EncodeableDecisionVariables
 	PlanningUnits           PlanningUnitIds `json:"-"`
-	ActiveManagementActions map[PlanningUnitId]ManagementActions
+	ActiveManagementActions map[string]ManagementActions
 }
 
 func (s Solution) ActiveActionsAsStrings() []string {
