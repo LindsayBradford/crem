@@ -177,8 +177,8 @@ func (m *Model) PlanningUnits() solution.PlanningUnitIds {
 	for row := uint(0); row < rows; row++ {
 		planningUnit := m.planningUnitTable.CellFloat64(0, row)
 		planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
-		planningUnitId := solution.PlanningUnitId(planningUnitAsString)
-		planningUnits[row] = solution.PlanningUnitId(planningUnitId)
+		planningUnitId := planningUnitAsString
+		planningUnits[row] = planningUnitId
 	}
 
 	return planningUnits

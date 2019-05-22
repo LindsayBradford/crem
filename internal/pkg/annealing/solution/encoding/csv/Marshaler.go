@@ -32,32 +32,68 @@ const (
 type DecisionVariableMarshaler struct{}
 
 func (cm *DecisionVariableMarshaler) Marshal(solution *solution.Solution) ([]byte, error) {
-	return cm.marshalDecisionVariables(solution.DecisionVariables)
+	return cm.marshalDecisionVariables(solution)
 }
 
-func (cm *DecisionVariableMarshaler) marshalDecisionVariables(variables variable.EncodeableDecisionVariables) ([]byte, error) {
-	csvStringAsBytes := ([]byte)(cm.decisionVariablesToCsvString(variables))
+func (cm *DecisionVariableMarshaler) marshalDecisionVariables(solution *solution.Solution) ([]byte, error) {
+	csvStringAsBytes := ([]byte)(cm.decisionVariablesToCsvString(solution))
 	return csvStringAsBytes, nil
 }
 
-func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(variables variable.EncodeableDecisionVariables) string {
+func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(solution *solution.Solution) string {
+
+	planningUnits := planningUnitsAsHeaders(solution.PlanningUnits)
+
 	builder := new(strings.FluentBuilder)
-	builder.Add(join(variableHeadings...)).Add(newline)
+	builder.
+		Add(join(variableHeadings...)).
+		Add(separator).
+		Add(join(planningUnits...)).
+		Add(newline)
+
+	variables := solution.DecisionVariables
 
 	for _, variable := range variables {
-		joinedVariableAttributes := joinAttributes(variable)
+		joinedVariableAttributes := joinAttributes(variable, solution.PlanningUnits)
 		builder.Add(joinedVariableAttributes).Add(newline)
 	}
 
 	return builder.String()
 }
 
-func joinAttributes(variable variable.EncodeableDecisionVariable) string {
-	return join(
+func planningUnitsAsHeaders(planningUnits solution.PlanningUnitIds) []string {
+	headers := make([]string, len(planningUnits))
+
+	for index, value := range planningUnits {
+		headers[index] = planningUnitHeading + "-" + value
+	}
+
+	return headers
+}
+
+func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits solution.PlanningUnitIds) string {
+	planningUnitValues := planningUnitValueList(variable, planningUnits)
+
+	baseVariableValues := join(
 		variable.Name,
 		toString(variable.Value),
 		variable.Measure.String(),
 	)
+
+	joinedPlanningUnitValues := join(planningUnitValues...)
+
+	return join(baseVariableValues, joinedPlanningUnitValues)
+}
+
+func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits solution.PlanningUnitIds) []string {
+	headers := make([]string, len(planningUnits))
+
+	if variable.ValuePerPlanningUnit != nil {
+		for index := range planningUnits {
+			headers[index] = toString(variable.ValuePerPlanningUnit[index].Value)
+		}
+	}
+	return headers
 }
 
 func join(entries ...string) string {
@@ -103,7 +139,7 @@ func csvEncodeActionHeadings(solution *solution.Solution) []string {
 }
 
 func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
-	actionHeadings []string, planningUnit solution.PlanningUnitId, solution *solution.Solution) []string {
+	actionHeadings []string, planningUnit string, solution *solution.Solution) []string {
 
 	values := make([]string, len(actionHeadings))
 

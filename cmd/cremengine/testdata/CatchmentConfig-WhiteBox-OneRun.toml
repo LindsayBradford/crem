@@ -1,7 +1,8 @@
 ScenarioName = "Test Catchment Annealer - One run"
 RunNumber=1
 OutputPath="testdata/solutions"
-OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+#CpuProfilePath="testdata/profile.pprof"
+OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 
 [[Loggers]]
 Name = "TestLogger"

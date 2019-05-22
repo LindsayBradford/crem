@@ -24,7 +24,7 @@ type GullySedimentContribution struct {
 	gulliesTable tables.CsvTable
 	parameters   parameters.Parameters
 
-	contributionMap map[planningUnitId][]gullySedimentTracker
+	contributionMap map[string][]gullySedimentTracker
 }
 
 func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, parameters parameters.Parameters) {
@@ -35,7 +35,7 @@ func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, p
 
 func (bsc *GullySedimentContribution) populateContributionMap() {
 	_, rowCount := bsc.gulliesTable.ColumnAndRowSize()
-	bsc.contributionMap = make(map[planningUnitId][]gullySedimentTracker, 0)
+	bsc.contributionMap = make(map[string][]gullySedimentTracker, 0)
 
 	for row := uint(0); row < rowCount; row++ {
 		bsc.populateContributionMapEntry(row)
@@ -94,7 +94,7 @@ func (bsc *GullySedimentContribution) OriginalSedimentContribution() float64 {
 	return sedimentContribution
 }
 
-func (bsc *GullySedimentContribution) SedimentContribution(planningUnit planningUnitId) float64 {
+func (bsc *GullySedimentContribution) SedimentContribution(planningUnit string) float64 {
 	sedimentContribution := float64(0)
 
 	if trackers, hasTrackers := bsc.contributionMap[planningUnit]; hasTrackers {
@@ -106,7 +106,7 @@ func (bsc *GullySedimentContribution) SedimentContribution(planningUnit planning
 	return sedimentContribution
 }
 
-func (bsc *GullySedimentContribution) ChannelLength(planningUnit planningUnitId) float64 {
+func (bsc *GullySedimentContribution) ChannelLength(planningUnit string) float64 {
 	channelLength := float64(0)
 
 	if trackers, hasTrackers := bsc.contributionMap[planningUnit]; hasTrackers {

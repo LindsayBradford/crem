@@ -13,7 +13,7 @@ type GullyRestorations struct {
 	sedimentContribution *GullySedimentContribution
 	parameters           parameters.Parameters
 
-	actionMap map[planningUnitId]*GullyRestoration
+	actionMap map[string]*GullyRestoration
 }
 
 func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters parameters.Parameters) *GullyRestorations {
@@ -25,18 +25,18 @@ func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters pa
 	return g
 }
 
-func (g *GullyRestorations) ManagementActions() map[planningUnitId]*GullyRestoration {
+func (g *GullyRestorations) ManagementActions() map[string]*GullyRestoration {
 	return g.actionMap
 }
 
 func (g *GullyRestorations) createManagementActions() {
-	g.actionMap = make(map[planningUnitId]*GullyRestoration)
+	g.actionMap = make(map[string]*GullyRestoration)
 	for planningUnit := range g.sedimentContribution.contributionMap {
 		g.createManagementAction(planningUnit)
 	}
 }
 
-func (g *GullyRestorations) createManagementAction(planningUnit planningUnitId) {
+func (g *GullyRestorations) createManagementAction(planningUnit string) {
 	originalGullyVolume := g.sedimentContribution.SedimentContribution(planningUnit)
 	costInDollars := g.calculateImplementationCost(planningUnit)
 
@@ -49,7 +49,7 @@ func (g *GullyRestorations) createManagementAction(planningUnit planningUnitId) 
 			WithImplementationCost(costInDollars)
 }
 
-func (g *GullyRestorations) calculateImplementationCost(planningUnit planningUnitId) float64 {
+func (g *GullyRestorations) calculateImplementationCost(planningUnit string) float64 {
 	channelRestorationCostPerKilometer := g.parameters.GetFloat64(parameters.GullyRestorationCostPerKilometer)
 
 	channelLengthInMetres := g.sedimentContribution.ChannelLength(planningUnit)

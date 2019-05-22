@@ -59,6 +59,14 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 		WithSaver(saver).
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
+	if scenarioConfig.CpuProfilePath != "" {
+		profilableRunner := new(scenario.ProfilableRunner).
+			ThatProfiles(runner).
+			ToFile(scenarioConfig.CpuProfilePath)
+
+		runner = profilableRunner
+	}
+
 	return runner, nil
 }
 

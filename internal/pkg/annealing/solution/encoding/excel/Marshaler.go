@@ -24,7 +24,7 @@ const (
 	unitOfMeasureColumn  = 2
 )
 
-var variableHeadings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
+var baseVariableHeadings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
 
 const (
 	planningUnitHeading = "PlanningUnit"
@@ -56,6 +56,15 @@ func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSe
 		table.SetCell(nameColumn, rowIndex, decisionVariable.Name)
 		table.SetCell(valueColumn, rowIndex, decisionVariable.Value)
 		table.SetCell(unitOfMeasureColumn, rowIndex, decisionVariable.Measure.String())
+
+		if decisionVariable.ValuePerPlanningUnit != nil {
+			var offsetColumn uint = unitOfMeasureColumn + 1
+
+			for j := range solution.PlanningUnits {
+				columnIndex := uint(j) + offsetColumn
+				table.SetCell(columnIndex, rowIndex, decisionVariable.ValuePerPlanningUnit[j].Value)
+			}
+		}
 	}
 
 	dataSet.AddTable(table.Name(), table)
@@ -65,14 +74,32 @@ func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSe
 func emptyDecisionVariableTable(solution *solution.Solution) *tables.CsvTableImpl {
 	table := new(tables.CsvTableImpl)
 
-	table.SetHeader(variableHeadings)
+	headings := variableHeadings(solution)
+
+	table.SetHeader(headings)
 	table.SetName(DecisionVariablesTableName)
 	table.SetColumnAndRowSize(
-		uint(len(variableHeadings)),
+		uint(len(headings)),
 		uint(len(solution.DecisionVariables)),
 	)
 
 	return table
+}
+
+func variableHeadings(solution *solution.Solution) []string {
+	finalisedHeadings := make([]string, len(baseVariableHeadings)+len(solution.PlanningUnits))
+
+	for index, entry := range baseVariableHeadings {
+		finalisedHeadings[index] = entry
+	}
+
+	baseOffset := len(baseVariableHeadings)
+
+	for index, entry := range solution.PlanningUnits {
+		finalisedHeadings[index+baseOffset] = planningUnitHeading + "-" + string(entry)
+	}
+
+	return finalisedHeadings
 }
 
 func (m *Marshaler) marshalActiveActions(solution *solution.Solution, dataSet *excel.DataSet) error {
