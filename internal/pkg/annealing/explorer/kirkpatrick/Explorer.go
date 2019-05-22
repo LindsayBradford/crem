@@ -124,17 +124,27 @@ func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction f
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
-		absoluteChangeInObjectiveValue := math.Abs(ke.objectiveValueChange)
-		probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
-		ke.setAcceptanceProbability(probabilityToAcceptBadChange)
-
-		randomValue := ke.RandomNumberGenerator().Float64Unitary()
-		if probabilityToAcceptBadChange > randomValue {
+		if ke.shouldAcceptBadChange() {
 			acceptFunction()
 		} else {
 			revertFunction()
 		}
 	}
+}
+
+func (ke *Explorer) shouldAcceptBadChange() bool {
+	probabilityToAcceptBadChange := ke.calculateProbabilityToAcceptBadChange()
+	randomValue := ke.RandomNumberGenerator().Float64Unitary()
+	return probabilityToAcceptBadChange > randomValue
+}
+
+func (ke *Explorer) calculateProbabilityToAcceptBadChange() float64 {
+	absoluteChangeInObjectiveValue := math.Abs(ke.objectiveValueChange)
+	probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
+
+	ke.setAcceptanceProbability(probabilityToAcceptBadChange)
+
+	return probabilityToAcceptBadChange
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
