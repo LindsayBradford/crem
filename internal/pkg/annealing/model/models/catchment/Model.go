@@ -1,6 +1,6 @@
-// Copyright (c) 2018 Australian Rivers Institute.
+// Copyright (c) 2019 Australian Rivers Institute.
 
-package scenario
+package catchment
 
 import (
 	"math"
@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/actions"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -47,14 +47,14 @@ type Model struct {
 	name.IdentifiableContainer
 	observer.ContainedEventNotifier
 
-	parameters parameters.Parameters
+	parameters Parameters
 
 	managementActions action.ModelManagementActions
 
 	planningUnitTable tables.CsvTable
 	gulliesTable      tables.CsvTable
 
-	variables.ContainedDecisionVariables
+	variable.ContainedDecisionVariables
 
 	oleFunctionWrapper threading.MainThreadFunctionWrapper
 	inputDataSet       excel.DataSet
@@ -223,7 +223,7 @@ func (m *Model) RevertChange() {
 }
 
 func (m *Model) deriveDataSourcePath() string {
-	relativeFilePath := m.parameters.GetString(parameters.DataSourcePath)
+	relativeFilePath := m.parameters.GetString(DataSourcePath)
 	workingDirectory, _ := os.Getwd()
 	return filepath.Join(workingDirectory, relativeFilePath)
 }

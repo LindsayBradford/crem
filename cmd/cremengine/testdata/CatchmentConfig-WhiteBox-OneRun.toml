@@ -45,4 +45,4 @@ CoolingFactor =  0.99  # 0.99
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-MaximumIterations = 5_000 # 1M
+MaximumIterations = 1_000 # 1M

@@ -1,36 +1,29 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variables
-
-import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
-)
+package variable
 
 const (
 	_ = iota
 )
 
-type DecisionVariables struct {
-}
-
 type ContainedDecisionVariables struct {
-	variable.InductiveDecisionVariables
+	InductiveDecisionVariables
 }
 
 func (c *ContainedDecisionVariables) Initialise() {
-	c.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
+	c.InductiveDecisionVariables = NewInductiveDecisionVariables()
 }
 
-func (c *ContainedDecisionVariables) DecisionVariables() *variable.DecisionVariables {
+func (c *ContainedDecisionVariables) DecisionVariables() *DecisionVariableMap {
 	inductiveVariables := c.InductiveDecisionVariables
-	vanillaVariables := make(variable.DecisionVariables, 0)
+	vanillaVariables := make(DecisionVariableMap, 0)
 	for _, inductiveVariable := range inductiveVariables {
 		vanillaVariables[inductiveVariable.Name()] = inductiveVariable
 	}
 	return &vanillaVariables
 }
 
-func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.DecisionVariable {
+func (c *ContainedDecisionVariables) DecisionVariable(name string) DecisionVariable {
 	return c.InductiveDecisionVariables.Variable(name)
 }
 

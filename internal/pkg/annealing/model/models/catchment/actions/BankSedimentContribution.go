@@ -6,7 +6,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 )
@@ -34,12 +34,12 @@ type sedimentTracker struct {
 
 type BankSedimentContribution struct {
 	planningUnitTable tables.CsvTable
-	parameters        parameters.Parameters
+	parameters        Parameters
 
 	contributionMap map[string]sedimentTracker
 }
 
-func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
+func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters Parameters) {
 	bsc.planningUnitTable = planningUnitTable
 	bsc.parameters = parameters
 	bsc.populateContributionMap()
@@ -68,13 +68,13 @@ func (bsc *BankSedimentContribution) partialBankSedimentContribution(rowNumber u
 	riverLength := bsc.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
 	bankHeight := bsc.planningUnitTable.CellFloat64(bankHeightIndex, rowNumber)
 
-	sedimentDensity := bsc.parameters.GetFloat64(parameters.SedimentDensity)
-	suspendedSedimentProportion := bsc.parameters.GetFloat64(parameters.SuspendedSedimentProportion)
+	sedimentDensity := bsc.parameters.GetFloat64(SedimentDensity)
+	suspendedSedimentProportion := bsc.parameters.GetFloat64(SuspendedSedimentProportion)
 
-	bankErosionFudgeFactor := bsc.parameters.GetFloat64(parameters.BankErosionFudgeFactor)
+	bankErosionFudgeFactor := bsc.parameters.GetFloat64(BankErosionFudgeFactor)
 
-	waterDensity := bsc.parameters.GetFloat64(parameters.WaterDensity)
-	localAcceleration := bsc.parameters.GetFloat64(parameters.LocalAcceleration)
+	waterDensity := bsc.parameters.GetFloat64(WaterDensity)
+	localAcceleration := bsc.parameters.GetFloat64(LocalAcceleration)
 	bankFullDischarge := bsc.planningUnitTable.CellFloat64(bankFullFlowIndex, rowNumber)
 	channelSlope := bsc.planningUnitTable.CellFloat64(channelSlopeIndex, rowNumber)
 

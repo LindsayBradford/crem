@@ -5,9 +5,9 @@ package variables
 import (
 	"strconv"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/actions"
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/actions"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/pkg/assert/release"
@@ -35,7 +35,7 @@ type SedimentProduction struct {
 	valuePerPlanningUnit map[string]float64
 }
 
-func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
+func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters Parameters) *SedimentProduction {
 	sl.SetName(SedimentProductionVariableName)
 	sl.SetUnitOfMeasure(variable.TonnesPerYear)
 	sl.SetPrecision(3)

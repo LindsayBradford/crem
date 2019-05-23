@@ -50,7 +50,7 @@ func (c *ContainedModel) SetModel(model Model) {
 }
 
 type DecisionVariableContainer interface {
-	DecisionVariables() *variable.DecisionVariables
+	DecisionVariables() *variable.DecisionVariableMap
 
 	DecisionVariable(name string) variable.DecisionVariable
 	DecisionVariableChange(decisionVariableName string) float64
@@ -73,12 +73,12 @@ func (nm *nullModel) WithName(name string) *nullModel {
 	return nm
 }
 
-func (nm *nullModel) Initialise()                                    {}
-func (nm *nullModel) TearDown()                                      {}
-func (nm *nullModel) TryRandomChange()                               {}
-func (nm *nullModel) AcceptChange()                                  {}
-func (nm *nullModel) RevertChange()                                  {}
-func (nm *nullModel) DecisionVariables() *variable.DecisionVariables { return nil }
+func (nm *nullModel) Initialise()                                      {}
+func (nm *nullModel) TearDown()                                        {}
+func (nm *nullModel) TryRandomChange()                                 {}
+func (nm *nullModel) AcceptChange()                                    {}
+func (nm *nullModel) RevertChange()                                    {}
+func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 	newVariable := variable.NewSimpleDecisionVariable(name)
 	return &newVariable

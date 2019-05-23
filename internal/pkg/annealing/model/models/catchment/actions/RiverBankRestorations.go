@@ -5,7 +5,7 @@ package actions
 import (
 	"strconv"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/parameters"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 )
 
@@ -13,12 +13,12 @@ const defaultRevegetationProportion = float64(1)
 
 type RiverBankRestorations struct {
 	planningUnitTable tables.CsvTable
-	parameters        parameters.Parameters
+	parameters        Parameters
 
 	actionMap map[string]*RiverBankRestoration
 }
 
-func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
+func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters Parameters) *RiverBankRestorations {
 	r.planningUnitTable = planningUnitTable
 	r.parameters = parameters
 	r.createManagementActions()
@@ -69,7 +69,7 @@ func (r *RiverBankRestorations) calculateChangeInBufferVegetation(rowNumber uint
 }
 
 func (r *RiverBankRestorations) calculateImplementationCost(rowNumber uint) float64 {
-	riparianRevegetationCostPerKilometer := r.parameters.GetFloat64(parameters.RiparianRevegetationCostPerKilometer)
+	riparianRevegetationCostPerKilometer := r.parameters.GetFloat64(RiparianRevegetationCostPerKilometer)
 	riverLengthInMetres := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
 	riverLengthInKilometres := riverLengthInMetres / 1000
 

@@ -221,9 +221,9 @@ func (sem *SimpleExcelModel) copyTempDecisionVarValueToActual(varName string) {
 	)
 }
 
-func (sem *SimpleExcelModel) DecisionVariables() *variable.DecisionVariables {
+func (sem *SimpleExcelModel) DecisionVariables() *variable.DecisionVariableMap {
 	simpleVariables := sem.decisionVariables
-	vanillaVariables := make(variable.DecisionVariables, 0)
+	vanillaVariables := make(variable.DecisionVariableMap, 0)
 	for _, variable := range simpleVariables {
 		vanillaVariables[variable.Name()] = variable
 	}

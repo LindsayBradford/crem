@@ -5,7 +5,6 @@ package dumb
 import (
 	"math"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
@@ -21,7 +20,7 @@ type Model struct {
 	rand.RandContainer
 
 	parameters Parameters
-	variables.ContainedDecisionVariables
+	variable.ContainedDecisionVariables
 }
 
 func New() *Model {

@@ -7,7 +7,7 @@ package variable
 
 import "github.com/LindsayBradford/crem/pkg/name"
 
-type DecisionVariables map[string]DecisionVariable
+type DecisionVariableMap map[string]DecisionVariable
 
 // DecisionVariable describes an interface between a Model and any decision making logic observing the model via its
 // decision variables.  This Value of a decision variable should be a fine-grained indicator of how well a model is
