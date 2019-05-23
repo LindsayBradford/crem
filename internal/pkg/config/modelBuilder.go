@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/dumb"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	errors2 "github.com/pkg/errors"

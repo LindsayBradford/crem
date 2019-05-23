@@ -8,7 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/dumb"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	errors2 "github.com/pkg/errors"
