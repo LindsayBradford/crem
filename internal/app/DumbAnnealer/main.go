@@ -6,7 +6,6 @@ package main
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/internal/app/SimpleExcelAnnealer/components"
 	"github.com/LindsayBradford/crem/internal/pkg/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
@@ -17,12 +16,7 @@ import (
 
 var (
 	defaultLogHandler logging.Logger
-	mainThreadChannel threading.MainThreadChannel
 )
-
-func init() {
-	mainThreadChannel = threading.GetMainThreadChannel()
-}
 
 func main() {
 	args := commandline.ParseArguments()
@@ -31,7 +25,7 @@ func main() {
 
 func RunFromConfigFile(configFile string) {
 	scenarioConfig := retrieveConfig(configFile)
-	scenarioRunner := buildScenarioOffConfig(scenarioConfig)
+	scenarioRunner := buildScenarioRunner(scenarioConfig)
 	runScenario(scenarioRunner)
 }
 
@@ -39,38 +33,59 @@ func retrieveConfig(configFile string) *config.CREMConfig {
 	configuration, retrieveError := config.RetrieveCremFromFile(configFile)
 
 	if retrieveError != nil {
-		wrappingError := errors.Wrap(retrieveError, "retrieving simple excel annealer configuration")
+		wrappingError := errors.Wrap(retrieveError, "retrieving dumb annealer configuration")
 		panic(wrappingError)
 	}
 
 	return configuration
 }
 
-func buildScenarioOffConfig(scenarioConfig *config.CREMConfig) scenario.CallableRunner {
-	scenarioRunner, annealerLogHandler := components.BuildScenarioRunner(scenarioConfig, &mainThreadChannel)
+func buildScenarioRunner(scenarioConfig *config.CREMConfig) scenario.CallableRunner {
+	scenarioRunner, annealerLogHandler := buildRunnerAndLogger(scenarioConfig)
+
 	defaultLogHandler = annealerLogHandler
 	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")
+
 	return scenarioRunner
 }
 
+func buildRunnerAndLogger(scenarioConfig *config.CREMConfig) (scenario.CallableRunner, logging.Logger) {
+	newAnnealer, humanLogHandler, buildError :=
+		new(config.AnnealerBuilder).
+			WithConfig(scenarioConfig).
+			Build()
+
+	if buildError != nil {
+		humanLogHandler.Error(buildError)
+		humanLogHandler.Error("Exiting program due to failed Annealer build")
+		os.Exit(1)
+	}
+
+	var runner scenario.CallableRunner
+
+	runner = new(scenario.Runner).
+		ForAnnealer(newAnnealer).
+		WithName(scenarioConfig.ScenarioName).
+		WithRunNumber(scenarioConfig.RunNumber).
+		WithTearDownFunction(threading.GetMainThreadChannel().Close).
+		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
+
+	if scenarioConfig.CpuProfilePath != "" {
+		profilableRunner := new(scenario.ProfilableRunner).
+			ThatProfiles(runner).
+			ToFile(scenarioConfig.CpuProfilePath)
+
+		runner = profilableRunner
+	}
+
+	return runner, humanLogHandler
+}
+
 func runScenario(scenarioRunner scenario.CallableRunner) {
-	defer func() {
-		if r := recover(); r != nil {
-			recoveryError, ok := r.(error)
-			if ok {
-				wrappedError := errors.Wrap(recoveryError, "running dumb annealer scenario")
-				defaultLogHandler.Error(wrappedError)
-				panic(wrappedError)
-			}
-		}
-	}()
-
-	defaultLogHandler.Debug("starting scenario runner")
-	go scenarioRunner.Run()
-
-	defaultLogHandler.Debug("starting ole function polling")
-	mainThreadChannel.RunHandler()
-
+	if runError := scenarioRunner.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running dumb annealer scenario")
+		defaultLogHandler.Error(wrappingError)
+	}
 	flushStreams()
 }
 
