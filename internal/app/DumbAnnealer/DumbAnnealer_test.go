@@ -14,7 +14,7 @@ func TestDumbAnnealerIntegrationOneRun(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Single run of Dumb Annealer",
-		ExecutablePath:    cremExceutablePath,
+		ExecutablePath:    dumbAnnealerExecutablePath,
 		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-OneRun.toml",
 		ExpectedErrorCode: appTesting.WithSuccess,
@@ -27,7 +27,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Three sequential runs of Dumb Annealer",
-		ExecutablePath:    cremExceutablePath,
+		ExecutablePath:    dumbAnnealerExecutablePath,
 		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
 		ExpectedErrorCode: appTesting.WithSuccess,
@@ -40,7 +40,7 @@ func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Three concurrent runs of Dumb Annealer",
-		ExecutablePath:    cremExceutablePath,
+		ExecutablePath:    dumbAnnealerExecutablePath,
 		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-ThreeRunsConcurrently.toml",
 		ExpectedErrorCode: appTesting.WithSuccess,
@@ -52,7 +52,7 @@ func TestDumbAnnealerIntegrationThreeRunsConcurrently(t *testing.T) {
 func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		Name:              "Single run of Kirkpatrick Dumb Annealer",
-		ExecutablePath:    cremExceutablePath,
+		ExecutablePath:    dumbAnnealerExecutablePath,
 		TimeoutSeconds:    defaultDumbAnnealerTimeout,
 		T:                 t,
 		ConfigFilePath:    "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
