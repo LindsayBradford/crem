@@ -26,7 +26,10 @@ type Model interface {
 
 	DeepClone() Model
 
+	ManagementActions() []action.ManagementAction
 	ActiveManagementActions() []action.ManagementAction
+	SetManagementAction(index int, value bool)
+
 	PlanningUnits() solution.PlanningUnitIds
 }
 
@@ -85,6 +88,8 @@ func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 }
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}
+func (nm *nullModel) ManagementActions() []action.ManagementAction               { return nil }
 func (nm *nullModel) ActiveManagementActions() []action.ManagementAction         { return nil }
+func (nm *nullModel) SetManagementAction(index int, value bool)                  {}
 func (nm *nullModel) PlanningUnits() solution.PlanningUnitIds                    { return nil }
 func (nm *nullModel) DeepClone() Model                                           { return nm }

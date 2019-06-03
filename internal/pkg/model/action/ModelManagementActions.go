@@ -69,6 +69,10 @@ func (m *ModelManagementActions) UndoLastActivationToggleUnobserved() {
 	m.lastApplied.ToggleActivationUnobserved()
 }
 
+func (m *ModelManagementActions) Actions() []ManagementAction {
+	return m.actions
+}
+
 func (m *ModelManagementActions) ActiveActions() []ManagementAction {
 	activeActions := make([]ManagementAction, 0)
 
@@ -79,4 +83,8 @@ func (m *ModelManagementActions) ActiveActions() []ManagementAction {
 	}
 
 	return activeActions
+}
+
+func (m *ModelManagementActions) SetActivation(index int, value bool) {
+	m.actions[index].SetActivation(value)
 }

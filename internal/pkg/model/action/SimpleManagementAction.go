@@ -63,6 +63,11 @@ func (sma *SimpleManagementAction) ToggleActivationUnobserved() {
 	sma.isActive = !sma.isActive
 }
 
+func (sma *SimpleManagementAction) SetActivation(value bool) {
+	sma.SetActivation(value)
+	sma.notifyObservers()
+}
+
 func (sma *SimpleManagementAction) IsActive() bool {
 	return sma.isActive
 }

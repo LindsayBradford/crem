@@ -20,3 +20,4 @@ func (a *Null) Subscribe(observers ...Observer)                           {}
 func (a *Null) InitialisingActivation()                                   {}
 func (a *Null) ToggleActivation()                                         {}
 func (a *Null) ToggleActivationUnobserved()                               {}
+func (a *Null) SetActivation(value bool)                                  {}

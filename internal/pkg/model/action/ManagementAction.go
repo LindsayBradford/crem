@@ -42,6 +42,9 @@ type ManagementAction interface {
 	// triggering Observer method ObserveAction callbacks.
 	ToggleActivation()
 
+	// SetActivation activates an the ManagementAction as per the value supplied,
+	SetActivation(value bool)
+
 	// ToggleActivationUnobserved activates an inactive ManagementAction and vice-versa, without triggering any
 	// Observer method callbacks. Expected to be called when undoing a change that observers shouldn't react to.
 	ToggleActivationUnobserved()

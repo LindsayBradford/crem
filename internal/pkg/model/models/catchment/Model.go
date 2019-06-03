@@ -166,8 +166,16 @@ func (m *Model) buildManagementActions() {
 	}
 }
 
+func (m *Model) ManagementActions() []action.ManagementAction {
+	return m.managementActions.Actions()
+}
+
 func (m *Model) ActiveManagementActions() []action.ManagementAction {
 	return m.managementActions.ActiveActions()
+}
+
+func (m *Model) SetManagementAction(index int, value bool) {
+	m.managementActions.SetActivation(index, value)
 }
 
 func (m *Model) PlanningUnits() solution.PlanningUnitIds {

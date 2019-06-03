@@ -6,10 +6,20 @@
 package variable
 
 import (
+	"sort"
+
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type DecisionVariableMap map[string]DecisionVariable
+
+func (m DecisionVariableMap) SortedKeys() (keys []string) {
+	for key := range m {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return
+}
 
 // DecisionVariable describes an interface between a Model and any decision making logic observing the model via its
 // decision variables.  This Value of a decision variable should be a fine-grained indicator of how well a model is

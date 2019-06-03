@@ -105,7 +105,11 @@ func (sem *SimpleExcelModel) TearDown() {
 	sem.excelDataAdapter.destroyExcelHandler()
 }
 
+func (sem *SimpleExcelModel) ManagementActions() []action.ManagementAction { return nil }
+
 func (sem *SimpleExcelModel) ActiveManagementActions() []action.ManagementAction { return nil }
+
+func (sem *SimpleExcelModel) SetManagementAction(index int, value bool) {}
 
 func (sem *SimpleExcelModel) PlanningUnits() solution.PlanningUnitIds { return nil }
 
