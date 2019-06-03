@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
 func NewSolution(id string) *Solution {

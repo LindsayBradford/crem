@@ -5,10 +5,10 @@ package config
 import (
 	"errors"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/dumb"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	errors2 "github.com/pkg/errors"

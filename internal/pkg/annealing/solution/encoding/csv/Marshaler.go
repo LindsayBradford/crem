@@ -6,8 +6,8 @@ import (
 	"fmt"
 	strings2 "strings"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 

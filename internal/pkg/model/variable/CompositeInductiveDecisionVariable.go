@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"math"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"

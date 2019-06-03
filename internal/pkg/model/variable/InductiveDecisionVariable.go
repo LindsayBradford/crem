@@ -2,7 +2,7 @@
 
 package variable
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+import "github.com/LindsayBradford/crem/internal/pkg/model/action"
 
 // InductiveDecisionVariable is a DecisionVariable that allows an 'inductive' Value to be temporarily stored
 // and retrieved for the decision variable (typically based based on some management action change).

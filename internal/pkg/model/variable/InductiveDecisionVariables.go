@@ -2,7 +2,9 @@
 
 package variable
 
-import "github.com/pkg/errors"
+import (
+	"github.com/pkg/errors"
+)
 
 func NewInductiveDecisionVariables() InductiveDecisionVariables {
 	return make(InductiveDecisionVariables, 1)

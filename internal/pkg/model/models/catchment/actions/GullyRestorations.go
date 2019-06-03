@@ -3,20 +3,20 @@
 package actions
 
 import (
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 )
 
 const actionedGullyVolume = 0
 
 type GullyRestorations struct {
 	sedimentContribution *GullySedimentContribution
-	parameters           Parameters
+	parameters           parameters.Parameters
 
 	actionMap map[string]*GullyRestoration
 }
 
-func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters Parameters) *GullyRestorations {
+func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters parameters.Parameters) *GullyRestorations {
 	g.sedimentContribution = new(GullySedimentContribution)
 	g.sedimentContribution.Initialise(gullyTable, parameters)
 	g.parameters = parameters
@@ -50,7 +50,7 @@ func (g *GullyRestorations) createManagementAction(planningUnit string) {
 }
 
 func (g *GullyRestorations) calculateImplementationCost(planningUnit string) float64 {
-	channelRestorationCostPerKilometer := g.parameters.GetFloat64(GullyRestorationCostPerKilometer)
+	channelRestorationCostPerKilometer := g.parameters.GetFloat64(parameters.GullyRestorationCostPerKilometer)
 
 	channelLengthInMetres := g.sedimentContribution.ChannelLength(planningUnit)
 	channelLengthInKilometres := channelLengthInMetres / 1000

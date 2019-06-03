@@ -2,7 +2,7 @@
 
 package actions
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
+import "github.com/LindsayBradford/crem/internal/pkg/model/action"
 
 type GullyRestoration struct {
 	action.SimpleManagementAction

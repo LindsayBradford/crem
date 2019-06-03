@@ -8,16 +8,16 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/actions"
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/variables"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -47,7 +47,7 @@ type Model struct {
 	name.IdentifiableContainer
 	observer.ContainedEventNotifier
 
-	parameters Parameters
+	parameters parameters.Parameters
 
 	managementActions action.ModelManagementActions
 
@@ -223,7 +223,7 @@ func (m *Model) RevertChange() {
 }
 
 func (m *Model) deriveDataSourcePath() string {
-	relativeFilePath := m.parameters.GetString(DataSourcePath)
+	relativeFilePath := m.parameters.GetString(parameters.DataSourcePath)
 	workingDirectory, _ := os.Getwd()
 	return filepath.Join(workingDirectory, relativeFilePath)
 }

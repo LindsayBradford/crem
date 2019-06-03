@@ -3,11 +3,11 @@
 package variables
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/actions"
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ type ImplementationCost struct {
 	valuePerPlanningUnit map[string]float64
 }
 
-func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters Parameters) *ImplementationCost {
+func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure(variable.Dollars)

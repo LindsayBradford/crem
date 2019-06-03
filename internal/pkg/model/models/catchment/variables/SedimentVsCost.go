@@ -3,8 +3,8 @@
 package variables
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
 const SedimentVsCostName = "SedimentVsCost"

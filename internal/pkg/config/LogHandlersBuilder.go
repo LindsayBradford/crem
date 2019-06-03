@@ -4,8 +4,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	. "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	. "github.com/LindsayBradford/crem/pkg/logging/formatters"

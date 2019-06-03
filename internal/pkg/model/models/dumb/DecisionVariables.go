@@ -3,7 +3,7 @@
 package dumb
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
 type DecisionVariables struct {

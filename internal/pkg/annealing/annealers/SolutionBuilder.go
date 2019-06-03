@@ -1,10 +1,11 @@
 package annealers
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"sort"
+
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
 type SolutionBuilder struct {

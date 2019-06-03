@@ -4,8 +4,9 @@ package action
 
 import (
 	"fmt"
-	. "github.com/onsi/gomega"
 	"testing"
+
+	. "github.com/onsi/gomega"
 )
 
 const equalTo = "=="
@@ -16,7 +17,6 @@ func TestManagementActions_Initialise(t *testing.T) {
 	// given
 
 	actionsUnderTest := new(ModelManagementActions)
-
 	// when
 	actionsUnderTest.Initialise()
 

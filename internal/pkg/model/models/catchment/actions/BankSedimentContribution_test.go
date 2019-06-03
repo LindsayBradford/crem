@@ -6,8 +6,8 @@ import (
 	"math"
 	"testing"
 
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	. "github.com/onsi/gomega"
 )
 
@@ -27,17 +27,17 @@ const (
 	defaultRiparianBufferArea = float64(10)
 )
 
-func buildExpectedPartialSedimentContribution(params Parameters) float64 {
-	streamDetail := params.GetFloat64(WaterDensity) * params.GetFloat64(LocalAcceleration) *
+func buildExpectedPartialSedimentContribution(params parameters.Parameters) float64 {
+	streamDetail := params.GetFloat64(parameters.WaterDensity) * params.GetFloat64(parameters.LocalAcceleration) *
 		defaultBankFullFlow * defaultRiverSlope
 	adjustedRiparianVegetation := float64(1)
 	floodPlainWidthRelationship := 1 - math.Exp(-1.5*math.Pow(10, -2)*defaultFloodPlainWidth)
 
-	maxRiverBankErosion := params.GetFloat64(BankErosionFudgeFactor) * streamDetail *
+	maxRiverBankErosion := params.GetFloat64(parameters.BankErosionFudgeFactor) * streamDetail *
 		adjustedRiparianVegetation * floodPlainWidthRelationship
 
-	riverSediment := defaultRiverLength * defaultBankHeight * params.GetFloat64(SedimentDensity) *
-		params.GetFloat64(SuspendedSedimentProportion)
+	riverSediment := defaultRiverLength * defaultBankHeight * params.GetFloat64(parameters.SedimentDensity) *
+		params.GetFloat64(parameters.SuspendedSedimentProportion)
 
 	contribution := maxRiverBankErosion * riverSediment
 
@@ -49,7 +49,7 @@ func TestBankSedimentContribution_Initialise(t *testing.T) {
 
 	// given
 	testDataTable := buildTestTable()
-	dummyParameters := new(Parameters).Initialise()
+	dummyParameters := new(parameters.Parameters).Initialise()
 	contributionUnderTest := new(BankSedimentContribution)
 
 	// when
@@ -76,7 +76,7 @@ func TestBankSedimentContribution_OriginalSedimentContribution(t *testing.T) {
 
 	// given
 	testDataTable := buildTestTable()
-	dummyParameters := new(Parameters).Initialise()
+	dummyParameters := new(parameters.Parameters).Initialise()
 	contributionUnderTest := new(BankSedimentContribution)
 	contributionUnderTest.Initialise(testDataTable, *dummyParameters)
 

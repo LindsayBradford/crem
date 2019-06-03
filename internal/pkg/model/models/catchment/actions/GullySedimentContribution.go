@@ -3,8 +3,8 @@
 package actions
 
 import (
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 )
 
 const (
@@ -22,12 +22,12 @@ type gullySedimentTracker struct {
 
 type GullySedimentContribution struct {
 	gulliesTable tables.CsvTable
-	parameters   Parameters
+	parameters   parameters.Parameters
 
 	contributionMap map[string][]gullySedimentTracker
 }
 
-func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, parameters Parameters) {
+func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, parameters parameters.Parameters) {
 	bsc.gulliesTable = gulliesTable
 	bsc.parameters = parameters
 	bsc.populateContributionMap()
@@ -70,11 +70,11 @@ func (bsc *GullySedimentContribution) SedimentFromVolume(gullyVolume float64) fl
 		return 0
 	}
 
-	drySedimentDensity := bsc.parameters.GetFloat64(SedimentDensity)
-	nonLinearErosionRateCompensationFactor := bsc.parameters.GetFloat64(GullyCompensationFactor)
+	drySedimentDensity := bsc.parameters.GetFloat64(parameters.SedimentDensity)
+	nonLinearErosionRateCompensationFactor := bsc.parameters.GetFloat64(parameters.GullyCompensationFactor)
 
-	totalErosionTime := float64(bsc.parameters.GetInt64(YearsOfErosion))
-	suspendedSedimentProportion := bsc.parameters.GetFloat64(SuspendedSedimentProportion)
+	totalErosionTime := float64(bsc.parameters.GetInt64(parameters.YearsOfErosion))
+	suspendedSedimentProportion := bsc.parameters.GetFloat64(parameters.SuspendedSedimentProportion)
 
 	return ((gullyVolume * drySedimentDensity * nonLinearErosionRateCompensationFactor) / totalErosionTime) *
 		suspendedSedimentProportion

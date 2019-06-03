@@ -5,7 +5,9 @@
 // that model's public interface.
 package variable
 
-import "github.com/LindsayBradford/crem/pkg/name"
+import (
+	"github.com/LindsayBradford/crem/pkg/name"
+)
 
 type DecisionVariableMap map[string]DecisionVariable
 
