@@ -5,12 +5,9 @@ package scenario
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
-	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
@@ -39,7 +36,6 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 	newAnnealer, _, buildError :=
 		new(config.AnnealerBuilder).
 			WithConfig(scenarioConfig).
-			RegisteringModel(buildCatchmentModelRegistration()).
 			Build()
 
 	if buildError != nil {
@@ -73,18 +69,6 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig) (scenario.CallableRu
 
 func configOutputTypeToSolutionOutputType(outputType config.ScenarioOutputType) encoding.OutputType {
 	return encoding.OutputType(outputType.String())
-}
-
-func buildCatchmentModelRegistration() config.ModelRegistration {
-	return config.ModelRegistration{
-		ModelType: "CatchmentModel",
-		ConfigFunction: func(config config.ModelConfig) model.Model {
-			return catchment.NewModel().
-				WithName(config.Name).
-				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
-				WithParameters(config.Parameters)
-		},
-	}
 }
 
 func runScenario(scenarioRunner scenario.CallableRunner) {

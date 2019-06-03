@@ -6,9 +6,11 @@ import (
 	"errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/model/models/dumb"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	. "github.com/LindsayBradford/crem/pkg/errors"
+	"github.com/LindsayBradford/crem/pkg/threading"
 	errors2 "github.com/pkg/errors"
 )
 
@@ -46,6 +48,23 @@ func (builder *modelBuilder) registerBaseModels() {
 		"DumbModel",
 		func(config ModelConfig) model.Model {
 			return dumb.New().WithName(config.Name).WithParameters(config.Parameters)
+		},
+	)
+
+	builder.RegisteringModel(
+		"DumbModel",
+		func(config ModelConfig) model.Model {
+			return dumb.New().WithName(config.Name).WithParameters(config.Parameters)
+		},
+	)
+
+	builder.RegisteringModel(
+		"CatchmentModel",
+		func(config ModelConfig) model.Model {
+			return catchment.NewModel().
+				WithName(config.Name).
+				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
+				WithParameters(config.Parameters)
 		},
 	)
 }
