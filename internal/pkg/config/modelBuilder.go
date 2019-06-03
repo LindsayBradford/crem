@@ -52,13 +52,6 @@ func (builder *modelBuilder) registerBaseModels() {
 	)
 
 	builder.RegisteringModel(
-		"DumbModel",
-		func(config ModelConfig) model.Model {
-			return dumb.New().WithName(config.Name).WithParameters(config.Parameters)
-		},
-	)
-
-	builder.RegisteringModel(
 		"CatchmentModel",
 		func(config ModelConfig) model.Model {
 			return catchment.NewModel().
