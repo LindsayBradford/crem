@@ -6,20 +6,19 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
-	"github.com/LindsayBradford/crem/pkg/threading"
 	. "github.com/onsi/gomega"
 )
 
 const equalTo = "=="
 
 func TestArchivist_Store(t *testing.T) {
-	// TODO: Rid myself of my reliance on CatchmentModel for testing this.  Too much prep-work for the model.
 	g := NewGomegaWithT(t)
 
 	// given
 	archivistUnderTest := new(Archivist)
-	testModel := catchment.NewModel()
+	testModel := modumb.NewModel()
 
 	expectedVariableSize := len(*testModel.DecisionVariables())
 	expectedActionSize := len(testModel.ManagementActions())
@@ -33,7 +32,6 @@ func TestArchivist_Store(t *testing.T) {
 }
 
 func TestArchivist_Retrieve_InitialModel(t *testing.T) {
-	// TODO: Rid myself of my reliance on CatchmentModel for testing this.  Too much prep-work for the model.
 	g := NewGomegaWithT(t)
 
 	// given
@@ -51,15 +49,13 @@ func TestArchivist_Retrieve_InitialModel(t *testing.T) {
 }
 
 func testArchivist_Retrieve_AlteredModel(t *testing.T) {
-	// TODO: Rid myself of my reliance on CatchmentModel for testing this.  Too much prep-work for the model.
+	// TODO: Test is failing on model equality... why?
 	g := NewGomegaWithT(t)
 
 	// given
 	archivistUnderTest := new(Archivist)
 
-	modelToStore := catchment.NewModel().
-		WithName("test").
-		WithOleFunctionWrapper(threading.GetMainThreadChannel().Call)
+	modelToStore := modumb.NewModel()
 
 	modelToStore.SetEventNotifier(new(observer.SynchronousAnnealingEventNotifier))
 	modelToStore.Initialise()
