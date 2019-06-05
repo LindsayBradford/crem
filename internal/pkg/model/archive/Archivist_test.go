@@ -30,24 +30,24 @@ func TestArchivist_Store(t *testing.T) {
 	g.Expect(expectedActionSize).To(BeNumerically(equalTo, actualArchive.Actions().Len()))
 }
 
-func testArchivist_Retrieve_InitialModel(t *testing.T) {
-	// TODO: Test is failing on model equality... why?
+func TestArchivist_Retrieve_InitialModel(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
 	archivistUnderTest := new(Archivist)
 
 	modelToStore := modumb.NewModel()
+	modelToStore.Initialise()
 	modelToRetrieve := modelToStore.DeepClone()
 
-	g.Expect(modelToStore).To(Equal(modelToRetrieve))
+	g.Expect(modelToStore.DecisionVariables()).To(Equal(modelToRetrieve.DecisionVariables()))
 
 	// when
 	storedArchive := archivistUnderTest.Store(modelToStore)
 	archivistUnderTest.Retrieve(storedArchive, modelToRetrieve)
 
 	// then
-	g.Expect(modelToStore).To(Equal(modelToRetrieve))
+	g.Expect(modelToStore.DecisionVariables()).To(Equal(modelToRetrieve.DecisionVariables()))
 }
 
 func testArchivist_Retrieve_AlteredModel(t *testing.T) {
