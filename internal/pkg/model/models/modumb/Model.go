@@ -46,6 +46,11 @@ func (m *Model) WithName(name string) *Model {
 	return m
 }
 
+func (m *Model) WithId(id string) *Model {
+	m.SetId(id)
+	return m
+}
+
 func (m *Model) WithParameters(params baseParameters.Map) *Model {
 	m.parameters.Merge(params)
 	return m

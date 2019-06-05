@@ -3,6 +3,10 @@
 package loggers
 
 import (
+	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 )
@@ -16,6 +20,21 @@ func buildTestingLogger() logging.Logger {
 		WithName("DefaultTestingLogger").
 		WithFormatter(new(formatters.RawMessageFormatter)).
 		WithLogLevelDestination(logging.DEBUG, logging.STDOUT).
+		WithLogLevelDestination(model.LogLevel, logging.STDOUT).
 		Build()
 	return testLogger
+}
+
+var DefaultTestingEventNotifier = buildTestingEventNotifier()
+
+func buildTestingEventNotifier() observer.EventNotifier {
+	filter := new(filters.IterationCountFilter)
+	messageObserver := new(annealingObserver.AnnealingMessageObserver).
+		WithLogHandler(DefaultTestingLogger).
+		WithFilter(filter)
+
+	eventNotifier := new(observer.SynchronousAnnealingEventNotifier)
+	eventNotifier.AddObserver(messageObserver)
+
+	return eventNotifier
 }
