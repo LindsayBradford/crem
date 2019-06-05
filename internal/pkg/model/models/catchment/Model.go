@@ -178,6 +178,10 @@ func (m *Model) SetManagementAction(index int, value bool) {
 	m.managementActions.SetActivation(index, value)
 }
 
+func (m *Model) SetManagementActionUnobserved(index int, value bool) {
+	m.managementActions.SetActivationUnobserved(index, value)
+}
+
 func (m *Model) PlanningUnits() solution.PlanningUnitIds {
 	_, rows := m.planningUnitTable.ColumnAndRowSize()
 	planningUnits := make(solution.PlanningUnitIds, rows)

@@ -111,6 +111,8 @@ func (sem *SimpleExcelModel) ActiveManagementActions() []action.ManagementAction
 
 func (sem *SimpleExcelModel) SetManagementAction(index int, value bool) {}
 
+func (sem *SimpleExcelModel) SetManagementActionUnobserved(index int, value bool) {}
+
 func (sem *SimpleExcelModel) PlanningUnits() solution.PlanningUnitIds { return nil }
 
 func (sem *SimpleExcelModel) saveDataToWorkbookAndClose() {

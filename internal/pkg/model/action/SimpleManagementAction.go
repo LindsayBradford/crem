@@ -68,12 +68,23 @@ func (sma *SimpleManagementAction) SetActivation(value bool) {
 	sma.notifyObservers()
 }
 
+func (sma *SimpleManagementAction) SetActivationUnobserved(value bool) {
+	sma.isActive = value
+}
+
 func (sma *SimpleManagementAction) IsActive() bool {
 	return sma.isActive
 }
 
 func (sma *SimpleManagementAction) ModelVariableValue(variableName ModelVariableName) float64 {
 	return sma.variables[variableName]
+}
+
+func (sma *SimpleManagementAction) ModelVariableKeys() (keys []ModelVariableName) {
+	for key := range sma.variables {
+		keys = append(keys, key)
+	}
+	return
 }
 
 func (sma *SimpleManagementAction) Subscribe(observers ...Observer) {

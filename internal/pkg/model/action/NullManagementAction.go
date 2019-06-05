@@ -21,3 +21,4 @@ func (a *Null) InitialisingActivation()                                   {}
 func (a *Null) ToggleActivation()                                         {}
 func (a *Null) ToggleActivationUnobserved()                               {}
 func (a *Null) SetActivation(value bool)                                  {}
+func (a *Null) SetActivationUnobserved(value bool)                        {}

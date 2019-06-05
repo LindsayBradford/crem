@@ -36,11 +36,11 @@ func TestArchivist_Retrieve_InitialModel(t *testing.T) {
 	// given
 	archivistUnderTest := new(Archivist)
 
-	modelToStore := modumb.NewModel()
-	modelToStore.Initialise()
+	modelToStore := buildMultiObjectiveDumbModel()
 	modelToRetrieve := modelToStore.DeepClone()
 
 	g.Expect(modelToStore.DecisionVariables()).To(Equal(modelToRetrieve.DecisionVariables()))
+	g.Expect(modelToStore.ManagementActions()).To(Equal(modelToRetrieve.ManagementActions()))
 
 	// when
 	storedArchive := archivistUnderTest.Store(modelToStore)
@@ -48,6 +48,7 @@ func TestArchivist_Retrieve_InitialModel(t *testing.T) {
 
 	// then
 	g.Expect(modelToStore.DecisionVariables()).To(Equal(modelToRetrieve.DecisionVariables()))
+	g.Expect(modelToStore.ManagementActions()).To(Equal(modelToRetrieve.ManagementActions()))
 }
 
 func TestArchivist_Retrieve_AlteredModel(t *testing.T) {
@@ -59,7 +60,7 @@ func TestArchivist_Retrieve_AlteredModel(t *testing.T) {
 
 	numberOfRandomChanges := 7
 	for change := 0; change < numberOfRandomChanges; change++ {
-		modelToStore.TryRandomChange()
+		modelToStore.DoRandomChange()
 	}
 
 	modelToRetrieve := modelToStore.DeepClone()
@@ -70,6 +71,7 @@ func TestArchivist_Retrieve_AlteredModel(t *testing.T) {
 
 	// then
 	g.Expect(modelToStore.DecisionVariables()).To(Equal(modelToRetrieve.DecisionVariables()))
+	g.Expect(modelToStore.ManagementActions()).To(Equal(modelToRetrieve.ManagementActions()))
 }
 
 func buildMultiObjectiveDumbModel() *modumb.Model {

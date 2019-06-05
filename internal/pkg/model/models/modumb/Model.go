@@ -4,6 +4,7 @@ package modumb
 
 import (
 	"fmt"
+	"strconv"
 
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -29,6 +30,12 @@ type Model struct {
 	managementActions action.ModelManagementActions
 
 	observer.ContainedEventNotifier
+}
+
+var Objectives = []string{
+	"Objective_0",
+	"Objective_1",
+	"Objective_2",
 }
 
 func NewModel() *Model {
@@ -69,25 +76,32 @@ func (m *Model) buildDecisionVariables() {
 	m.ContainedDecisionVariables.Initialise()
 	objectiveOne := new(variables.DumbObjective).
 		Initialise().
-		WithName("ObjectiveOne").
+		WithName(Objectives[0]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveOneValue)).
 		WithObservers(m)
 
 	objectiveTwo := new(variables.DumbObjective).
 		Initialise().
-		WithName("ObjectiveTwo").
+		WithName(Objectives[1]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveTwoValue)).
 		WithObservers(m)
 
 	objectiveThree := new(variables.DumbObjective).
 		Initialise().
-		WithName("ObjectiveThree").
+		WithName(Objectives[2]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveThreeValue)).
 		WithObservers(m)
 
 	m.ContainedDecisionVariables.Add(
 		objectiveOne, objectiveTwo, objectiveThree,
 	)
+
+	sortedKeys := m.ContainedDecisionVariables.DecisionVariables().SortedKeys()
+
+	for _, value := range sortedKeys {
+		variable := m.ContainedDecisionVariables.Variable(value)
+		m.ObserveDecisionVariable(variable)
+	}
 }
 
 func (m *Model) buildManagementActions() {
@@ -95,25 +109,25 @@ func (m *Model) buildManagementActions() {
 	numberOfPlanningUnits := m.parameters.GetInt64(parameters.NumberOfPlanningUnits)
 	for planningUnit := int64(0); planningUnit < numberOfPlanningUnits; planningUnit++ {
 
-		planningUnitAsString := fmt.Sprintf("%d", planningUnit)
+		planningUnitAsString := strconv.FormatInt(planningUnit, 10)
 
 		actionOne := actions.New().
-			WithObjectiveValue("ObjectiveOne", 1).
+			WithObjectiveValue(action.ModelVariableName(Objectives[0]), -1).
 			WithPlanningUnit(planningUnitAsString)
 
 		actionTwo := actions.New().
-			WithObjectiveValue("ObjectiveOne", 2).
+			WithObjectiveValue(action.ModelVariableName(Objectives[1]), -2).
 			WithPlanningUnit(planningUnitAsString)
 
 		actionThree := actions.New().
-			WithObjectiveValue("ObjectiveOne", 4).
+			WithObjectiveValue(action.ModelVariableName(Objectives[2]), -3).
 			WithPlanningUnit(planningUnitAsString)
 
 		m.managementActions.Add(actionOne, actionTwo, actionThree)
 
-		actionOne.Subscribe(m.ContainedDecisionVariables.Variable("ObjectiveOne"))
-		actionTwo.Subscribe(m.ContainedDecisionVariables.Variable("ObjectiveTwo"))
-		actionThree.Subscribe(m.ContainedDecisionVariables.Variable("ObjectiveThree"))
+		actionOne.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[0]))
+		actionTwo.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[1]))
+		actionThree.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[2]))
 	}
 }
 
@@ -124,6 +138,12 @@ func (m *Model) TearDown() {
 func (m *Model) TryRandomChange() {
 	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
+}
+
+func (m *Model) DoRandomChange() {
+	m.note("Applying Random Change")
+	m.managementActions.RandomlyToggleOneActivation()
+	m.AcceptChange()
 }
 
 func (m *Model) SetDecisionVariable(name string, value float64) {
@@ -151,6 +171,10 @@ func (m *Model) SetManagementAction(index int, value bool) {
 	m.managementActions.SetActivation(index, value)
 }
 
+func (m *Model) SetManagementActionUnobserved(index int, value bool) {
+	m.managementActions.SetActivationUnobserved(index, value)
+}
+
 func (m *Model) PlanningUnits() solution.PlanningUnitIds { return nil }
 
 func (m *Model) DeepClone() model.Model {
@@ -169,5 +193,33 @@ func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value())
+	m.EventNotifier().NotifyObserversOfEvent(*event)
+}
+
+func (m *Model) ObserveAction(action action.ManagementAction) {
+	m.noteAppliedManagementAction(action)
+}
+
+func (m *Model) ObserveActionInitialising(action action.ManagementAction) {
+	m.noteAppliedManagementAction(action)
+}
+
+func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction) {
+
+	event := observer.NewEvent(observer.ManagementAction).
+		WithId(m.Id()).
+		WithAttribute("Type", actionToNote.Type()).
+		WithAttribute("PlanningUnit", actionToNote.PlanningUnit()).
+		WithAttribute("IsActive", actionToNote.IsActive())
+
+	for _, name := range Objectives {
+		modelVariableName := action.ModelVariableName(name)
+		value := actionToNote.ModelVariableValue(modelVariableName)
+		if value != 0 {
+			noteText := fmt.Sprintf("Changing [%s] with active value=[%f]", name, value)
+			event.WithNote(noteText)
+		}
+	}
+
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }

@@ -29,6 +29,7 @@ type Model interface {
 	ManagementActions() []action.ManagementAction
 	ActiveManagementActions() []action.ManagementAction
 	SetManagementAction(index int, value bool)
+	SetManagementActionUnobserved(index int, value bool)
 
 	PlanningUnits() solution.PlanningUnitIds
 }
@@ -76,11 +77,13 @@ func (nm *nullModel) WithName(name string) *nullModel {
 	return nm
 }
 
-func (nm *nullModel) Initialise()                                      {}
-func (nm *nullModel) TearDown()                                        {}
-func (nm *nullModel) TryRandomChange()                                 {}
-func (nm *nullModel) AcceptChange()                                    {}
-func (nm *nullModel) RevertChange()                                    {}
+func (nm *nullModel) Initialise() {}
+func (nm *nullModel) TearDown()   {}
+
+func (nm *nullModel) TryRandomChange() {}
+func (nm *nullModel) AcceptChange()    {}
+func (nm *nullModel) RevertChange()    {}
+
 func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 	newVariable := variable.NewSimpleDecisionVariable(name)
@@ -88,8 +91,12 @@ func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 }
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}
-func (nm *nullModel) ManagementActions() []action.ManagementAction               { return nil }
-func (nm *nullModel) ActiveManagementActions() []action.ManagementAction         { return nil }
-func (nm *nullModel) SetManagementAction(index int, value bool)                  {}
-func (nm *nullModel) PlanningUnits() solution.PlanningUnitIds                    { return nil }
-func (nm *nullModel) DeepClone() Model                                           { return nm }
+
+func (nm *nullModel) ManagementActions() []action.ManagementAction        { return nil }
+func (nm *nullModel) ActiveManagementActions() []action.ManagementAction  { return nil }
+func (nm *nullModel) SetManagementAction(index int, value bool)           {}
+func (nm *nullModel) SetManagementActionUnobserved(index int, value bool) {}
+
+func (nm *nullModel) PlanningUnits() solution.PlanningUnitIds { return nil }
+
+func (nm *nullModel) DeepClone() Model { return nm }

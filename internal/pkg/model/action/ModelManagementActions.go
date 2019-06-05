@@ -88,3 +88,7 @@ func (m *ModelManagementActions) ActiveActions() []ManagementAction {
 func (m *ModelManagementActions) SetActivation(index int, value bool) {
 	m.actions[index].SetActivation(value)
 }
+
+func (m *ModelManagementActions) SetActivationUnobserved(index int, value bool) {
+	m.actions[index].SetActivationUnobserved(value)
+}

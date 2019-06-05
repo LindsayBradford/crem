@@ -35,14 +35,14 @@ func (kp *Parameters) buildMetaData() {
 		parameters.MetaData{
 			Key:          InitialObjectiveTwoValue,
 			Validator:    kp.Parameters.IsDecimal,
-			DefaultValue: float64(1000),
+			DefaultValue: float64(2000),
 		},
 	)
 	kp.AddMetaData(
 		parameters.MetaData{
 			Key:          InitialObjectiveThreeValue,
 			Validator:    kp.Parameters.IsDecimal,
-			DefaultValue: float64(1000),
+			DefaultValue: float64(3000),
 		},
 	)
 	kp.AddMetaData(

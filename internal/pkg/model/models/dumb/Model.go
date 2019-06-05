@@ -117,9 +117,10 @@ func (dm *Model) RevertChange() {
 	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
 }
 
-func (dm *Model) ManagementActions() []action.ManagementAction       { return nil }
-func (dm *Model) ActiveManagementActions() []action.ManagementAction { return nil }
-func (dm *Model) SetManagementAction(index int, value bool)          {}
+func (dm *Model) ManagementActions() []action.ManagementAction        { return nil }
+func (dm *Model) ActiveManagementActions() []action.ManagementAction  { return nil }
+func (dm *Model) SetManagementAction(index int, value bool)           {}
+func (dm *Model) SetManagementActionUnobserved(index int, value bool) {}
 
 func (dm *Model) PlanningUnits() solution.PlanningUnitIds { return nil }
 

@@ -40,6 +40,6 @@ func (a *Archivist) buildActionArchive(model model.Model) archive.BooleanArchive
 func (a *Archivist) Retrieve(archive *ModelArchive, model model.Model) {
 	actionArchive := archive.Actions()
 	for index := 0; index < actionArchive.Len(); index++ {
-		model.SetManagementAction(index, actionArchive.Value(index))
+		model.SetManagementActionUnobserved(index, actionArchive.Value(index))
 	}
 }
