@@ -73,6 +73,10 @@ func (v *Float64Vector) IsDominatedBy(otherCandidate Candidate) bool {
 	return otherCandidate.Dominates(v)
 }
 
+func (v *Float64Vector) DominancePresent(otherCandidate Candidate) bool {
+	return v.Dominates(otherCandidate) || otherCandidate.Dominates(v)
+}
+
 func (v *Float64Vector) NoDominancePresent(otherCandidate Candidate) bool {
-	return !(v.Dominates(otherCandidate) && otherCandidate.Dominates(v))
+	return !(v.DominancePresent(otherCandidate))
 }

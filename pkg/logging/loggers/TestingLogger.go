@@ -38,3 +38,17 @@ func buildTestingEventNotifier() observer.EventNotifier {
 
 	return eventNotifier
 }
+
+var NullTestingEventNotifier = buildNullTestingEventNotifier()
+
+func buildNullTestingEventNotifier() observer.EventNotifier {
+	filter := new(filters.IterationCountFilter)
+	messageObserver := new(annealingObserver.AnnealingMessageObserver).
+		WithLogHandler(new(NullLogger)).
+		WithFilter(filter)
+
+	eventNotifier := new(observer.SynchronousAnnealingEventNotifier)
+	eventNotifier.AddObserver(messageObserver)
+
+	return eventNotifier
+}
