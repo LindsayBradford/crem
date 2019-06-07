@@ -10,6 +10,116 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const equalTo = "=="
+
+func TestNonDominanceModelArchive_EmptyArchive_IsNonDominant(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// when
+	archiveUnderTest := New()
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+}
+
+func TestNonDominanceModelArchive_ArchiveSetPropertyMaintained(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	modelToChange := buildSilentMultiObjectiveDumbModel()
+	archiveUnderTest := New()
+
+	// when
+	modelToChange.DoRandomChange()
+	storageResult := archiveUnderTest.Archive(modelToChange)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+
+	// when
+	storageResult = archiveUnderTest.Archive(modelToChange)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(RejectedWithDuplicateEntryDetected))
+}
+
+func TestNonDominanceModelArchive_DominatorReplaceDominated(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	modelToChange := buildSilentMultiObjectiveDumbModel()
+	archiveUnderTest := New()
+
+	// when
+	storageResult := archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+
+	// when
+	modelToChange.SetManagementAction(0, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+
+	// when
+	modelToChange.SetManagementAction(3, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+}
+
+func TestNonDominanceModelArchive_ArchiveAttemptOfDominatedRejected(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	modelToChange := buildSilentMultiObjectiveDumbModel()
+	archiveUnderTest := New()
+
+	// when
+	storageResult := archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+
+	// when
+	modelToChange.SetManagementAction(0, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+
+	// when
+	modelToChange.SetManagementAction(0, false)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.Archive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(RejectedWithStoredEntryDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+}
+
 func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -31,13 +141,10 @@ func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
 		// then
 		g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	}
+
 	t.Logf("Model cnanges required for [%d] archive entrries = %d\n", actualArchiveSize, changesRequired)
 
-	for _, entry := range archiveUnderTest.archive {
-		t.Logf("%v\n", entry.Variables)
-	}
-
-	g.Expect(true).To(BeTrue())
+	showArchiveState(t, archiveUnderTest)
 }
 
 func buildSilentMultiObjectiveDumbModel() *modumb.Model {
@@ -45,4 +152,10 @@ func buildSilentMultiObjectiveDumbModel() *modumb.Model {
 	model.SetEventNotifier(loggers.NullTestingEventNotifier)
 	model.Initialise()
 	return model
+}
+
+func showArchiveState(t *testing.T, archive *NonDominanceModelArchive) {
+	for _, entry := range archive.archive {
+		t.Logf("Variables: %v, action SHA265: %s\n", entry.Variables, entry.Actions.Sha256())
+	}
 }

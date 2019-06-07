@@ -59,15 +59,6 @@ func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState
 	return storageState
 }
 
-func (a *NonDominanceModelArchive) newModelStateIsRejectedByArchive(modelState *CompressedModelState) bool {
-	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
-		if a.archive[currentIndex].Variables.Dominates(&modelState.Variables) {
-			return true
-		}
-	}
-	return false
-}
-
 func (a *NonDominanceModelArchive) newModelStateCannotBeArchived(modelState *CompressedModelState) StorageResult {
 	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
 		if a.archive[currentIndex].Variables.Dominates(&modelState.Variables) {
@@ -84,6 +75,10 @@ func (a *NonDominanceModelArchive) IsEmpty() bool {
 	return len(a.archive) == 0
 }
 
+func (a *NonDominanceModelArchive) Len() int {
+	return len(a.archive)
+}
+
 func (a *NonDominanceModelArchive) IsNonDominant() bool {
 	if a.IsEmpty() {
 		return true
@@ -92,13 +87,9 @@ func (a *NonDominanceModelArchive) IsNonDominant() bool {
 	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
 		for downstreamIndex := currentIndex + 1; downstreamIndex < len(a.archive)-1; downstreamIndex++ {
 			if a.archive[currentIndex].Variables.DominancePresent(&a.archive[downstreamIndex].Variables) {
-				return false
+				return false // Shouldn't happen if ArchiveState() is successfully ensuring non-dominance holds regardless.
 			}
 		}
 	}
 	return true
-}
-
-func (a *NonDominanceModelArchive) ArchiveArray() []*CompressedModelState {
-	return a.archive
 }

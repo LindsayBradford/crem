@@ -4,9 +4,13 @@
 package archive
 
 import (
-	"github.com/pkg/errors"
+	"crypto/sha256"
+	"fmt"
 	"math"
+	"strconv"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 const entriesPerArchiveEntry = 64
@@ -112,4 +116,15 @@ func (a *BooleanArchive) IsEquivalentTo(b *BooleanArchive) bool {
 		}
 	}
 	return true
+}
+
+func (a *BooleanArchive) Sha256() string {
+	archiveAsByteArray := make([]byte, 0)
+	for index := range a.archiveArray {
+		bytes := []byte(strconv.FormatUint(a.archiveArray[index], 10))
+		archiveAsByteArray = append(archiveAsByteArray, bytes...)
+	}
+
+	sha256OfArchive := sha256.Sum256(archiveAsByteArray)
+	return fmt.Sprintf("%x", sha256OfArchive)
 }

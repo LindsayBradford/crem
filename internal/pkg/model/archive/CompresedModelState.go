@@ -47,3 +47,7 @@ func (c *CompressedModelState) actionValuesMatch(index int, model model.Model) b
 func (c *CompressedModelState) IsEquivalentTo(otherSate *CompressedModelState) bool {
 	return c.Actions.IsEquivalentTo(&otherSate.Actions)
 }
+
+func (c *CompressedModelState) Sha256() string {
+	return c.Actions.Sha256()
+}
