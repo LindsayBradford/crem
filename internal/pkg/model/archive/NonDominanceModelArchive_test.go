@@ -18,19 +18,23 @@ func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
 	archiveUnderTest := New()
 
 	// when
-	numberOfRandomChanges := 200
-	for change := 0; change < numberOfRandomChanges; change++ {
+	desiredArchiveSize := 7
+	actualArchiveSize := len(archiveUnderTest.archive)
+	var changesRequired uint
+	for actualArchiveSize < desiredArchiveSize {
 		modelToChange.DoRandomChange()
+		changesRequired++
 
 		archiveUnderTest.Archive(modelToChange)
-
-		for _, entry := range archiveUnderTest.archive {
-			t.Logf("%v\n", entry.Variables)
-		}
-		t.Log("----\n")
+		actualArchiveSize = len(archiveUnderTest.archive)
 
 		// then
 		g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	}
+	t.Logf("Model cnanges required for [%d] archive entrries = %d\n", actualArchiveSize, changesRequired)
+
+	for _, entry := range archiveUnderTest.archive {
+		t.Logf("%v\n", entry.Variables)
 	}
 
 	g.Expect(true).To(BeTrue())

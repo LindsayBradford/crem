@@ -99,3 +99,16 @@ func (a *BooleanArchive) deriveDetail(entryIndex int) *entryDetail {
 func archiveSize(entriesNeeded int) int {
 	return int(math.Ceil(float64(entriesNeeded) / entriesPerArchiveEntry))
 }
+
+func (a *BooleanArchive) IsEquivalentTo(b *BooleanArchive) bool {
+	if len(a.archiveArray) != len(b.archiveArray) {
+		return false
+	}
+
+	for index := range a.archiveArray {
+		if a.archiveArray[index] != b.archiveArray[index] {
+			return false
+		}
+	}
+	return true
+}

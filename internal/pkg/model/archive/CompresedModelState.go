@@ -43,3 +43,7 @@ func (c *CompressedModelState) actionsMatch(model model.Model) bool {
 func (c *CompressedModelState) actionValuesMatch(index int, model model.Model) bool {
 	return c.Actions.Value(index) == model.ManagementActions()[index].IsActive()
 }
+
+func (c *CompressedModelState) IsEquivalentTo(otherSate *CompressedModelState) bool {
+	return c.Actions.IsEquivalentTo(&otherSate.Actions)
+}

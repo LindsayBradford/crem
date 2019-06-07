@@ -4,12 +4,14 @@ package archive
 
 import "github.com/LindsayBradford/crem/internal/pkg/model"
 
-type StorageDominanceResult uint
+type StorageResult uint
 
 const (
-	StoredReplacingDominatedEntries StorageDominanceResult = iota
+	StoredReplacingDominatedEntries StorageResult = iota
 	StoredWithNoDominanceDetected
 	RejectedWithStoredEntryDominanceDetected
+	RejectedWithDuplicateEntryDetected
+	canBeStored
 )
 
 func New() *NonDominanceModelArchive {
@@ -26,17 +28,19 @@ func (a *NonDominanceModelArchive) Initialise() *NonDominanceModelArchive {
 	return a
 }
 
-func (a *NonDominanceModelArchive) Archive(model model.Model) StorageDominanceResult {
+func (a *NonDominanceModelArchive) Archive(model model.Model) StorageResult {
 	compressedModelState := a.compressor.Compress(model)
 	return a.ArchiveState(compressedModelState)
 }
 
-func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState) StorageDominanceResult {
-	if a.newModelStateIsDominatedByArchiveEntries(modelState) {
-		return RejectedWithStoredEntryDominanceDetected
+func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState) StorageResult {
+	storageState := a.newModelStateCannotBeArchived(modelState)
+
+	if storageState != canBeStored {
+		return storageState
 	}
 
-	storageState := StoredWithNoDominanceDetected
+	storageState = StoredWithNoDominanceDetected
 
 	nonDominatedArray := make([]*CompressedModelState, 0)
 	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
@@ -55,13 +59,25 @@ func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState
 	return storageState
 }
 
-func (a *NonDominanceModelArchive) newModelStateIsDominatedByArchiveEntries(modelState *CompressedModelState) bool {
+func (a *NonDominanceModelArchive) newModelStateIsRejectedByArchive(modelState *CompressedModelState) bool {
 	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
 		if a.archive[currentIndex].Variables.Dominates(&modelState.Variables) {
 			return true
 		}
 	}
 	return false
+}
+
+func (a *NonDominanceModelArchive) newModelStateCannotBeArchived(modelState *CompressedModelState) StorageResult {
+	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
+		if a.archive[currentIndex].Variables.Dominates(&modelState.Variables) {
+			return RejectedWithStoredEntryDominanceDetected
+		}
+		if a.archive[currentIndex].Actions.IsEquivalentTo(&modelState.Actions) {
+			return RejectedWithDuplicateEntryDetected
+		}
+	}
+	return canBeStored
 }
 
 func (a *NonDominanceModelArchive) IsEmpty() bool {
