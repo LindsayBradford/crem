@@ -101,7 +101,8 @@ func archiveSize(entriesNeeded int) int {
 }
 
 func (a *BooleanArchive) IsEquivalentTo(b *BooleanArchive) bool {
-	if len(a.archiveArray) != len(b.archiveArray) {
+	if a.size != b.size {
+		return false
 		return false
 	}
 

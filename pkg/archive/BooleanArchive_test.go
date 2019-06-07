@@ -11,7 +11,7 @@ import (
 
 const equalTo = "=="
 
-func TestBankSedimentContribution_New(t *testing.T) {
+func TestBooleanArchive_New(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -30,7 +30,7 @@ func TestBankSedimentContribution_New(t *testing.T) {
 	}
 }
 
-func TestBankSedimentContribution_SetValue_OverArchiveRage(t *testing.T) {
+func TestBooleanArchive_SetValue_OverArchiveRage(t *testing.T) {
 	g := NewGomegaWithT(t)
 	random := rand.NewTimeSeeded()
 
@@ -77,7 +77,7 @@ func TestBankSedimentContribution_SetValue_OverArchiveRage(t *testing.T) {
 	g.Expect(falseCount).To(BeNumerically(equalTo, expectedSize-numberToSetTrue))
 }
 
-func TestBankSedimentContribution_SetValue_Toggling(t *testing.T) {
+func TestBooleanArchive_SetValue_Toggling(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedSize := 5
@@ -100,7 +100,7 @@ func TestBankSedimentContribution_SetValue_Toggling(t *testing.T) {
 	}
 }
 
-func TestBankSedimentContribution_SetValue_OutsideValidRange(t *testing.T) {
+func TestBooleanArchive_SetValue_OutsideValidRange(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -124,7 +124,7 @@ func TestBankSedimentContribution_SetValue_OutsideValidRange(t *testing.T) {
 	g.Expect(outOfBoundsSet).To(Panic())
 }
 
-func TestBankSedimentContribution_Value_OutsideValidRange(t *testing.T) {
+func TestBooleanArchive_Value_OutsideValidRange(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -146,4 +146,62 @@ func TestBankSedimentContribution_Value_OutsideValidRange(t *testing.T) {
 
 	// then
 	g.Expect(outOfBoundsValue).To(Panic())
+}
+
+func TestBooleanArchive_IsEquivalentTo_ValidResponses(t *testing.T) {
+	g := NewGomegaWithT(t)
+	random := rand.NewTimeSeeded()
+
+	expectedSize := 200
+	firstArchiveUnderTest := New(expectedSize)
+	secondArchiveUnderTest := New(expectedSize)
+
+	// given
+
+	numberToSetTrue := 10
+	expectedTrueIndexes := make([]int, numberToSetTrue)
+	for current := 0; current < numberToSetTrue; current++ {
+		indexToSetTrue := random.Intn(expectedSize)
+		for previous := 0; previous < current; previous++ {
+			duplicateIndexFound := true
+			for duplicateIndexFound {
+				if expectedTrueIndexes[previous] == indexToSetTrue {
+					indexToSetTrue = random.Intn(expectedSize)
+				} else {
+					duplicateIndexFound = false
+				}
+			}
+		}
+		expectedTrueIndexes[current] = indexToSetTrue
+	}
+	t.Logf("Archive indexes that should be set to true: %v", expectedTrueIndexes)
+
+	for current := 0; current < numberToSetTrue; current++ {
+		// when
+		firstArchiveUnderTest.SetValue(expectedTrueIndexes[current], true)
+
+		// then
+		g.Expect(firstArchiveUnderTest.IsEquivalentTo(secondArchiveUnderTest)).To(BeFalse())
+
+		// when
+		secondArchiveUnderTest.SetValue(expectedTrueIndexes[current], true)
+
+		// then
+		g.Expect(firstArchiveUnderTest.IsEquivalentTo(secondArchiveUnderTest)).To(BeTrue())
+	}
+}
+
+func TestBooleanArchive_IsEquivalentTo_InvalidTest(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	baseSize := 200
+	baseArchiveUnderTest := New(baseSize)
+	sameSizedArchiveUnderTest := New(baseSize)
+
+	g.Expect(baseArchiveUnderTest.IsEquivalentTo(sameSizedArchiveUnderTest)).To(BeTrue())
+
+	differentSize := baseSize + 1
+	differentlySizedArchiveUnderTest := New(differentSize)
+
+	g.Expect(baseArchiveUnderTest.IsEquivalentTo(differentlySizedArchiveUnderTest)).To(BeFalse())
 }
