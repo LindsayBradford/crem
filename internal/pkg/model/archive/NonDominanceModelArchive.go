@@ -12,6 +12,7 @@ const (
 	RejectedWithStoredEntryDominanceDetected
 	RejectedWithDuplicateEntryDetected
 	canBeStored
+	StoredForcingDominatingStateRemoval
 )
 
 func New() *NonDominanceModelArchive {
@@ -28,12 +29,12 @@ func (a *NonDominanceModelArchive) Initialise() *NonDominanceModelArchive {
 	return a
 }
 
-func (a *NonDominanceModelArchive) Archive(model model.Model) StorageResult {
+func (a *NonDominanceModelArchive) AttemptToArchive(model model.Model) StorageResult {
 	compressedModelState := a.compressor.Compress(model)
-	return a.ArchiveState(compressedModelState)
+	return a.AttemptToArchiveState(compressedModelState)
 }
 
-func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState) StorageResult {
+func (a *NonDominanceModelArchive) AttemptToArchiveState(modelState *CompressedModelState) StorageResult {
 	storageState := a.newModelStateCannotBeArchived(modelState)
 
 	if storageState != canBeStored {
@@ -57,6 +58,26 @@ func (a *NonDominanceModelArchive) ArchiveState(modelState *CompressedModelState
 
 	a.archive = append(a.archive, modelState)
 	return storageState
+}
+
+func (a *NonDominanceModelArchive) ForceIntoArchive(model model.Model) StorageResult {
+	compressedModelState := a.compressor.Compress(model)
+	return a.ForceModelStateIntoArchive(compressedModelState)
+}
+
+func (a *NonDominanceModelArchive) ForceModelStateIntoArchive(modelState *CompressedModelState) StorageResult {
+	nonDominatedArray := make([]*CompressedModelState, 0)
+	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
+		currentState := &a.archive[currentIndex].Variables
+		if !currentState.Dominates(&modelState.Variables) {
+			nonDominatedArray = append(nonDominatedArray, a.archive[currentIndex])
+		}
+	}
+
+	a.archive = nonDominatedArray
+
+	a.archive = append(a.archive, modelState)
+	return StoredForcingDominatingStateRemoval
 }
 
 func (a *NonDominanceModelArchive) newModelStateCannotBeArchived(modelState *CompressedModelState) StorageResult {
@@ -87,7 +108,7 @@ func (a *NonDominanceModelArchive) IsNonDominant() bool {
 	for currentIndex := 0; currentIndex < len(a.archive); currentIndex++ {
 		for downstreamIndex := currentIndex + 1; downstreamIndex < len(a.archive)-1; downstreamIndex++ {
 			if a.archive[currentIndex].Variables.DominancePresent(&a.archive[downstreamIndex].Variables) {
-				return false // Shouldn't happen if ArchiveState() is successfully ensuring non-dominance holds regardless.
+				return false // Shouldn't happen if AttemptToArchiveState() is successfully ensuring non-dominance holds regardless.
 			}
 		}
 	}
