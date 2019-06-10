@@ -5,6 +5,7 @@ package kirkpatrick
 import (
 	"math"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -21,8 +22,9 @@ type Explorer struct {
 	name.IdentifiableContainer
 
 	model.ContainedModel
-	rand.RandContainer
 	loggers.ContainedLogger
+
+	kirkpatrick.Coolant
 
 	scenarioId string
 
@@ -34,9 +36,6 @@ type Explorer struct {
 	changeIsDesirable     bool
 	changeAccepted        bool
 	objectiveValueChange  float64
-
-	temperature   float64
-	coolingFactor float64
 }
 
 func New() *Explorer {
@@ -68,7 +67,7 @@ func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
 	ke.setOptimisationDirectionFromParams()
 
 	ke.SetTemperature(ke.parameters.GetFloat64(StartingTemperature))
-	ke.coolingFactor = ke.parameters.GetFloat64(CoolingFactor)
+	ke.CoolingFactor = ke.parameters.GetFloat64(CoolingFactor)
 
 	ke.checkDecisionVariableFromParams()
 
@@ -79,7 +78,7 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 	if temperature <= 0 {
 		return errors.New("invalid attempt to set annealer temperature to value <= 0")
 	}
-	ke.temperature = temperature
+	ke.Temperature = temperature
 	return nil
 }
 
@@ -124,27 +123,12 @@ func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction f
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
 	} else {
-		if ke.shouldAcceptBadChange() {
+		if ke.DecideIfAcceptable(ke.objectiveValueChange) {
 			acceptFunction()
 		} else {
 			revertFunction()
 		}
 	}
-}
-
-func (ke *Explorer) shouldAcceptBadChange() bool {
-	probabilityToAcceptBadChange := ke.calculateProbabilityToAcceptBadChange()
-	randomValue := ke.RandomNumberGenerator().Float64Unitary()
-	return probabilityToAcceptBadChange > randomValue
-}
-
-func (ke *Explorer) calculateProbabilityToAcceptBadChange() float64 {
-	absoluteChangeInObjectiveValue := math.Abs(ke.objectiveValueChange)
-	probabilityToAcceptBadChange := math.Exp(-absoluteChangeInObjectiveValue / ke.temperature)
-
-	ke.setAcceptanceProbability(probabilityToAcceptBadChange)
-
-	return probabilityToAcceptBadChange
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
@@ -192,11 +176,11 @@ func (ke *Explorer) setAcceptanceProbability(probability float64) {
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	baseAttributes := new(attributes.Attributes).
 		Add(explorer.ObjectiveValue, ke.ObjectiveValue()).
-		Add(explorer.Temperature, ke.temperature)
+		Add(explorer.Temperature, ke.Temperature)
 
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes.Add(explorer.CoolingFactor, ke.coolingFactor)
+		return baseAttributes.Add(explorer.CoolingFactor, ke.CoolingFactor)
 	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes
 	case observer.FinishedIteration:
@@ -207,8 +191,4 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 			Add(explorer.ChangeAccepted, ke.changeAccepted)
 	}
 	return nil
-}
-
-func (ke *Explorer) CoolDown() {
-	ke.temperature *= ke.coolingFactor
 }
