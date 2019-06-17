@@ -291,6 +291,12 @@ func TestAnnealerBuilder_DumbAnnealerRichValidConfig(t *testing.T) {
 	g.Expect(actualObservers[1]).To(BeAssignableToTypeOf(dummyAttributeObserver))
 }
 
+func NewTestRegisterableExplorer() *TestRegistereableExplorer {
+	explorer := new(TestRegistereableExplorer)
+	explorer.Explorer = *kirkpatrick.New()
+	return explorer
+}
+
 type TestRegistereableExplorer struct {
 	kirkpatrick.Explorer
 }
@@ -310,7 +316,7 @@ func TestAnnealerBuilder_NullAnnealerWithCustomExplorer(t *testing.T) {
 		ExplorerRegistration{
 			ExplorerType: "TestDefinedSolutionExplorer",
 			ConfigFunction: func(config SolutionExplorerConfig) explorer.Explorer {
-				return new(TestRegistereableExplorer).WithName(config.Name)
+				return NewTestRegisterableExplorer().WithName(config.Name)
 			},
 		},
 	)

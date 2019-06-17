@@ -4,7 +4,10 @@
 package main
 
 import (
+	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	appTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
+
 	"testing"
 )
 
@@ -57,6 +60,31 @@ func TestKirkpatrickDumbAnnealerIntegrationOneRun(t *testing.T) {
 		T:                 t,
 		ConfigFilePath:    "testdata/KirkpatrickDumbAnnealerTestConfig-OneRun.toml",
 		ExpectedErrorCode: appTesting.WithSuccess,
+	}
+
+	appTesting.TestExecutableAgainstConfigFile(context)
+}
+
+func TestKirkpatrickDumbAnnealer_ScenarioOneRunWhitebox_ExitWithSuccess(t *testing.T) {
+	context := appTesting.WhiteboxTestingContext{
+		Name:           "Single run of catchment model annealer",
+		T:              t,
+		ConfigFilePath: "testdata/KirkpatrickDumbAnnealerTestConfig-Whitebox-OneRun.toml",
+		Runner:         RunFromConfigFile,
+	}
+
+	scenario.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
+func TestKirkpatrickDumbAnnealerBadConfig_Fails(t *testing.T) {
+	context := appTesting.BlackboxTestingContext{
+		T:                 t,
+		Name:              "Kirkpatrick Dumb Annealer with Bad Config",
+		ExecutablePath:    dumbAnnealerExecutablePath,
+		TimeoutSeconds:    defaultDumbAnnealerTimeout,
+		ConfigFilePath:    "testdata/KirkpatrickDumbAnnealerTestConfig-BadConfig.toml",
+		ExpectedErrorCode: appTesting.WithFailure,
 	}
 
 	appTesting.TestExecutableAgainstConfigFile(context)

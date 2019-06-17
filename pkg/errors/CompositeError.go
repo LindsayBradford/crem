@@ -21,6 +21,7 @@ type CompositeError struct {
 func New(text string) *CompositeError {
 	newError := new(CompositeError)
 	newError.compositeText = text
+	newError.individualErrors = make([]error, 0)
 	return newError
 }
 

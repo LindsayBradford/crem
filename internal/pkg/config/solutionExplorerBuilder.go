@@ -88,6 +88,10 @@ func (builder *solutionExplorerBuilder) Build(explorerName string) (explorer.Exp
 		return null.NullExplorer, builder.errors
 	}
 
+	if myExplorer.ParameterErrors() != nil {
+		return null.NullExplorer, myExplorer.ParameterErrors()
+	}
+
 	return myExplorer, nil
 }
 

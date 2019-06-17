@@ -26,7 +26,7 @@ type LogHandlersBuilder struct {
 }
 
 func (builder *LogHandlersBuilder) initialise() *LogHandlersBuilder {
-	builder.errors = new(CompositeError)
+	builder.errors = New("LogHandler")
 	return builder
 }
 

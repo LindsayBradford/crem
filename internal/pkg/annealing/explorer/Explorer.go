@@ -33,6 +33,7 @@ type Explorer interface {
 	DeepClone() Explorer
 	Initialise()
 	TearDown()
+	ParameterErrors() error
 
 	TryRandomChange()
 

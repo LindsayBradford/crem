@@ -1,0 +1,31 @@
+ScenarioName = "Test Kirkpatrick Dumb Annealer - One run"
+
+[[AnnealingObservers]]
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 1 # 200
+
+[[AnnealingObservers]]
+Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+
+[[Models]]
+Type = "DumbModel"
+Name = "DumbAndMostlyVanillaModel"
+[Models.Parameters]
+InitialObjectiveValue = 2_000.0
+MaximumObjectiveValue = 2_500.0
+MinimumObjectiveValue = 1_500.0
+
+[[SolutionExplorers]]
+Type = "KirkpatrickExplorer"
+Name = "Explosa"
+[SolutionExplorers.Parameters]
+OptimisationDirection = "Mimimising"
+StartingTemperature = "wrong"
+CoolingFactor =  "Even More Wrong"
+
+[Annealer]
+SolutionExplorer = "Explosa"
+Model = "DumbAndMostlyVanillaModel"
+[Annealer.Parameters]
+MaximumIterations = 2_000 # 1M

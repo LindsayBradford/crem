@@ -25,6 +25,7 @@ func (e *Explorer) WithName(name string) *Explorer {
 func (e *Explorer) DeepClone() explorer.Explorer { return e }
 func (e *Explorer) Initialise()                  {}
 func (e *Explorer) TearDown()                    {}
+func (e *Explorer) ParameterErrors() error       { return nil }
 
 func (e *Explorer) TryRandomChange() {}
 func (e *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
