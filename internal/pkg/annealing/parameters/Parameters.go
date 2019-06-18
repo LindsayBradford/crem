@@ -74,12 +74,12 @@ func (p *Parameters) Merge(params Map) {
 	}
 }
 
-func (p *Parameters) MergeOnly(params Map, keys ...string) {
-	p.validationErrors = errors.New("SolutionExplorer Parameters")
-	for suppliedKey, suppliedValue := range params {
-		for _, filterKey := range keys {
-			if suppliedKey == filterKey && p.validateParam(suppliedKey, suppliedValue) {
-				p.paramMap[suppliedKey] = suppliedValue
+func (p *Parameters) AssignUserValues(userValues Map) {
+	p.validationErrors = errors.New("Parameters")
+	for _, key := range p.specifications.Keys() {
+		if value, userSpecifiedKey := userValues[key]; userSpecifiedKey {
+			if p.validateParam(key, value) {
+				p.paramMap[key] = value
 			}
 		}
 	}

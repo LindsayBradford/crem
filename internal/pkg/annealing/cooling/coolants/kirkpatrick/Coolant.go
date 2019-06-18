@@ -27,7 +27,7 @@ func (c *Coolant) Initialise() *Coolant {
 }
 
 func (c *Coolant) WithParameters(params parameters.Map) *Coolant {
-	c.parameters.MergeOnly(params, StartingTemperature, CoolingFactor)
+	c.parameters.AssignUserValues(params)
 
 	c.Temperature = c.parameters.GetFloat64(StartingTemperature)
 	c.CoolingFactor = c.parameters.GetFloat64(CoolingFactor)

@@ -30,6 +30,14 @@ func (s Specifications) HasEntry(key string) bool {
 	return isPresent
 }
 
+func (s Specifications) Keys() []string {
+	keys := make([]string, 0)
+	for key := range s {
+		keys = append(keys, key)
+	}
+	return keys
+}
+
 func (s Specifications) Merge(specsToMerge Specifications) {
 	for key, value := range specsToMerge {
 		s[key] = value
