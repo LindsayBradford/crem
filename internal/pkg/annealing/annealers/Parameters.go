@@ -4,28 +4,14 @@ package annealers
 
 import "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 
-const (
-	_                        = iota
-	MaximumIterations string = "MaximumIterations"
-)
-
 type Parameters struct {
 	parameters.Parameters
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Parameters.Initialise()
-	p.buildMetaData()
-	p.CreateDefaults()
+	p.Parameters.CreateEmpty().
+		WithSpecifications(
+			DefineSpecifications(),
+		).AssigningDefaults()
 	return p
-}
-
-func (p *Parameters) buildMetaData() {
-	p.AddMetaData(
-		parameters.MetaData{
-			Key:          MaximumIterations,
-			Validator:    p.IsNonNegativeInteger,
-			DefaultValue: int64(0),
-		},
-	)
 }

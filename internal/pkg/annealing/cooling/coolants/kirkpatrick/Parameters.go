@@ -6,6 +6,12 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 )
 
+const (
+	_                          = iota
+	CoolingFactor       string = "CoolingFactor"
+	StartingTemperature string = "StartingTemperature"
+)
+
 type Parameters struct {
 	parameters.Parameters
 }

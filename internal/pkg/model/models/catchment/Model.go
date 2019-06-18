@@ -152,7 +152,7 @@ func (m *Model) buildManagementActions() {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	// TODO: Create other sediment management actions
+	// TODO: CreateEmpty other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)

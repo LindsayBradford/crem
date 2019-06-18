@@ -20,7 +20,6 @@ MinimumObjectiveValue = 1_500.0
 Type = "KirkpatrickExplorer"
 Name = "Explosa"
 [SolutionExplorers.Parameters]
-OptimisationDirection = "Mimimising"
 StartingTemperature = "wrong"
 CoolingFactor =  "Even More Wrong"
 

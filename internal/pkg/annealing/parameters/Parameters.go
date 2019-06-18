@@ -3,10 +3,7 @@
 package parameters
 
 import (
-	"fmt"
-	"math"
-	"os"
-
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
 
@@ -18,7 +15,7 @@ type Container interface {
 
 type Parameters struct {
 	paramMap         Map
-	metaDataMap      MetaDataMap
+	specifications   *specification.Specifications
 	validationErrors *errors.CompositeError
 }
 
@@ -36,20 +33,11 @@ func (m Map) SetString(key string, value string) {
 	m[key] = value
 }
 
-type MetaDataMap map[string]MetaData
-
-type MetaData struct {
-	Key          string
-	Validator    Validator
-	DefaultValue interface{}
-	IsOptional   bool
-}
-
 type Validator func(key string, value interface{}) bool
 
-func (p *Parameters) Initialise() *Parameters {
+func (p *Parameters) CreateEmpty() *Parameters {
 	p.validationErrors = errors.New("Parameters")
-	p.metaDataMap = make(MetaDataMap, 0)
+	p.specifications = specification.New()
 	return p
 }
 
@@ -58,17 +46,23 @@ func (p *Parameters) HasEntry(entryKey string) bool {
 	return entryFound
 }
 
-func (p *Parameters) CreateDefaults() {
+func (p *Parameters) AssigningDefaults() {
 	p.paramMap = make(Map, 0)
-	for key, value := range p.metaDataMap {
+	for key, value := range *p.specifications {
 		if !value.IsOptional {
 			p.paramMap[key] = value.DefaultValue
 		}
 	}
 }
 
-func (p *Parameters) AddMetaData(metaData MetaData) {
-	p.metaDataMap[metaData.Key] = metaData
+func (p *Parameters) WithSpecifications(specifications *specification.Specifications) *Parameters {
+	p.specifications = specifications
+	return p
+}
+
+func (p *Parameters) AddingSpecification(specification specification.Specification) *Parameters {
+	p.specifications.Add(specification)
+	return p
 }
 
 func (p *Parameters) Merge(params Map) {
@@ -76,6 +70,17 @@ func (p *Parameters) Merge(params Map) {
 	for suppliedKey, suppliedValue := range params {
 		if p.validateParam(suppliedKey, suppliedValue) {
 			p.paramMap[suppliedKey] = suppliedValue
+		}
+	}
+}
+
+func (p *Parameters) MergeOnly(params Map, keys ...string) {
+	p.validationErrors = errors.New("SolutionExplorer Parameters")
+	for suppliedKey, suppliedValue := range params {
+		for _, filterKey := range keys {
+			if suppliedKey == filterKey && p.validateParam(suppliedKey, suppliedValue) {
+				p.paramMap[suppliedKey] = suppliedValue
+			}
 		}
 	}
 }
@@ -92,105 +97,16 @@ func (p *Parameters) ValidationErrors() error {
 }
 
 func (p *Parameters) validateParam(key string, value interface{}) bool {
-	if _, isPresent := p.metaDataMap[key]; isPresent {
-		return p.metaDataMap[key].Validator(key, value)
-	} else {
-		p.keyMissingValidator(key)
+	specsAsMap := *p.specifications
+	validationError := specsAsMap.Validate(key, value).(specification.ValidationError)
+	if !validationError.IsValid() {
+		p.validationErrors.Add(validationError)
 	}
-	return true
+	return validationError.IsValid()
 }
 
 func (p *Parameters) keyMissingValidator(key string) {
 	p.validationErrors.AddMessage("Parameter [" + string(key) + "] is not a parameter for this explorer")
-}
-
-func (p *Parameters) IsDecimal(key string, value interface{}) bool {
-	_, typeIsOk := value.(float64)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be a decimal value")
-		return false
-	}
-	return true
-}
-
-func (p *Parameters) IsDecimalBetweenZeroAndOne(key string, value interface{}) bool {
-	return p.IsDecimalWithInclusiveBounds(key, value, 0, 1)
-}
-
-func (p *Parameters) IsNonNegativeDecimal(key string, value interface{}) bool {
-	return p.IsDecimalWithInclusiveBounds(key, value, 0, math.MaxFloat64)
-}
-
-func (p *Parameters) IsDecimalWithInclusiveBounds(key string, value interface{}, minValue float64, maxValue float64) bool {
-	valueAsFloat, typeIsOk := value.(float64)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be a decimal value")
-		return false
-	}
-
-	if valueAsFloat < minValue || valueAsFloat > maxValue {
-		message := fmt.Sprintf("Parameter [%s] supplied with decimal value [%g], but must be between [%g] and [%g] inclusive", key, value, minValue, maxValue)
-		p.validationErrors.AddMessage(message)
-		return false
-	}
-	return true
-}
-
-func (p *Parameters) IsInteger(key string, value interface{}) bool {
-	_, typeIsOk := value.(int64)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be an integer value")
-		return false
-	}
-	return true
-}
-
-func (p *Parameters) IsNonNegativeInteger(key string, value interface{}) bool {
-	return p.IsIntegerWithInclusiveBounds(key, value, 0, math.MaxInt64)
-}
-
-func (p *Parameters) IsIntegerWithInclusiveBounds(key string, value interface{}, minValue int64, maxValue int64) bool {
-	valueAsInteger, typeIsOk := value.(int64)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be an integer value")
-		return false
-	}
-
-	if valueAsInteger < minValue || valueAsInteger > maxValue {
-		message := fmt.Sprintf("Parameter [%s] supplied with integer value [%v], but must be between [%d] and [%d] inclusive", key, value, minValue, maxValue)
-		p.validationErrors.AddMessage(message)
-		return false
-	}
-	return true
-}
-
-func (p *Parameters) IsString(key string, value interface{}) bool {
-	_, typeIsOk := value.(string)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be a string value")
-		return false
-	}
-	return true
-}
-
-func (p *Parameters) IsReadableFile(key string, value interface{}) bool {
-	valueAsString, typeIsOk := value.(string)
-	if !typeIsOk {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be a string")
-		return false
-	}
-	if !isReadableFilePath(valueAsString) {
-		p.validationErrors.AddMessage("Parameter [" + key + "] must be a valid path to a readable file")
-		return false
-	}
-	return true
-}
-
-func isReadableFilePath(filePath string) bool {
-	file, err := os.OpenFile(filePath, os.O_RDONLY, 0666)
-	defer file.Close()
-
-	return err == nil
 }
 
 func (p *Parameters) GetInt64(key string) int64 {

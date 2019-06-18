@@ -70,7 +70,8 @@ func TestKirkpatrickDumbAnnealer_ScenarioOneRunWhitebox_ExitWithSuccess(t *testi
 		Name:           "Single run of catchment model annealer",
 		T:              t,
 		ConfigFilePath: "testdata/KirkpatrickDumbAnnealerTestConfig-Whitebox-OneRun.toml",
-		Runner:         RunFromConfigFile,
+		// ConfigFilePath:    "testdata/KirkpatrickDumbAnnealerTestConfig-BadConfig.toml",
+		Runner: RunFromConfigFile,
 	}
 
 	scenario.LogHandler = loggers.DefaultTestingLogger

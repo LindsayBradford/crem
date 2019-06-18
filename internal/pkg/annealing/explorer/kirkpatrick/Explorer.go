@@ -12,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/attributes"
+	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -41,12 +42,14 @@ type Explorer struct {
 func New() *Explorer {
 	newExplorer := new(Explorer)
 	newExplorer.parameters.Initialise()
+	newExplorer.Coolant.Initialise()
 	newExplorer.SetModel(model.NewNullModel())
 	return newExplorer
 }
 
 func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
+
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
 }
@@ -62,13 +65,10 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 }
 
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
-	ke.parameters.Merge(params)
+	ke.parameters.MergeOnly(params, DecisionVariableName, OptimisationDirection)
+	ke.Coolant.WithParameters(params)
 
 	ke.setOptimisationDirectionFromParams()
-
-	ke.SetTemperature(ke.parameters.GetFloat64(StartingTemperature))
-	ke.CoolingFactor = ke.parameters.GetFloat64(CoolingFactor)
-
 	ke.checkDecisionVariableFromParams()
 
 	return ke
@@ -101,7 +101,16 @@ func (ke *Explorer) checkDecisionVariableFromParams() {
 }
 
 func (ke *Explorer) ParameterErrors() error {
+	coolantErrors := ke.Coolant.ParameterErrors()
+	if explorerErrors, isComposite := ke.parameters.ValidationErrors().(*errors2.CompositeError); isComposite {
+		explorerErrors.Add(coolantErrors)
+		return explorerErrors
+	} else if coolantErrors != nil {
+		return coolantErrors
+	}
+
 	return ke.parameters.ValidationErrors()
+
 }
 
 func (ke *Explorer) ObjectiveValue() float64 {

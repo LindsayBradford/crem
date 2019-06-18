@@ -20,7 +20,7 @@ MinimumObjectiveValue = 1_500.0
 Type = "KirkpatrickExplorer"
 Name = "DerpaDaExBurba"
 [SolutionExplorers.Parameters]
-OptimisationDirection = "Mimimising"
+OptimisationDirection = "Minimising"
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.95  # 0.99
 

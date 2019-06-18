@@ -5,15 +5,38 @@ package kirkpatrick
 import (
 	"math"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 )
 
 type Coolant struct {
 	rand.RandContainer
+	parameters Parameters
 
 	AcceptanceProbability float64
 	Temperature           float64
 	CoolingFactor         float64
+}
+
+func (c *Coolant) Initialise() *Coolant {
+	c.parameters.CreateEmpty().
+		WithSpecifications(
+			DefineSpecifications(),
+		).AssigningDefaults()
+	return c
+}
+
+func (c *Coolant) WithParameters(params parameters.Map) *Coolant {
+	c.parameters.MergeOnly(params, StartingTemperature, CoolingFactor)
+
+	c.Temperature = c.parameters.GetFloat64(StartingTemperature)
+	c.CoolingFactor = c.parameters.GetFloat64(CoolingFactor)
+
+	return c
+}
+
+func (c *Coolant) ParameterErrors() error {
+	return c.parameters.ValidationErrors()
 }
 
 func (c *Coolant) DecideIfAcceptable(objectiveFunctionChange float64) bool {
