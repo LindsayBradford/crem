@@ -37,7 +37,7 @@ type Validator func(key string, value interface{}) bool
 
 func (p *Parameters) CreateEmpty() *Parameters {
 	p.validationErrors = errors.New("Parameters")
-	p.specifications = specification.New()
+	p.specifications = specification.NewSpecifications()
 	return p
 }
 

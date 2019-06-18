@@ -3,7 +3,7 @@
 package components
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 )
 
 const (
@@ -11,18 +11,18 @@ const (
 	DataSourcePath string = "DataSourcePath"
 )
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          Penalty,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: 1.0,
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          DataSourcePath,
-			Validator:    specification.IsReadableFile,
+			Validator:    IsReadableFile,
 			DefaultValue: "",
 		},
 	)

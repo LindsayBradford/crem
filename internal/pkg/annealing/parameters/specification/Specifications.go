@@ -13,7 +13,7 @@ type Specification struct {
 	IsOptional   bool
 }
 
-func New() *Specifications {
+func NewSpecifications() *Specifications {
 	newSpecs := make(Specifications, 0)
 	return &newSpecs
 }

@@ -24,7 +24,7 @@ const (
 )
 
 func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+	specs := specification.NewSpecifications()
 	specs.Add(
 		specification.Specification{
 			Key:          BankErosionFudgeFactor,

@@ -3,7 +3,7 @@
 package parameters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 )
 
 const (
@@ -14,30 +14,30 @@ const (
 	NumberOfPlanningUnits = "NumberOfPlanningUnits"
 )
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          InitialObjectiveOneValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(1000),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          InitialObjectiveTwoValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(2000),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          InitialObjectiveThreeValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(3000),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          NumberOfPlanningUnits,
-			Validator:    specification.IsNonNegativeInteger,
+			Validator:    IsNonNegativeInteger,
 			DefaultValue: int64(100),
 		},
 	)

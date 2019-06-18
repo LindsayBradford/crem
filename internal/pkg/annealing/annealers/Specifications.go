@@ -9,7 +9,7 @@ import (
 const MaximumIterations string = "MaximumIterations"
 
 func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+	specs := specification.NewSpecifications()
 	specs.Add(
 		specification.Specification{
 			Key:          MaximumIterations,

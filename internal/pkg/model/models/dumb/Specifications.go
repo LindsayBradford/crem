@@ -3,7 +3,7 @@
 package dumb
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 )
 
 const (
@@ -12,24 +12,24 @@ const (
 	MaximumObjectiveValue = "MaximumObjectiveValue"
 )
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          InitialObjectiveValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(1000),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          MinimumObjectiveValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(0),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          MaximumObjectiveValue,
-			Validator:    specification.IsDecimal,
+			Validator:    IsDecimal,
 			DefaultValue: float64(2000),
 		},
 	)

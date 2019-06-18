@@ -3,21 +3,21 @@
 package kirkpatrick
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 )
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          StartingTemperature,
-			Validator:    specification.IsNonNegativeDecimal,
+			Validator:    IsNonNegativeDecimal,
 			DefaultValue: float64(0),
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          CoolingFactor,
-			Validator:    specification.IsDecimalBetweenZeroAndOne,
+			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(1.0),
 		},
 	)

@@ -31,7 +31,7 @@ const defaultStringValue = "<undefiled>"
 func TestSpecifications_InvalidKey(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	noSpecificationError := specsUnderTest.Validate(notValidKey, defaultIntegerValue).(ValidationError)
 	t.Log(noSpecificationError)
@@ -41,7 +41,7 @@ func TestSpecifications_InvalidKey(t *testing.T) {
 func TestSpecifications_Decimal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -63,7 +63,7 @@ func TestSpecifications_Decimal(t *testing.T) {
 func TestSpecifications_NonNegativeDecimal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -89,7 +89,7 @@ func TestSpecifications_NonNegativeDecimal(t *testing.T) {
 func TestSpecifications_BetweenZeroAndOneDecimal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -123,7 +123,7 @@ func TestSpecifications_BetweenZeroAndOneDecimal(t *testing.T) {
 func TestSpecifications_Integer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -145,7 +145,7 @@ func TestSpecifications_Integer(t *testing.T) {
 func TestSpecifications_NonNegativeInteger(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -171,7 +171,7 @@ func TestSpecifications_NonNegativeInteger(t *testing.T) {
 func TestSpecifications_IsString(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -193,7 +193,7 @@ func TestSpecifications_IsString(t *testing.T) {
 func TestSpecifications_IsReadableFile(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -219,7 +219,7 @@ func TestSpecifications_IsReadableFile(t *testing.T) {
 func TestSpecifications_Merge(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	specsUnderTest := New()
+	specsUnderTest := NewSpecifications()
 
 	specsUnderTest.Add(
 		Specification{
@@ -237,7 +237,7 @@ func TestSpecifications_Merge(t *testing.T) {
 	t.Log(stringSpecMissingError)
 	g.Expect(stringSpecMissingError.IsValid()).To(BeFalse())
 
-	stringSpec := New()
+	stringSpec := NewSpecifications()
 
 	stringSpec.Add(
 		Specification{

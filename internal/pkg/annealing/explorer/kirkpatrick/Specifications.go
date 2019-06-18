@@ -5,7 +5,7 @@ package kirkpatrick
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -34,16 +34,16 @@ func (od optimisationDirection) String() string {
 	}
 }
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.New()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          DecisionVariableName,
-			Validator:    specification.IsString,
+			Validator:    IsString,
 			DefaultValue: variable.ObjectiveValue,
 		},
 	).Add(
-		specification.Specification{
+		Specification{
 			Key:          OptimisationDirection,
 			Validator:    isOptimisationDirection,
 			DefaultValue: Minimising.String(),
@@ -55,12 +55,12 @@ func DefineSpecifications() *specification.Specifications {
 func isOptimisationDirection(key string, value interface{}) error {
 	valueAsString, typeIsOk := value.(string)
 	if !typeIsOk {
-		return specification.NewInvalidSpecificationError("Parameter [" + key + "] must be a string value")
+		return NewInvalidSpecificationError("Parameter [" + key + "] must be a string value")
 	}
 	if _, parsingError := parseOptimisationDirection(valueAsString); parsingError == nil {
-		return specification.NewValidSpecificationError(key, value)
+		return NewValidSpecificationError(key, value)
 	} else {
-		return specification.NewInvalidSpecificationError(parsingError.Error())
+		return NewInvalidSpecificationError(parsingError.Error())
 	}
 }
 
