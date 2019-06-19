@@ -15,6 +15,7 @@ Name = "DumbAndMostlyVanillaModel"
 InitialObjectiveValue = 2_000.0
 MaximumObjectiveValue = 2_500.0
 MinimumObjectiveValue = 1_500.0
+NonExistantModelParam = "Shouldn't be here"
 
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"

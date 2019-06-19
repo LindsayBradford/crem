@@ -11,7 +11,7 @@ const (
 	DataSourcePath string = "DataSourcePath"
 )
 
-func DefineSpecifications() *Specifications {
+func ParameterSpecifications() *Specifications {
 	specs := NewSpecifications()
 	specs.Add(
 		Specification{

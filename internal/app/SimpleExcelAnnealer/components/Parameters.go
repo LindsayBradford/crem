@@ -11,6 +11,8 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Enforces(DefineSpecifications())
+	p.Parameters.
+		Initialise("Simple Excel Annealer Parameter Validation").
+		Enforcing(ParameterSpecifications())
 	return p
 }

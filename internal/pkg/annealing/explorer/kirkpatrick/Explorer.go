@@ -101,16 +101,16 @@ func (ke *Explorer) checkDecisionVariableFromParams() {
 }
 
 func (ke *Explorer) ParameterErrors() error {
-	coolantErrors := ke.Coolant.ParameterErrors()
-	if explorerErrors, isComposite := ke.parameters.ValidationErrors().(*errors2.CompositeError); isComposite {
-		explorerErrors.Add(coolantErrors)
-		return explorerErrors
-	} else if coolantErrors != nil {
-		return coolantErrors
+	mergedErrors := errors2.New("Kirkpatrick Explorer Parameter Validation")
+
+	mergedErrors.Add(ke.parameters.ValidationErrors())
+	mergedErrors.Add(ke.Coolant.ParameterErrors())
+
+	if mergedErrors.Size() > 0 {
+		return mergedErrors
 	}
 
-	return ke.parameters.ValidationErrors()
-
+	return nil
 }
 
 func (ke *Explorer) ObjectiveValue() float64 {

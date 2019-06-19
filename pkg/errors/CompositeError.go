@@ -111,7 +111,15 @@ func (ce *CompositeError) Size() int {
 
 // Add includes newError as one of the sub-errors of a CompositeError
 func (ce *CompositeError) Add(newError error) {
-	ce.individualErrors = append(ce.individualErrors, newError)
+	switch typedError := newError.(type) {
+	case nil:
+	case *CompositeError:
+		if typedError.Size() > 0 {
+			ce.individualErrors = append(ce.individualErrors, newError)
+		}
+	default:
+		ce.individualErrors = append(ce.individualErrors, newError)
+	}
 }
 
 // Add combines the supplied message as a new built-in error to the array of sub-errors of a CompositeError

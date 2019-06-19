@@ -11,9 +11,11 @@ type Parameters struct {
 	parameters.Parameters
 }
 
-func (kp *Parameters) Initialise() *Parameters {
-	kp.Enforces(ParameterSpecifications())
-	return kp
+func (p *Parameters) Initialise() *Parameters {
+	p.Parameters.
+		Initialise("Kirkpatrick Coolant Parameter Validation").
+		Enforcing(ParameterSpecifications())
+	return p
 }
 
 const (

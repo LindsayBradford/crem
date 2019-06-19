@@ -14,7 +14,9 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Enforces(ParameterSpecifications())
+	p.Parameters.
+		Initialise("Catchment Model Parameter Validation").
+		Enforcing(ParameterSpecifications())
 	return p
 }
 

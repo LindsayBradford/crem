@@ -33,17 +33,15 @@ type Parameters struct {
 	validationErrors errors.CompositeError
 }
 
-func (p *Parameters) Enforces(specs *specification.Specifications) *Parameters {
-	p.Initialise().
-		WithSpecifications(specs).
-		CreatingDefaults()
+func (p *Parameters) Enforcing(specs *specification.Specifications) *Parameters {
+	p.WithSpecifications(specs).CreatingDefaults()
 	return p
 }
 
 type Validator func(key string, value interface{}) bool
 
-func (p *Parameters) Initialise() *Parameters {
-	p.validationErrors.Initialise("Parameters")
+func (p *Parameters) Initialise(parametersName string) *Parameters {
+	p.validationErrors.Initialise(parametersName)
 	p.specifications = make(specification.Specifications, 0)
 	return p
 }

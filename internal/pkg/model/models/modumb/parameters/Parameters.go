@@ -12,7 +12,9 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Enforces(DefineSpecifications())
+	p.Parameters.
+		Initialise("Multi-Objective Dumb Model Parameter Validation").
+		Enforcing(ParameterSpecifications())
 	return p
 }
 
@@ -24,7 +26,7 @@ const (
 	NumberOfPlanningUnits = "NumberOfPlanningUnits"
 )
 
-func DefineSpecifications() *Specifications {
+func ParameterSpecifications() *Specifications {
 	specs := NewSpecifications()
 	specs.Add(
 		Specification{

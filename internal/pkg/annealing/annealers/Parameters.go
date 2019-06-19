@@ -9,9 +9,8 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Parameters.Initialise().
-		WithSpecifications(
-			DefineSpecifications(),
-		).CreatingDefaults()
+	p.Parameters.
+		Initialise("Annealer Parameter Validation").
+		Enforcing(DefineSpecifications())
 	return p
 }
