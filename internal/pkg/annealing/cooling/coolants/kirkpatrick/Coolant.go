@@ -5,7 +5,7 @@ package kirkpatrick
 import (
 	"math"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 )
 

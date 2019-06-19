@@ -3,7 +3,7 @@
 package components
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 )
 
 type Parameters struct {

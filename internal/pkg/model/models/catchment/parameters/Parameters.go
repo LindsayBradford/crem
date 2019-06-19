@@ -3,10 +3,10 @@
 package parameters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"math"
 
-	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 )
 
 type Parameters struct {

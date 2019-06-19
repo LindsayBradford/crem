@@ -3,7 +3,7 @@
 package annealers
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	. "github.com/onsi/gomega"
 )
 import "testing"

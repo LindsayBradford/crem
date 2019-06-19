@@ -3,7 +3,7 @@
 package parameters
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
 

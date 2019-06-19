@@ -3,9 +3,9 @@
 package parameters
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 	"testing"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
 	. "github.com/onsi/gomega"
 )
 
@@ -43,7 +43,7 @@ func TestAddMetaData_CreateDefaults(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters)
-	parametersUnderTest.CreateEmpty().WithSpecifications(testSpecifications()).AssigningDefaults()
+	parametersUnderTest.Enforces(testSpecifications())
 
 	g.Expect(parametersUnderTest.GetFloat64(decimalKey)).To(BeNumerically("==", defaultDecimalValue), "metadata should have set correct default")
 	g.Expect(parametersUnderTest.GetInt64(integerKey)).To(BeNumerically("==", defaultIntegerValue), "metadata should have set correct default")
@@ -56,7 +56,7 @@ func TestMergeOptionalParameter(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	parametersUnderTest := new(Parameters)
-	parametersUnderTest.CreateEmpty().WithSpecifications(testSpecifications()).AssigningDefaults()
+	parametersUnderTest.Enforces(testSpecifications())
 
 	g.Expect(parametersUnderTest.HasEntry(optionalKey)).To(BeFalse(), "default for optional meta data entry should not have been created")
 

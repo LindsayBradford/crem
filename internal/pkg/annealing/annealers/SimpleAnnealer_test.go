@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
 )

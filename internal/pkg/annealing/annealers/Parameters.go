@@ -2,7 +2,7 @@
 
 package annealers
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+import "github.com/LindsayBradford/crem/internal/pkg/parameters"
 
 type Parameters struct {
 	parameters.Parameters

@@ -3,7 +3,7 @@
 package annealers
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 )
 
 const MaximumIterations string = "MaximumIterations"
