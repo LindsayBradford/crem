@@ -55,7 +55,7 @@ func (sem *SimpleExcelModel) buildDecisionVariables() {
 }
 
 func (sem *SimpleExcelModel) WithParameters(params parameters.Map) *SimpleExcelModel {
-	sem.parameters.Merge(params)
+	sem.parameters.AssignOnlyEnforcedUserValues(params)
 	return sem
 }
 

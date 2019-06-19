@@ -24,7 +24,7 @@ func (c *Coolant) Initialise() *Coolant {
 }
 
 func (c *Coolant) WithParameters(params parameters.Map) *Coolant {
-	c.parameters.AssignUserValues(params)
+	c.parameters.AssignOnlyEnforcedUserValues(params)
 
 	c.Temperature = c.parameters.GetFloat64(StartingTemperature)
 	c.CoolingFactor = c.parameters.GetFloat64(CoolingFactor)

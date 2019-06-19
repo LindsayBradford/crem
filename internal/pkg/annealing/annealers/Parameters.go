@@ -9,9 +9,9 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Parameters.CreateEmpty().
+	p.Parameters.Initialise().
 		WithSpecifications(
 			DefineSpecifications(),
-		).AssigningDefaults()
+		).CreatingDefaults()
 	return p
 }

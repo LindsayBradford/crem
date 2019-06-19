@@ -45,7 +45,7 @@ func (dm *Model) WithName(name string) *Model {
 }
 
 func (dm *Model) WithParameters(params parameters.Map) *Model {
-	dm.parameters.Merge(params)
+	dm.parameters.AssignAllUserValues(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
 	dm.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)

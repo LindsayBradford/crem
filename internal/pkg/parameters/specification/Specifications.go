@@ -61,6 +61,6 @@ func (m *MissingSpecificationError) IsValid() bool {
 
 func NewSpecificationMissingError(key string) *MissingSpecificationError {
 	newError := new(MissingSpecificationError)
-	newError.baseError = errors.New("Parameter [" + key + "] has no specification")
+	newError.baseError = errors.New("Parameter [" + key + "] is not supported")
 	return newError
 }

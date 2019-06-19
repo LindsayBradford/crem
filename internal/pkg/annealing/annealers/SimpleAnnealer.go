@@ -58,7 +58,7 @@ func (sa *SimpleAnnealer) SetId(title string) {
 }
 
 func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
-	sa.parameters.Merge(params)
+	sa.parameters.AssignOnlyEnforcedUserValues(params)
 	sa.assignStateFromParameters()
 	return sa.parameters.ValidationErrors()
 }

@@ -59,7 +59,7 @@ func (m *Model) WithId(id string) *Model {
 }
 
 func (m *Model) WithParameters(params baseParameters.Map) *Model {
-	m.parameters.Merge(params)
+	m.parameters.AssignAllUserValues(params)
 	return m
 }
 

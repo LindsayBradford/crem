@@ -11,9 +11,6 @@ type Parameters struct {
 }
 
 func (p *Parameters) Initialise() *Parameters {
-	p.Parameters.CreateEmpty().
-		WithSpecifications(
-			DefineSpecifications(),
-		).AssigningDefaults()
+	p.Enforces(DefineSpecifications())
 	return p
 }

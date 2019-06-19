@@ -7,26 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/errors"
 )
 
-// ContainedLogger is an interface for anything needing Parameters
-type Container interface {
-	SetParameters(params Map) error
-	ParameterErrors() error
-}
-
-type Parameters struct {
-	paramMap         Map
-	specifications   *specification.Specifications
-	validationErrors errors.CompositeError
-}
-
 type Map map[string]interface{}
-
-func (p *Parameters) Enforces(specs *specification.Specifications) *Parameters {
-	p.CreateEmpty().
-		WithSpecifications(specs).
-		AssigningDefaults()
-	return p
-}
 
 func (m Map) SetInt64(key string, value int64) {
 	m[key] = value
@@ -40,11 +21,30 @@ func (m Map) SetString(key string, value string) {
 	m[key] = value
 }
 
+// ContainedLogger is an interface for anything needing Parameters
+type Container interface {
+	SetParameters(params Map) error
+	ParameterErrors() error
+}
+
+type Parameters struct {
+	paramMap         Map
+	specifications   specification.Specifications
+	validationErrors errors.CompositeError
+}
+
+func (p *Parameters) Enforces(specs *specification.Specifications) *Parameters {
+	p.Initialise().
+		WithSpecifications(specs).
+		CreatingDefaults()
+	return p
+}
+
 type Validator func(key string, value interface{}) bool
 
-func (p *Parameters) CreateEmpty() *Parameters {
+func (p *Parameters) Initialise() *Parameters {
 	p.validationErrors.Initialise("Parameters")
-	p.specifications = specification.NewSpecifications()
+	p.specifications = make(specification.Specifications, 0)
 	return p
 }
 
@@ -53,9 +53,9 @@ func (p *Parameters) HasEntry(entryKey string) bool {
 	return entryFound
 }
 
-func (p *Parameters) AssigningDefaults() {
+func (p *Parameters) CreatingDefaults() {
 	p.paramMap = make(Map, 0)
-	for key, value := range *p.specifications {
+	for key, value := range p.specifications {
 		if !value.IsOptional {
 			p.paramMap[key] = value.DefaultValue
 		}
@@ -63,24 +63,19 @@ func (p *Parameters) AssigningDefaults() {
 }
 
 func (p *Parameters) WithSpecifications(specifications *specification.Specifications) *Parameters {
-	p.specifications = specifications
+	p.specifications = *specifications
 	return p
 }
 
-func (p *Parameters) AddingSpecification(specification specification.Specification) *Parameters {
-	p.specifications.Add(specification)
-	return p
-}
-
-func (p *Parameters) Merge(params Map) {
-	for suppliedKey, suppliedValue := range params {
+func (p *Parameters) AssignAllUserValues(userValues Map) {
+	for suppliedKey, suppliedValue := range userValues {
 		if p.validateParam(suppliedKey, suppliedValue) {
 			p.paramMap[suppliedKey] = suppliedValue
 		}
 	}
 }
 
-func (p *Parameters) AssignUserValues(userValues Map) {
+func (p *Parameters) AssignOnlyEnforcedUserValues(userValues Map) {
 	for _, key := range p.specifications.Keys() {
 		if value, userSpecifiedKey := userValues[key]; userSpecifiedKey {
 			if p.validateParam(key, value) {
@@ -102,16 +97,11 @@ func (p *Parameters) ValidationErrors() error {
 }
 
 func (p *Parameters) validateParam(key string, value interface{}) bool {
-	specsAsMap := *p.specifications
-	validationError := specsAsMap.Validate(key, value).(specification.ValidationError)
+	validationError := p.specifications.Validate(key, value).(specification.ValidationError)
 	if !validationError.IsValid() {
 		p.validationErrors.Add(validationError)
 	}
 	return validationError.IsValid()
-}
-
-func (p *Parameters) keyMissingValidator(key string) {
-	p.validationErrors.AddMessage("Parameter [" + string(key) + "] is not a parameter for this explorer")
 }
 
 func (p *Parameters) GetInt64(key string) int64 {

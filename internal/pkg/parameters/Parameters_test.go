@@ -34,7 +34,7 @@ const defaultStringValue = "<undefiled>"
 func TestEmptyParameters_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	parametersUnderTest := new(Parameters).CreateEmpty()
+	parametersUnderTest := new(Parameters).Initialise()
 
 	g.Expect(parametersUnderTest.ValidationErrors()).To(BeNil(), "No errors on initialising empty parameters")
 }
@@ -65,7 +65,7 @@ func TestMergeOptionalParameter(t *testing.T) {
 	expectedValue := 0.4
 
 	paramsToMerge[optionalKey] = expectedValue
-	parametersUnderTest.Merge(paramsToMerge)
+	parametersUnderTest.AssignAllUserValues(paramsToMerge)
 
 	g.Expect(parametersUnderTest.GetFloat64(optionalKey)).To(BeNumerically("==", expectedValue), "metadata should have set correct default")
 }
@@ -73,7 +73,7 @@ func TestMergeOptionalParameter(t *testing.T) {
 func TestAddValidationErrorMessage(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	parametersUnderTest := new(Parameters).CreateEmpty()
+	parametersUnderTest := new(Parameters).Initialise()
 	parametersUnderTest.AddValidationErrorMessage("here is a user-defined validation error, useful for embedding semantics tests to one or more parameters")
 
 	g.Expect(parametersUnderTest.ValidationErrors()).To(Not(BeNil()))

@@ -76,8 +76,7 @@ func (m *Model) WithParameters(params baseParameters.Map) *Model {
 }
 
 func (m *Model) SetParameters(params baseParameters.Map) error {
-	m.parameters.Merge(params)
-
+	m.parameters.AssignAllUserValues(params)
 	return m.parameters.ValidationErrors()
 }
 
@@ -152,7 +151,7 @@ func (m *Model) buildManagementActions() {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	// TODO: CreateEmpty other sediment management actions
+	// TODO: Initialise other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)

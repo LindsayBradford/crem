@@ -65,7 +65,7 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 }
 
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
-	ke.parameters.AssignUserValues(params)
+	ke.parameters.AssignOnlyEnforcedUserValues(params)
 	ke.Coolant.WithParameters(params)
 
 	ke.setOptimisationDirectionFromParams()
