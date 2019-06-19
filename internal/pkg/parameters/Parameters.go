@@ -16,7 +16,7 @@ type Container interface {
 type Parameters struct {
 	paramMap         Map
 	specifications   *specification.Specifications
-	validationErrors *errors.CompositeError
+	validationErrors errors.CompositeError
 }
 
 type Map map[string]interface{}
@@ -43,7 +43,7 @@ func (m Map) SetString(key string, value string) {
 type Validator func(key string, value interface{}) bool
 
 func (p *Parameters) CreateEmpty() *Parameters {
-	p.validationErrors = errors.New("Parameters")
+	p.validationErrors.Initialise("Parameters")
 	p.specifications = specification.NewSpecifications()
 	return p
 }
@@ -73,7 +73,6 @@ func (p *Parameters) AddingSpecification(specification specification.Specificati
 }
 
 func (p *Parameters) Merge(params Map) {
-	p.validationErrors = errors.New("SolutionExplorer Parameters")
 	for suppliedKey, suppliedValue := range params {
 		if p.validateParam(suppliedKey, suppliedValue) {
 			p.paramMap[suppliedKey] = suppliedValue
@@ -82,7 +81,6 @@ func (p *Parameters) Merge(params Map) {
 }
 
 func (p *Parameters) AssignUserValues(userValues Map) {
-	p.validationErrors = errors.New("Parameters")
 	for _, key := range p.specifications.Keys() {
 		if value, userSpecifiedKey := userValues[key]; userSpecifiedKey {
 			if p.validateParam(key, value) {
@@ -98,7 +96,7 @@ func (p *Parameters) AddValidationErrorMessage(errorMessage string) {
 
 func (p *Parameters) ValidationErrors() error {
 	if p.validationErrors.Size() > 0 {
-		return p.validationErrors
+		return &p.validationErrors
 	}
 	return nil
 }

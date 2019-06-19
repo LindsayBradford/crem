@@ -19,10 +19,14 @@ type CompositeError struct {
 
 // New returns a new CompositeError. The text parameter supplied is used as a prefix when reporting a list of errors.
 func New(text string) *CompositeError {
-	newError := new(CompositeError)
-	newError.compositeText = text
-	newError.individualErrors = make([]error, 0)
+	newError := new(CompositeError).Initialise(text)
 	return newError
+}
+
+func (ce *CompositeError) Initialise(text string) *CompositeError {
+	ce.compositeText = text
+	ce.individualErrors = make([]error, 0)
+	return ce
 }
 
 // Error conforms to the built-in interface type for representing an error condition over a composed set of errors.
