@@ -38,6 +38,30 @@ func TestSpecifications_InvalidKey(t *testing.T) {
 	g.Expect(noSpecificationError.IsValid()).To(BeFalse())
 }
 
+func TestSpecifications_Keys(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	specsUnderTest := NewSpecifications()
+
+	g.Expect(specsUnderTest.Keys()).To(BeEmpty())
+
+	specsUnderTest.Add(
+		Specification{
+			Key:          decimalKey,
+			Validator:    IsDecimal,
+			DefaultValue: defaultDecimalValue,
+		},
+	).Add(
+		Specification{
+			Key:          integerKey,
+			Validator:    IsInteger,
+			DefaultValue: defaultDecimalValue,
+		},
+	)
+
+	g.Expect(specsUnderTest.Keys()).To(ConsistOf(decimalKey, integerKey))
+}
+
 func TestSpecifications_Decimal(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -214,46 +238,4 @@ func TestSpecifications_IsReadableFile(t *testing.T) {
 	validError := specsUnderTest.Validate(readableFileKey, "testdata/readableFile.txt").(ValidationError)
 	t.Log(validError)
 	g.Expect(validError.IsValid()).To(BeTrue())
-}
-
-func TestSpecifications_Merge(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	specsUnderTest := NewSpecifications()
-
-	specsUnderTest.Add(
-		Specification{
-			Key:          decimalKey,
-			Validator:    IsDecimal,
-			DefaultValue: defaultDecimalValue,
-		},
-	)
-
-	validError := specsUnderTest.Validate(decimalKey, float64(10)).(ValidationError)
-	t.Log(validError)
-	g.Expect(validError.IsValid()).To(BeTrue())
-
-	stringSpecMissingError := specsUnderTest.Validate(stringKey, defaultStringValue).(ValidationError)
-	t.Log(stringSpecMissingError)
-	g.Expect(stringSpecMissingError.IsValid()).To(BeFalse())
-
-	stringSpec := NewSpecifications()
-
-	stringSpec.Add(
-		Specification{
-			Key:          stringKey,
-			Validator:    IsString,
-			DefaultValue: defaultStringValue,
-		},
-	)
-
-	stringSpecPresentError := stringSpec.Validate(stringKey, defaultStringValue).(ValidationError)
-	t.Log(stringSpecPresentError)
-	g.Expect(stringSpecPresentError.IsValid()).To(BeTrue())
-
-	specsUnderTest.Merge(*stringSpec)
-
-	stringSpecMergedError := specsUnderTest.Validate(stringKey, defaultStringValue).(ValidationError)
-	t.Log(stringSpecMergedError)
-	g.Expect(stringSpecMergedError.IsValid()).To(BeTrue())
 }

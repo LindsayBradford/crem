@@ -38,12 +38,6 @@ func (s Specifications) Keys() []string {
 	return keys
 }
 
-func (s Specifications) Merge(specsToMerge Specifications) {
-	for key, value := range specsToMerge {
-		s[key] = value
-	}
-}
-
 func (s Specifications) Validate(key string, value interface{}) error {
 	if s.HasEntry(key) {
 		return s[key].Validator(key, value)
