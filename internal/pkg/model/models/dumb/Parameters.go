@@ -2,16 +2,46 @@
 
 package dumb
 
-import "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/parameters"
+	. "github.com/LindsayBradford/crem/internal/pkg/annealing/parameters/specification"
+)
 
 type Parameters struct {
 	parameters.Parameters
 }
 
-func (kp *Parameters) Initialise() *Parameters {
-	kp.Parameters.CreateEmpty().
-		WithSpecifications(
-			DefineSpecifications(),
-		).AssigningDefaults()
-	return kp
+func (p *Parameters) Initialise() *Parameters {
+	p.Enforces(ParameterSpecifications())
+	return p
+}
+
+const (
+	InitialObjectiveValue = "InitialObjectiveValue"
+	MinimumObjectiveValue = "MinimumObjectiveValue"
+	MaximumObjectiveValue = "MaximumObjectiveValue"
+)
+
+func ParameterSpecifications() *Specifications {
+	specs := NewSpecifications()
+	specs.Add(
+		Specification{
+			Key:          InitialObjectiveValue,
+			Validator:    IsDecimal,
+			DefaultValue: float64(1000),
+		},
+	).Add(
+		Specification{
+			Key:          MinimumObjectiveValue,
+			Validator:    IsDecimal,
+			DefaultValue: float64(0),
+		},
+	).Add(
+		Specification{
+			Key:          MaximumObjectiveValue,
+			Validator:    IsDecimal,
+			DefaultValue: float64(2000),
+		},
+	)
+	return specs
 }

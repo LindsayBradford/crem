@@ -19,10 +19,7 @@ type Coolant struct {
 }
 
 func (c *Coolant) Initialise() *Coolant {
-	c.parameters.CreateEmpty().
-		WithSpecifications(
-			DefineSpecifications(),
-		).AssigningDefaults()
+	c.parameters.Initialise()
 	return c
 }
 

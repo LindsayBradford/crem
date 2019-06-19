@@ -21,6 +21,13 @@ type Parameters struct {
 
 type Map map[string]interface{}
 
+func (p *Parameters) Enforces(specs *specification.Specifications) *Parameters {
+	p.CreateEmpty().
+		WithSpecifications(specs).
+		AssigningDefaults()
+	return p
+}
+
 func (m Map) SetInt64(key string, value int64) {
 	m[key] = value
 }
