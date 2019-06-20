@@ -48,7 +48,7 @@ func (builder *solutionExplorerBuilder) registerBaseExplorers() {
 		"DumbExplorer",
 		func(config SolutionExplorerConfig) explorer.Explorer {
 			return kirkpatrick.New().
-				WithModel(dumb.New()).
+				WithModel(dumb.NewModel()).
 				WithName(config.Name).
 				WithParameters(config.Parameters)
 		},

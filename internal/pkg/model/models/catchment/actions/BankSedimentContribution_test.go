@@ -102,7 +102,7 @@ func buildTestTable() tables.CsvTable {
 		newTable.SetCell(floodPlainWidthIndex, currentRow, defaultFloodPlainWidth)
 		newTable.SetCell(bankFullFlowIndex, currentRow, defaultBankFullFlow)
 		newTable.SetCell(riparianVegetationIndex, currentRow, expectedRiparianVegetationProportion)
-		newTable.SetCell(planningUnitAreaIndex, currentRow, defaultPlanningUnitArea)
+		newTable.SetCell(subCatchmentAreaIndex, currentRow, defaultPlanningUnitArea)
 		newTable.SetCell(riparianBufferAreaIndex, currentRow, defaultRiparianBufferArea)
 	}
 

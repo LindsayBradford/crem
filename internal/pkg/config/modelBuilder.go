@@ -47,7 +47,7 @@ func (builder *modelBuilder) registerBaseModels() {
 	builder.RegisteringModel(
 		"DumbModel",
 		func(config ModelConfig) model.Model {
-			return dumb.New().WithName(config.Name).WithParameters(config.Parameters)
+			return dumb.NewModel().WithName(config.Name).WithParameters(config.Parameters)
 		},
 	)
 
@@ -118,7 +118,6 @@ func (builder *modelBuilder) buildModels() []model.Model {
 					builder.errors.Add(wrappedErrors)
 				}
 			}
-
 		} else {
 			builder.errors.Add(
 				errors.New("configuration specifies a model type [\"" +

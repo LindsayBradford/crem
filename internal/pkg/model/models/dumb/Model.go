@@ -23,7 +23,7 @@ type Model struct {
 	variable.ContainedDecisionVariables
 }
 
-func New() *Model {
+func NewModel() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 

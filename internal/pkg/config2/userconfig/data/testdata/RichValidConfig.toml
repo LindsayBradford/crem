@@ -1,0 +1,42 @@
+[Scenario]
+Name = "testScenario"
+RunNumber = 4
+MaximumConcurrentRunNumber = -1
+OutputPath = "solutions"
+OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
+CpuProfilePath = "someProfiler/OutputFilePath.pprof"
+[Scenario.UserDetail]
+TextEntry = "Some Text"
+IntegerEntry = 42
+FloatEntry = 42.42
+BooleanEntry = true
+
+[Scenario.Observer]
+LoggingType = "NativeLibrary"  # "NativeLibrary" (default) | "BareBones"
+LoggingFormatter = "NameValuePair"  # "JSON" | "NameValuePair" | "RawMessage" (default)
+ObserverType = "MessageObserver" # "AttributeObserver" | "InvarantObserver" | "MessageObserver" (default)
+[Scenario.Observer.LogLevelDestinations]
+Debugging = "StandardError"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"    # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"      # "Discarded"  | "StandardOutput" | "StandardError" (Default)
+Annealing = "Discarded"   # "Discarded"  | "StandardOutput" (Default) | "StandardError"
+[Scenario.Observer.Parameters]
+IterationFilter = "EveryPercentileOfFinishedIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+PercentileOfIterations = 10.0
+
+[Annealer]
+Type="Kirkpatrick"
+EventNotifier = "Concurrent"  # "Synchronous" (default) | Concurrent"
+[Annealer.Parameters]
+OptimisationDirection = "Minimising"
+MaximumIterations = 2_000
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.95  # 0.99
+
+[Model]
+Type="Dumb"
+[Model.Parameters]
+InitialObjectiveValue = 2_000.0
+MaximumObjectiveValue = 2_500.0
+MinimumObjectiveValue = 1_500.0

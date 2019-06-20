@@ -12,14 +12,15 @@ import (
 )
 
 const (
-	planningUnitIndex       = 0
-	riverLengthIndex        = 2
-	channelSlopeIndex       = 3
-	bankHeightIndex         = 4
-	floodPlainWidthIndex    = 6
-	bankFullFlowIndex       = 7
+	planningUnitIndex    = 0
+	riverLengthIndex     = 2
+	channelSlopeIndex    = 3
+	bankFullFlowIndex    = 4
+	bankHeightIndex      = 6
+	floodPlainWidthIndex = 7
+
 	riparianVegetationIndex = 8
-	planningUnitAreaIndex   = 9
+	subCatchmentAreaIndex   = 9
 	riparianBufferAreaIndex = 10
 )
 

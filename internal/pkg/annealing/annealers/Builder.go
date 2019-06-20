@@ -77,7 +77,7 @@ func (builder *Builder) WithEventNotifier(delegate observer.EventNotifier) *Buil
 
 func (builder *Builder) WithDumbSolutionExplorer() *Builder {
 	annealerBeingBuilt := builder.annealer
-	explorer := kirkpatrick.New().WithModel(dumb.New())
+	explorer := kirkpatrick.New().WithModel(dumb.NewModel())
 	explorer.SetId(annealerBeingBuilt.Id())
 	annealerBeingBuilt.SetSolutionExplorer(explorer)
 	return builder

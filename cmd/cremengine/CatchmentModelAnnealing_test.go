@@ -41,9 +41,8 @@ func TestCremEngine_ScenarioBadInputsBlackbox_ExitWithError(t *testing.T) {
 
 func TestCremEngine_ScenarioOneRunWhitebox_ExitWithSuccess(t *testing.T) {
 	context := appTesting.WhiteboxTestingContext{
-		Name: "Single run of catchment model annealer",
-		T:    t,
-		//ConfigFilePath:    "testdata/CatchmentConfig-BadInputs.toml",
+		Name:           "Single run of catchment model annealer",
+		T:              t,
 		ConfigFilePath: "testdata/CatchmentConfig-WhiteBox-OneRun.toml",
 		Runner:         scenario.RunExcelCompatibleScenarioFromConfigFile,
 	}

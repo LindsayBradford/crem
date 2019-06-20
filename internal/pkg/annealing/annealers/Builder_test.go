@@ -102,7 +102,7 @@ func TestAnnealerBuilder_WithKirkpatrickExplorer(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	expectedSolutionExplorer := kirkpatrick.New()
-	expectedSolutionExplorer.WithModel(dumb.New())
+	expectedSolutionExplorer.WithModel(dumb.NewModel())
 	expectedSolutionExplorer.SetId("Simple Annealer")
 
 	builder := new(Builder)

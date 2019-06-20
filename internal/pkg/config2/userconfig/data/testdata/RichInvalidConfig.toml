@@ -1,0 +1,20 @@
+[Scenario]
+Name = 42
+RunNumber = "NAN"
+MaximumConcurrentRunNumber = "NAN"
+OutputPath = 42.42
+OutputType = 42
+CpuProfilePath = 42
+[Scenario.UserDetail]
+1 = "Some Text"
+
+[Annealer]
+Type=42
+EventNotifier = "NotAnEventNotifier"  # "Synchronous" (default) | Concurrent"
+[Annealer.Parameters]
+2 = 2
+
+[Model]
+Type=42
+[Model.Parameters]
+3 = 3

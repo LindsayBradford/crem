@@ -3,17 +3,17 @@
 package annealers
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
+	. "github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 )
 
 const MaximumIterations string = "MaximumIterations"
 
-func DefineSpecifications() *specification.Specifications {
-	specs := specification.NewSpecifications()
+func DefineSpecifications() *Specifications {
+	specs := NewSpecifications()
 	specs.Add(
-		specification.Specification{
+		Specification{
 			Key:          MaximumIterations,
-			Validator:    specification.IsNonNegativeInteger,
+			Validator:    IsNonNegativeInteger,
 			DefaultValue: int64(0),
 		},
 	)
