@@ -9,7 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 )
 
-const defaultRevegetationProportion = float64(1)
+const defaultRevegetationProportion = float64(75)
 
 type RiverBankRestorations struct {
 	planningUnitTable tables.CsvTable
@@ -75,7 +75,7 @@ func (r *RiverBankRestorations) calculateImplementationCost(rowNumber uint) floa
 
 	vegetationChange := r.calculateChangeInBufferVegetation(rowNumber)
 
-	vegetationChangeLengthInKilometres := vegetationChange * riverLengthInKilometres
+	vegetationChangeLengthInKilometres := vegetationChange / 100 * riverLengthInKilometres
 
 	implementationCost := vegetationChangeLengthInKilometres * riparianRevegetationCostPerKilometer
 
