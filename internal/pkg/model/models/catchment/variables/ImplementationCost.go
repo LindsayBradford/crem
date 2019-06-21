@@ -133,9 +133,9 @@ func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost) acceptPlanningUnitChange(asIsSedimentContribution float64, toBeSedimentContribution float64) {
+func (ic *ImplementationCost) acceptPlanningUnitChange(asIsCost float64, toBeCost float64) {
 	planningUnit := ic.actionObserved.PlanningUnit()
-	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsCost + toBeCost
 }
 
 func (ic *ImplementationCost) ValuesPerPlanningUnit() map[string]float64 {

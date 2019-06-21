@@ -15,6 +15,7 @@ func NewSolution(id string) *Solution {
 	newSolution.Id = id
 	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
 	newSolution.ActiveManagementActions = make(map[string]ManagementActions, 0)
+	newSolution.InactiveManagementActions = make(map[string]ManagementActions, 0)
 
 	return newSolution
 }
@@ -38,10 +39,11 @@ func (m ManagementActions) Less(i, j int) bool {
 }
 
 type Solution struct {
-	Id                      string
-	DecisionVariables       variable.EncodeableDecisionVariables
-	PlanningUnits           PlanningUnitIds `json:"-"`
-	ActiveManagementActions map[string]ManagementActions
+	Id                        string
+	DecisionVariables         variable.EncodeableDecisionVariables
+	PlanningUnits             PlanningUnitIds `json:"-"`
+	ActiveManagementActions   map[string]ManagementActions
+	InactiveManagementActions map[string]ManagementActions
 }
 
 func (s Solution) ActiveActionsAsStrings() []string {
@@ -49,6 +51,24 @@ func (s Solution) ActiveActionsAsStrings() []string {
 
 	entryAdded := make(map[ManagementActionType]bool, 0)
 	for _, actions := range s.ActiveManagementActions {
+		for _, action := range actions {
+			if _, hasEntry := entryAdded[action]; !hasEntry {
+				actionList = append(actionList, action)
+				entryAdded[action] = true
+			}
+		}
+	}
+
+	sort.Sort(actionList)
+
+	return actionsToStrings(actionList)
+}
+
+func (s Solution) InactiveActionsAsStrings() []string {
+	actionList := make(ManagementActions, 0)
+
+	entryAdded := make(map[ManagementActionType]bool, 0)
+	for _, actions := range s.InactiveManagementActions {
 		for _, action := range actions {
 			if _, hasEntry := entryAdded[action]; !hasEntry {
 				actionList = append(actionList, action)

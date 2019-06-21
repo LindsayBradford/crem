@@ -30,7 +30,7 @@ func (sb *SolutionBuilder) Build() *solution.Solution {
 
 	sb.addDecisionVariables()
 	sb.addPlanningUnits()
-	sb.addPlanningUnitManagementActionMap()
+	sb.addPlanningUnitManagementActionMaps()
 
 	return sb.solution
 }
@@ -58,10 +58,15 @@ func (sb *SolutionBuilder) addPlanningUnits() {
 	sb.solution.PlanningUnits = sb.model.PlanningUnits()
 }
 
-func (sb *SolutionBuilder) addPlanningUnitManagementActionMap() {
-	for _, action := range sb.model.ActiveManagementActions() {
+func (sb *SolutionBuilder) addPlanningUnitManagementActionMaps() {
+	for _, action := range sb.model.ManagementActions() {
 		planningUnit := action.PlanningUnit()
 		actionType := solution.ManagementActionType(action.Type())
-		sb.solution.ActiveManagementActions[planningUnit] = append(sb.solution.ActiveManagementActions[planningUnit], actionType)
+		switch action.IsActive() {
+		case true:
+			sb.solution.ActiveManagementActions[planningUnit] = append(sb.solution.ActiveManagementActions[planningUnit], actionType)
+		case false:
+			sb.solution.InactiveManagementActions[planningUnit] = append(sb.solution.InactiveManagementActions[planningUnit], actionType)
+		}
 	}
 }

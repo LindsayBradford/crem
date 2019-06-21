@@ -134,6 +134,7 @@ func csvEncodeActionHeadings(solution *solution.Solution) []string {
 	headings[0] = planningUnitHeading
 
 	headings = append(headings, solution.ActiveActionsAsStrings()...)
+	headings = append(headings, solution.InactiveActionsAsStrings()...)
 
 	return headings
 }

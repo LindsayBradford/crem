@@ -41,7 +41,7 @@ func (m *Marshaler) Marshal(solution *solution.Solution, dataSet *excel.DataSet)
 		return variableErr
 	}
 
-	if variableErr := m.marshalActiveActions(solution, dataSet); variableErr != nil {
+	if variableErr := m.marshalActionState(solution, dataSet); variableErr != nil {
 		return variableErr
 	}
 
@@ -102,7 +102,7 @@ func variableHeadings(solution *solution.Solution) []string {
 	return finalisedHeadings
 }
 
-func (m *Marshaler) marshalActiveActions(solution *solution.Solution, dataSet *excel.DataSet) error {
+func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *excel.DataSet) error {
 	table, actionHeadings := emptyActionTable(solution)
 
 	for y, planningUnit := range solution.PlanningUnits {
@@ -157,6 +157,7 @@ func tableHeadings(solution *solution.Solution) []string {
 	headings[planningUnitColumn] = planningUnitHeading
 
 	headings = append(headings, solution.ActiveActionsAsStrings()...)
+	headings = append(headings, solution.InactiveActionsAsStrings()...)
 
 	return headings
 }

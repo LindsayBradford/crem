@@ -196,7 +196,7 @@ func (m *Model) PlanningUnits() solution.PlanningUnitIds {
 }
 
 func (m *Model) buildSedimentVsCostDecisionVariable() {
-	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
+	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	const sedimentWeight = 0.5
@@ -205,7 +205,7 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().
 		WithObservers(m).
-		WithWeightedVariable(sedimentLoad, sedimentWeight).
+		WithWeightedVariable(sedimentProduction, sedimentWeight).
 		WithWeightedVariable(implementationCost, implementationWeight).
 		Build()
 
@@ -214,7 +214,7 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 	}
 
 	noteBuilder := new(strings.FluentBuilder).
-		Add(sedimentLoad.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
+		Add(sedimentProduction.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
 		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationWeight, 'f', 3, 64))
 
 	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
