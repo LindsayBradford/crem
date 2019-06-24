@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	defaultConverter = strings.NewConverter().WithFloatingPointPrecision(6).PaddingZeros()
+	defaultConverter = strings.NewConverter().Localised().WithFloatingPointPrecision(6).PaddingZeros()
 )
 
 // AnnealingMessageObserver produces a stream of human-friendly, free-form text log entries from any observed

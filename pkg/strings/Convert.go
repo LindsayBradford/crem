@@ -38,6 +38,7 @@ func NewConverter() *Converter {
 type Converter struct {
 	precision   int
 	floatFormat string
+	localised   bool
 
 	quoting bool
 }
@@ -55,6 +56,11 @@ func (c *Converter) PaddingZeros() *Converter {
 
 func (c *Converter) NotPaddingZeros() *Converter {
 	c.floatFormat = "%g"
+	return c
+}
+
+func (c *Converter) Localised() *Converter {
+	c.localised = true
 	return c
 }
 
@@ -91,6 +97,30 @@ func (c *Converter) convertRawString(value interface{}) string {
 }
 
 func (c *Converter) convertNonString(value interface{}) string {
+	switch c.localised {
+	case true:
+		return c.convertLocalisedNonString(value)
+	default:
+		return c.convertGlobalisedNonString(value)
+	}
+}
+
+func (c *Converter) convertGlobalisedNonString(value interface{}) string {
+	switch value.(type) {
+	case bool:
+		return strconv.FormatBool(value.(bool))
+	case int:
+		return fmt.Sprintf(integerFormat, value.(int))
+	case uint64:
+		return fmt.Sprintf(integerFormat, value.(uint64))
+	case float64:
+		roundedValue := math.RoundFloat(value.(float64), c.precision)
+		return fmt.Sprintf(c.floatFormat, roundedValue)
+	}
+	panic(errors.New("could not convert value to globalised string"))
+}
+
+func (c *Converter) convertLocalisedNonString(value interface{}) string {
 	switch value.(type) {
 	case bool:
 		return strconv.FormatBool(value.(bool))
@@ -102,5 +132,5 @@ func (c *Converter) convertNonString(value interface{}) string {
 		roundedValue := math.RoundFloat(value.(float64), c.precision)
 		return localised.Sprintf(c.floatFormat, roundedValue)
 	}
-	panic(errors.New("could not convert value to string"))
+	panic(errors.New("could not convert value to localised string"))
 }

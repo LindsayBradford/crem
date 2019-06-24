@@ -13,6 +13,7 @@ const (
 
 var (
 	nvpConverter = strings.NewConverter().
+		Localised().
 		WithFloatingPointPrecision(6).
 		NotPaddingZeros().
 		QuotingStrings()

@@ -3,7 +3,6 @@
 package csv
 
 import (
-	"fmt"
 	strings2 "strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -28,6 +27,9 @@ const (
 	inactiveActionValue = "0"
 	activeActionValue   = "1"
 )
+
+var currencyConverter = strings.NewConverter().WithFloatingPointPrecision(2).PaddingZeros()
+var defaultConverter = strings.NewConverter().WithFloatingPointPrecision(3).PaddingZeros()
 
 type DecisionVariableMarshaler struct{}
 
@@ -76,7 +78,7 @@ func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits 
 
 	baseVariableValues := join(
 		variable.Name,
-		toString(variable.Value),
+		formatVariable(variable),
 		variable.Measure.String(),
 	)
 
@@ -85,12 +87,29 @@ func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits 
 	return join(baseVariableValues, joinedPlanningUnitValues)
 }
 
+func formatVariable(variableToFormat variable.EncodeableDecisionVariable) string {
+	return formatVariableValue(variableToFormat, variableToFormat.Value)
+}
+
+func formatVariableValue(variableToFormat variable.EncodeableDecisionVariable, valueToFormat float64) string {
+	var outputVariable string
+
+	switch variableToFormat.Measure {
+	case variable.Dollars:
+		outputVariable = currencyConverter.Convert(valueToFormat)
+	default:
+		outputVariable = defaultConverter.Convert(valueToFormat)
+	}
+
+	return outputVariable
+}
+
 func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits solution.PlanningUnitIds) []string {
 	headers := make([]string, len(planningUnits))
 
 	if variable.ValuePerPlanningUnit != nil {
 		for index := range planningUnits {
-			headers[index] = toString(variable.ValuePerPlanningUnit[index].Value)
+			headers[index] = formatVariableValue(variable, variable.ValuePerPlanningUnit[index].Value)
 		}
 	}
 	return headers
@@ -98,10 +117,6 @@ func planningUnitValueList(variable variable.EncodeableDecisionVariable, plannin
 
 func join(entries ...string) string {
 	return strings2.Join(entries, separator)
-}
-
-func toString(value interface{}) string {
-	return fmt.Sprintf("%v", value)
 }
 
 type ManagementActionMarshaler struct{}

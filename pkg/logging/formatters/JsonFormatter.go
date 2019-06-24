@@ -18,6 +18,7 @@ const (
 
 var (
 	jsonConverter = strings.NewConverter().
+		Localised().
 		WithFloatingPointPrecision(6).
 		NotPaddingZeros().
 		QuotingStrings()

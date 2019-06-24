@@ -22,6 +22,7 @@ func ExampleJsonFormatter_Format() {
 		{Name: "Four", Value: 42.42},
 		{Name: "Five", Value: new(jsonStringer)},
 		{Name: "Six", Value: true},
+		{Name: "Seven", Value: 7777.777777},
 	}
 
 	exampleFormatter := new(JsonFormatter)
@@ -29,5 +30,5 @@ func ExampleJsonFormatter_Format() {
 	exampleJson := exampleFormatter.Format(exampleAttributes)
 	fmt.Print(exampleJson)
 
-	// Output: {"One": "valueOne", "Two": 42, "Three": 0, "Four": 42.42, "Five": "stringerValue", "Six": true}
+	// Output: {"One": "valueOne", "Two": 42, "Three": 0, "Four": 42.42, "Five": "stringerValue", "Six": true, "Seven": 7,777.777777}
 }
