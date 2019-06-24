@@ -3,6 +3,8 @@
 package excel
 
 import (
+	"strconv"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -62,7 +64,9 @@ func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSe
 
 			for j := range solution.PlanningUnits {
 				columnIndex := uint(j) + offsetColumn
-				table.SetCell(columnIndex, rowIndex, decisionVariable.ValuePerPlanningUnit[j].Value)
+
+				inputVariable := decisionVariable.ValuePerPlanningUnit[j].Value
+				table.SetCell(columnIndex, rowIndex, inputVariable)
 			}
 		}
 	}
@@ -107,7 +111,9 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 
 	for y, planningUnit := range solution.PlanningUnits {
 		rowIndex := uint(y)
-		table.SetCell(planningUnitColumn, rowIndex, string(planningUnit))
+
+		planningUnitAsInt, _ := strconv.ParseInt(planningUnit, 10, 64)
+		table.SetCell(planningUnitColumn, rowIndex, planningUnitAsInt)
 
 		if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 			for x, csvHeading := range actionHeadings {

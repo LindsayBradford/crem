@@ -308,7 +308,12 @@ func (ds *DataSet) storeCsvTableToWorksheet(table tables.CsvTable, worksheet exc
 	for col := uint(0); col < colCount; col++ {
 		for row := uint(0); row < rowCount; row++ {
 			cell := worksheet.Cells(row+csvRowOffset, col+csvColOffset)
-			cell.SetValue(table.Cell(col, row))
+
+			value := table.Cell(col, row)
+			derivedNumberFormat := deriveExcelNumberFormat(value)
+
+			cell.SetNumberFormat(derivedNumberFormat)
+			cell.SetValue(value)
 			cell.Release()
 		}
 	}
@@ -322,4 +327,18 @@ func (ds *DataSet) saveAndCloseWorkbookAs(workbook excel.Workbook, filePath stri
 
 func (ds *DataSet) Teardown() {
 	ds.excelHandler.Destroy()
+}
+
+func deriveExcelNumberFormat(value interface{}) string {
+	// https://www.excelhowto.com/macros/formatting-a-range-of-cells-in-excel-vba/
+	switch value.(type) {
+	case bool:
+		return "@"
+	case int, int64, uint64:
+		return "#,##0"
+	case float64:
+		return "#,##0.00"
+	default:
+		return "@"
+	}
 }

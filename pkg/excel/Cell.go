@@ -9,6 +9,7 @@ import (
 type Cell interface {
 	Value() interface{}
 	SetValue(value interface{})
+	SetNumberFormat(value interface{})
 	Release()
 }
 
@@ -27,6 +28,10 @@ func (cell *CellImpl) Value() interface{} {
 
 func (cell *CellImpl) SetValue(value interface{}) {
 	cell.setProperty("Value", value)
+}
+
+func (cell *CellImpl) SetNumberFormat(value interface{}) {
+	cell.setProperty("NumberFormat", value)
 }
 
 func (cell *CellImpl) getPropertyVariant(propertyName string, parameters ...interface{}) interface{} {

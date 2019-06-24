@@ -71,6 +71,7 @@ func (handler *Handler) setPropertiesForSilentOperation() {
 	handler.setProperty("Visible", false)
 	handler.setProperty("DisplayAlerts", false)
 	handler.setProperty("ScreenUpdating", false)
+	handler.setProperty("ErrorCheckingOptions.NumberAsText", false)
 }
 
 func (handler *Handler) Destroy() {

@@ -39,7 +39,7 @@ type Converter struct {
 	precision   int
 	floatFormat string
 
-	quotingStrings bool
+	quoting bool
 }
 
 func (c *Converter) WithFloatingPointPrecision(precision int) *Converter {
@@ -48,7 +48,8 @@ func (c *Converter) WithFloatingPointPrecision(precision int) *Converter {
 }
 
 func (c *Converter) PaddingZeros() *Converter {
-	c.floatFormat = "%f"
+	finalFormat := fmt.Sprintf("%%.%df", c.precision)
+	c.floatFormat = finalFormat
 	return c
 }
 
@@ -58,7 +59,7 @@ func (c *Converter) NotPaddingZeros() *Converter {
 }
 
 func (c *Converter) QuotingStrings() *Converter {
-	c.quotingStrings = true
+	c.quoting = true
 	return c
 }
 
@@ -72,7 +73,7 @@ func (c *Converter) Convert(value interface{}) string {
 }
 
 func (c *Converter) convertString(value interface{}) string {
-	if c.quotingStrings {
+	if c.quoting {
 		return escapedQuote + c.convertRawString(value) + escapedQuote
 	}
 	return c.convertRawString(value)
