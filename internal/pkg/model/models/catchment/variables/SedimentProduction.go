@@ -11,6 +11,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/assert/release"
+	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 )
 
@@ -193,7 +194,8 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 
 func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSedimentContribution float64, toBeSedimentContribution float64) {
 	planningUnit := sl.actionObserved.PlanningUnit()
-	sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+	change := sl.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
+	sl.valuePerPlanningUnit[planningUnit] = math.RoundFloat(change, int(sl.Precision()))
 }
 
 func (sl *SedimentProduction) ValuesPerPlanningUnit() map[string]float64 {
@@ -206,8 +208,9 @@ func (sl *SedimentProduction) RejectInductiveValue() {
 }
 
 func (sl *SedimentProduction) rejectPlanningUnitChange() {
-	change := sl.BaseInductiveDecisionVariable.DifferenceInValues()
+	recordedChange := math.RoundFloat(sl.BaseInductiveDecisionVariable.DifferenceInValues(), int(sl.Precision()))
 	planningUnit := sl.actionObserved.PlanningUnit()
 
-	sl.valuePerPlanningUnit[planningUnit] = sl.valuePerPlanningUnit[planningUnit] - change
+	rejectChange := sl.valuePerPlanningUnit[planningUnit] - recordedChange
+	sl.valuePerPlanningUnit[planningUnit] = math.RoundFloat(rejectChange, int(sl.Precision()))
 }

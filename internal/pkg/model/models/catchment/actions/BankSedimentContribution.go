@@ -124,5 +124,5 @@ func (bsc *BankSedimentContribution) PlanningUnitSedimentContribution(planningUn
 }
 
 func (bsc *BankSedimentContribution) adjustedProportionOfIntactVegetation(proportionOfIntactVegetation float64) float64 {
-	return 1 - 0.95*proportionOfIntactVegetation //TODO: Why a 5% dampener here?  Nothing in documentation. Should it be a parameter?
+	return 1 - 0.95*(proportionOfIntactVegetation/100) //TODO: Why a 5% dampener here?  Nothing in documentation. Should it be a parameter?
 }
