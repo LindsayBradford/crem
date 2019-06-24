@@ -3,10 +3,16 @@
 package variable
 
 import (
+	"bytes"
+	"fmt"
 	"sort"
 
 	"github.com/LindsayBradford/crem/pkg/math"
+	"github.com/LindsayBradford/crem/pkg/strings"
 )
+
+var currencyConverter = strings.NewConverter().Localised().WithFloatingPointPrecision(2).PaddingZeros()
+var defaultConverter = strings.NewConverter().Localised().WithFloatingPointPrecision(3).PaddingZeros()
 
 type EncodeableDecisionVariables []EncodeableDecisionVariable
 
@@ -77,4 +83,63 @@ func encodeValuesPerPlanningUnit(variable DecisionVariable) PlanningUnitValues {
 	sort.Sort(values)
 
 	return values
+}
+
+func (v *EncodeableDecisionVariable) MarshalJSON() ([]byte, error) {
+	// TODO: Code-stink is high.  Scrub this down.
+	buffer := bytes.NewBufferString("{")
+
+	var key string
+	var value string
+
+	key = "Name"
+	value = v.Name
+	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", key, value))
+
+	key = "Measure"
+	value = v.Measure.String()
+	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", key, value))
+
+	key = "Value"
+
+	switch v.Measure {
+	case Dollars:
+		value = currencyConverter.Convert(v.Value)
+	default:
+		value = defaultConverter.Convert(v.Value)
+	}
+
+	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", key, value))
+
+	if len(v.ValuePerPlanningUnit) > 0 {
+		buffer.WriteString(",")
+		key = "ValuePerPlanningUnit"
+		buffer.WriteString(fmt.Sprintf("\"%s\":[", key))
+
+		length := len(v.ValuePerPlanningUnit)
+		count := 0
+		for _, planningUnitValue := range v.ValuePerPlanningUnit {
+
+			key = planningUnitValue.PlanningUnit
+
+			var formattedPlanningUnitValue string
+			switch v.Measure {
+			case Dollars:
+				formattedPlanningUnitValue = currencyConverter.Convert(planningUnitValue.Value)
+			default:
+				formattedPlanningUnitValue = defaultConverter.Convert(planningUnitValue.Value)
+			}
+
+			buffer.WriteString(fmt.Sprintf("{\"PlanningUnit\":\"%s\", \"Value\":\"%s\"}", key, formattedPlanningUnitValue))
+
+			count++
+			if count < length {
+				buffer.WriteString(",")
+			}
+		}
+		buffer.WriteString("]")
+	}
+
+	buffer.WriteString("}")
+	return buffer.Bytes(), nil
 }
