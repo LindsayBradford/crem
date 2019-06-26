@@ -1,4 +1,4 @@
-ScenarioName = "Test Catchment Annealer - One run"
+ScenarioName = "Catchment Annealer - One run"
 RunNumber=1
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"

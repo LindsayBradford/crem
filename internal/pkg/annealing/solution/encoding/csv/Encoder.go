@@ -58,7 +58,7 @@ func (e Encoder) encodeManagementActions(solution *solution.Solution) error {
 func (e Encoder) encodeMarshaled(marshaledSolution []byte, outputPath string) error {
 	os.Remove(outputPath)
 
-	file, openError := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE, 0666)
+	file, openError := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if openError != nil {
 		return errors.Wrap(openError, "opening file for "+fileType+" encoding of solution")
 	}
