@@ -99,9 +99,9 @@ func (m *Model) Initialise() {
 	m.buildCoreDecisionVariables()
 	m.buildManagementActions()
 
-	m.buildSedimentVsCostDecisionVariable()
-
 	m.managementActions.RandomlyInitialise()
+
+	m.buildSedimentVsCostDecisionVariable()
 }
 
 func (m *Model) fetchPlanningUnitTable() tables.CsvTable {

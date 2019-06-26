@@ -8,13 +8,13 @@ OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
 Name = "TestLogger"
 [Loggers.LogLevelDestinations]
 #Debug = "StandardOutput"
-Model = "StandardOutput"
+#Model = "StandardOutput"
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
 Logger = "TestLogger"
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1
+NumberOfIterations = 10_000
 
 [[AnnealingObservers]]
 Type = "InvariantObserver"
@@ -38,11 +38,11 @@ Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
 [SolutionExplorers.Parameters]
 DecisionVariable = "SedimentVsCost"
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.99  # 0.99
+StartingTemperature = 10_000.0 #10
+CoolingFactor =  0.999  # 0.99
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-MaximumIterations = 10_000 # 1M
+MaximumIterations = 1_000_000 # 1M
