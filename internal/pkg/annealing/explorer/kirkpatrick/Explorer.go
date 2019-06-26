@@ -3,8 +3,6 @@
 package kirkpatrick
 
 import (
-	"math"
-
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -16,6 +14,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
+	"math"
 )
 
 type Explorer struct {
@@ -33,10 +32,9 @@ type Explorer struct {
 	optimisationDirection optimisationDirection
 	objectiveVariableName string
 
-	acceptanceProbability float64
-	changeIsDesirable     bool
-	changeAccepted        bool
-	objectiveValueChange  float64
+	changeIsDesirable    bool
+	changeAccepted       bool
+	objectiveValueChange float64
 }
 
 func New() *Explorer {
@@ -184,7 +182,7 @@ func (ke *Explorer) TearDown() {
 }
 
 func (ke *Explorer) setAcceptanceProbability(probability float64) {
-	ke.acceptanceProbability = math.Min(explorer.Guaranteed, probability)
+	ke.AcceptanceProbability = math.Min(explorer.Guaranteed, probability)
 }
 
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
@@ -201,7 +199,7 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return baseAttributes.
 			Add(explorer.ChangeInObjectiveValue, ke.objectiveValueChange).
 			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-			Add(explorer.AcceptanceProbability, ke.acceptanceProbability).
+			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
 			Add(explorer.ChangeAccepted, ke.changeAccepted)
 	}
 	return nil
