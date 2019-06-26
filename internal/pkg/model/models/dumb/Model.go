@@ -45,12 +45,18 @@ func (dm *Model) WithName(name string) *Model {
 }
 
 func (dm *Model) WithParameters(params parameters.Map) *Model {
+	dm.SetParameters(params)
+
+	return dm
+}
+
+func (dm *Model) SetParameters(params parameters.Map) error {
 	dm.parameters.AssignAllUserValues(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
 	dm.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)
 
-	return dm
+	return dm.ParameterErrors()
 }
 
 func (dm *Model) ParameterErrors() error {

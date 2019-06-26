@@ -14,7 +14,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-type ModelInterpreter struct {
+const (
+	NullModel               = "NullModel"
+	DumbModel               = "DumbModel"
+	MultiObjectiveDumbModel = "MultiObjectiveDumbModel"
+	CatchmentModel          = "CatchmentModel"
+)
+
+type ModelConfigInterpreter struct {
 	errors           *compositeErrors.CompositeError
 	registeredModels map[string]ModelConfigFunction
 
@@ -23,26 +30,27 @@ type ModelInterpreter struct {
 
 type ModelConfigFunction func(config ModelConfig) model.Model
 
-func NewModelInterpreter() *ModelInterpreter {
-	newInterpreter := new(ModelInterpreter).
+func NewModelConfigInterpreter() *ModelConfigInterpreter {
+	newInterpreter := new(ModelConfigInterpreter).initialise().
 		RegisteringModel(
-			"NullModel",
+			NullModel,
 			func(config ModelConfig) model.Model {
 				return model.NewNullModel()
 			},
 		).RegisteringModel(
-		"DumbModel",
+		DumbModel,
 		func(config ModelConfig) model.Model {
-			return dumb.NewModel().WithParameters(config.Parameters)
+			return dumb.NewModel().
+				WithParameters(config.Parameters)
 		},
 	).RegisteringModel(
-		"MultiObjectiveDumbModel",
+		MultiObjectiveDumbModel,
 		func(config ModelConfig) model.Model {
 			return modumb.NewModel().
 				WithParameters(config.Parameters)
 		},
 	).RegisteringModel(
-		"CatchmentModel",
+		CatchmentModel,
 		func(config ModelConfig) model.Model {
 			return catchment.NewModel().
 				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
@@ -50,18 +58,23 @@ func NewModelInterpreter() *ModelInterpreter {
 		},
 	)
 
-	newInterpreter.errors = compositeErrors.New("Model Configuration")
-
 	return newInterpreter
 }
 
-func (i *ModelInterpreter) Interpret(modelConfig *ModelConfig) {
+func (i *ModelConfigInterpreter) initialise() *ModelConfigInterpreter {
+	i.registeredModels = make(map[string]ModelConfigFunction, 0)
+	i.errors = compositeErrors.New("Model Configuration")
+	i.model = model.NullModel
+	return i
+}
+
+func (i *ModelConfigInterpreter) Interpret(modelConfig *ModelConfig) *ModelConfigInterpreter {
 	if _, foundModel := i.registeredModels[modelConfig.Type]; !foundModel {
 		i.errors.Add(
 			errors.New("configuration specifies a model type [\"" +
 				modelConfig.Type + "\"], but no models are registered for that type"),
 		)
-		return
+		return i
 	}
 
 	configFunction := i.registeredModels[modelConfig.Type]
@@ -70,19 +83,25 @@ func (i *ModelInterpreter) Interpret(modelConfig *ModelConfig) {
 		if paramErrors := parameterisedModel.ParameterErrors(); paramErrors != nil {
 			wrappedErrors := errors.Wrap(paramErrors, "building model ["+modelConfig.Type+"]")
 			i.errors.Add(wrappedErrors)
+			return i
 		}
 	}
+	i.model = newModel
+	return i
 }
 
-func (i *ModelInterpreter) RegisteringModel(modelType string, configFunction ModelConfigFunction) *ModelInterpreter {
+func (i *ModelConfigInterpreter) RegisteringModel(modelType string, configFunction ModelConfigFunction) *ModelConfigInterpreter {
 	i.registeredModels[modelType] = configFunction
 	return i
 }
 
-func (i *ModelInterpreter) Model() model.Model {
+func (i *ModelConfigInterpreter) Model() model.Model {
 	return i.model
 }
 
-func (i *ModelInterpreter) Errors() error {
-	return i.errors
+func (i *ModelConfigInterpreter) Errors() error {
+	if i.errors.Size() > 0 {
+		return i.errors
+	}
+	return nil
 }

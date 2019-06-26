@@ -59,8 +59,13 @@ func (m *Model) WithId(id string) *Model {
 }
 
 func (m *Model) WithParameters(params baseParameters.Map) *Model {
-	m.parameters.AssignAllUserValues(params)
+	m.SetParameters(params)
 	return m
+}
+
+func (m *Model) SetParameters(params baseParameters.Map) error {
+	m.parameters.AssignAllUserValues(params)
+	return m.ParameterErrors()
 }
 
 func (m *Model) ParameterErrors() error {

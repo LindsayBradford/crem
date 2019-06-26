@@ -154,11 +154,8 @@ func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
 
 func (sl *SedimentProduction) handleGullyRestorationAction() {
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)
-
-		asIsSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(asIsVolume)
-		toBeSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(toBeVolume)
+		asIsSedimentContribution := sl.actionObserved.ModelVariableValue(asIsName)
+		toBeSedimentContribution := sl.actionObserved.ModelVariableValue(toBeName)
 
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
@@ -168,19 +165,16 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
+		setVariable(actions.OriginalGullySediment, actions.ActionedGullySediment)
 	case false:
-		setVariable(actions.ActionedGullyVolume, actions.OriginalGullyVolume)
+		setVariable(actions.ActionedGullySediment, actions.OriginalGullySediment)
 	}
 }
 
 func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsVolume := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeVolume := sl.actionObserved.ModelVariableValue(toBeName)
-
-		asIsSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(asIsVolume)
-		toBeSedimentContribution := sl.gullySedimentContribution.SedimentFromVolume(toBeVolume)
+		asIsSedimentContribution := sl.actionObserved.ModelVariableValue(asIsName)
+		toBeSedimentContribution := sl.actionObserved.ModelVariableValue(toBeName)
 
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
@@ -189,7 +183,7 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 	}
 
 	assert.That(sl.actionObserved.IsActive()).Holds()
-	setVariable(actions.OriginalGullyVolume, actions.ActionedGullyVolume)
+	setVariable(actions.OriginalGullySediment, actions.ActionedGullySediment)
 }
 
 func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSedimentContribution float64, toBeSedimentContribution float64) {

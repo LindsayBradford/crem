@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -29,11 +30,11 @@ type Explorer interface {
 	name.Nameable
 	name.Identifiable
 	model.Container
+	parameters.Container
 
 	DeepClone() Explorer
 	Initialise()
 	TearDown()
-	ParameterErrors() error
 
 	TryRandomChange()
 

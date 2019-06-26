@@ -1,9 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package data
 
 import (
@@ -13,15 +9,6 @@ import (
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 )
-
-type Config struct {
-	MetaData MetaDataConfig
-
-	Scenario ScenarioConfig
-
-	Annealer AnnealerConfig
-	Model    ModelConfig
-}
 
 type decoderSummary struct {
 	contentType contentType

@@ -255,8 +255,6 @@ func TestSimpleAnnealer_BadParameters(t *testing.T) {
 
 	g.Expect(actualError).To(Not(BeNil()))
 	t.Log(actualError)
-
-	g.Expect(actualError).To(Equal(annealer.ParameterErrors()))
 }
 
 type DummyLogHandler struct {

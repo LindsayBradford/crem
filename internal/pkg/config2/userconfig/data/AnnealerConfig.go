@@ -18,6 +18,10 @@ type AnnealerType struct {
 	value string
 }
 
+func (at AnnealerType) String() string {
+	return string(at.value)
+}
+
 var (
 	UnspecifiedAnnealerType = AnnealerType{""}
 	Kirkpatrick             = AnnealerType{"Kirkpatrick"}

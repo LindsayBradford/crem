@@ -10,6 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
+	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -59,6 +60,9 @@ func (sa *SimpleAnnealer) SetId(title string) {
 
 func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 	sa.parameters.AssignOnlyEnforcedUserValues(params)
+
+	sa.SolutionExplorer().SetParameters(params)
+
 	sa.assignStateFromParameters()
 	return sa.parameters.ValidationErrors()
 }
@@ -68,7 +72,16 @@ func (sa *SimpleAnnealer) assignStateFromParameters() {
 }
 
 func (sa *SimpleAnnealer) ParameterErrors() error {
-	return sa.parameters.ValidationErrors()
+	mergedErrors := compositeErrors.New("Kirkpatrick Explorer Parameter Validation")
+
+	mergedErrors.Add(sa.parameters.ValidationErrors())
+	mergedErrors.Add(sa.SolutionExplorer().ParameterErrors())
+
+	if mergedErrors.Size() > 0 {
+		return mergedErrors
+	}
+
+	return nil
 }
 
 func (sa *SimpleAnnealer) DeepClone() annealing.Annealer {

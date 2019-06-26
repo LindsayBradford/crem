@@ -4,6 +4,7 @@ package annealing
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
@@ -19,6 +20,7 @@ type Annealer interface {
 	parameters.Container
 	explorer.Container
 	logging.Container
+	model.Container
 
 	observer.EventNotifierContainer
 

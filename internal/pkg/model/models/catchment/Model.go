@@ -217,6 +217,8 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 		Add(sedimentProduction.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
 		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationWeight, 'f', 3, 64))
 
+	m.ObserveDecisionVariableWithNote(sedimentProduction, " Initial Value")
+	m.ObserveDecisionVariableWithNote(implementationCost, " Initial Value")
 	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
 
 	m.ContainedDecisionVariables.Add(sedimentVsCost)

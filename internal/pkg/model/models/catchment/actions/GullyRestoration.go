@@ -27,16 +27,16 @@ func (r *GullyRestoration) WithImplementationCost(costInDollars float64) *GullyR
 	return r
 }
 
-const OriginalGullyVolume action.ModelVariableName = "OriginalGullyVolume"
+const OriginalGullySediment action.ModelVariableName = "OriginalGullySediment"
 
-func (r *GullyRestoration) WithOriginalGullyVolume(gullyVolume float64) *GullyRestoration {
-	r.SimpleManagementAction.WithVariable(OriginalGullyVolume, gullyVolume)
+func (r *GullyRestoration) WithOriginalGullySediment(gullyVolume float64) *GullyRestoration {
+	r.SimpleManagementAction.WithVariable(OriginalGullySediment, gullyVolume)
 	return r
 }
 
-const ActionedGullyVolume action.ModelVariableName = "ActionedGullyVolume"
+const ActionedGullySediment action.ModelVariableName = "ActionedGullySediment"
 
-func (r *GullyRestoration) WithActionedGullyVolume(gullyVolume float64) *GullyRestoration {
-	r.SimpleManagementAction.WithVariable(ActionedGullyVolume, gullyVolume)
+func (r *GullyRestoration) WithActionedGullySediment(gullyVolume float64) *GullyRestoration {
+	r.SimpleManagementAction.WithVariable(ActionedGullySediment, gullyVolume)
 	return r
 }

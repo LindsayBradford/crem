@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -22,10 +23,11 @@ func (e *Explorer) WithName(name string) *Explorer {
 	return e
 }
 
-func (e *Explorer) DeepClone() explorer.Explorer { return e }
-func (e *Explorer) Initialise()                  {}
-func (e *Explorer) TearDown()                    {}
-func (e *Explorer) ParameterErrors() error       { return nil }
+func (e *Explorer) DeepClone() explorer.Explorer              { return e }
+func (e *Explorer) Initialise()                               {}
+func (e *Explorer) TearDown()                                 {}
+func (e *Explorer) SetParameters(params parameters.Map) error { return nil }
+func (e *Explorer) ParameterErrors() error                    { return nil }
 
 func (e *Explorer) TryRandomChange() {}
 func (e *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {

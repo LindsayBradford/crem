@@ -60,8 +60,12 @@ func (bsc *GullySedimentContribution) populateContributionMapEntry(rowNumber uin
 	}
 }
 
+func (bsc *GullySedimentContribution) gullyVolume(rowNumber uint) float64 {
+	return bsc.gulliesTable.CellFloat64(gullyErosionVolumeIndex, rowNumber)
+}
+
 func (bsc *GullySedimentContribution) gullySediment(rowNumber uint) float64 {
-	gullyVolume := bsc.gulliesTable.CellFloat64(gullyErosionVolumeIndex, rowNumber)
+	gullyVolume := bsc.gullyVolume(rowNumber)
 	return bsc.SedimentFromVolume(gullyVolume)
 }
 

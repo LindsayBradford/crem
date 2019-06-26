@@ -7,7 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 )
 
-const actionedGullyVolume = 0
+const actionedGullySediment = 0
 
 type GullyRestorations struct {
 	sedimentContribution *GullySedimentContribution
@@ -37,15 +37,15 @@ func (g *GullyRestorations) createManagementActions() {
 }
 
 func (g *GullyRestorations) createManagementAction(planningUnit string) {
-	originalGullyVolume := g.sedimentContribution.SedimentContribution(planningUnit)
+	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
 	costInDollars := g.calculateImplementationCost(planningUnit)
 
 	g.actionMap[planningUnit] =
 		new(GullyRestoration).
 			WithGullyRestorationType().
 			WithPlanningUnit(string(planningUnit)).
-			WithOriginalGullyVolume(originalGullyVolume).
-			WithActionedGullyVolume(actionedGullyVolume).
+			WithOriginalGullySediment(originalGullySediment).
+			WithActionedGullySediment(actionedGullySediment).
 			WithImplementationCost(costInDollars)
 }
 

@@ -65,13 +65,18 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 }
 
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
+	ke.SetParameters(params)
+	return ke
+}
+
+func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.parameters.AssignOnlyEnforcedUserValues(params)
 	ke.Coolant.WithParameters(params)
 
 	ke.setOptimisationDirectionFromParams()
 	ke.checkDecisionVariableFromParams()
 
-	return ke
+	return ke.parameters.ValidationErrors()
 }
 
 func (ke *Explorer) SetTemperature(temperature float64) error {
@@ -145,7 +150,7 @@ func (ke *Explorer) changeTriedIsDesirable() bool {
 	case Minimising:
 		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() <= 0
 	case Maximising:
-		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() >= 0
+		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() > 0
 	}
 	return ke.changeIsDesirable
 }
