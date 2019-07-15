@@ -74,9 +74,13 @@ func encodeValuesPerPlanningUnit(variable DecisionVariable) PlanningUnitValues {
 
 	values := make(PlanningUnitValues, 0)
 	for planningUnitId, planningUnitValue := range rawValues {
+		roundedValue := math.RoundFloat(planningUnitValue, int(variable.Precision()))
+		if roundedValue == 0 {
+			continue
+		}
 		newValue := PlanningUnitValue{
 			PlanningUnit: planningUnitId,
-			Value:        math.RoundFloat(planningUnitValue, int(variable.Precision())),
+			Value:        roundedValue,
 		}
 		values = append(values, newValue)
 	}
