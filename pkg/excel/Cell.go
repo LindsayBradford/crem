@@ -3,8 +3,12 @@
 package excel
 
 import (
+	"fmt"
 	"github.com/go-ole/go-ole"
+	"github.com/pkg/errors"
 )
+
+const textNumberFormat = "@"
 
 type Cell interface {
 	Value() interface{}
@@ -27,7 +31,15 @@ func (cell *CellImpl) Value() interface{} {
 }
 
 func (cell *CellImpl) SetValue(value interface{}) {
-	cell.setProperty("Value", value)
+	switch value.(type) {
+	case fmt.Stringer:
+		valueAsStringer := value.(fmt.Stringer)
+		cell.setProperty("Value", valueAsStringer.String())
+	case bool, int, uint, int32, uint32, uint64, int64, float32, float64, string, nil:
+		cell.setProperty("Value", value)
+	default:
+		panic(errors.New("Attempt to set cell value value of unsupported type"))
+	}
 }
 
 func (cell *CellImpl) SetNumberFormat(value interface{}) {

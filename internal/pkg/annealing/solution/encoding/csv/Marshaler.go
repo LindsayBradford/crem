@@ -3,7 +3,6 @@
 package csv
 
 import (
-	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	strings2 "strings"
 
@@ -69,8 +68,7 @@ func planningUnitsAsHeaders(planningUnits planningunit.Ids) []string {
 	headers := make([]string, len(planningUnits))
 
 	for index, value := range planningUnits {
-		valueAsString := fmt.Sprintf("%00d", value)
-		headers[index] = planningUnitHeading + "-" + valueAsString
+		headers[index] = planningUnitHeading + "-" + value.String()
 	}
 
 	return headers
@@ -151,8 +149,7 @@ func csvEncodeActionHeadings(solution *solution.Solution) []string {
 	headings := make([]string, 1)
 	headings[0] = planningUnitHeading
 
-	headings = append(headings, solution.ActiveActionsAsStrings()...)
-	headings = append(headings, solution.InactiveActionsAsStrings()...)
+	headings = append(headings, solution.ActionsAsStrings()...)
 
 	return headings
 }
@@ -162,7 +159,7 @@ func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
 
 	values := make([]string, len(actionHeadings))
 
-	values[0] = string(planningUnit)
+	values[0] = planningUnit.String()
 
 	if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 		for headingIndex, csvHeading := range actionHeadings {

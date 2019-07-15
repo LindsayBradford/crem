@@ -98,7 +98,7 @@ func variableHeadings(solution *solution.Solution) []string {
 	baseOffset := len(baseVariableHeadings)
 
 	for index, entry := range solution.PlanningUnits {
-		finalisedHeadings[index+baseOffset] = planningUnitHeading + "-" + string(entry)
+		finalisedHeadings[index+baseOffset] = planningUnitHeading + "-" + entry.String()
 	}
 
 	return finalisedHeadings
@@ -110,7 +110,7 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 	for y, planningUnit := range solution.PlanningUnits {
 		rowIndex := uint(y)
 
-		table.SetCell(planningUnitColumn, rowIndex, planningUnit)
+		table.SetCell(planningUnitColumn, rowIndex, uint64(planningUnit))
 
 		if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 			for x, csvHeading := range actionHeadings {
@@ -158,9 +158,7 @@ func tableHeadings(solution *solution.Solution) []string {
 	headings := make([]string, 1)
 
 	headings[planningUnitColumn] = planningUnitHeading
-
-	headings = append(headings, solution.ActiveActionsAsStrings()...)
-	headings = append(headings, solution.InactiveActionsAsStrings()...)
+	headings = append(headings, solution.ActionsAsStrings()...)
 
 	return headings
 }

@@ -5,6 +5,7 @@ package variable
 import (
 	"bytes"
 	"fmt"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"sort"
 
 	"github.com/LindsayBradford/crem/pkg/math"
@@ -29,7 +30,7 @@ func (v EncodeableDecisionVariables) Less(i, j int) bool {
 }
 
 type PlanningUnitValue struct {
-	PlanningUnit string
+	PlanningUnit planningunit.Id
 	Value        float64
 }
 
@@ -120,7 +121,7 @@ func (v *EncodeableDecisionVariable) MarshalJSON() ([]byte, error) {
 		count := 0
 		for _, planningUnitValue := range v.ValuePerPlanningUnit {
 
-			key = planningUnitValue.PlanningUnit
+			key = planningUnitValue.PlanningUnit.String()
 
 			var formattedPlanningUnitValue string
 			switch v.Measure {

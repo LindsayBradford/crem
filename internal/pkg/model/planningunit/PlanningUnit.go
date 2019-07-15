@@ -5,7 +5,7 @@ import "fmt"
 type Id uint64
 
 func (i Id) String() string {
-	return fmt.Sprintf("%03d", i)
+	return fmt.Sprintf("%d", i)
 }
 
 type Ids []Id

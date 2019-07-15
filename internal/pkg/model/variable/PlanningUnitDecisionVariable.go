@@ -2,6 +2,8 @@
 
 package variable
 
+import "github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+
 type PlanningUnitDecisionVariable interface {
-	ValuesPerPlanningUnit() map[string]float64
+	ValuesPerPlanningUnit() map[planningunit.Id]float64
 }
