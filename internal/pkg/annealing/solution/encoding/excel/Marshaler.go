@@ -112,6 +112,14 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 
 		table.SetCell(planningUnitColumn, rowIndex, uint64(planningUnit))
 
+		for x, csvHeading := range actionHeadings {
+			columnIndex := uint(x)
+			if shouldSkipColumnWith(csvHeading) {
+				continue
+			}
+			table.SetCell(columnIndex, rowIndex, inactiveActionValue)
+		}
+
 		if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 			for x, csvHeading := range actionHeadings {
 				columnIndex := uint(x)
@@ -129,13 +137,6 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 				table.SetCell(columnIndex, rowIndex, actionValue)
 			}
 		} else {
-			for x, csvHeading := range actionHeadings {
-				columnIndex := uint(x)
-				if shouldSkipColumnWith(csvHeading) {
-					continue
-				}
-				table.SetCell(columnIndex, rowIndex, inactiveActionValue)
-			}
 		}
 	}
 

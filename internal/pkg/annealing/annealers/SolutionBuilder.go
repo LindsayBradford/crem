@@ -62,7 +62,7 @@ func (sb *SolutionBuilder) addPlanningUnitManagementActionMaps() {
 	for _, action := range sb.model.ManagementActions() {
 		planningUnit := action.PlanningUnit()
 		actionType := solution.ManagementActionType(action.Type())
-		sb.solution.ManagementActions[planningUnit] = append(sb.solution.ActiveManagementActions[planningUnit], actionType)
+		sb.solution.ManagementActions[actionType] = true
 		switch action.IsActive() {
 		case true:
 			sb.solution.ActiveManagementActions[planningUnit] = append(sb.solution.ActiveManagementActions[planningUnit], actionType)
