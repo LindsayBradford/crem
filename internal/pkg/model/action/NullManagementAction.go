@@ -2,6 +2,11 @@
 
 package action
 
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"math"
+)
+
 // NullManagementAction is a stateless/neutral implementation of the ManagementAction interface, useful for testing
 // scenarios where action state is irrelevant or within scenarios where a Null Pattern for actions makes sense
 // (https://en.wikipedia.org/wiki/Null_object_pattern).
@@ -9,7 +14,9 @@ var NullManagementAction ManagementAction = new(Null)
 
 type Null struct{}
 
-func (a *Null) PlanningUnit() string { return "null" }
+const NullPlanningUnitId planningunit.Id = math.MaxUint64
+
+func (a *Null) PlanningUnit() planningunit.Id { return NullPlanningUnitId }
 
 const NullManagementActionType ManagementActionType = "NullType"
 

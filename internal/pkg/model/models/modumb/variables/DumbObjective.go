@@ -5,6 +5,7 @@ package variables
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/actions"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -14,13 +15,13 @@ const notImplementedValue float64 = 0
 type DumbObjective struct {
 	variable.BaseInductiveDecisionVariable
 	actionObserved       action.ManagementAction
-	valuePerPlanningUnit map[string]float64
+	valuePerPlanningUnit map[planningunit.Id]float64
 }
 
 func (do *DumbObjective) Initialise() *DumbObjective {
 	do.SetUnitOfMeasure(variable.NotApplicable)
 	do.SetPrecision(2)
-	do.valuePerPlanningUnit = make(map[string]float64, 0)
+	do.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
 	return do
 }
 
@@ -40,7 +41,7 @@ func (do *DumbObjective) WithObservers(observers ...variable.Observer) *DumbObje
 }
 
 func (do *DumbObjective) deriveInitialValue() float64 {
-	do.valuePerPlanningUnit = make(map[string]float64, 0)
+	do.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
 	return notImplementedValue
 }
 
@@ -112,7 +113,7 @@ func (do *DumbObjective) acceptPlanningUnitChange(asIsSedimentContribution float
 	do.valuePerPlanningUnit[planningUnit] = do.valuePerPlanningUnit[planningUnit] - asIsSedimentContribution + toBeSedimentContribution
 }
 
-func (do *DumbObjective) ValuesPerPlanningUnit() map[string]float64 {
+func (do *DumbObjective) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
 	return do.valuePerPlanningUnit
 }
 

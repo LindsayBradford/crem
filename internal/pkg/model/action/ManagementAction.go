@@ -4,6 +4,10 @@
 // decision variables based on their activation status.
 package action
 
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+)
+
 // ManagementActionType identifies a set of management actions that make the same kind of change to relevant
 // model decision variables.
 type ManagementActionType string
@@ -19,7 +23,7 @@ type ModelVariableName string
 // ManagementAction defines a general interface for the implementation of management actions.
 type ManagementAction interface {
 	// PlanningUnit returns the identifier of the planning unit in which management action is spatially located.
-	PlanningUnit() string
+	PlanningUnit() planningunit.Id
 
 	// Type identifies the ManagementActionType of a particular management action
 	Type() ManagementActionType

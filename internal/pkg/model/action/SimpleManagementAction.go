@@ -3,6 +3,7 @@
 package action
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/pkg/errors"
 )
 
@@ -11,7 +12,7 @@ var _ ManagementAction = new(SimpleManagementAction)
 // SimpleManagementAction is a basic, generally useful implementation of the ManagementAction interface, using a
 // fluent interface for its action construction.
 type SimpleManagementAction struct {
-	planningUnit string
+	planningUnit planningunit.Id
 	actionType   ManagementActionType
 	isActive     bool
 
@@ -19,7 +20,7 @@ type SimpleManagementAction struct {
 	observers []Observer
 }
 
-func (sma *SimpleManagementAction) WithPlanningUnit(planningUnit string) *SimpleManagementAction {
+func (sma *SimpleManagementAction) WithPlanningUnit(planningUnit planningunit.Id) *SimpleManagementAction {
 	sma.planningUnit = planningUnit
 	return sma
 }
@@ -38,7 +39,7 @@ func (sma *SimpleManagementAction) WithVariable(variableName ModelVariableName, 
 	return sma
 }
 
-func (sma *SimpleManagementAction) PlanningUnit() string {
+func (sma *SimpleManagementAction) PlanningUnit() planningunit.Id {
 	return sma.planningUnit
 }
 

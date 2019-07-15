@@ -2,13 +2,16 @@
 
 package actions
 
-import "github.com/LindsayBradford/crem/internal/pkg/model/action"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+)
 
 type GullyRestoration struct {
 	action.SimpleManagementAction
 }
 
-func (g *GullyRestoration) WithPlanningUnit(planningUnit string) *GullyRestoration {
+func (g *GullyRestoration) WithPlanningUnit(planningUnit planningunit.Id) *GullyRestoration {
 	g.SimpleManagementAction.WithPlanningUnit(planningUnit)
 	return g
 }

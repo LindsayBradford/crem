@@ -3,6 +3,8 @@
 package csv
 
 import (
+	"fmt"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	strings2 "strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -63,17 +65,18 @@ func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(solution *solu
 	return builder.String()
 }
 
-func planningUnitsAsHeaders(planningUnits solution.PlanningUnitIds) []string {
+func planningUnitsAsHeaders(planningUnits planningunit.Ids) []string {
 	headers := make([]string, len(planningUnits))
 
 	for index, value := range planningUnits {
-		headers[index] = planningUnitHeading + "-" + value
+		valueAsString := fmt.Sprintf("%00d", value)
+		headers[index] = planningUnitHeading + "-" + valueAsString
 	}
 
 	return headers
 }
 
-func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits solution.PlanningUnitIds) string {
+func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) string {
 	planningUnitValues := planningUnitValueList(variable, planningUnits)
 
 	baseVariableValues := join(
@@ -104,7 +107,7 @@ func formatVariableValue(variableToFormat variable.EncodeableDecisionVariable, v
 	return outputVariable
 }
 
-func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits solution.PlanningUnitIds) []string {
+func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) []string {
 	headers := make([]string, len(planningUnits))
 
 	if variable.ValuePerPlanningUnit != nil {
@@ -155,7 +158,7 @@ func csvEncodeActionHeadings(solution *solution.Solution) []string {
 }
 
 func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
-	actionHeadings []string, planningUnit string, solution *solution.Solution) []string {
+	actionHeadings []string, planningUnit planningunit.Id, solution *solution.Solution) []string {
 
 	values := make([]string, len(actionHeadings))
 

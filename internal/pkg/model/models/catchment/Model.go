@@ -3,12 +3,12 @@
 package catchment
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"math"
 	"os"
 	"path/filepath"
 	"strconv"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -181,14 +181,13 @@ func (m *Model) SetManagementActionUnobserved(index int, value bool) {
 	m.managementActions.SetActivationUnobserved(index, value)
 }
 
-func (m *Model) PlanningUnits() solution.PlanningUnitIds {
+func (m *Model) PlanningUnits() planningunit.Ids {
 	_, rows := m.planningUnitTable.ColumnAndRowSize()
-	planningUnits := make(solution.PlanningUnitIds, rows)
+	planningUnits := make(planningunit.Ids, rows)
 
 	for row := uint(0); row < rows; row++ {
 		planningUnit := m.planningUnitTable.CellFloat64(0, row)
-		planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
-		planningUnitId := planningUnitAsString
+		planningUnitId := actions.Float64ToPlanningUnitId(planningUnit)
 		planningUnits[row] = planningUnitId
 	}
 

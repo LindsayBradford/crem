@@ -2,13 +2,16 @@
 
 package actions
 
-import "github.com/LindsayBradford/crem/internal/pkg/model/action"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+)
 
 type RiverBankRestoration struct {
 	action.SimpleManagementAction
 }
 
-func (r *RiverBankRestoration) WithPlanningUnit(planningUnit string) *RiverBankRestoration {
+func (r *RiverBankRestoration) WithPlanningUnit(planningUnit planningunit.Id) *RiverBankRestoration {
 	r.SimpleManagementAction.WithPlanningUnit(planningUnit)
 	return r
 }

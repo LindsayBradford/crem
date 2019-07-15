@@ -4,6 +4,7 @@ package actions
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
 var _ action.ManagementAction = new(DumbAction)
@@ -24,7 +25,7 @@ func (r *DumbAction) WithType(value action.ManagementActionType) *DumbAction {
 	return r
 }
 
-func (r *DumbAction) WithPlanningUnit(planningUnit string) *DumbAction {
+func (r *DumbAction) WithPlanningUnit(planningUnit planningunit.Id) *DumbAction {
 	r.SimpleManagementAction.WithPlanningUnit(planningUnit)
 	return r
 }

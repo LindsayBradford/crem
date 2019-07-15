@@ -4,6 +4,7 @@ package action
 
 import (
 	"fmt"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"testing"
 
 	. "github.com/onsi/gomega"
@@ -32,7 +33,7 @@ func TestManagementActions_Add(t *testing.T) {
 	actionsUnderTest.Initialise()
 
 	// when
-	dummyAction1 := buildDummyAction("dummy1")
+	dummyAction1 := buildDummyAction(1)
 	actionsUnderTest.Add(dummyAction1)
 
 	// then
@@ -40,7 +41,7 @@ func TestManagementActions_Add(t *testing.T) {
 	g.Expect(actionsUnderTest.actions).To(ContainElement(dummyAction1))
 
 	// when
-	dummyAction2 := buildDummyAction("dummy2")
+	dummyAction2 := buildDummyAction(2)
 	actionsUnderTest.Add(dummyAction2)
 
 	// then
@@ -53,7 +54,7 @@ func TestManagementActions_Add(t *testing.T) {
 
 const ManagementActionsTestType ManagementActionType = "ManagementActionsTestType"
 
-func buildDummyAction(planningUnit string) ManagementAction {
+func buildDummyAction(planningUnit planningunit.Id) ManagementAction {
 	newAction := new(SimpleManagementAction).
 		WithPlanningUnit(planningUnit).
 		WithType(ManagementActionsTestType).
@@ -84,7 +85,7 @@ func TestManagementActions_RandomlyToggleOneActivation_OnePresent(t *testing.T) 
 	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
-	dummyAction1 := buildDummyAction("dummy1")
+	dummyAction1 := buildDummyAction(1)
 	actionsUnderTest.Add(dummyAction1)
 
 	// when
@@ -105,11 +106,11 @@ func TestManagementActions_RandomlyInitialise(t *testing.T) {
 	actionSpy := new(spyObserver)
 
 	dummyActions := []ManagementAction{
-		buildDummyAction("dummy1"),
-		buildDummyAction("dummy2"),
-		buildDummyAction("dummy3"),
-		buildDummyAction("dummy4"),
-		buildDummyAction("dummy5"),
+		buildDummyAction(1),
+		buildDummyAction(2),
+		buildDummyAction(3),
+		buildDummyAction(4),
+		buildDummyAction(4),
 	}
 
 	for _, action := range dummyActions {
@@ -140,7 +141,7 @@ func TestManagementActions_UndoLastActivationToggleUnobserved(t *testing.T) {
 	actionsUnderTest := new(ModelManagementActions)
 	actionsUnderTest.Initialise()
 
-	dummyAction := buildDummyAction("dummy")
+	dummyAction := buildDummyAction(1)
 
 	actionSpy := new(spyObserver)
 

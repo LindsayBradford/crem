@@ -3,9 +3,9 @@
 package dumb
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"math"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
@@ -128,7 +128,7 @@ func (dm *Model) ActiveManagementActions() []action.ManagementAction  { return n
 func (dm *Model) SetManagementAction(index int, value bool)           {}
 func (dm *Model) SetManagementActionUnobserved(index int, value bool) {}
 
-func (dm *Model) PlanningUnits() solution.PlanningUnitIds { return nil }
+func (dm *Model) PlanningUnits() planningunit.Ids { return nil }
 
 func (dm *Model) DeepClone() model.Model {
 	clone := *dm

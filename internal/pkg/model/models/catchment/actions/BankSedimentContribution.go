@@ -3,8 +3,8 @@
 package actions
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"math"
-	"strconv"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
@@ -24,8 +24,8 @@ const (
 	riparianBufferAreaIndex = 10
 )
 
-func Float64ToPlanningUnitId(value float64) string {
-	return strconv.FormatFloat(value, 'g', -1, 64)
+func Float64ToPlanningUnitId(value float64) planningunit.Id {
+	return planningunit.Id(value)
 }
 
 type sedimentTracker struct {
@@ -37,7 +37,7 @@ type BankSedimentContribution struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	contributionMap map[string]sedimentTracker
+	contributionMap map[planningunit.Id]sedimentTracker
 }
 
 func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
@@ -48,7 +48,7 @@ func (bsc *BankSedimentContribution) Initialise(planningUnitTable tables.CsvTabl
 
 func (bsc *BankSedimentContribution) populateContributionMap() {
 	_, rowCount := bsc.planningUnitTable.ColumnAndRowSize()
-	bsc.contributionMap = make(map[string]sedimentTracker, rowCount)
+	bsc.contributionMap = make(map[planningunit.Id]sedimentTracker, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		bsc.populateContributionMapEntry(row)
@@ -102,7 +102,7 @@ func (bsc *BankSedimentContribution) OriginalSedimentContribution() float64 {
 	return sedimentContribution
 }
 
-func (bsc *BankSedimentContribution) OriginalPlanningUnitSedimentContribution(id string) float64 {
+func (bsc *BankSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
 	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[id]
 	assert.That(planningUnitIsPresent).Holds()
 
@@ -113,7 +113,7 @@ func (bsc *BankSedimentContribution) OriginalPlanningUnitSedimentContribution(id
 	return sedimentContribution
 }
 
-func (bsc *BankSedimentContribution) PlanningUnitSedimentContribution(planningUnit string, proportionOfIntactVegetation float64) float64 {
+func (bsc *BankSedimentContribution) PlanningUnitSedimentContribution(planningUnit planningunit.Id, proportionOfIntactVegetation float64) float64 {
 	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[planningUnit]
 	assert.That(planningUnitIsPresent).Holds()
 

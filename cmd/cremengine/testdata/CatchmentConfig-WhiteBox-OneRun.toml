@@ -8,7 +8,7 @@ OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
 Name = "TestLogger"
 [Loggers.LogLevelDestinations]
 #Debug = "StandardOutput"
-#Model = "StandardOutput"
+Model = "StandardOutput"
 
 [[AnnealingObservers]]
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
@@ -45,4 +45,4 @@ CoolingFactor =  0.999  # 0.99
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-MaximumIterations = 1_000_000 # 1M
+MaximumIterations = 1_000 # 1M

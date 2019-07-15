@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -18,7 +19,7 @@ type ImplementationCost struct {
 	variable.BaseInductiveDecisionVariable
 	actionObserved action.ManagementAction
 
-	valuePerPlanningUnit map[string]float64
+	valuePerPlanningUnit map[planningunit.Id]float64
 }
 
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
@@ -35,7 +36,7 @@ func (ic *ImplementationCost) WithObservers(observers ...variable.Observer) *Imp
 }
 
 func (ic *ImplementationCost) deriveInitialImplementationCost() float64 {
-	ic.valuePerPlanningUnit = make(map[string]float64, 0)
+	ic.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
 	return notImplementedCost
 }
 
@@ -138,7 +139,7 @@ func (ic *ImplementationCost) acceptPlanningUnitChange(asIsCost float64, toBeCos
 	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsCost + toBeCost
 }
 
-func (ic *ImplementationCost) ValuesPerPlanningUnit() map[string]float64 {
+func (ic *ImplementationCost) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
 	return ic.valuePerPlanningUnit
 }
 

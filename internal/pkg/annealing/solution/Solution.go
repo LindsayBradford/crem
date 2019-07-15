@@ -3,6 +3,7 @@
 package solution
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"sort"
 	"strings"
 
@@ -14,13 +15,11 @@ func NewSolution(id string) *Solution {
 
 	newSolution.Id = id
 	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
-	newSolution.ActiveManagementActions = make(map[string]ManagementActions, 0)
-	newSolution.InactiveManagementActions = make(map[string]ManagementActions, 0)
+	newSolution.ActiveManagementActions = make(map[planningunit.Id]ManagementActions, 0)
+	newSolution.InactiveManagementActions = make(map[planningunit.Id]ManagementActions, 0)
 
 	return newSolution
 }
-
-type PlanningUnitIds []string
 
 type ManagementActionType string
 
@@ -41,9 +40,9 @@ func (m ManagementActions) Less(i, j int) bool {
 type Solution struct {
 	Id                        string
 	DecisionVariables         variable.EncodeableDecisionVariables
-	PlanningUnits             PlanningUnitIds `json:"-"`
-	ActiveManagementActions   map[string]ManagementActions
-	InactiveManagementActions map[string]ManagementActions
+	PlanningUnits             planningunit.Ids `json:"-"`
+	ActiveManagementActions   map[planningunit.Id]ManagementActions
+	InactiveManagementActions map[planningunit.Id]ManagementActions
 }
 
 func (s Solution) ActiveActionsAsStrings() []string {

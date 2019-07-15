@@ -3,11 +3,11 @@
 package components
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"math"
 	"path/filepath"
 	"strings"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
@@ -113,7 +113,7 @@ func (sem *SimpleExcelModel) SetManagementAction(index int, value bool) {}
 
 func (sem *SimpleExcelModel) SetManagementActionUnobserved(index int, value bool) {}
 
-func (sem *SimpleExcelModel) PlanningUnits() solution.PlanningUnitIds { return nil }
+func (sem *SimpleExcelModel) PlanningUnits() planningunit.Ids { return nil }
 
 func (sem *SimpleExcelModel) saveDataToWorkbookAndClose() {
 	newFileName := toSafeFileName(sem.Id())

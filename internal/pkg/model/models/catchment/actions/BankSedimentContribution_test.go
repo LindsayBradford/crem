@@ -65,7 +65,7 @@ func TestBankSedimentContribution_Initialise(t *testing.T) {
 	// then
 	g.Expect(len(contributionUnderTest.contributionMap)).To(BeNumerically(equalTo, actualRows))
 
-	firstMapEntry := contributionUnderTest.contributionMap["0"]
+	firstMapEntry := contributionUnderTest.contributionMap[0]
 	expectedPartialSedimentContribution := buildExpectedPartialSedimentContribution(*dummyParameters)
 	g.Expect(firstMapEntry.partialSedimentContribution).To(BeNumerically(equalTo, expectedPartialSedimentContribution))
 	g.Expect(firstMapEntry.originalIntactRiparianVegetation).To(BeNumerically(equalTo, expectedRiparianVegetationProportion))
@@ -84,7 +84,7 @@ func TestBankSedimentContribution_OriginalSedimentContribution(t *testing.T) {
 	actualOriginalSedimentContribution := contributionUnderTest.OriginalSedimentContribution()
 
 	// then
-	partialSedimentContribution := contributionUnderTest.contributionMap["0"].partialSedimentContribution
+	partialSedimentContribution := contributionUnderTest.contributionMap[0].partialSedimentContribution
 	fullSedimentContribution := partialSedimentContribution * contributionUnderTest.adjustedProportionOfIntactVegetation(expectedRiparianVegetationProportion)
 	expectedFullSedimentContribution := fullSedimentContribution * expectedRowNumber
 	g.Expect(actualOriginalSedimentContribution).To(BeNumerically(equalTo, expectedFullSedimentContribution))

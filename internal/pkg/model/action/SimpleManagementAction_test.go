@@ -13,7 +13,7 @@ const testVariableName ModelVariableName = "testVariable"
 
 func NewTestManagementAction() *SimpleManagementAction {
 	action := new(SimpleManagementAction).
-		WithPlanningUnit("testPu").
+		WithPlanningUnit(1).
 		WithType(testType).
 		WithVariable(testVariableName, 0.5)
 

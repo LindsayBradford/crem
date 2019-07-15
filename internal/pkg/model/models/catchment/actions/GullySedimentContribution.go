@@ -5,6 +5,7 @@ package actions
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
 const (
@@ -24,7 +25,7 @@ type GullySedimentContribution struct {
 	gulliesTable tables.CsvTable
 	parameters   parameters.Parameters
 
-	contributionMap map[string][]gullySedimentTracker
+	contributionMap map[planningunit.Id][]gullySedimentTracker
 }
 
 func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, parameters parameters.Parameters) {
@@ -35,7 +36,7 @@ func (bsc *GullySedimentContribution) Initialise(gulliesTable tables.CsvTable, p
 
 func (bsc *GullySedimentContribution) populateContributionMap() {
 	_, rowCount := bsc.gulliesTable.ColumnAndRowSize()
-	bsc.contributionMap = make(map[string][]gullySedimentTracker, 0)
+	bsc.contributionMap = make(map[planningunit.Id][]gullySedimentTracker, 0)
 
 	for row := uint(0); row < rowCount; row++ {
 		bsc.populateContributionMapEntry(row)
@@ -98,7 +99,7 @@ func (bsc *GullySedimentContribution) OriginalSedimentContribution() float64 {
 	return sedimentContribution
 }
 
-func (bsc *GullySedimentContribution) SedimentContribution(planningUnit string) float64 {
+func (bsc *GullySedimentContribution) SedimentContribution(planningUnit planningunit.Id) float64 {
 	sedimentContribution := float64(0)
 
 	if trackers, hasTrackers := bsc.contributionMap[planningUnit]; hasTrackers {
@@ -110,7 +111,7 @@ func (bsc *GullySedimentContribution) SedimentContribution(planningUnit string) 
 	return sedimentContribution
 }
 
-func (bsc *GullySedimentContribution) ChannelLength(planningUnit string) float64 {
+func (bsc *GullySedimentContribution) ChannelLength(planningUnit planningunit.Id) float64 {
 	channelLength := float64(0)
 
 	if trackers, hasTrackers := bsc.contributionMap[planningUnit]; hasTrackers {

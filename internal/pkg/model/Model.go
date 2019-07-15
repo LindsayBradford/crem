@@ -3,8 +3,8 @@
 package model
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -31,7 +31,7 @@ type Model interface {
 	SetManagementAction(index int, value bool)
 	SetManagementActionUnobserved(index int, value bool)
 
-	PlanningUnits() solution.PlanningUnitIds
+	PlanningUnits() planningunit.Ids
 }
 
 // ContainedLogger defines an interface embedding a Model
@@ -97,6 +97,6 @@ func (nm *nullModel) ActiveManagementActions() []action.ManagementAction  { retu
 func (nm *nullModel) SetManagementAction(index int, value bool)           {}
 func (nm *nullModel) SetManagementActionUnobserved(index int, value bool) {}
 
-func (nm *nullModel) PlanningUnits() solution.PlanningUnitIds { return nil }
+func (nm *nullModel) PlanningUnits() planningunit.Ids { return nil }
 
 func (nm *nullModel) DeepClone() Model { return nm }

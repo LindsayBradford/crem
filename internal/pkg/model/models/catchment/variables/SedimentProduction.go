@@ -3,7 +3,7 @@
 package variables
 
 import (
-	"strconv"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -21,8 +21,8 @@ var _ variable.DecisionVariable = new(SedimentProduction)
 
 const planningUnitIndex = 0
 
-func Float64ToPlanningUnitId(value float64) string {
-	return strconv.FormatFloat(value, 'g', -1, 64)
+func Float64ToPlanningUnitId(value float64) planningunit.Id {
+	return planningunit.Id(value)
 }
 
 type SedimentProduction struct {
@@ -33,7 +33,7 @@ type SedimentProduction struct {
 
 	actionObserved action.ManagementAction
 
-	valuePerPlanningUnit map[string]float64
+	valuePerPlanningUnit map[planningunit.Id]float64
 }
 
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
@@ -56,7 +56,7 @@ func (sl *SedimentProduction) WithObservers(observers ...variable.Observer) *Sed
 
 func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningUnitTable tables.CsvTable) {
 	_, rowCount := planningUnitTable.ColumnAndRowSize()
-	sl.valuePerPlanningUnit = make(map[string]float64, rowCount)
+	sl.valuePerPlanningUnit = make(map[planningunit.Id]float64, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		planningUnitFloat64 := planningUnitTable.CellFloat64(planningUnitIndex, row)
@@ -79,7 +79,7 @@ func (sl *SedimentProduction) hillSlopeSedimentContribution() float64 {
 	return 0 // TODO: implement
 }
 
-func (sl *SedimentProduction) hillSlopeSedimentContributionForPlanningUnit(planningUnit string) float64 {
+func (sl *SedimentProduction) hillSlopeSedimentContributionForPlanningUnit(planningUnit planningunit.Id) float64 {
 	return 0 // TODO: implement
 }
 
@@ -192,7 +192,7 @@ func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSedimentContribution 
 	sl.valuePerPlanningUnit[planningUnit] = math.RoundFloat(change, int(sl.Precision()))
 }
 
-func (sl *SedimentProduction) ValuesPerPlanningUnit() map[string]float64 {
+func (sl *SedimentProduction) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
 	return sl.valuePerPlanningUnit
 }
 

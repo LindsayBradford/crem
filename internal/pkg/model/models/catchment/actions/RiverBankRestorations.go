@@ -3,10 +3,9 @@
 package actions
 
 import (
-	"strconv"
-
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
 const defaultRevegetationProportion = float64(0.75)
@@ -15,7 +14,7 @@ type RiverBankRestorations struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	actionMap map[string]*RiverBankRestoration
+	actionMap map[planningunit.Id]*RiverBankRestoration
 }
 
 func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
@@ -26,13 +25,13 @@ func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, pa
 	return r
 }
 
-func (r *RiverBankRestorations) ManagementActions() map[string]*RiverBankRestoration {
+func (r *RiverBankRestorations) ManagementActions() map[planningunit.Id]*RiverBankRestoration {
 	return r.actionMap
 }
 
 func (r *RiverBankRestorations) createManagementActions() {
 	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
-	r.actionMap = make(map[string]*RiverBankRestoration, rowCount)
+	r.actionMap = make(map[planningunit.Id]*RiverBankRestoration, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		r.createManagementAction(row)
@@ -41,16 +40,15 @@ func (r *RiverBankRestorations) createManagementActions() {
 
 func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
-
-	planningUnitAsString := strconv.FormatFloat(planningUnit, 'g', -1, 64)
+	planningUnitAsId := Float64ToPlanningUnitId(planningUnit)
 
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
 
-	r.actionMap[planningUnitAsString] =
+	r.actionMap[planningUnitAsId] =
 		new(RiverBankRestoration).
-			WithPlanningUnit(planningUnitAsString).
+			WithPlanningUnit(planningUnitAsId).
 			WithRiverBankRestorationType().
 			WithUnActionedBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(defaultRevegetationProportion).

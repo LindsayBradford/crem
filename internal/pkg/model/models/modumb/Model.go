@@ -4,14 +4,12 @@ package modumb
 
 import (
 	"fmt"
-	"strconv"
-
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/variables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
@@ -112,21 +110,19 @@ func (m *Model) buildDecisionVariables() {
 func (m *Model) buildManagementActions() {
 	m.managementActions.Initialise()
 	numberOfPlanningUnits := m.parameters.GetInt64(parameters.NumberOfPlanningUnits)
-	for planningUnit := int64(0); planningUnit < numberOfPlanningUnits; planningUnit++ {
-
-		planningUnitAsString := strconv.FormatInt(planningUnit, 10)
+	for planningUnit := planningunit.Id(0); planningUnit < planningunit.Id(numberOfPlanningUnits); planningUnit++ {
 
 		actionOne := actions.New().
 			WithObjectiveValue(action.ModelVariableName(Objectives[0]), -1).
-			WithPlanningUnit(planningUnitAsString)
+			WithPlanningUnit(planningUnit)
 
 		actionTwo := actions.New().
 			WithObjectiveValue(action.ModelVariableName(Objectives[1]), -2).
-			WithPlanningUnit(planningUnitAsString)
+			WithPlanningUnit(planningUnit)
 
 		actionThree := actions.New().
 			WithObjectiveValue(action.ModelVariableName(Objectives[2]), -3).
-			WithPlanningUnit(planningUnitAsString)
+			WithPlanningUnit(planningUnit)
 
 		m.managementActions.Add(actionOne, actionTwo, actionThree)
 
@@ -180,7 +176,7 @@ func (m *Model) SetManagementActionUnobserved(index int, value bool) {
 	m.managementActions.SetActivationUnobserved(index, value)
 }
 
-func (m *Model) PlanningUnits() solution.PlanningUnitIds { return nil }
+func (m *Model) PlanningUnits() planningunit.Ids { return nil }
 
 func (m *Model) DeepClone() model.Model {
 	clone := *m
