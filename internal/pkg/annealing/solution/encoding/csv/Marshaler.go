@@ -109,8 +109,13 @@ func planningUnitValueList(variable variable.EncodeableDecisionVariable, plannin
 	headers := make([]string, len(planningUnits))
 
 	if variable.ValuePerPlanningUnit != nil {
-		for index := range planningUnits {
-			headers[index] = formatVariableValue(variable, variable.ValuePerPlanningUnit[index].Value)
+		for planningUnitIndex, planningUnit := range planningUnits {
+			headers[planningUnitIndex] = formatVariableValue(variable, 0)
+			for _, variableValue := range variable.ValuePerPlanningUnit {
+				if planningUnit == variableValue.PlanningUnit {
+					headers[planningUnitIndex] = formatVariableValue(variable, variableValue.Value)
+				}
+			}
 		}
 	}
 	return headers
