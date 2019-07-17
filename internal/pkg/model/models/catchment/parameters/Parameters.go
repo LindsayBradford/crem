@@ -30,8 +30,12 @@ const (
 	YearsOfErosion              string = "YearsOfErosion"
 	DataSourcePath              string = "DataSourcePath"
 
-	RiparianRevegetationCostPerKilometer string = "RiparianRevegetationCostPerKilometer"
-	GullyRestorationCostPerKilometer     string = "GullyRestorationCostPerKilometer"
+	RiparianBufferVegetationProportionTarget string = "RiparianBufferVegetationProportionTarget"
+	HillSlopeBevegetationProportionTarget    string = "HillSlopeBevegetationProportionTarget"
+
+	RiparianRevegetationCostPerKilometer        string = "RiparianRevegetationCostPerKilometer"
+	GullyRestorationCostPerKilometer            string = "GullyRestorationCostPerKilometer"
+	HillSlopeRestorationCostPerKilometerSquared string = "HillSlopeRestorationCostPerKilometerSquared"
 )
 
 func ParameterSpecifications() *Specifications {
@@ -86,6 +90,18 @@ func ParameterSpecifications() *Specifications {
 		},
 	).Add(
 		Specification{
+			Key:          RiparianBufferVegetationProportionTarget,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.75),
+		},
+	).Add(
+		Specification{
+			Key:          HillSlopeBevegetationProportionTarget,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(1.0),
+		},
+	).Add(
+		Specification{
 			Key:          RiparianRevegetationCostPerKilometer,
 			Validator:    IsDecimal,
 			DefaultValue: float64(24000),
@@ -95,6 +111,12 @@ func ParameterSpecifications() *Specifications {
 			Key:          GullyRestorationCostPerKilometer,
 			Validator:    IsDecimal,
 			DefaultValue: float64(44000),
+		},
+	).Add(
+		Specification{
+			Key:          HillSlopeRestorationCostPerKilometerSquared,
+			Validator:    IsDecimal,
+			DefaultValue: float64(200000),
 		},
 	)
 	return specs

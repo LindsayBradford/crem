@@ -10,14 +10,14 @@ import (
 
 const actionedGullySediment = 0
 
-type GullyRestorations struct {
+type GullyRestorationGroup struct {
 	sedimentContribution *GullySedimentContribution
 	parameters           parameters.Parameters
 
 	actionMap map[planningunit.Id]*GullyRestoration
 }
 
-func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters parameters.Parameters) *GullyRestorations {
+func (g *GullyRestorationGroup) Initialise(gullyTable tables.CsvTable, parameters parameters.Parameters) *GullyRestorationGroup {
 	g.sedimentContribution = new(GullySedimentContribution)
 	g.sedimentContribution.Initialise(gullyTable, parameters)
 	g.parameters = parameters
@@ -26,31 +26,30 @@ func (g *GullyRestorations) Initialise(gullyTable tables.CsvTable, parameters pa
 	return g
 }
 
-func (g *GullyRestorations) ManagementActions() map[planningunit.Id]*GullyRestoration {
+func (g *GullyRestorationGroup) ManagementActions() map[planningunit.Id]*GullyRestoration {
 	return g.actionMap
 }
 
-func (g *GullyRestorations) createManagementActions() {
+func (g *GullyRestorationGroup) createManagementActions() {
 	g.actionMap = make(map[planningunit.Id]*GullyRestoration)
 	for planningUnit := range g.sedimentContribution.contributionMap {
 		g.createManagementAction(planningUnit)
 	}
 }
 
-func (g *GullyRestorations) createManagementAction(planningUnit planningunit.Id) {
+func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit.Id) {
 	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
 	costInDollars := g.calculateImplementationCost(planningUnit)
 
 	g.actionMap[planningUnit] =
-		new(GullyRestoration).
-			WithGullyRestorationType().
+		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySediment).
 			WithImplementationCost(costInDollars)
 }
 
-func (g *GullyRestorations) calculateImplementationCost(planningUnit planningunit.Id) float64 {
+func (g *GullyRestorationGroup) calculateImplementationCost(planningUnit planningunit.Id) float64 {
 	channelRestorationCostPerKilometer := g.parameters.GetFloat64(parameters.GullyRestorationCostPerKilometer)
 
 	channelLengthInMetres := g.sedimentContribution.ChannelLength(planningUnit)

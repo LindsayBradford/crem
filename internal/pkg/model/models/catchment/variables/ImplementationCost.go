@@ -47,6 +47,8 @@ func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
 		ic.handleRiverBankRestorationAction()
 	case actions.GullyRestorationType:
 		ic.handleGullyRestorationAction()
+	case actions.HillSlopeRestorationType:
+		ic.handleHillSlopeRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}
@@ -59,6 +61,8 @@ func (ic *ImplementationCost) ObserveActionInitialising(action action.Management
 		ic.handleInitialisingRiverBankRestorationAction()
 	case actions.GullyRestorationType:
 		ic.handleInitialisingGullyRestorationAction()
+	case actions.HillSlopeRestorationType:
+		ic.handleInitialisingHillSlopeRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
 	}
@@ -114,6 +118,40 @@ func (ic *ImplementationCost) handleGullyRestorationAction() {
 		setTempVariable(notImplementedCost, implementationCost)
 	case false:
 		setTempVariable(implementationCost, notImplementedCost)
+	}
+}
+
+func (ic *ImplementationCost) handleHillSlopeRestorationAction() {
+	setTempVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.BaseInductiveDecisionVariable.Value()
+		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.HillSlopeRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setTempVariable(notImplementedCost, implementationCost)
+	case false:
+		setTempVariable(implementationCost, notImplementedCost)
+	}
+}
+
+func (ic *ImplementationCost) handleInitialisingHillSlopeRestorationAction() {
+	setVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.BaseInductiveDecisionVariable.Value()
+		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.HillSlopeRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setVariable(notImplementedCost, implementationCost)
+	case false:
+		setVariable(implementationCost, notImplementedCost)
 	}
 }
 

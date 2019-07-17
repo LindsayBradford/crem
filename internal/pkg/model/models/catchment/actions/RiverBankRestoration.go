@@ -7,19 +7,20 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
+const RiverBankRestorationType action.ManagementActionType = "RiverBankRestoration"
+
+func NewRiverBankRestoration() *RiverBankRestoration {
+	action := new(RiverBankRestoration)
+	action.WithType(RiverBankRestorationType)
+	return action
+}
+
 type RiverBankRestoration struct {
 	action.SimpleManagementAction
 }
 
 func (r *RiverBankRestoration) WithPlanningUnit(planningUnit planningunit.Id) *RiverBankRestoration {
 	r.SimpleManagementAction.WithPlanningUnit(planningUnit)
-	return r
-}
-
-const RiverBankRestorationType action.ManagementActionType = "RiverBankRestoration"
-
-func (r *RiverBankRestoration) WithRiverBankRestorationType() *RiverBankRestoration {
-	r.SimpleManagementAction.WithType(RiverBankRestorationType)
 	return r
 }
 
@@ -32,14 +33,14 @@ func (r *RiverBankRestoration) WithImplementationCost(costInDollars float64) *Ri
 
 const ActionedBufferVegetation action.ModelVariableName = "ActionedBufferVegetation"
 
-func (r *RiverBankRestoration) WithActionedBufferVegetation(changeAsBufferProportion float64) *RiverBankRestoration {
-	r.SimpleManagementAction.WithVariable(ActionedBufferVegetation, changeAsBufferProportion)
+func (r *RiverBankRestoration) WithActionedBufferVegetation(proportionOfVegetation float64) *RiverBankRestoration {
+	r.SimpleManagementAction.WithVariable(ActionedBufferVegetation, proportionOfVegetation)
 	return r
 }
 
 const OriginalBufferVegetation action.ModelVariableName = "OriginalBufferVegetation"
 
-func (r *RiverBankRestoration) WithUnActionedBufferVegetation(originalBufferProportion float64) *RiverBankRestoration {
-	r.SimpleManagementAction.WithVariable(OriginalBufferVegetation, originalBufferProportion)
+func (r *RiverBankRestoration) WithUnActionedBufferVegetation(proportionOfVegetation float64) *RiverBankRestoration {
+	r.SimpleManagementAction.WithVariable(OriginalBufferVegetation, proportionOfVegetation)
 	return r
 }

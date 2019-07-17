@@ -8,16 +8,14 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
-const defaultRevegetationProportion = float64(0.75)
-
-type RiverBankRestorations struct {
+type RiverBankRestorationGroup struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
 	actionMap map[planningunit.Id]*RiverBankRestoration
 }
 
-func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorations {
+func (r *RiverBankRestorationGroup) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorationGroup {
 	r.planningUnitTable = planningUnitTable
 	r.parameters = parameters
 	r.createManagementActions()
@@ -25,11 +23,11 @@ func (r *RiverBankRestorations) Initialise(planningUnitTable tables.CsvTable, pa
 	return r
 }
 
-func (r *RiverBankRestorations) ManagementActions() map[planningunit.Id]*RiverBankRestoration {
+func (r *RiverBankRestorationGroup) ManagementActions() map[planningunit.Id]*RiverBankRestoration {
 	return r.actionMap
 }
 
-func (r *RiverBankRestorations) createManagementActions() {
+func (r *RiverBankRestorationGroup) createManagementActions() {
 	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
 	r.actionMap = make(map[planningunit.Id]*RiverBankRestoration, rowCount)
 
@@ -38,44 +36,46 @@ func (r *RiverBankRestorations) createManagementActions() {
 	}
 }
 
-func (r *RiverBankRestorations) createManagementAction(rowNumber uint) {
+func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
-	planningUnitAsId := Float64ToPlanningUnitId(planningUnit)
+	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
 
+	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
+
 	r.actionMap[planningUnitAsId] =
-		new(RiverBankRestoration).
+		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithRiverBankRestorationType().
 			WithUnActionedBufferVegetation(originalBufferVegetation).
-			WithActionedBufferVegetation(defaultRevegetationProportion).
+			WithActionedBufferVegetation(vegetationTarget).
 			WithImplementationCost(costInDollars)
 }
 
-func (r *RiverBankRestorations) originalBufferVegetation(rowNumber uint) float64 {
+func (r *RiverBankRestorationGroup) originalBufferVegetation(rowNumber uint) float64 {
 	proportionOfRiparianVegetation := r.planningUnitTable.CellFloat64(riparianVegetationIndex, rowNumber)
 	return proportionOfRiparianVegetation
 }
 
-func (r *RiverBankRestorations) calculateChangeInBufferVegetation(rowNumber uint) float64 {
+func (r *RiverBankRestorationGroup) calculateChangeInBufferVegetation(rowNumber uint) float64 {
 	proportionOfRiparianVegetation := r.originalBufferVegetation(rowNumber)
-	changeInRiparianVegetation := defaultRevegetationProportion - proportionOfRiparianVegetation // TODO: Assumes full riparian revegation - revisit later.
+	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
+	changeInRiparianVegetation := vegetationTarget - proportionOfRiparianVegetation
 	return changeInRiparianVegetation
 }
 
-func (r *RiverBankRestorations) calculateImplementationCost(rowNumber uint) float64 {
-	riparianRevegetationCostPerKilometer := r.parameters.GetFloat64(parameters.RiparianRevegetationCostPerKilometer)
+func (r *RiverBankRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
+	riparianRevegetationCostPerKlmSquared := r.parameters.GetFloat64(parameters.HillSlopeRestorationCostPerKilometerSquared)
 	riverLengthInMetres := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
 	riverLengthInKilometres := riverLengthInMetres / 1000
 
 	vegetationChange := r.calculateChangeInBufferVegetation(rowNumber)
 
-	vegetationChangeLengthInKilometres := vegetationChange * riverLengthInKilometres
+	vegetationChangeLengthInKilometresSquared := vegetationChange * riverLengthInKilometres
 
-	implementationCost := vegetationChangeLengthInKilometres * riparianRevegetationCostPerKilometer
+	implementationCost := vegetationChangeLengthInKilometresSquared * riparianRevegetationCostPerKlmSquared
 
 	return implementationCost
 }

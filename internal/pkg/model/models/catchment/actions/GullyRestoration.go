@@ -7,19 +7,20 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
+const GullyRestorationType action.ManagementActionType = "GullyRestoration"
+
+func NewGullyRestoration() *GullyRestoration {
+	action := new(GullyRestoration)
+	action.WithType(GullyRestorationType)
+	return action
+}
+
 type GullyRestoration struct {
 	action.SimpleManagementAction
 }
 
 func (g *GullyRestoration) WithPlanningUnit(planningUnit planningunit.Id) *GullyRestoration {
 	g.SimpleManagementAction.WithPlanningUnit(planningUnit)
-	return g
-}
-
-const GullyRestorationType action.ManagementActionType = "GullyRestoration"
-
-func (g *GullyRestoration) WithGullyRestorationType() *GullyRestoration {
-	g.SimpleManagementAction.WithType(GullyRestorationType)
 	return g
 }
 

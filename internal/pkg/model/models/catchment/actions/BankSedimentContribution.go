@@ -24,10 +24,6 @@ const (
 	riparianBufferAreaIndex = 10
 )
 
-func Float64ToPlanningUnitId(value float64) planningunit.Id {
-	return planningunit.Id(value)
-}
-
 type sedimentTracker struct {
 	partialSedimentContribution      float64
 	originalIntactRiparianVegetation float64
@@ -57,7 +53,7 @@ func (bsc *BankSedimentContribution) populateContributionMap() {
 
 func (bsc *BankSedimentContribution) populateContributionMapEntry(rowNumber uint) {
 	planningUnit := bsc.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
-	mapKey := Float64ToPlanningUnitId(planningUnit)
+	mapKey := planningunit.Float64ToId(planningUnit)
 
 	bsc.contributionMap[mapKey] = sedimentTracker{
 		partialSedimentContribution:      bsc.partialBankSedimentContribution(rowNumber),

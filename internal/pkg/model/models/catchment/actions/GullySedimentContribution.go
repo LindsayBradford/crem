@@ -45,7 +45,7 @@ func (bsc *GullySedimentContribution) populateContributionMap() {
 
 func (bsc *GullySedimentContribution) populateContributionMapEntry(rowNumber uint) {
 	planningUnit := bsc.gulliesTable.CellFloat64(gulliesPlanningUnitIndex, rowNumber)
-	mapKey := Float64ToPlanningUnitId(planningUnit)
+	mapKey := planningunit.Float64ToId(planningUnit)
 
 	newGullyTracker := gullySedimentTracker{
 		GullyId:            bsc.gulliesTable.CellFloat64(gullyIdIndex, rowNumber),

@@ -152,13 +152,13 @@ func (m *Model) buildManagementActions() {
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
 	// TODO: Initialise other sediment management actions
-	riverBankRestorations := new(actions.RiverBankRestorations).Initialise(m.planningUnitTable, m.parameters)
+	riverBankRestorations := new(actions.RiverBankRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
-	gullyRestorations := new(actions.GullyRestorations).Initialise(m.gulliesTable, m.parameters)
+	gullyRestorations := new(actions.GullyRestorationGroup).Initialise(m.gulliesTable, m.parameters)
 	for _, action := range gullyRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
@@ -187,7 +187,7 @@ func (m *Model) PlanningUnits() planningunit.Ids {
 
 	for row := uint(0); row < rows; row++ {
 		planningUnit := m.planningUnitTable.CellFloat64(0, row)
-		planningUnitId := actions.Float64ToPlanningUnitId(planningUnit)
+		planningUnitId := planningunit.Float64ToId(planningUnit)
 		planningUnits[row] = planningUnitId
 	}
 
