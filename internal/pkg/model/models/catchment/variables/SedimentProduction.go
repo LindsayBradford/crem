@@ -186,6 +186,7 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
+	// TODO:  Need to reduce if matching RiverBankingRestoration is active. CRP final report, table 3-4, sect 3.6.1
 	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
@@ -210,6 +211,7 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleInitialisingHillSlopeRestorationAction() {
+	// TODO:  Need to reduce if matching RiverBankingRestoration is active. CRP final report, table 3-4, sect 3.6.1
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
