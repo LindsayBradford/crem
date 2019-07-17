@@ -8,8 +8,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
 
-const actionedGullySediment = 0
-
 type GullyRestorationGroup struct {
 	sedimentContribution *GullySedimentContribution
 	parameters           parameters.Parameters
@@ -41,11 +39,13 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
 	costInDollars := g.calculateImplementationCost(planningUnit)
 
+	actionedGullySedimentReduction := g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
+
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
-			WithActionedGullySediment(actionedGullySediment).
+			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
 			WithImplementationCost(costInDollars)
 }
 

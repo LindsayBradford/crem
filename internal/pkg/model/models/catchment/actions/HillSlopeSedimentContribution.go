@@ -70,6 +70,7 @@ func (h *HillSlopeSedimentContribution) OriginalSedimentContribution() float64 {
 }
 
 func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
+	// TODO:  Need to reduce if matching RiverBankingRestoration is active.
 	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[id]
 	assert.That(planningUnitIsPresent).Holds()
 
@@ -79,6 +80,7 @@ func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution
 }
 
 func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
+	// TODO:  Need to reduce if matching RiverBankingRestoration is active.
 	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[planningUnit]
 	assert.That(planningUnitIsPresent).Holds()
 

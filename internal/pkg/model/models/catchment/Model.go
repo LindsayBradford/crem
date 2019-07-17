@@ -151,7 +151,6 @@ func (m *Model) buildManagementActions() {
 	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	// TODO: Initialise other sediment management actions
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)
@@ -160,6 +159,12 @@ func (m *Model) buildManagementActions() {
 
 	gullyRestorations := new(actions.GullyRestorationGroup).Initialise(m.gulliesTable, m.parameters)
 	for _, action := range gullyRestorations.ManagementActions() {
+		m.managementActions.Add(action)
+		action.Subscribe(m, sedimentLoad, implementationCost)
+	}
+
+	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
+	for _, action := range hillSlopeRestorations.ManagementActions() {
 		m.managementActions.Add(action)
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}

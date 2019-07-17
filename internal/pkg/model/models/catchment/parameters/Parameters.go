@@ -32,6 +32,7 @@ const (
 
 	RiparianBufferVegetationProportionTarget string = "RiparianBufferVegetationProportionTarget"
 	HillSlopeBevegetationProportionTarget    string = "HillSlopeBevegetationProportionTarget"
+	GullySedimentReductionTarget             string = "GullySedimentReductionTarget"
 
 	RiparianRevegetationCostPerKilometer        string = "RiparianRevegetationCostPerKilometer"
 	GullyRestorationCostPerKilometer            string = "GullyRestorationCostPerKilometer"
@@ -96,9 +97,15 @@ func ParameterSpecifications() *Specifications {
 		},
 	).Add(
 		Specification{
+			Key:          GullySedimentReductionTarget,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.8),
+		},
+	).Add(
+		Specification{
 			Key:          HillSlopeBevegetationProportionTarget,
 			Validator:    IsDecimalBetweenZeroAndOne,
-			DefaultValue: float64(1.0),
+			DefaultValue: float64(0.75),
 		},
 	).Add(
 		Specification{
