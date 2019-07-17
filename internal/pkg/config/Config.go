@@ -15,7 +15,7 @@ import (
 
 const ShortApplicationName = "CatchmentResilienceExplorationModeller"
 const LongApplicationName = "Catchment Resilience Exploration Modeller"
-const Version = "v1"
+const Version = "v0.1"
 
 const defaultServerConfigPath = "config/server.toml"
 
