@@ -51,6 +51,8 @@ func (m *Marshaler) Marshal(solution *solution.Solution, dataSet *excel.DataSet)
 func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSet *excel.DataSet) error {
 	table := emptyDecisionVariableTable(solution)
 
+	var offsetColumn uint = unitOfMeasureColumn + 1
+
 	for i, decisionVariable := range solution.DecisionVariables {
 		rowIndex := uint(i)
 		table.SetCell(nameColumn, rowIndex, decisionVariable.Name)
@@ -58,15 +60,28 @@ func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSe
 		table.SetCell(unitOfMeasureColumn, rowIndex, decisionVariable.Measure.String())
 
 		if decisionVariable.ValuePerPlanningUnit != nil {
-			var offsetColumn uint = unitOfMeasureColumn + 1
+			for planningUnitIndex, planningUnit := range solution.PlanningUnits {
+				columnIndex := uint(planningUnitIndex) + offsetColumn
+				table.SetCell(columnIndex, rowIndex, 0)
 
-			for j := range solution.PlanningUnits {
-				columnIndex := uint(j) + offsetColumn
-
-				inputVariable := decisionVariable.ValuePerPlanningUnit[j].Value
-				table.SetCell(columnIndex, rowIndex, inputVariable)
+				for _, variableValue := range decisionVariable.ValuePerPlanningUnit {
+					if planningUnit == variableValue.PlanningUnit {
+						table.SetCell(columnIndex, rowIndex, variableValue.Value)
+					}
+				}
 			}
 		}
+
+		//if decisionVariable.ValuePerPlanningUnit != nil {
+		//	var offsetColumn uint = unitOfMeasureColumn + 1
+		//
+		//	for j := range solution.PlanningUnits {
+		//		columnIndex := uint(j) + offsetColumn
+		//
+		//		inputVariable := decisionVariable.ValuePerPlanningUnit[j].Value
+		//		table.SetCell(columnIndex, rowIndex, inputVariable)
+		//	}
+		//}
 	}
 
 	dataSet.AddTable(table.Name(), table)
