@@ -121,6 +121,23 @@ func (ic *ImplementationCost) handleGullyRestorationAction() {
 	}
 }
 
+func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
+	setVariable := func(asIsCost float64, toBeCost float64) {
+		currentValue := ic.BaseInductiveDecisionVariable.Value()
+		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
+	}
+
+	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
+
+	switch ic.actionObserved.IsActive() {
+	case true:
+		setVariable(notImplementedCost, implementationCost)
+	case false:
+		setVariable(implementationCost, notImplementedCost)
+	}
+}
+
 func (ic *ImplementationCost) handleHillSlopeRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
@@ -146,23 +163,6 @@ func (ic *ImplementationCost) handleInitialisingHillSlopeRestorationAction() {
 	}
 
 	implementationCost := ic.actionObserved.ModelVariableValue(actions.HillSlopeRestorationCost)
-
-	switch ic.actionObserved.IsActive() {
-	case true:
-		setVariable(notImplementedCost, implementationCost)
-	case false:
-		setVariable(implementationCost, notImplementedCost)
-	}
-}
-
-func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
-	setVariable := func(asIsCost float64, toBeCost float64) {
-		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
-		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
-	}
-
-	implementationCost := ic.actionObserved.ModelVariableValue(actions.GullyRestorationCost)
 
 	switch ic.actionObserved.IsActive() {
 	case true:

@@ -163,6 +163,7 @@ func (m *Model) buildManagementActions() {
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
+	// TODO: Add Hillslope contribution back in.
 	//hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
 	//for _, action := range hillSlopeRestorations.ManagementActions() {
 	//	m.managementActions.Add(action)

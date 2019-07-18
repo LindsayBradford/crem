@@ -18,7 +18,9 @@ type CompositeInductiveDecisionVariable struct {
 	name.NameContainer
 
 	weightedVariables map[InductiveDecisionVariable]float64
+
 	variableScales    map[InductiveDecisionVariable]float64
+	scaleVectorLength float64
 
 	ContainedDecisionVariableObservers
 	ContainedUnitOfMeasure
@@ -57,10 +59,10 @@ func (v *CompositeInductiveDecisionVariable) Build() (*CompositeInductiveDecisio
 
 func (v *CompositeInductiveDecisionVariable) calculateScalingVector() {
 	// https://en.wikipedia.org/wiki/Feature_scaling#Scaling_to_unit_length
-	vectorLength := v.vectorLengthOfVariableValues()
+	v.scaleVectorLength = v.vectorLengthOfVariableValues()
 	for variable := range v.weightedVariables {
 		variableValue := variable.Value()
-		v.variableScales[variable] = variableValue / vectorLength
+		v.variableScales[variable] = variableValue / v.scaleVectorLength
 	}
 }
 
@@ -93,9 +95,9 @@ func (v *CompositeInductiveDecisionVariable) Value() float64 {
 		variableValue := variable.Value()
 		scaledValue := variableValue / scale
 		weight := v.weightedVariables[variable]
-		value += scaledValue * weight / numberOfVariables
+		value += scaledValue * weight * numberOfVariables
 	}
-	return value
+	return value / v.scaleVectorLength
 }
 
 func (v *CompositeInductiveDecisionVariable) SetValue(value float64) {
@@ -109,9 +111,9 @@ func (v *CompositeInductiveDecisionVariable) InductiveValue() float64 {
 		variableValue := variable.InductiveValue()
 		scaledValue := variableValue / scale
 		weight := v.weightedVariables[variable]
-		value += scaledValue * weight / numberOfVariables
+		value += scaledValue * weight * numberOfVariables
 	}
-	return value
+	return value / v.scaleVectorLength
 }
 
 func (v *CompositeInductiveDecisionVariable) SetInductiveValue(value float64) {

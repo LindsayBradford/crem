@@ -13,10 +13,10 @@ import (
 
 const defaultCatchmentModelAnnealerTimeout = 10
 
-func TestCremEngine_ScenarioOneRunBlackbox_ExitWithSuccess(t *testing.T) {
+func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "Single run of CremEngine CatchmentModel",
+		Name:              "CREMEngine - Black Box",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/TestCREMEngine-BlackBox.toml",
@@ -26,10 +26,10 @@ func TestCremEngine_ScenarioOneRunBlackbox_ExitWithSuccess(t *testing.T) {
 	appTesting.TestExecutableAgainstConfigFile(context)
 }
 
-func TestCremEngine_ScenarioBadInputsBlackbox_ExitWithError(t *testing.T) {
+func TestCREMExplorer_BlackBox_ExitWithError(t *testing.T) {
 	context := appTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "Attempted run of CremEngine CatchmentModel with bad inputs",
+		Name:              "CREMEngine - Black Box with bad inputs",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/TestCREMEngine-BadInputs.toml",
@@ -39,9 +39,9 @@ func TestCremEngine_ScenarioBadInputsBlackbox_ExitWithError(t *testing.T) {
 	appTesting.TestExecutableAgainstConfigFile(context)
 }
 
-func TestCremEngine_ScenarioOneRunWhitebox_ExitWithSuccess(t *testing.T) {
+func TestCREMExplorer_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := appTesting.WhiteboxTestingContext{
-		Name:           "Single run of catchment model annealer",
+		Name:           "CREMEngine - White Box",
 		T:              t,
 		ConfigFilePath: "testdata/TestCREMEngine-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,

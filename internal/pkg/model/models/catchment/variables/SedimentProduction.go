@@ -67,15 +67,18 @@ func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningU
 
 		sl.valuePerPlanningUnit[planningUnit] =
 			sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) +
-				sl.gullySedimentContribution.SedimentContribution(planningUnit) +
-				sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
+				sl.gullySedimentContribution.SedimentContribution(planningUnit) // +
+		// sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
+		// TODO: Add Hillslope contribution back in.
 	}
 }
 
 func (sl *SedimentProduction) deriveInitialSedimentLoad() float64 {
 	return sl.bankSedimentContribution.OriginalSedimentContribution() +
-		sl.gullySedimentContribution.OriginalSedimentContribution() +
-		sl.hillSlopeSedimentContribution.OriginalSedimentContribution()
+		sl.gullySedimentContribution.OriginalSedimentContribution() // +
+	// sl.hillSlopeSedimentContribution.OriginalSedimentContribution()
+	// TODO: Add Hillslope contribution back in.
+
 }
 
 func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
