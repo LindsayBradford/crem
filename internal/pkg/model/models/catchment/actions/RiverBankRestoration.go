@@ -40,7 +40,7 @@ func (r *RiverBankRestoration) WithActionedBufferVegetation(proportionOfVegetati
 
 const OriginalBufferVegetation action.ModelVariableName = "OriginalBufferVegetation"
 
-func (r *RiverBankRestoration) WithUnActionedBufferVegetation(proportionOfVegetation float64) *RiverBankRestoration {
+func (r *RiverBankRestoration) WithoRIGINALBufferVegetation(proportionOfVegetation float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(OriginalBufferVegetation, proportionOfVegetation)
 	return r
 }

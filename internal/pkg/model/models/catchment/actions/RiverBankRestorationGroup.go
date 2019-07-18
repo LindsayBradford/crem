@@ -49,7 +49,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithUnActionedBufferVegetation(originalBufferVegetation).
+			WithoRIGINALBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
 			WithImplementationCost(costInDollars)
 }
@@ -67,7 +67,7 @@ func (r *RiverBankRestorationGroup) calculateChangeInBufferVegetation(rowNumber 
 }
 
 func (r *RiverBankRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
-	riparianRevegetationCostPerKlmSquared := r.parameters.GetFloat64(parameters.HillSlopeRestorationCostPerKilometerSquared)
+	riparianRevegetationCostPerKlmSquared := r.parameters.GetFloat64(parameters.RiparianRevegetationCostPerKilometer)
 	riverLengthInMetres := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
 	riverLengthInKilometres := riverLengthInMetres / 1000
 
