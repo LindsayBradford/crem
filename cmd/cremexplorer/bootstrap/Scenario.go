@@ -1,9 +1,9 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package scenario
+package bootstrap
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/commandline"
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"

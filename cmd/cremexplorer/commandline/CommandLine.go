@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/config"
 	"github.com/pkg/errors"
 )
 
@@ -27,9 +27,8 @@ func ParseArguments() *Arguments {
 }
 
 type Arguments struct {
-	Version          bool
-	ScenarioFile     string
-	ServerConfigFile string
+	Version      bool
+	ScenarioFile string
 }
 
 // THe define sets up the relevant command-line
@@ -42,13 +41,6 @@ func (args *Arguments) define() {
 		"ScenarioFile",
 		"",
 		"file dictating scenario run-time behaviour",
-	)
-
-	flag.StringVar(
-		&args.ServerConfigFile,
-		"ServerConfigFile",
-		"",
-		"file dictating HTTP server runtime behaviour",
 	)
 
 	flag.BoolVar(
@@ -69,6 +61,10 @@ func (args *Arguments) define() {
 
 func (args *Arguments) process() {
 
+	if flag.NFlag() == 0 {
+		flag.Usage()
+	}
+
 	if args.Version == true {
 		fmt.Println(
 			GetVersionString(),
@@ -78,10 +74,6 @@ func (args *Arguments) process() {
 
 	if args.ScenarioFile != "" {
 		validateFilePath(args.ScenarioFile)
-	}
-
-	if args.ServerConfigFile != "" {
-		validateFilePath(args.ServerConfigFile)
 	}
 }
 
@@ -117,23 +109,13 @@ func Exit(exitValue interface{}) {
 // a request for how to use the utility from the command-line
 
 func usageMessage() {
-	fmt.Printf("Help for %s\n", GetVersionString())
+	fmt.Printf("Usage of %s\n", GetVersionString())
 	fmt.Println("  --Help                         Prints this help message.")
 	fmt.Println("  --Version                      Prints the version number of this utility.")
 	fmt.Println("  --ScenarioFile  <FilePath>     File describing a scenario to run and its  run-time behaviour.")
-	fmt.Println("  --ServerConfigFile <FilePath>  File describing how the application is to run as a web server.")
-	fmt.Println()
-	fmt.Println("Web-server usage takes the form:")
-	fmt.Printf("  %s [--ServerConfigFile <FilePath>]\n", justExecutableName())
-	fmt.Println()
-	fmt.Println("  If no server config fle is specified, configuration will first attempt to load from the relative")
-	fmt.Println("  path \"./config/server.toml\". If no such path exists, a web-server will start with default values")
-	fmt.Println("  for all entries in a server config file. ")
 	fmt.Println()
 	fmt.Println("Running a single scenario takes the form:")
 	fmt.Printf("  %s --ScenarioFile <FilePath>\n", justExecutableName())
-	fmt.Println()
-	fmt.Println("If a scenario file is specified, the application runs the scenario instead of a web server.")
 
 	Exit(0)
 }
@@ -142,7 +124,7 @@ func usageMessage() {
 // version number as defined in the utility's configuration.
 
 func GetVersionString() string {
-	return fmt.Sprintf("%s %s (%s)", justExecutableName(), config.Version, runtime.Version())
+	return fmt.Sprintf("%s v%s (%s)", justExecutableName(), config.Version, runtime.Version())
 }
 
 func justExecutableName() string {

@@ -4,10 +4,10 @@
 package main
 
 import (
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/bootstrap"
 	"os"
 	"testing"
 
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
 	appTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/onsi/gomega/gexec"
@@ -65,7 +65,7 @@ func TestSimpleExcelAnnealer_Whitebox_ExitWithSuccess(t *testing.T) {
 		Runner:         RunFromConfigFile,
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 	os.Remove(excelFileUnderTest)
 }

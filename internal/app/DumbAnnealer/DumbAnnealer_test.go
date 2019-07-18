@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/LindsayBradford/crem/cmd/cremengine/components/scenario"
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/bootstrap"
 	appTesting "github.com/LindsayBradford/crem/internal/pkg/config/testing"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 
@@ -74,7 +74,7 @@ func TestKirkpatrickDumbAnnealer_ScenarioOneRunWhitebox_ExitWithSuccess(t *testi
 		Runner: RunFromConfigFile,
 	}
 
-	scenario.LogHandler = loggers.DefaultTestingLogger
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
 

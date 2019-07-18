@@ -1,19 +1,9 @@
-ScenarioName = "Test Catchment Annealer - One run"
-
-[[Loggers]]
-Name = "TestLogger"
-[Loggers.LogLevelDestinations]
-#Debug = "StandardOutput"
-Model = "StandardOutput"
+ScenarioName = "Test CREMEngine - Bad Inputs"
 
 [[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
-Logger = "TestLogger"
+Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1
-
-[[AnnealingObservers]]
-Type = "InvariantObserver"
+NumberOfIterations = 2_00_000 # 200
 
 [[Models]]
 Type = "CatchmentModel"
@@ -25,8 +15,8 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
-RiparianRevegetationCostPerKilometer = 1.0 # 24,000 (default)
-DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
+DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
+HereIsARogueModelParameter = 0.2    # BADNESS HERE BOSS!
 
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
@@ -40,4 +30,4 @@ CoolingFactor =  0.99  # 0.99
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-MaximumIterations = 200 # 1M
+MaximumIterations = 1_000_000 # 1M

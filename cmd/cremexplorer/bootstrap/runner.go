@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-package scenario
+package bootstrap
 
 import (
 	"os"
@@ -10,16 +10,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/pkg/errors"
 )
-
-func RunServerScenarioFromConfig(cremConfig *config.CREMConfig) error {
-	scenarioRunner, runnerError := BuildScenarioRunner(cremConfig)
-	if runnerError != nil {
-		return runnerError
-	}
-
-	go runScenario(scenarioRunner)
-	return nil
-}
 
 func RunScenarioFromConfig(cremConfig *config.CREMConfig) error {
 	scenarioRunner, runnerError := BuildScenarioRunner(cremConfig)

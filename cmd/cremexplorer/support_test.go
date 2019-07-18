@@ -10,7 +10,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var cremExceutablePath string
+var exceutablePath string
 
 const withFailure = 1
 
@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 
 func setup(m *testing.M) {
 	var err error
-	cremExceutablePath, err = gexec.Build("github.com/LindsayBradford/crem/cmd/cremengine")
+	exceutablePath, err = gexec.Build("github.com/LindsayBradford/crem/cmd/cremexplorer")
 
 	if err != nil {
 		os.Exit(withFailure)

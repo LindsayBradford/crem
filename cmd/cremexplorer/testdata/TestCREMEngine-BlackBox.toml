@@ -1,8 +1,4 @@
-ScenarioName = "Catchment Annealer - One run"
-RunNumber=1
-OutputPath="testdata/solutions"
-#CpuProfilePath="testdata/profile.pprof"
-OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
+ScenarioName = "Test CREMEngine - Black Box"
 
 [[Loggers]]
 Name = "TestLogger"
@@ -14,7 +10,7 @@ Model = "StandardOutput"
 Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
 Logger = "TestLogger"
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 10_000
+NumberOfIterations = 1
 
 [[AnnealingObservers]]
 Type = "InvariantObserver"
@@ -29,20 +25,19 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
-RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
-GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
-DataSourcePath = "testdata/testCatchmentExcelDataSet.xlsx"
+RiparianRevegetationCostPerKilometer = 1.0 # 24,000 (default)
+DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 
 [[SolutionExplorers]]
 Type = "KirkpatrickExplorer"
 Name = "SingleObjectiveExplorer"
 [SolutionExplorers.Parameters]
-DecisionVariable = "SedimentVsCost"
-StartingTemperature = 10_000.0 #10
-CoolingFactor =  0.999  # 0.99
+DecisionVariable = "SedimentProduction"
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.99  # 0.99
 
 [Annealer]
 SolutionExplorer = "SingleObjectiveExplorer"
 Model = "TurbidityModel"
 [Annealer.Parameters]
-MaximumIterations = 1_000 # 1M
+MaximumIterations = 200 # 1M

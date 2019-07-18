@@ -6,7 +6,7 @@ package main
 import (
 	"os"
 
-	"github.com/LindsayBradford/crem/internal/pkg/commandline"
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
