@@ -67,18 +67,15 @@ func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningU
 
 		sl.valuePerPlanningUnit[planningUnit] =
 			sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) +
-				sl.gullySedimentContribution.SedimentContribution(planningUnit) // +
-		// sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
-		// TODO: Add Hillslope contribution back in.
+				sl.gullySedimentContribution.SedimentContribution(planningUnit) +
+				sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
 	}
 }
 
 func (sl *SedimentProduction) deriveInitialSedimentLoad() float64 {
 	return sl.bankSedimentContribution.OriginalSedimentContribution() +
-		sl.gullySedimentContribution.OriginalSedimentContribution() // +
-	// sl.hillSlopeSedimentContribution.OriginalSedimentContribution()
-	// TODO: Add Hillslope contribution back in.
-
+		sl.gullySedimentContribution.OriginalSedimentContribution() +
+		sl.hillSlopeSedimentContribution.OriginalSedimentContribution()
 }
 
 func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
@@ -189,15 +186,15 @@ func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
-	// TODO:  Need to reduce if matching RiverBankingRestoration is active. CRP final report, table 3-4, sect 3.6.1
+	// TODO:  Reduce if matching RiverBankingRestoration is active. CRP final report, table 3-4, sect 3.6.1, pg 31
 	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
 
 		planningUnit := sl.actionObserved.PlanningUnit()
 
-		asIsSedimentContribution := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
-		toBeSedimentContribution := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
+		asIsSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
+		toBeSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
 
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
@@ -221,8 +218,8 @@ func (sl *SedimentProduction) handleInitialisingHillSlopeRestorationAction() {
 
 		planningUnit := sl.actionObserved.PlanningUnit()
 
-		asIsSedimentContribution := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
-		toBeSedimentContribution := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
+		asIsSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
+		toBeSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
 
 		currentValue := sl.BaseInductiveDecisionVariable.Value()
 		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)

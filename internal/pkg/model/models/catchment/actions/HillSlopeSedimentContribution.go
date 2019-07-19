@@ -5,6 +5,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
+	"math"
 )
 
 const (
@@ -18,6 +19,7 @@ type hillslopeSedimentTracker struct {
 	rslk                         float64
 	originalProportionVegetation float64
 	distanceToCatchment          float64
+	area                         float64
 }
 
 type HillSlopeSedimentContribution struct {
@@ -50,6 +52,7 @@ func (h *HillSlopeSedimentContribution) populateContributionMapEntry(rowNumber u
 		rslk:                         h.hillslopeRkls(rowNumber),
 		originalProportionVegetation: h.originalHillSlopeVegetation(rowNumber),
 		distanceToCatchment:          h.distanceToCatchment(rowNumber),
+		area:                         h.hillslopArea(rowNumber),
 	}
 }
 
@@ -58,6 +61,10 @@ func (h *HillSlopeSedimentContribution) hillslopeRkls(rowNumber uint) float64 {
 	// See Catchment Rehabilitation Planner final report, section 3.2.3
 	rkls := h.planningUnitTable.CellFloat64(hillSlopeRKLSIndex, rowNumber)
 	return rkls
+}
+
+func (h *HillSlopeSedimentContribution) hillslopArea(rowNumber uint) float64 {
+	return h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
 }
 
 func (h *HillSlopeSedimentContribution) originalHillSlopeVegetation(rowNumber uint) float64 {
@@ -95,6 +102,12 @@ func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(plannin
 }
 
 func (h *HillSlopeSedimentContribution) calculateVegetationCover(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
-	//TODO:  The HSDR concept is missing.  Needs Eq 3.6 & 3.7 to modify variable "C"
-	return proportionOfHillSlopeVegetation
+	distanceToRiparianBuffer := h.contributionMap[planningUnit].distanceToCatchment
+	area := h.contributionMap[planningUnit].area
+	groundCover := area * proportionOfHillSlopeVegetation
+
+	b := (0.001 * math.Exp(0.053*groundCover)) * -1
+	vegetationCover := (0.1336 * math.Exp(b*distanceToRiparianBuffer)) * (0.5665 * math.Exp(-0.0487*groundCover))
+
+	return vegetationCover
 }
