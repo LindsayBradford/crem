@@ -67,20 +67,25 @@ func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningU
 		planningUnitFloat64 := planningUnitTable.CellFloat64(planningUnitIndex, row)
 		planningUnit := Float64ToPlanningUnitId(planningUnitFloat64)
 
+		sl.riparianVegetationProportionPerPlanningUnit[planningUnit] =
+			sl.bankSedimentContribution.OriginalPlanningUnitVegetationProportion(planningUnit)
+
+		riparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
+
 		sl.valuePerPlanningUnit[planningUnit] =
 			sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) +
 				sl.gullySedimentContribution.SedimentContribution(planningUnit) +
-				sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
-
-		sl.riparianVegetationProportionPerPlanningUnit[planningUnit] =
-			sl.bankSedimentContribution.OriginalPlanningUnitVegetationProportion(planningUnit)
+				(sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter)
 	}
 }
 
 func (sl *SedimentProduction) deriveInitialSedimentLoad() float64 {
-	return sl.bankSedimentContribution.OriginalSedimentContribution() +
-		sl.gullySedimentContribution.OriginalSedimentContribution() +
-		sl.hillSlopeSedimentContribution.OriginalSedimentContribution()
+	initialSedimentLoad := float64(0)
+	for _, sedimentAtPlanningUnit := range sl.valuePerPlanningUnit {
+		initialSedimentLoad += sedimentAtPlanningUnit
+	}
+
+	return initialSedimentLoad
 }
 
 func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
@@ -131,12 +136,13 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 	switch sl.actionObserved.IsActive() {
 	case true:
 		setTempVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
+		sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
+			sl.actionObserved.ModelVariableValue(actions.ActionedBufferVegetation)
 	case false:
 		setTempVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
+		sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
+			sl.actionObserved.ModelVariableValue(actions.OriginalBufferVegetation)
 	}
-
-	sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-		sl.actionObserved.ModelVariableValue(actions.ActionedBufferVegetation)
 }
 
 func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
@@ -224,7 +230,6 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleInitialisingHillSlopeRestorationAction() {
-	// TODO:  Need to reduce if matching RiverBankingRestoration is active. CRP final report, table 3-4, sect 3.6.1
 	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
 		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
 		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)

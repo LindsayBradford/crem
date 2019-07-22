@@ -163,12 +163,11 @@ func (m *Model) buildManagementActions() {
 		action.Subscribe(m, sedimentLoad, implementationCost)
 	}
 
-	// TODO: Add Hillslope contribution back in.
-	//hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
-	//for _, action := range hillSlopeRestorations.ManagementActions() {
-	//	m.managementActions.Add(action)
-	//	action.Subscribe(m, sedimentLoad, implementationCost)
-	//}
+	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
+	for _, action := range hillSlopeRestorations.ManagementActions() {
+		m.managementActions.Add(action)
+		action.Subscribe(m, sedimentLoad, implementationCost)
+	}
 }
 
 func (m *Model) ManagementActions() []action.ManagementAction {
@@ -204,8 +203,8 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	const sedimentWeight = 0.5
-	const implementationWeight = 0.5
+	const sedimentWeight = float64(0.5)
+	const implementationWeight = float64(0.5)
 
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().

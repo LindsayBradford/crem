@@ -96,18 +96,23 @@ func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(plannin
 	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[planningUnit]
 	assert.That(planningUnitIsPresent).Holds()
 
-	sedimentContribution := planningUnitSedimentTracker.rslk * h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation)
+	sedimentContribution := math.Max(0, planningUnitSedimentTracker.rslk*h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation))
 
 	return sedimentContribution
 }
 
 func (h *HillSlopeSedimentContribution) calculateVegetationCover(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
+	// See: CRP final report, section 3.2.3, pg 24.
 	distanceToRiparianBuffer := h.contributionMap[planningUnit].distanceToCatchment
 	area := h.contributionMap[planningUnit].area
 	groundCover := area * proportionOfHillSlopeVegetation
 
-	b := (0.001 * math.Exp(0.053*groundCover)) * -1
-	vegetationCover := (0.1336 * math.Exp(b*distanceToRiparianBuffer)) * (0.5665 * math.Exp(-0.0487*groundCover))
+	unmodifiedVegetationCoverFactor := 0.5665 * math.Exp(-0.0487*groundCover)
 
-	return vegetationCover
+	b := 0.001 * math.Exp(0.053*groundCover)
+	hillSlopeSedimentDeliveryRatio := 0.1336 * math.Exp((-1*b)*distanceToRiparianBuffer)
+
+	vegetationCoverFactor := unmodifiedVegetationCoverFactor * hillSlopeSedimentDeliveryRatio
+
+	return vegetationCoverFactor
 }

@@ -40,11 +40,15 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
+	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
+
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
 
-	costInDollars := r.calculateImplementationCost(rowNumber)
+	if originalBufferVegetation >= vegetationTarget {
+		return
+	}
 
-	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
+	costInDollars := r.calculateImplementationCost(rowNumber)
 
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().

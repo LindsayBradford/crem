@@ -40,11 +40,15 @@ func (r *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
+	hillSlopeArea := r.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
+	vegetationTarget := r.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
 	originalHillSlopeVegetation := r.originalHillSlopeVegetation(rowNumber)
 
-	costInDollars := r.calculateImplementationCost(rowNumber)
+	if hillSlopeArea == 0 || originalHillSlopeVegetation >= vegetationTarget {
+		return
+	}
 
-	vegetationTarget := r.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
+	costInDollars := r.calculateImplementationCost(rowNumber)
 
 	r.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
