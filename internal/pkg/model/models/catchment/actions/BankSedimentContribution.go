@@ -98,6 +98,15 @@ func (bsc *BankSedimentContribution) OriginalSedimentContribution() float64 {
 	return sedimentContribution
 }
 
+func (bsc *BankSedimentContribution) OriginalPlanningUnitVegetationProportion(id planningunit.Id) float64 {
+	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[id]
+	assert.That(planningUnitIsPresent).Holds()
+
+	originalVegetation := planningUnitSedimentTracker.originalIntactRiparianVegetation
+
+	return originalVegetation
+}
+
 func (bsc *BankSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
 	planningUnitSedimentTracker, planningUnitIsPresent := bsc.contributionMap[id]
 	assert.That(planningUnitIsPresent).Holds()
