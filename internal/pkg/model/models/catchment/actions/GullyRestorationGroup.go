@@ -39,7 +39,7 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
 	costInDollars := g.calculateImplementationCost(planningUnit)
 
-	actionedGullySedimentReduction := g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
+	actionedGullySedimentReduction := 1 - g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
 
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().

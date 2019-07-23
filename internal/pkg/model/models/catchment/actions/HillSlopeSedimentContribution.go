@@ -75,12 +75,11 @@ func (h *HillSlopeSedimentContribution) distanceToCatchment(rowNumber uint) floa
 	return h.planningUnitTable.CellFloat64(hillSlopeDistanceIndex, rowNumber)
 }
 
-func (h *HillSlopeSedimentContribution) OriginalSedimentContribution() float64 {
-	sedimentContribution := float64(0)
-	for planningUnit := range h.contributionMap {
-		sedimentContribution += h.OriginalPlanningUnitSedimentContribution(planningUnit)
-	}
-	return sedimentContribution
+func (h *HillSlopeSedimentContribution) OriginalPlanningUnitVegetationProportion(id planningunit.Id) float64 {
+	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[id]
+	assert.That(planningUnitIsPresent).Holds()
+
+	return planningUnitSedimentTracker.originalProportionVegetation
 }
 
 func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
@@ -96,7 +95,7 @@ func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(plannin
 	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[planningUnit]
 	assert.That(planningUnitIsPresent).Holds()
 
-	sedimentContribution := math.Max(0, planningUnitSedimentTracker.rslk*h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation))
+	sedimentContribution := planningUnitSedimentTracker.rslk * h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation)
 
 	return sedimentContribution
 }
