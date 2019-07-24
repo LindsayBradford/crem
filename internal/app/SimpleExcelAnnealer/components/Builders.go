@@ -39,7 +39,7 @@ func BuildScenarioRunner(scenarioConfig *config.CREMConfig, mainThreadChannel *t
 	runner = new(scenario.SpreadsheetSafeScenarioRunner).ThatLocks(runner)
 
 	if scenarioConfig.CpuProfilePath != "" {
-		profilableRunner := new(scenario.ProfilableRunner).
+		profilableRunner := new(scenario.ProfilingRunner).
 			ThatProfiles(runner).
 			ToFile(scenarioConfig.CpuProfilePath)
 

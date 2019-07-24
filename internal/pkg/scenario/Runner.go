@@ -12,8 +12,10 @@ import (
 )
 
 type CallableRunner interface {
-	Run() error
+	SetAnnealer(annealer annealing.Annealer)
 	LogHandler() logging.Logger
+
+	Run() error
 }
 
 type Runner struct {
@@ -31,6 +33,19 @@ type Runner struct {
 	finishTime Time
 }
 
+func NewRunner() *Runner {
+	return new(Runner).initialise()
+}
+
+func (runner *Runner) initialise() *Runner {
+	runner.runNumber = 1
+	runner.maxConcurrentRuns = 1 // Sequential by default
+	runner.name = "Default Scenario"
+	runner.tearDown = defaultTearDown
+	return runner
+}
+
+// TODO: deprecated
 func (runner *Runner) ForAnnealer(annealer annealing.Annealer) *Runner {
 	runner.runNumber = 1
 	runner.maxConcurrentRuns = 1 // Sequential by default
@@ -44,10 +59,14 @@ func (runner *Runner) ForAnnealer(annealer annealing.Annealer) *Runner {
 	return runner
 }
 
+func (runner *Runner) WithLogHandler(logHandler logging.Logger) *Runner {
+	runner.logHandler = logHandler
+	return runner
+}
+
 func (runner *Runner) WithSaver(saver CallableSaver) *Runner {
-	saver.SetLogHandler(runner.annealer.LogHandler())
+	saver.SetLogHandler(runner.logHandler)
 	runner.saver = saver
-	runner.annealer.AddObserver(saver)
 	return runner
 }
 
@@ -81,6 +100,11 @@ func (runner *Runner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *Runne
 		runner.maxConcurrentRuns = maxConcurrentRuns
 	}
 	return runner
+}
+
+func (runner *Runner) SetAnnealer(annealer annealing.Annealer) {
+	runner.annealer = annealer
+	annealer.SetLogHandler(runner.logHandler)
 }
 
 func (runner *Runner) Run() error {

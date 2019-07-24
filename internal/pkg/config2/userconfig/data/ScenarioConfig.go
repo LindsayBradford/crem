@@ -1,9 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package data
 
 type ScenarioConfig struct {

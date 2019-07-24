@@ -6,6 +6,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	. "github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/scenario"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 )
 
 func NewInerpreter() *ConfigInterpreter {
@@ -13,26 +15,32 @@ func NewInerpreter() *ConfigInterpreter {
 
 	newInterpreter.modelInterpreter = NewModelConfigInterpreter()
 	newInterpreter.annealerInterpreter = NewAnnealerConfigInterpreter()
+	newInterpreter.scenarioInterpreter = NewScenarioConfigInterpreter()
 
 	return newInterpreter
 }
 
 type ConfigInterpreter struct {
-	modelInterpreter    *ModelConfigInterpreter
+	modelInterpreter *ModelConfigInterpreter
+	model            model.Model
+
 	annealerInterpreter *AnnealerConfigInterpreter
+	annealer            annealing.Annealer
+
+	scenarioInterpreter *ScenarioConfigInterpreter
+	scenario            scenario.Scenario
 }
 
 func (i *ConfigInterpreter) Interpret(config *Config) {
-	i.modelInterpreter.Interpret(&config.Model)
-	i.annealerInterpreter.Interpret(&config.Annealer)
+	i.model = i.modelInterpreter.Interpret(&config.Model).Model()
+	i.annealer = i.annealerInterpreter.Interpret(&config.Annealer).Annealer()
+	i.scenario = i.scenarioInterpreter.Interpret(&config.Scenario).Scenario()
 
-	i.Annealer().SetModel(i.Model())
+	i.annealer.SetModel(i.model)
+	i.scenario.SetAnnealer(i.annealer)
 }
 
-func (i *ConfigInterpreter) Model() model.Model {
-	return i.modelInterpreter.Model()
-}
-
-func (i *ConfigInterpreter) Annealer() annealing.Annealer {
-	return i.annealerInterpreter.Annealer()
+func (i *ConfigInterpreter) Scenario() scenario.Scenario {
+	assert.That(i.scenario != nil)
+	return i.scenario
 }

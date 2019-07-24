@@ -3,31 +3,36 @@
 package scenario
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario/profiling"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
-type ProfilableRunner struct {
+type ProfilingRunner struct {
 	base        CallableRunner
 	profilePath string
 }
 
-func (runner *ProfilableRunner) ThatProfiles(base CallableRunner) *ProfilableRunner {
+func (runner *ProfilingRunner) ThatProfiles(base CallableRunner) *ProfilingRunner {
 	runner.base = base
 	return runner
 }
 
-func (runner *ProfilableRunner) ToFile(filePath string) *ProfilableRunner {
+func (runner *ProfilingRunner) ToFile(filePath string) *ProfilingRunner {
 	runner.profilePath = filePath
 	return runner
 }
 
-func (runner *ProfilableRunner) LogHandler() logging.Logger {
+func (runner *ProfilingRunner) SetAnnealer(annealer annealing.Annealer) {
+	runner.base.SetAnnealer(annealer)
+}
+
+func (runner *ProfilingRunner) LogHandler() logging.Logger {
 	return runner.base.LogHandler()
 }
 
-func (runner *ProfilableRunner) Run() error {
+func (runner *ProfilingRunner) Run() error {
 	runner.LogHandler().Info("About to collect cpu profiling data to file [" + runner.profilePath + "]")
 	defer runner.LogHandler().Info("Collection of cpu profiling data to file [" + runner.profilePath + "] complete.")
 
@@ -41,6 +46,10 @@ type SpreadsheetSafeScenarioRunner struct {
 func (runner *SpreadsheetSafeScenarioRunner) ThatLocks(base CallableRunner) *SpreadsheetSafeScenarioRunner {
 	runner.base = base
 	return runner
+}
+
+func (runner *SpreadsheetSafeScenarioRunner) SetAnnealer(annealer annealing.Annealer) {
+	runner.base.SetAnnealer(annealer)
 }
 
 func (runner *SpreadsheetSafeScenarioRunner) LogHandler() logging.Logger {

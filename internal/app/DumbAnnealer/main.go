@@ -71,7 +71,7 @@ func buildRunnerAndLogger(scenarioConfig *config.CREMConfig) (scenario.CallableR
 		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
 
 	if scenarioConfig.CpuProfilePath != "" {
-		profilableRunner := new(scenario.ProfilableRunner).
+		profilableRunner := new(scenario.ProfilingRunner).
 			ThatProfiles(runner).
 			ToFile(scenarioConfig.CpuProfilePath)
 
