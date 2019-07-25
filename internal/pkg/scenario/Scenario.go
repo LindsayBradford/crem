@@ -8,9 +8,6 @@ import (
 
 type Scenario interface {
 	SetAnnealer(annealer annealing.Annealer)
-	SetRunner(runner CallableRunner)
-	SetObserver(observer observer.Observer)
-
 	Run()
 }
 
@@ -36,13 +33,15 @@ func (s *BaseScenario) SetAnnealer(annealer annealing.Annealer) {
 	s.annealer = annealer
 }
 
-func (s *BaseScenario) SetRunner(runner CallableRunner) {
+func (s *BaseScenario) WithRunner(runner CallableRunner) *BaseScenario {
 	s.runner = runner
+	return s
 }
 
-func (s *BaseScenario) SetObserver(observer observer.Observer) {
+func (s *BaseScenario) WithObserver(observer observer.Observer) *BaseScenario {
 	assert.That(s.runner != nil)
 	s.observer = observer
+	return s
 }
 
 func (s *BaseScenario) Run() {
@@ -55,6 +54,4 @@ var NullScenario Scenario = new(nullScenario)
 type nullScenario struct{}
 
 func (s *nullScenario) SetAnnealer(annealer annealing.Annealer) {}
-func (s *nullScenario) SetRunner(runner CallableRunner)         {}
-func (s *nullScenario) SetObserver(observer observer.Observer)  {}
 func (s *nullScenario) Run()                                    {}

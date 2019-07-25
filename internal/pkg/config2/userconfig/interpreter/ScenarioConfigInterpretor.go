@@ -1,19 +1,16 @@
 package interpreter
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
-	"github.com/LindsayBradford/crem/pkg/logging"
-	"github.com/LindsayBradford/crem/pkg/logging/formatters"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 )
 
 type ScenarioConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
+
+	observerInterpreter *ObserverConfigInterpreter
 
 	scenario scenario.Scenario
 }
@@ -26,24 +23,26 @@ func NewScenarioConfigInterpreter() *ScenarioConfigInterpreter {
 func (i *ScenarioConfigInterpreter) initialise() *ScenarioConfigInterpreter {
 	i.errors = compositeErrors.New("Scenario Configuration")
 	i.scenario = scenario.NullScenario
+	i.observerInterpreter = NewObserverConfigInterpreter()
 	return i
 }
 
 func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data.ScenarioConfig) *ScenarioConfigInterpreter {
-	scenario := scenario.NewBaseScenario()
+	i.observerInterpreter.Interpret(&scenarioConfig.Observer)
 
-	runner := buildRunner(scenarioConfig)
-	scenario.SetRunner(runner)
+	runner := i.buildRunner(scenarioConfig)
+	i.scenario = scenario.NewBaseScenario().
+		WithRunner(runner).
+		WithObserver(i.observerInterpreter.Observer())
 
-	i.scenario = scenario
 	return i
 }
 
-func buildRunner(scenarioConfig *data.ScenarioConfig) scenario.CallableRunner {
+func (i *ScenarioConfigInterpreter) buildRunner(scenarioConfig *data.ScenarioConfig) scenario.CallableRunner {
 	var runner scenario.CallableRunner
 
 	saver := buildSaver(scenarioConfig)
-	logHandler := buildLogHandler(scenarioConfig)
+	logHandler := i.observerInterpreter.LogHandler()
 
 	runner = scenario.NewRunner().
 		WithName(scenarioConfig.Name).
@@ -68,20 +67,6 @@ func buildSaver(scenarioConfig *data.ScenarioConfig) *scenario.Saver {
 		WithOutputType(configOutputTypeToSolutionOutputType(scenarioConfig.OutputType)).
 		WithOutputPath(scenarioConfig.OutputPath)
 	return saver
-}
-
-func buildLogHandler(scenarioConfig *data.ScenarioConfig) logging.Logger {
-	// TODO: build off config.
-	builder := new(loggers.Builder)
-
-	defaultLogger, _ := builder.ForNativeLibraryLogHandler().
-		WithName("DefaultLogHandler").
-		WithFormatter(new(formatters.RawMessageFormatter)).
-		WithLogLevelDestination(observer.AnnealerLogLevel, logging.STDOUT).
-		WithLogLevelDestination(model.LogLevel, logging.DISCARD).
-		Build()
-
-	return defaultLogger
 }
 
 func configOutputTypeToSolutionOutputType(outputType data.ScenarioOutputType) encoding.OutputType {
