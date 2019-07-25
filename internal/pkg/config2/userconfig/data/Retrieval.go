@@ -54,7 +54,7 @@ func RetrieveConfigFromString(tomlString string) (*Config, error) {
 }
 
 func retrieveConfig(source decoderSummary) (*Config, error) {
-	var conf Config
+	var conf = defaultConfig()
 	metaData, decodeErr := source.decoder(source.content, &conf)
 	if decodeErr != nil {
 		return nil, errors.Wrap(decodeErr, "failed retrieving config from "+source.contentType.String())
@@ -70,6 +70,17 @@ func retrieveConfig(source decoderSummary) (*Config, error) {
 	}
 
 	return &conf, nil
+}
+
+func defaultConfig() Config {
+	config := Config{
+		Scenario: ScenarioConfig{
+			RunNumber:                  1,
+			MaximumConcurrentRunNumber: 1,
+			OutputPath:                 ".",
+		},
+	}
+	return config
 }
 
 func checkMandatoryFields(config *Config) error {

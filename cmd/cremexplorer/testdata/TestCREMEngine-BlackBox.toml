@@ -1,6 +1,5 @@
 [Scenario]
 Name = "Test CREMEngine - Black Box"
-RunNumber = 1
 OutputPath="testdata/solutions"
 
 [Scenario.Observer]

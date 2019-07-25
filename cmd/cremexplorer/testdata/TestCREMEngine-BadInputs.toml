@@ -4,7 +4,7 @@ RunNumber = 1
 OutputPath="testdata/solutions"
 
 [Scenario.Observer]
-Type = "InvariantObserver"
+Type = "MessageObserver"
 
 [Annealer]
 Type="Kirkpatrick"
