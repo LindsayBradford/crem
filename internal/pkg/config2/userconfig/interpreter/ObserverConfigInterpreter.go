@@ -38,12 +38,19 @@ func (i *ObserverConfigInterpreter) initialiseObserving() {
 }
 
 func (i *ObserverConfigInterpreter) Interpret(config *data.ObserverConfig) *ObserverConfigInterpreter {
-	i.loggingInterpreter.Interpret(&config.LoggingConfig)
-	i.interpretObserverSpecific(config)
+	i.interpretLogger(&config.LoggingConfig)
+	i.interpretObserver(config)
 	return i
 }
 
-func (i *ObserverConfigInterpreter) interpretObserverSpecific(config *data.ObserverConfig) {
+func (i *ObserverConfigInterpreter) interpretLogger(config *data.LoggingConfig) {
+	i.loggingInterpreter.Interpret(config)
+	if i.loggingInterpreter.Errors() != nil {
+		i.errors.Add(i.loggingInterpreter.Errors())
+	}
+}
+
+func (i *ObserverConfigInterpreter) interpretObserver(config *data.ObserverConfig) {
 	i.observer = new(annealingObserver.AnnealingMessageObserver).
 		WithLogHandler(i.LogHandler()).
 		WithFilter(new(filters.IterationCountFilter).WithModulo(1))
@@ -55,4 +62,11 @@ func (i *ObserverConfigInterpreter) Observer() observer.Observer {
 
 func (i *ObserverConfigInterpreter) LogHandler() logging.Logger {
 	return i.loggingInterpreter.LogHandler()
+}
+
+func (i *ObserverConfigInterpreter) Errors() error {
+	if i.errors.Size() > 0 {
+		return i.errors
+	}
+	return nil
 }

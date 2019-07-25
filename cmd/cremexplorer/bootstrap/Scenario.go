@@ -3,6 +3,8 @@
 package bootstrap
 
 import (
+	"os"
+
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
 	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/interpreter"
@@ -14,9 +16,14 @@ import (
 )
 
 var (
-	LogHandler logging.Logger
-	Scenario   scenario.Scenario
+	LogHandler    logging.Logger
+	myScenario    scenario.Scenario
+	myInterpreter interpreter.ConfigInterpreter
 )
+
+func init() {
+	myInterpreter = *interpreter.NewInterpreter()
+}
 
 func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
 	excel.EnableSpreadsheetSafeties()
@@ -32,27 +39,44 @@ func runMainThreadBoundScenarioFromConfigFile(configFile string) {
 }
 
 func RunScenarioFromConfigFile(configFile string) {
-	configuration := retrieveScenarioConfiguration(configFile)
-	establishScenario(configuration)
+	deriveScenario(configFile)
+	runScenario()
+	flushStreams()
+}
 
-	if runError := Scenario.Run(); runError != nil {
+func runScenario() {
+	if runError := myScenario.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running scenario")
+		LogHandler.Error(wrappingError)
 		commandline.Exit(runError)
 	}
 }
 
-func establishScenario(config *data.Config) {
-	Scenario = interpreter.NewInterpreter().Interpret(config).Scenario()
-
-	LogHandler = Scenario.LogHandler()
-	LogHandler.Info("Configuring with [" + config.MetaData.FilePath + "]")
-
+func flushStreams() {
+	os.Stdout.Sync()
+	os.Stderr.Sync()
 }
 
-func retrieveScenarioConfiguration(configFile string) *data.Config {
+func deriveScenario(configFile string) {
+	config := loadScenarioConfig(configFile)
+	myScenario = myInterpreter.Interpret(config).Scenario()
+
+	LogHandler = myScenario.LogHandler()
+	LogHandler.Info("Configuring scenario with [" + config.MetaData.FilePath + "]")
+
+	interpreterErrors := myInterpreter.Errors()
+
+	if interpreterErrors != nil {
+		wrappingError := errors.Wrap(interpreterErrors, "interpreting scenario file")
+		commandline.Exit(wrappingError)
+	}
+}
+
+func loadScenarioConfig(configFile string) *data.Config {
 	configuration, retrieveError := data.RetrieveConfigFromFile(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
-		panic(wrappingError)
+		commandline.Exit(wrappingError)
 	}
 
 	return configuration

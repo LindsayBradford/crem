@@ -13,6 +13,7 @@ type ScenarioConfigInterpreter struct {
 	observerInterpreter *ObserverConfigInterpreter
 
 	scenario scenario.Scenario
+	runner   scenario.CallableRunner
 }
 
 func NewScenarioConfigInterpreter() *ScenarioConfigInterpreter {
@@ -23,43 +24,52 @@ func NewScenarioConfigInterpreter() *ScenarioConfigInterpreter {
 func (i *ScenarioConfigInterpreter) initialise() *ScenarioConfigInterpreter {
 	i.errors = compositeErrors.New("Scenario Configuration")
 	i.scenario = scenario.NullScenario
+	i.runner = scenario.NullRunner
 	i.observerInterpreter = NewObserverConfigInterpreter()
+
 	return i
 }
 
 func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data.ScenarioConfig) *ScenarioConfigInterpreter {
-	i.observerInterpreter.Interpret(&scenarioConfig.Observer)
+	i.interpretObserver(&scenarioConfig.Observer)
+	i.interpretRunner(scenarioConfig)
 
-	runner := i.buildRunner(scenarioConfig)
 	i.scenario = scenario.NewBaseScenario().
-		WithRunner(runner).
+		WithRunner(i.runner).
 		WithObserver(i.observerInterpreter.Observer())
 
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) buildRunner(scenarioConfig *data.ScenarioConfig) scenario.CallableRunner {
+func (i *ScenarioConfigInterpreter) interpretObserver(config *data.ObserverConfig) {
+	i.observerInterpreter.Interpret(config)
+	if i.observerInterpreter.Errors() != nil {
+		i.errors.Add(i.observerInterpreter.Errors())
+	}
+}
+
+func (i *ScenarioConfigInterpreter) interpretRunner(config *data.ScenarioConfig) {
 	var runner scenario.CallableRunner
 
-	saver := buildSaver(scenarioConfig)
+	saver := buildSaver(config)
 	logHandler := i.observerInterpreter.LogHandler()
 
 	runner = scenario.NewRunner().
-		WithName(scenarioConfig.Name).
-		WithRunNumber(scenarioConfig.RunNumber).
-		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber).
+		WithName(config.Name).
+		WithRunNumber(config.RunNumber).
+		WithMaximumConcurrentRuns(config.MaximumConcurrentRunNumber).
 		WithLogHandler(logHandler).
 		WithSaver(saver)
 
-	if scenarioConfig.CpuProfilePath != "" {
+	if config.CpuProfilePath != "" {
 		profilingRunner := new(scenario.ProfilingRunner).
 			ThatProfiles(runner).
-			ToFile(scenarioConfig.CpuProfilePath)
+			ToFile(config.CpuProfilePath)
 
 		runner = profilingRunner
 	}
 
-	return runner
+	i.runner = runner
 }
 
 func buildSaver(scenarioConfig *data.ScenarioConfig) *scenario.Saver {

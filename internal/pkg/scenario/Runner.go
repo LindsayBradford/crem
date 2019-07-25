@@ -206,3 +206,11 @@ func (runner *Runner) logRunFinishedMessage(runNumber uint64) {
 		runner.logHandler.Info(runner.generateCloneId(runNumber) + ": run finished")
 	}
 }
+
+var NullRunner CallableRunner = new(nullRunner)
+
+type nullRunner struct{}
+
+func (s *nullRunner) SetAnnealer(annealer annealing.Annealer) {}
+func (s *nullRunner) LogHandler() logging.Logger              { return nil }
+func (s *nullRunner) Run() error                              { return nil }

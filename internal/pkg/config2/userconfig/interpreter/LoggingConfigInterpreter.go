@@ -138,3 +138,10 @@ func (i *LoggingConfigInterpreter) deriveDestination(configDestination string, c
 func (i *LoggingConfigInterpreter) LogHandler() logging.Logger {
 	return i.logger
 }
+
+func (i *LoggingConfigInterpreter) Errors() error {
+	if i.errors.Size() > 0 {
+		return i.errors
+	}
+	return nil
+}

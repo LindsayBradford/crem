@@ -19,6 +19,13 @@ type AnnealerConfigInterpreter struct {
 	annealer annealing.Annealer
 }
 
+func (i *AnnealerConfigInterpreter) initialise() *AnnealerConfigInterpreter {
+	i.registeredAnnealers = make(map[data.AnnealerType]AnnealerConfigFunction, 0)
+	i.errors = compositeErrors.New("Annealer Configuration")
+	i.annealer = &annealers.NullAnnealer{}
+	return i
+}
+
 type AnnealerConfigFunction func(config data.AnnealerConfig) annealing.Annealer
 
 func NewAnnealerConfigInterpreter() *AnnealerConfigInterpreter {
@@ -58,13 +65,6 @@ func NewAnnealerConfigInterpreter() *AnnealerConfigInterpreter {
 		},
 	)
 	return newInterpreter
-}
-
-func (i *AnnealerConfigInterpreter) initialise() *AnnealerConfigInterpreter {
-	i.registeredAnnealers = make(map[data.AnnealerType]AnnealerConfigFunction, 0)
-	i.errors = compositeErrors.New("Annealer Configuration")
-	i.annealer = &annealers.NullAnnealer{}
-	return i
 }
 
 func (i *AnnealerConfigInterpreter) Interpret(annealerConfig *data.AnnealerConfig) *AnnealerConfigInterpreter {

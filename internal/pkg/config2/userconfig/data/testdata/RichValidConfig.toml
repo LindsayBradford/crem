@@ -14,7 +14,7 @@ BooleanEntry = true
 [Scenario.Observer]
 LoggingType = "NativeLibrary"  # "NativeLibrary" (default) | "BareBones"
 LoggingFormatter = "NameValuePair"  # "JSON" | "NameValuePair" | "RawMessage" (default)
-ObserverType = "MessageObserver" # "AttributeObserver" | "InvarantObserver" | "MessageObserver" (default)
+Type = "MessageObserver" # "AttributeObserver" | "InvarantObserver" | "MessageObserver" (default)
 [Scenario.Observer.LogLevelDestinations]
 Debugging = "StandardError"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Information = "StandardOutput" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
