@@ -45,20 +45,6 @@ func (runner *Runner) initialise() *Runner {
 	return runner
 }
 
-// TODO: deprecated
-func (runner *Runner) ForAnnealer(annealer annealing.Annealer) *Runner {
-	runner.runNumber = 1
-	runner.maxConcurrentRuns = 1 // Sequential by default
-	runner.name = "Default Scenario"
-	runner.tearDown = defaultTearDown
-
-	runner.logHandler = annealer.LogHandler()
-	runner.annealer = annealer
-	runner.saver = new(Saver)
-
-	return runner
-}
-
 func (runner *Runner) WithLogHandler(logHandler logging.Logger) *Runner {
 	runner.logHandler = logHandler
 	return runner

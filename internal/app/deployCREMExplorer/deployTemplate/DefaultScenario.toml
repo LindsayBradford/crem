@@ -1,25 +1,30 @@
-ScenarioName = "Default Scenario"
+[Scenario]
+Name = "Default Scenario"
 OutputPath="output"
-RunNumber=1
-
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 
-[[Loggers]]
-Name = "TestLogger"
-[Loggers.LogLevelDestinations]
+[Scenario.Observer]
+Type = "MessageObserver"
+[Scenario.Observer.Parameters]
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 10_000
+[Scenario.Observer.LogLevelDestinations]
+Annealer = "StandardOutput"
+Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 #Debug = "StandardOutput"
 #Model = "StandardOutput"
 
-[[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
-Logger = "TestLogger"
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 10_000
+[Annealer]
+Type="Kirkpatrick"
+[Annealer.Parameters]
+DecisionVariable = "SedimentVsCost"
+StartingTemperature = 10_000.0 #10
+CoolingFactor =  0.999  # 0.99
+MaximumIterations = 1_000_000 # 1M
 
-[[Models]]
+[Model]
 Type = "CatchmentModel"
-Name = "TurbidityModel"
-[Models.Parameters]
+[Model.Parameters]
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
 LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
@@ -29,17 +34,3 @@ SuspendedSedimentProportion = 0.5   # 0.5 (default)
 RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "input/Laidley_data_v1_3.xlsx"
-
-[[SolutionExplorers]]
-Type = "KirkpatrickExplorer"
-Name = "SingleObjectiveExplorer"
-[SolutionExplorers.Parameters]
-DecisionVariable = "SedimentVsCost"
-StartingTemperature = 10_000.0 # 10.0
-CoolingFactor =  0.999  # 0.99
-
-[Annealer]
-SolutionExplorer = "SingleObjectiveExplorer"
-Model = "TurbidityModel"
-[Annealer.Parameters]
-MaximumIterations = 1_000_000 # 1M
