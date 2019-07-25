@@ -1,31 +1,24 @@
-ScenarioName = "Test Kirkpatrick Dumb Annealer - One run"
+[Scenario]
+Name = "Test Kirkpatrick Dumb Annealer - Bad Config"
 
-[[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1 # 200
-
-[[AnnealingObservers]]
+[Scenario.Observer]
 Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+[Scenario.Observer.Parameters]
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 1
+[Scenario.Observer.LogLevelDestinations]
+Annealer = "StandardOutput"
 
-[[Models]]
+[Annealer]
+Type="Kirkpatrick"
+[Annealer.Parameters]
+StartingTemperature = "wrong"
+CoolingFactor =  "Even More Wrong"
+MaximumIterations = 2_000
+
+[Model]
 Type = "DumbModel"
-Name = "DumbAndMostlyVanillaModel"
-[Models.Parameters]
 InitialObjectiveValue = 2_000.0
 MaximumObjectiveValue = 2_500.0
 MinimumObjectiveValue = 1_500.0
 NonExistantModelParam = "Shouldn't be here"
-
-[[SolutionExplorers]]
-Type = "KirkpatrickExplorer"
-Name = "Explosa"
-[SolutionExplorers.Parameters]
-StartingTemperature = "wrong"
-CoolingFactor =  "Even More Wrong"
-
-[Annealer]
-SolutionExplorer = "Explosa"
-Model = "DumbAndMostlyVanillaModel"
-[Annealer.Parameters]
-MaximumIterations = 2_000 # 1M

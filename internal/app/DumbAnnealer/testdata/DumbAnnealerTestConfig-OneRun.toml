@@ -1,26 +1,20 @@
-ScenarioName = "Test Dumb Annealer - One run"
+[Scenario]
+Name = "Test Dumb Annealer - One run"
 
-[[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1 # 200
-
-[[AnnealingObservers]]
+[Scenario.Observer]
 Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
-
-[[Models]]
-Type = "DumbModel"
-Name = "HurrDurr"
-
-[[SolutionExplorers]]
-Type = "KirkpatrickExplorer"
-Name = "DerpaDaExBurba"
-[SolutionExplorers.Parameters]
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.95  # 0.99
+[Scenario.Observer.Parameters]
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 1
+[Scenario.Observer.LogLevelDestinations]
+Annealer = "StandardOutput"
 
 [Annealer]
-SolutionExplorer = "DerpaDaExBurba"
-Model = "HurrDurr"
+Type="Kirkpatrick"
 [Annealer.Parameters]
-MaximumIterations = 2_000 # 1M
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.95  # 0.99
+MaximumIterations = 2_000
+
+[Model]
+Type = "DumbModel"

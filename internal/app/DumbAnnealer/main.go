@@ -7,7 +7,8 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
-	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -15,78 +16,60 @@ import (
 )
 
 var (
-	defaultLogHandler logging.Logger
+	LogHandler    logging.Logger
+	myScenario    scenario.Scenario
+	myInterpreter interpreter.ConfigInterpreter
 )
+
+func init() {
+	myInterpreter = *interpreter.NewInterpreter()
+}
 
 func main() {
 	args := commandline.ParseArguments()
-	RunFromConfigFile(args.ScenarioFile)
+
+	go RunFromConfigFile(args.ScenarioFile)
+	threading.GetMainThreadChannel().RunHandler()
 }
 
 func RunFromConfigFile(configFile string) {
-	scenarioConfig := retrieveConfig(configFile)
-	scenarioRunner := buildScenarioRunner(scenarioConfig)
-	runScenario(scenarioRunner)
+	deriveScenario(configFile)
+	runScenario()
+	flushStreams()
+	threading.GetMainThreadChannel().Close()
 }
 
-func retrieveConfig(configFile string) *config.CREMConfig {
-	configuration, retrieveError := config.RetrieveCremFromFile(configFile)
+func deriveScenario(configFile string) {
+	config := loadScenarioConfig(configFile)
+	myScenario = myInterpreter.Interpret(config).Scenario()
 
+	LogHandler = myScenario.LogHandler()
+	LogHandler.Info("Configuring scenario with [" + config.MetaData.FilePath + "]")
+
+	interpreterErrors := myInterpreter.Errors()
+
+	if interpreterErrors != nil {
+		wrappingError := errors.Wrap(interpreterErrors, "interpreting scenario file")
+		commandline.Exit(wrappingError)
+	}
+}
+
+func loadScenarioConfig(configFile string) *data.Config {
+	configuration, retrieveError := data.RetrieveConfigFromFile(configFile)
 	if retrieveError != nil {
-		wrappingError := errors.Wrap(retrieveError, "retrieving dumb annealer configuration")
-		panic(wrappingError)
+		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
+		commandline.Exit(wrappingError)
 	}
 
 	return configuration
 }
 
-func buildScenarioRunner(scenarioConfig *config.CREMConfig) scenario.CallableRunner {
-	scenarioRunner, annealerLogHandler := buildRunnerAndLogger(scenarioConfig)
-
-	defaultLogHandler = annealerLogHandler
-	defaultLogHandler.Info("Configuring with [" + scenarioConfig.FilePath + "]")
-
-	return scenarioRunner
-}
-
-func buildRunnerAndLogger(scenarioConfig *config.CREMConfig) (scenario.CallableRunner, logging.Logger) {
-	newAnnealer, humanLogHandler, buildError :=
-		new(config.AnnealerBuilder).
-			WithConfig(scenarioConfig).
-			Build()
-
-	if buildError != nil {
-		humanLogHandler.Error(buildError)
-		humanLogHandler.Error("Exiting program due to failed Annealer build")
-		os.Exit(1)
+func runScenario() {
+	if runError := myScenario.Run(); runError != nil {
+		wrappingError := errors.Wrap(runError, "running scenario")
+		LogHandler.Error(wrappingError)
+		commandline.Exit(runError)
 	}
-
-	var runner scenario.CallableRunner
-
-	runner = new(scenario.Runner).
-		ForAnnealer(newAnnealer).
-		WithName(scenarioConfig.ScenarioName).
-		WithRunNumber(scenarioConfig.RunNumber).
-		WithTearDownFunction(threading.GetMainThreadChannel().Close).
-		WithMaximumConcurrentRuns(scenarioConfig.MaximumConcurrentRunNumber)
-
-	if scenarioConfig.CpuProfilePath != "" {
-		profilableRunner := new(scenario.ProfilingRunner).
-			ThatProfiles(runner).
-			ToFile(scenarioConfig.CpuProfilePath)
-
-		runner = profilableRunner
-	}
-
-	return runner, humanLogHandler
-}
-
-func runScenario(scenarioRunner scenario.CallableRunner) {
-	if runError := scenarioRunner.Run(); runError != nil {
-		wrappingError := errors.Wrap(runError, "running dumb annealer scenario")
-		defaultLogHandler.Error(wrappingError)
-	}
-	flushStreams()
 }
 
 func flushStreams() {

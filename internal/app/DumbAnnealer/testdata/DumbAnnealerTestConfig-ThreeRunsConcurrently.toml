@@ -1,25 +1,22 @@
-ScenarioName = "Test Dumb Annealer - Three concurrent runs"
+[Scenario]
+Name = "Test Dumb Annealer - Three concurrent runs"
 RunNumber = 3
 MaximumConcurrentRunNumber = 3
 
-[[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" (default)
+[Scenario.Observer]
+Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
+[Scenario.Observer.Parameters]
 IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 2_00_000 # 200
-
-[[Models]]
-Type = "DumbModel"
-Name = "HurrDurr"
-
-[[SolutionExplorers]]
-Type = "KirkpatrickExplorer"
-Name = "HurrDurrLookin"
-[SolutionExplorers.Parameters]
-StartingTemperature = 10.0 #10
-CoolingFactor =  0.99  # 0.99
+NumberOfIterations = 1
+[Scenario.Observer.LogLevelDestinations]
+Annealer = "StandardOutput"
 
 [Annealer]
-SolutionExplorer = "HurrDurrLookin"
-Model = "HurrDurr"
+Type="Kirkpatrick"
 [Annealer.Parameters]
-MaximumIterations = 1_000_000 # 1M
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.95  # 0.99
+MaximumIterations = 2_000
+
+[Model]
+Type = "DumbModel"
