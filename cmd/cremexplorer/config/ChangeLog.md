@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.3 ( _TBD_ ):
+### New Features
+* Simplification of explorer configuration. 
+
 ## Version 0.2 (23 July 2019):
 ### New Features
 * Introduction of hillslope sediment and hillslope revegetation management action to CatchmentModel.
