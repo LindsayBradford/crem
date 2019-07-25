@@ -17,3 +17,9 @@ vendor/*/
 # Video data
 *.wmv
 *.ppm
+
+# Deployment data
+/internal/app/deployCREMExplorer/deployTemplate/input
+/internal/app/deployCREMExplorer/deployTemplate/output
+/internal/app/deployCREMExplorer/deploy/*.zip
+/internal/app/deployCREMExplorer/deployTemplate/*.md
