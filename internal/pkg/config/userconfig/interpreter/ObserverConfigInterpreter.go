@@ -5,7 +5,7 @@ package interpreter
 import (
 	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
-	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"

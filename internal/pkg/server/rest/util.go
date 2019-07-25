@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/LindsayBradford/crem/internal/pkg/config"
 )
 
 const ContentTypeHeaderKey = "Content-Type"
@@ -26,7 +24,8 @@ func FormattedTimestamp() string {
 }
 
 func NameAndVersionString() string {
-	return fmt.Sprintf("%s, version %s", config.LongApplicationName, config.Version)
+	// TODO:  This should be application specific. Not a general utility function.
+	return fmt.Sprintf("%s, version %s", "Some application name", "<someVersion>")
 }
 
 func SendTextOnResponseBody(text string, w http.ResponseWriter) {

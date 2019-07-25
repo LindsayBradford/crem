@@ -6,7 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
-	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"

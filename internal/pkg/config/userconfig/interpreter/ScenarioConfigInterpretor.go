@@ -2,7 +2,7 @@ package interpreter
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
-	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 )

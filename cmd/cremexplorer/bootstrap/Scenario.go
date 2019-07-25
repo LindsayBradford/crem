@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
-	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
-	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/interpreter"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"

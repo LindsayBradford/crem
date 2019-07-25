@@ -7,7 +7,7 @@ package server
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -17,11 +17,11 @@ type RestServer struct {
 	adminMux *admin.Mux
 	apiMux   rest.Mux
 
-	configuration *config.HttpServerConfig
+	configuration *data.HttpServerConfig
 	Logger        logging.Logger
 }
 
-func (s *RestServer) WithConfig(configuration *config.HttpServerConfig) *RestServer {
+func (s *RestServer) WithConfig(configuration *data.HttpServerConfig) *RestServer {
 	s.configuration = configuration
 	return s
 }

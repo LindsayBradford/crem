@@ -5,7 +5,7 @@ package interpreter
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
-	. "github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	. "github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"

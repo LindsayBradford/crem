@@ -3,7 +3,7 @@
 package interpreter
 
 import (
-	. "github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	. "github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/dumb"
