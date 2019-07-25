@@ -5,8 +5,8 @@ package data
 import "github.com/LindsayBradford/crem/internal/pkg/parameters"
 
 type ObserverConfig struct {
-	ObserverType ScenarioObserverType
-	Parameters   parameters.Map
+	Type       ScenarioObserverType
+	Parameters parameters.Map
 
 	LoggingConfig
 }

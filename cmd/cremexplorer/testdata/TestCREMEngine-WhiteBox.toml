@@ -1,28 +1,31 @@
-ScenarioName = "Test CREMEngine - White Box"
+[Scenario]
+Name = "Test CREMEngine - White Box"
 RunNumber=1
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
 
-[[Loggers]]
-Name = "TestLogger"
-[Loggers.LogLevelDestinations]
-#Debug = "StandardOutput"
+[Scenario.Observer]
+[Scenario.Observer.Parameters]
+IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
+NumberOfIterations = 1
+[Scenario.Observer.LogLevelDestinations]
+Annealer = "StandardOutput"
+Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Model = "StandardOutput"
 
-[[AnnealingObservers]]
-Type = "MessageObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
-Logger = "TestLogger"
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 100
+[Annealer]
+Type="Kirkpatrick"
+[Annealer.Parameters]
+DecisionVariable = "SedimentVsCost"
+OptimisationDirection = "Minimising"
+StartingTemperature = 1_000.0 #10
+CoolingFactor =  0.999  # 0.99
+MaximumIterations = 2_000
 
-[[AnnealingObservers]]
-Type = "InvariantObserver"
-
-[[Models]]
+[Model]
 Type = "CatchmentModel"
-Name = "TurbidityModel"
-[Models.Parameters]
+[Model.Parameters]
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
 LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
@@ -33,16 +36,3 @@ RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 
-[[SolutionExplorers]]
-Type = "KirkpatrickExplorer"
-Name = "SingleObjectiveExplorer"
-[SolutionExplorers.Parameters]
-DecisionVariable = "SedimentVsCost"
-StartingTemperature = 1_000.0 #10
-CoolingFactor =  0.999  # 0.99
-
-[Annealer]
-SolutionExplorer = "SingleObjectiveExplorer"
-Model = "TurbidityModel"
-[Annealer.Parameters]
-MaximumIterations = 1_000 # 1M

@@ -4,11 +4,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
+	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
 type Scenario interface {
+	LogHandler() logging.Logger
 	SetAnnealer(annealer annealing.Annealer)
-	Run()
+	Run() error
 }
 
 func NewBaseScenario() *BaseScenario {
@@ -27,8 +29,8 @@ type BaseScenario struct {
 func (s *BaseScenario) SetAnnealer(annealer annealing.Annealer) {
 	assert.That(s.observer != nil)
 
-	annealer.AddObserver(s.observer)
 	s.runner.SetAnnealer(annealer)
+	annealer.AddObserver(s.observer)
 
 	s.annealer = annealer
 }
@@ -44,9 +46,14 @@ func (s *BaseScenario) WithObserver(observer observer.Observer) *BaseScenario {
 	return s
 }
 
-func (s *BaseScenario) Run() {
+func (s *BaseScenario) LogHandler() logging.Logger {
+	assert.That(s.runner != nil)
+	return s.runner.LogHandler()
+}
+
+func (s *BaseScenario) Run() error {
 	assert.That(s.annealer != nil)
-	s.runner.Run()
+	return s.runner.Run()
 }
 
 var NullScenario Scenario = new(nullScenario)
@@ -54,4 +61,5 @@ var NullScenario Scenario = new(nullScenario)
 type nullScenario struct{}
 
 func (s *nullScenario) SetAnnealer(annealer annealing.Annealer) {}
-func (s *nullScenario) Run()                                    {}
+func (s *nullScenario) LogHandler() logging.Logger              { return nil }
+func (s *nullScenario) Run() error                              { return nil }

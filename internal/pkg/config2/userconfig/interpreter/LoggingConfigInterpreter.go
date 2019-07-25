@@ -61,11 +61,15 @@ func (i *LoggingConfigInterpreter) deriveLogHandler(config *data.LoggingConfig) 
 	case data.NativeLibrary, data.UnspecifiedLoggerType:
 		i.loggerBuilder.
 			ForNativeLibraryLogHandler().
-			WithFormatter(formatter)
+			WithFormatter(formatter).
+			WithLogLevelDestination(annealingObserver.AnnealerLogLevel, logging.STDOUT).
+			WithLogLevelDestination(model.LogLevel, logging.DISCARD)
 	case data.BareBones:
 		i.loggerBuilder.
 			ForBareBonesLogHandler().
-			WithFormatter(formatter)
+			WithFormatter(formatter).
+			WithLogLevelDestination(annealingObserver.AnnealerLogLevel, logging.STDOUT).
+			WithLogLevelDestination(model.LogLevel, logging.DISCARD)
 	default:
 		panic("Should not reach here")
 	}

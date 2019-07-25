@@ -4,7 +4,9 @@ package bootstrap
 
 import (
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
-	"github.com/LindsayBradford/crem/internal/pkg/config"
+	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config2/userconfig/interpreter"
+	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -13,6 +15,7 @@ import (
 
 var (
 	LogHandler logging.Logger
+	Scenario   scenario.Scenario
 )
 
 func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
@@ -30,21 +33,23 @@ func runMainThreadBoundScenarioFromConfigFile(configFile string) {
 
 func RunScenarioFromConfigFile(configFile string) {
 	configuration := retrieveScenarioConfiguration(configFile)
-	establishScenarioLogger(configuration)
+	establishScenario(configuration)
 
-	if runError := RunScenarioFromConfig(configuration); runError != nil {
+	if runError := Scenario.Run(); runError != nil {
 		commandline.Exit(runError)
 	}
 }
 
-func establishScenarioLogger(configuration *config.CREMConfig) {
-	loggers, _ := new(config.LogHandlersBuilder).WithConfig(configuration.Loggers).Build()
-	LogHandler = loggers[0]
-	LogHandler.Info("Configuring with [" + configuration.FilePath + "]")
+func establishScenario(config *data.Config) {
+	Scenario = interpreter.NewInterpreter().Interpret(config).Scenario()
+
+	LogHandler = Scenario.LogHandler()
+	LogHandler.Info("Configuring with [" + config.MetaData.FilePath + "]")
+
 }
 
-func retrieveScenarioConfiguration(configFile string) *config.CREMConfig {
-	configuration, retrieveError := config.RetrieveCremFromFile(configFile)
+func retrieveScenarioConfiguration(configFile string) *data.Config {
+	configuration, retrieveError := data.RetrieveConfigFromFile(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		panic(wrappingError)

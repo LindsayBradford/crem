@@ -8,6 +8,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -35,5 +37,7 @@ func (e *Explorer) EventAttributes(eventType observer.EventType) attributes.Attr
 }
 func (e *Explorer) CoolDown() {}
 
-func (e *Explorer) Model() model.Model         { return model.NullModel }
-func (e *Explorer) SetModel(model model.Model) {}
+func (e *Explorer) Model() model.Model                  { return model.NullModel }
+func (e *Explorer) SetModel(model model.Model)          {}
+func (e *Explorer) LogHandler() logging.Logger          { return new(loggers.NullLogger) }
+func (e *Explorer) SetLogHandler(logger logging.Logger) {}

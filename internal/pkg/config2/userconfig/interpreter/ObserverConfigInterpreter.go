@@ -44,7 +44,9 @@ func (i *ObserverConfigInterpreter) Interpret(config *data.ObserverConfig) *Obse
 }
 
 func (i *ObserverConfigInterpreter) interpretObserverSpecific(config *data.ObserverConfig) {
-	// TODO: implement this
+	i.observer = new(annealingObserver.AnnealingMessageObserver).
+		WithLogHandler(i.LogHandler()).
+		WithFilter(new(filters.IterationCountFilter).WithModulo(1))
 }
 
 func (i *ObserverConfigInterpreter) Observer() observer.Observer {

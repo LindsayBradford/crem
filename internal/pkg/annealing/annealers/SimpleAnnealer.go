@@ -11,6 +11,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
+	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -56,6 +57,19 @@ func (sa *SimpleAnnealer) Initialise() {
 func (sa *SimpleAnnealer) SetId(title string) {
 	sa.IdentifiableContainer.SetId(title)
 	sa.SolutionExplorer().SetId(title)
+}
+
+func (sa *SimpleAnnealer) SetLogHandler(logHandler logging.Logger) {
+	sa.ContainedLogger.SetLogHandler(logHandler)
+	sa.SolutionExplorer().SetLogHandler(logHandler)
+}
+
+func (sa *SimpleAnnealer) SetModel(model model.Model) {
+	//TODO: Code-stink.  Why do I need to tie the model event notifier in at the annnealer level?
+	if eventNotifyingModel, isEventNotifier := model.(observer.EventNotifierContainer); isEventNotifier {
+		eventNotifyingModel.SetEventNotifier(sa.EventNotifier())
+	}
+	sa.SolutionExplorer().SetModel(model)
 }
 
 func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
