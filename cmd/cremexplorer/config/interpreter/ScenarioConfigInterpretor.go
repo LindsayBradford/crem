@@ -3,16 +3,17 @@
 package interpreter
 
 import (
-	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
+	appData "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
+	"github.com/pkg/errors"
 )
 
 type ScenarioConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
 
-	observerInterpreter *ReportingConfigInterpreter
+	reportingInterpreter *ReportingConfigInterpreter
 
 	scenario scenario.Scenario
 	runner   scenario.CallableRunner
@@ -27,34 +28,38 @@ func (i *ScenarioConfigInterpreter) initialise() *ScenarioConfigInterpreter {
 	i.errors = compositeErrors.New("Scenario Configuration")
 	i.scenario = scenario.NullScenario
 	i.runner = scenario.NullRunner
-	i.observerInterpreter = NewObserverConfigInterpreter()
+	i.reportingInterpreter = NewObserverConfigInterpreter()
 
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data2.ScenarioConfig) *ScenarioConfigInterpreter {
-	i.interpretObserver(&scenarioConfig.Reporting)
+func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *appData.ScenarioConfig) *ScenarioConfigInterpreter {
+	i.interpretReporting(&scenarioConfig.Reporting)
 	i.interpretRunner(scenarioConfig)
 
 	i.scenario = scenario.NewBaseScenario().
 		WithRunner(i.runner).
-		WithObserver(i.observerInterpreter.Observer())
+		WithObserver(i.reportingInterpreter.Observer())
 
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) interpretObserver(config *data2.ReportingConfig) {
-	i.observerInterpreter.Interpret(config)
-	if i.observerInterpreter.Errors() != nil {
-		i.errors.Add(i.observerInterpreter.Errors())
+func (i *ScenarioConfigInterpreter) interpretReporting(config *appData.ReportingConfig) {
+	i.reportingInterpreter.Interpret(config)
+	if i.reportingInterpreter.Errors() != nil {
+		i.errors.Add(i.reportingInterpreter.Errors())
 	}
 }
 
-func (i *ScenarioConfigInterpreter) interpretRunner(config *data2.ScenarioConfig) {
+func (i *ScenarioConfigInterpreter) interpretRunner(config *appData.ScenarioConfig) {
 	var runner scenario.CallableRunner
 
+	if config.Name == "" {
+		i.errors.Add(errors.New("Missing mandatory scenario name field"))
+	}
+
 	saver := buildSaver(config)
-	logHandler := i.observerInterpreter.LogHandler()
+	logHandler := i.reportingInterpreter.LogHandler()
 
 	runner = scenario.NewRunner().
 		WithName(config.Name).
@@ -74,14 +79,14 @@ func (i *ScenarioConfigInterpreter) interpretRunner(config *data2.ScenarioConfig
 	i.runner = runner
 }
 
-func buildSaver(scenarioConfig *data2.ScenarioConfig) *scenario.Saver {
+func buildSaver(scenarioConfig *appData.ScenarioConfig) *scenario.Saver {
 	saver := scenario.NewSaver().
 		WithOutputType(configOutputTypeToSolutionOutputType(scenarioConfig.OutputType)).
 		WithOutputPath(scenarioConfig.OutputPath)
 	return saver
 }
 
-func configOutputTypeToSolutionOutputType(outputType data2.ScenarioOutputType) encoding.OutputType {
+func configOutputTypeToSolutionOutputType(outputType appData.ScenarioOutputType) encoding.OutputType {
 	return encoding.OutputType(outputType.String())
 }
 

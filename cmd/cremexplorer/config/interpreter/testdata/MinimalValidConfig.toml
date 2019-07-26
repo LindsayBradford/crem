@@ -1,0 +1,8 @@
+[scenario]
+Name = "testScenario"
+
+[Annealer]
+Type="Kirkpatrick"
+
+[Model]
+Type="CatchmentModel"

@@ -1,11 +1,9 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package interpreter
 
 import (
-	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
+	appData "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
@@ -14,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
+	"github.com/pkg/errors"
 )
 
 func NewInterpreter() *ConfigInterpreter {
@@ -49,7 +48,12 @@ func (i *ConfigInterpreter) initialise() *ConfigInterpreter {
 	return i
 }
 
-func (i *ConfigInterpreter) Interpret(config *data2.Config) *ConfigInterpreter {
+func (i *ConfigInterpreter) Interpret(config *appData.Config) *ConfigInterpreter {
+	if config == nil {
+		i.errors.Add(errors.New("no config supplied for interpretation"))
+		return i
+	}
+
 	i.interpretModelConfig(&config.Model)
 	i.interpretAnnealerConfig(&config.Annealer)
 	i.interpretScenarioConfig(&config.Scenario)
@@ -74,7 +78,7 @@ func (i *ConfigInterpreter) interpretAnnealerConfig(config *data.AnnealerConfig)
 	}
 }
 
-func (i *ConfigInterpreter) interpretScenarioConfig(config *data2.ScenarioConfig) {
+func (i *ConfigInterpreter) interpretScenarioConfig(config *appData.ScenarioConfig) {
 	i.scenario = i.scenarioInterpreter.Interpret(config).Scenario()
 	if i.scenarioInterpreter.Errors() != nil {
 		i.errors.Add(i.scenarioInterpreter.Errors())

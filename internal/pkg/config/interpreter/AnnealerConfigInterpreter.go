@@ -8,6 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 )
@@ -67,20 +68,22 @@ func NewAnnealerConfigInterpreter() *AnnealerConfigInterpreter {
 	return newInterpreter
 }
 
-func (i *AnnealerConfigInterpreter) Interpret(annealerConfig *data.AnnealerConfig) *AnnealerConfigInterpreter {
-	if _, foundAnnealer := i.registeredAnnealers[annealerConfig.Type]; !foundAnnealer {
+func (i *AnnealerConfigInterpreter) Interpret(config *data.AnnealerConfig) *AnnealerConfigInterpreter {
+	assert.That(config != nil)
+
+	if _, foundAnnealer := i.registeredAnnealers[config.Type]; !foundAnnealer {
 		i.errors.Add(
 			errors.New("configuration specifies annealer type [\"" +
-				annealerConfig.Type.String() + "\"], but no annealers are registered for that type"),
+				config.Type.String() + "\"], but no annealers are registered for that type"),
 		)
 		return i
 	}
 
-	configFunction := i.registeredAnnealers[annealerConfig.Type]
-	newAnnealer := configFunction(*annealerConfig)
+	configFunction := i.registeredAnnealers[config.Type]
+	newAnnealer := configFunction(*config)
 	if parameterisedModel, hasParameters := newAnnealer.(parameters.Container); hasParameters {
 		if paramErrors := parameterisedModel.ParameterErrors(); paramErrors != nil {
-			wrappedErrors := errors.Wrap(paramErrors, "building annealer ["+annealerConfig.Type.String()+"]")
+			wrappedErrors := errors.Wrap(paramErrors, "building annealer ["+config.Type.String()+"]")
 			i.errors.Add(wrappedErrors)
 			return i
 		}

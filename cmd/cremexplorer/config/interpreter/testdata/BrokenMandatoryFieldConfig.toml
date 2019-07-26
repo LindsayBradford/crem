@@ -1,0 +1,9 @@
+[scenario]
+Name = ""
+RunNumber = 0
+
+[Annealer]
+Type=""
+
+[Model]
+Type=""
