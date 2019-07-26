@@ -8,6 +8,7 @@ import (
 	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/pkg/assert/debug"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
@@ -40,9 +41,7 @@ func (i *LoggingConfigInterpreter) initialise() *LoggingConfigInterpreter {
 		WithLogLevelDestination(model.LogLevel, logging.DISCARD).
 		Build()
 
-	if buildErrors != nil {
-		i.errors.Add(buildErrors)
-	}
+	assert.That(buildErrors == nil)
 
 	return i
 }
@@ -61,12 +60,14 @@ func (i *LoggingConfigInterpreter) deriveLogHandler(config *data.LoggingConfig) 
 	case data.NativeLibrary, data.UnspecifiedLoggerType:
 		i.loggerBuilder.
 			ForNativeLibraryLogHandler().
+			WithName("Configuration supplied NativeLibrary LogHandler").
 			WithFormatter(formatter).
 			WithLogLevelDestination(annealingObserver.AnnealerLogLevel, logging.STDOUT).
 			WithLogLevelDestination(model.LogLevel, logging.DISCARD)
 	case data.BareBones:
 		i.loggerBuilder.
 			ForBareBonesLogHandler().
+			WithName("Configuration supplied BareBones LogHandler").
 			WithFormatter(formatter).
 			WithLogLevelDestination(annealingObserver.AnnealerLogLevel, logging.STDOUT).
 			WithLogLevelDestination(model.LogLevel, logging.DISCARD)

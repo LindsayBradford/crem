@@ -9,7 +9,7 @@ type LoggingConfig struct {
 }
 
 type LoggerType struct {
-	value string
+	Value string
 }
 
 var (
@@ -22,11 +22,11 @@ func (lt *LoggerType) UnmarshalText(text []byte) error {
 	context := UnmarshalContext{
 		ConfigKey: "[[Loggers]].Type",
 		ValidValues: []string{
-			NativeLibrary.value, BareBones.value,
+			NativeLibrary.Value, BareBones.Value,
 		},
 		TextToValidate: string(text),
 		AssignmentFunction: func() {
-			lt.value = string(text)
+			lt.Value = string(text)
 		},
 	}
 
@@ -34,7 +34,7 @@ func (lt *LoggerType) UnmarshalText(text []byte) error {
 }
 
 type FormatterType struct {
-	value string
+	Value string
 }
 
 var (
@@ -48,11 +48,11 @@ func (ft *FormatterType) UnmarshalText(text []byte) error {
 	context := UnmarshalContext{
 		ConfigKey: "[[Loggers]].Formatter",
 		ValidValues: []string{
-			RawMessage.value, Json.value, NameValuePair.value,
+			RawMessage.Value, Json.Value, NameValuePair.Value,
 		},
 		TextToValidate: string(text),
 		AssignmentFunction: func() {
-			ft.value = string(text)
+			ft.Value = string(text)
 		},
 	}
 
