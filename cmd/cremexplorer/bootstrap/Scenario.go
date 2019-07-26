@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
-	"github.com/LindsayBradford/crem/internal/pkg/config/data"
-	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
+	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
+	interpreter2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -18,11 +18,11 @@ import (
 var (
 	LogHandler    logging.Logger
 	myScenario    scenario.Scenario
-	myInterpreter interpreter.ConfigInterpreter
+	myInterpreter interpreter2.ConfigInterpreter
 )
 
 func init() {
-	myInterpreter = *interpreter.NewInterpreter()
+	myInterpreter = *interpreter2.NewInterpreter()
 }
 
 func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
@@ -72,8 +72,8 @@ func deriveScenario(configFile string) {
 	}
 }
 
-func loadScenarioConfig(configFile string) *data.Config {
-	configuration, retrieveError := data.RetrieveConfigFromFile(configFile)
+func loadScenarioConfig(configFile string) *data2.Config {
+	configuration, retrieveError := data2.RetrieveConfigFromFile(configFile)
 	if retrieveError != nil {
 		wrappingError := errors.Wrap(retrieveError, "retrieving scenario configuration")
 		commandline.Exit(wrappingError)

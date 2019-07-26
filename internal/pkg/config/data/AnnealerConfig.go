@@ -13,11 +13,11 @@ type AnnealerConfig struct {
 }
 
 type AnnealerType struct {
-	value string
+	Value string
 }
 
 func (at AnnealerType) String() string {
-	return string(at.value)
+	return string(at.Value)
 }
 
 var (
@@ -27,18 +27,18 @@ var (
 )
 
 func (at *AnnealerType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "Annealer.Type",
-		validValues: []string{
-			Kirkpatrick.value, Suppapitnarm.value,
+	context := UnmarshalContext{
+		ConfigKey: "Annealer.Type",
+		ValidValues: []string{
+			Kirkpatrick.Value, Suppapitnarm.Value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
-			at.value = string(text)
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
+			at.Value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return ProcessUnmarshalContext(context)
 }
 
 type EventNotifierType struct {
@@ -52,16 +52,16 @@ var (
 )
 
 func (ent *EventNotifierType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "Annealer.EventNotifier",
-		validValues: []string{
+	context := UnmarshalContext{
+		ConfigKey: "Annealer.EventNotifier",
+		ValidValues: []string{
 			Sequential.value, Concurrent.value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
 			ent.value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return ProcessUnmarshalContext(context)
 }

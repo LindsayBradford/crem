@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/BurntSushi/toml"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 )
@@ -94,7 +95,7 @@ func checkMandatoryFields(config *Config) error {
 		errors.AddMessage("Scenario.RunNumber must be supplied with a value >= 1")
 	}
 
-	if config.Annealer.Type == UnspecifiedAnnealerType {
+	if config.Annealer.Type == data.UnspecifiedAnnealerType {
 		errors.AddMessage("Annealer.Type must be supplied")
 	}
 

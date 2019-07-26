@@ -24,7 +24,7 @@ type Destinations struct {
 	Destinations map[Level]Destination
 }
 
-// Initialise creates and returns a Destinations instance with a default Destinations map.
+// initialise creates and returns a Destinations instance with a default Destinations map.
 // Specifically, DEBUG is discarded, INFO and WARN are delivered to STDOUT, and ERROR to STDERR.
 func (d *Destinations) Initialise() *Destinations {
 	d.Destinations = map[Level]Destination{

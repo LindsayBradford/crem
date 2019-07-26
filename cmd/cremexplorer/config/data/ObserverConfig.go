@@ -3,6 +3,7 @@
 package data
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 )
 
@@ -10,7 +11,7 @@ type ObserverConfig struct {
 	Type       ScenarioObserverType
 	Parameters parameters.Map
 
-	LoggingConfig
+	data.LoggingConfig
 }
 
 type ScenarioObserverType struct {
@@ -25,16 +26,16 @@ var (
 )
 
 func (ot *ScenarioObserverType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "[Scenario.Observer].Type",
-		validValues: []string{
+	context := data.UnmarshalContext{
+		ConfigKey: "[Scenario.Observer].Type",
+		ValidValues: []string{
 			AttributeObserver.value, MessageObserver.value, InvariantObserver.value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
 			ot.value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return data.ProcessUnmarshalContext(context)
 }

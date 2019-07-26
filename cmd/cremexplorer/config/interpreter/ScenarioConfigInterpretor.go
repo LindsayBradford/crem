@@ -1,8 +1,8 @@
 package interpreter
 
 import (
+	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
-	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 )
@@ -30,7 +30,7 @@ func (i *ScenarioConfigInterpreter) initialise() *ScenarioConfigInterpreter {
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data.ScenarioConfig) *ScenarioConfigInterpreter {
+func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data2.ScenarioConfig) *ScenarioConfigInterpreter {
 	i.interpretObserver(&scenarioConfig.Observer)
 	i.interpretRunner(scenarioConfig)
 
@@ -41,14 +41,14 @@ func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data.ScenarioConfi
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) interpretObserver(config *data.ObserverConfig) {
+func (i *ScenarioConfigInterpreter) interpretObserver(config *data2.ObserverConfig) {
 	i.observerInterpreter.Interpret(config)
 	if i.observerInterpreter.Errors() != nil {
 		i.errors.Add(i.observerInterpreter.Errors())
 	}
 }
 
-func (i *ScenarioConfigInterpreter) interpretRunner(config *data.ScenarioConfig) {
+func (i *ScenarioConfigInterpreter) interpretRunner(config *data2.ScenarioConfig) {
 	var runner scenario.CallableRunner
 
 	saver := buildSaver(config)
@@ -72,14 +72,14 @@ func (i *ScenarioConfigInterpreter) interpretRunner(config *data.ScenarioConfig)
 	i.runner = runner
 }
 
-func buildSaver(scenarioConfig *data.ScenarioConfig) *scenario.Saver {
+func buildSaver(scenarioConfig *data2.ScenarioConfig) *scenario.Saver {
 	saver := scenario.NewSaver().
 		WithOutputType(configOutputTypeToSolutionOutputType(scenarioConfig.OutputType)).
 		WithOutputPath(scenarioConfig.OutputPath)
 	return saver
 }
 
-func configOutputTypeToSolutionOutputType(outputType data.ScenarioOutputType) encoding.OutputType {
+func configOutputTypeToSolutionOutputType(outputType data2.ScenarioOutputType) encoding.OutputType {
 	return encoding.OutputType(outputType.String())
 }
 

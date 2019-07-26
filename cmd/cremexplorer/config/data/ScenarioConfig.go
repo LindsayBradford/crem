@@ -2,6 +2,8 @@
 
 package data
 
+import "github.com/LindsayBradford/crem/internal/pkg/config/data"
+
 type ScenarioConfig struct {
 	Name string
 
@@ -33,16 +35,16 @@ var (
 )
 
 func (sot *ScenarioOutputType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "OutputType",
-		validValues: []string{
+	context := data.UnmarshalContext{
+		ConfigKey: "OutputType",
+		ValidValues: []string{
 			CsvOutput.value, JsonOutput.value, ExcelOutput.value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
 			sot.value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return data.ProcessUnmarshalContext(context)
 }

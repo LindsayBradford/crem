@@ -1,11 +1,15 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
+// Copyright (c) 2019 Australian Rivers Institute.
+
 package interpreter
 
 import (
+	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -14,7 +18,7 @@ import (
 type ObserverConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
 
-	loggingInterpreter *LoggingConfigInterpreter
+	loggingInterpreter *interpreter.LoggingConfigInterpreter
 
 	observer observer.Observer
 }
@@ -26,7 +30,7 @@ func NewObserverConfigInterpreter() *ObserverConfigInterpreter {
 
 func (i *ObserverConfigInterpreter) initialise() *ObserverConfigInterpreter {
 	i.errors = compositeErrors.New("Observer Configuration")
-	i.loggingInterpreter = NewLoggingConfigInterpreter().initialise()
+	i.loggingInterpreter = interpreter.NewLoggingConfigInterpreter()
 	i.initialiseObserving()
 	return i
 }
@@ -37,7 +41,7 @@ func (i *ObserverConfigInterpreter) initialiseObserving() {
 		WithFilter(new(filters.IterationCountFilter).WithModulo(1))
 }
 
-func (i *ObserverConfigInterpreter) Interpret(config *data.ObserverConfig) *ObserverConfigInterpreter {
+func (i *ObserverConfigInterpreter) Interpret(config *data2.ObserverConfig) *ObserverConfigInterpreter {
 	i.interpretLogger(&config.LoggingConfig)
 	i.interpretObserver(config)
 	return i
@@ -50,7 +54,7 @@ func (i *ObserverConfigInterpreter) interpretLogger(config *data.LoggingConfig) 
 	}
 }
 
-func (i *ObserverConfigInterpreter) interpretObserver(config *data.ObserverConfig) {
+func (i *ObserverConfigInterpreter) interpretObserver(config *data2.ObserverConfig) {
 	i.observer = new(annealingObserver.AnnealingMessageObserver).
 		WithLogHandler(i.LogHandler()).
 		WithFilter(new(filters.IterationCountFilter).WithModulo(1))

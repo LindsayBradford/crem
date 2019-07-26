@@ -19,18 +19,18 @@ var (
 )
 
 func (lt *LoggerType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "[[Loggers]].Type",
-		validValues: []string{
+	context := UnmarshalContext{
+		ConfigKey: "[[Loggers]].Type",
+		ValidValues: []string{
 			NativeLibrary.value, BareBones.value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
 			lt.value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return ProcessUnmarshalContext(context)
 }
 
 type FormatterType struct {
@@ -45,16 +45,16 @@ var (
 )
 
 func (ft *FormatterType) UnmarshalText(text []byte) error {
-	context := unmarshalContext{
-		configKey: "[[Loggers]].Formatter",
-		validValues: []string{
+	context := UnmarshalContext{
+		ConfigKey: "[[Loggers]].Formatter",
+		ValidValues: []string{
 			RawMessage.value, Json.value, NameValuePair.value,
 		},
-		textToValidate: string(text),
-		assignmentFunction: func() {
+		TextToValidate: string(text),
+		AssignmentFunction: func() {
 			ft.value = string(text)
 		},
 	}
 
-	return processUnmarshalContext(context)
+	return ProcessUnmarshalContext(context)
 }

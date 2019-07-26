@@ -1,11 +1,15 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
+// Copyright (c) 2019 Australian Rivers Institute.
+
 package interpreter
 
 import (
+	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
@@ -20,10 +24,10 @@ func NewInterpreter() *ConfigInterpreter {
 type ConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
 
-	modelInterpreter *ModelConfigInterpreter
+	modelInterpreter *interpreter.ModelConfigInterpreter
 	model            model.Model
 
-	annealerInterpreter *AnnealerConfigInterpreter
+	annealerInterpreter *interpreter.AnnealerConfigInterpreter
 	annealer            annealing.Annealer
 
 	scenarioInterpreter *ScenarioConfigInterpreter
@@ -34,10 +38,10 @@ func (i *ConfigInterpreter) initialise() *ConfigInterpreter {
 	i.errors = compositeErrors.New("Configuration")
 
 	i.model = model.NewNullModel()
-	i.modelInterpreter = NewModelConfigInterpreter()
+	i.modelInterpreter = interpreter.NewModelConfigInterpreter()
 
 	i.annealer = &annealers.NullAnnealer{}
-	i.annealerInterpreter = NewAnnealerConfigInterpreter()
+	i.annealerInterpreter = interpreter.NewAnnealerConfigInterpreter()
 
 	i.scenario = scenario.NullScenario
 	i.scenarioInterpreter = NewScenarioConfigInterpreter()
@@ -45,7 +49,7 @@ func (i *ConfigInterpreter) initialise() *ConfigInterpreter {
 	return i
 }
 
-func (i *ConfigInterpreter) Interpret(config *data.Config) *ConfigInterpreter {
+func (i *ConfigInterpreter) Interpret(config *data2.Config) *ConfigInterpreter {
 	i.interpretModelConfig(&config.Model)
 	i.interpretAnnealerConfig(&config.Annealer)
 	i.interpretScenarioConfig(&config.Scenario)
@@ -70,7 +74,7 @@ func (i *ConfigInterpreter) interpretAnnealerConfig(config *data.AnnealerConfig)
 	}
 }
 
-func (i *ConfigInterpreter) interpretScenarioConfig(config *data.ScenarioConfig) {
+func (i *ConfigInterpreter) interpretScenarioConfig(config *data2.ScenarioConfig) {
 	i.scenario = i.scenarioInterpreter.Interpret(config).Scenario()
 	if i.scenarioInterpreter.Errors() != nil {
 		i.errors.Add(i.scenarioInterpreter.Errors())

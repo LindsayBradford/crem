@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	. "github.com/onsi/gomega"
 )
 
@@ -38,7 +39,7 @@ func TestRetrieveConfigFromFile_MinimalValidConfig_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	expectedAnnealerType := AnnealerType{testAnnealerType}
+	expectedAnnealerType := data.AnnealerType{Value: testAnnealerType}
 
 	// when
 	config, retrieveError := RetrieveConfigFromFile(minimalValidTestFile)
@@ -58,7 +59,7 @@ func TestRetrieveConfigFromString_MinimalValidConfig_NoErrors(t *testing.T) {
 
 	// given
 	configText := readTestFileAsText(minimalValidTestFile)
-	expectedAnnealerType := AnnealerType{testAnnealerType}
+	expectedAnnealerType := data.AnnealerType{testAnnealerType}
 
 	// when
 	config, retrieveError := RetrieveConfigFromString(configText)
