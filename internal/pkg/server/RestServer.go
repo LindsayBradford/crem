@@ -7,7 +7,7 @@ package server
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/logging"

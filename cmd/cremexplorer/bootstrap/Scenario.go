@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
-	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
-	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/interpreter"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -58,11 +58,11 @@ func flushStreams() {
 }
 
 func deriveScenario(configFile string) {
-	config := loadScenarioConfig(configFile)
-	myScenario = myInterpreter.Interpret(config).Scenario()
+	myConfig := loadScenarioConfig(configFile)
+	myScenario = myInterpreter.Interpret(myConfig).Scenario()
 
 	LogHandler = myScenario.LogHandler()
-	LogHandler.Info("Configuring scenario with [" + config.MetaData.FilePath + "]")
+	LogHandler.Info("Configuring scenario with [" + myConfig.MetaData.FilePath + "]")
 
 	interpreterErrors := myInterpreter.Errors()
 

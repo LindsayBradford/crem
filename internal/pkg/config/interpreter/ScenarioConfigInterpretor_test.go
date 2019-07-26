@@ -1,8 +1,9 @@
 package interpreter
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	"testing"
+
+	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 
 	. "github.com/onsi/gomega"
 )

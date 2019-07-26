@@ -2,7 +2,9 @@
 
 package data
 
-import "github.com/LindsayBradford/crem/internal/pkg/parameters"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
+)
 
 type ObserverConfig struct {
 	Type       ScenarioObserverType

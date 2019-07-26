@@ -5,7 +5,7 @@ package interpreter
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
-	. "github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/scenario"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
@@ -45,7 +45,7 @@ func (i *ConfigInterpreter) initialise() *ConfigInterpreter {
 	return i
 }
 
-func (i *ConfigInterpreter) Interpret(config *Config) *ConfigInterpreter {
+func (i *ConfigInterpreter) Interpret(config *data.Config) *ConfigInterpreter {
 	i.interpretModelConfig(&config.Model)
 	i.interpretAnnealerConfig(&config.Annealer)
 	i.interpretScenarioConfig(&config.Scenario)
@@ -56,21 +56,21 @@ func (i *ConfigInterpreter) Interpret(config *Config) *ConfigInterpreter {
 	return i
 }
 
-func (i *ConfigInterpreter) interpretModelConfig(config *ModelConfig) {
+func (i *ConfigInterpreter) interpretModelConfig(config *data.ModelConfig) {
 	i.model = i.modelInterpreter.Interpret(config).Model()
 	if i.modelInterpreter.Errors() != nil {
 		i.errors.Add(i.modelInterpreter.Errors())
 	}
 }
 
-func (i *ConfigInterpreter) interpretAnnealerConfig(config *AnnealerConfig) {
+func (i *ConfigInterpreter) interpretAnnealerConfig(config *data.AnnealerConfig) {
 	i.annealer = i.annealerInterpreter.Interpret(config).Annealer()
 	if i.annealerInterpreter.Errors() != nil {
 		i.errors.Add(i.annealerInterpreter.Errors())
 	}
 }
 
-func (i *ConfigInterpreter) interpretScenarioConfig(config *ScenarioConfig) {
+func (i *ConfigInterpreter) interpretScenarioConfig(config *data.ScenarioConfig) {
 	i.scenario = i.scenarioInterpreter.Interpret(config).Scenario()
 	if i.scenarioInterpreter.Errors() != nil {
 		i.errors.Add(i.scenarioInterpreter.Errors())

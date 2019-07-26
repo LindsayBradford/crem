@@ -3,7 +3,7 @@
 package interpreter
 
 import (
-	. "github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/dumb"
@@ -28,30 +28,30 @@ type ModelConfigInterpreter struct {
 	model model.Model
 }
 
-type ModelConfigFunction func(config ModelConfig) model.Model
+type ModelConfigFunction func(config data.ModelConfig) model.Model
 
 func NewModelConfigInterpreter() *ModelConfigInterpreter {
 	newInterpreter := new(ModelConfigInterpreter).initialise().
 		RegisteringModel(
 			NullModel,
-			func(config ModelConfig) model.Model {
+			func(config data.ModelConfig) model.Model {
 				return model.NewNullModel()
 			},
 		).RegisteringModel(
 		DumbModel,
-		func(config ModelConfig) model.Model {
+		func(config data.ModelConfig) model.Model {
 			return dumb.NewModel().
 				WithParameters(config.Parameters)
 		},
 	).RegisteringModel(
 		MultiObjectiveDumbModel,
-		func(config ModelConfig) model.Model {
+		func(config data.ModelConfig) model.Model {
 			return modumb.NewModel().
 				WithParameters(config.Parameters)
 		},
 	).RegisteringModel(
 		CatchmentModel,
-		func(config ModelConfig) model.Model {
+		func(config data.ModelConfig) model.Model {
 			return catchment.NewModel().
 				WithOleFunctionWrapper(threading.GetMainThreadChannel().Call).
 				WithParameters(config.Parameters)
@@ -68,7 +68,7 @@ func (i *ModelConfigInterpreter) initialise() *ModelConfigInterpreter {
 	return i
 }
 
-func (i *ModelConfigInterpreter) Interpret(modelConfig *ModelConfig) *ModelConfigInterpreter {
+func (i *ModelConfigInterpreter) Interpret(modelConfig *data.ModelConfig) *ModelConfigInterpreter {
 	if _, foundModel := i.registeredModels[modelConfig.Type]; !foundModel {
 		i.errors.Add(
 			errors.New("configuration specifies a model type [\"" +

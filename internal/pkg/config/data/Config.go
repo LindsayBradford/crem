@@ -6,7 +6,6 @@ type Config struct {
 	MetaData MetaDataConfig
 
 	Scenario ScenarioConfig
-
 	Annealer AnnealerConfig
 	Model    ModelConfig
 }

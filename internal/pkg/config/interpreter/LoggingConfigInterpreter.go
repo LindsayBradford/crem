@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
-	"github.com/LindsayBradford/crem/internal/pkg/config/userconfig/data"
+	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
