@@ -49,6 +49,58 @@ func TestConfigInterpreter_NullAnnealer_NoErrors(t *testing.T) {
 	g.Expect(actualAnnealer).To(BeAssignableToTypeOf(expectedAnnealerType))
 }
 
+func TestConfigInterpreter_UnrecognisedAnnealer_Errors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	configUnderTest := data.AnnealerConfig{
+		Type: data.AnnealerType{Value: "Unknown"},
+	}
+
+	// when
+	interpreterUnderTest := NewAnnealerConfigInterpreter().Interpret(&configUnderTest)
+
+	// then
+	if interpreterUnderTest.Errors() != nil {
+		t.Log(interpreterUnderTest.Errors())
+	}
+	g.Expect(interpreterUnderTest.Errors()).To(Not(BeNil()))
+
+	actualAnnealer := interpreterUnderTest.Annealer()
+	expectedAnnealerType := &annealers.NullAnnealer{}
+	g.Expect(actualAnnealer).To(BeAssignableToTypeOf(expectedAnnealerType))
+}
+
+func TestConfigInterpreter_BadParameters_Errors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	parametersUnderTest := parameters.Map{
+		"MaximumIterations":     int64(0),
+		"DecisionVariable":      "UnknownVariable",
+		"OptimisationDirection": "InvalidDirection",
+		"CoolingFactor":         0.95,
+		"StartingTemperature":   float64(0),
+	}
+	configUnderTest := data.AnnealerConfig{
+		Type:       data.Kirkpatrick,
+		Parameters: parametersUnderTest,
+	}
+
+	// when
+	interpreterUnderTest := NewAnnealerConfigInterpreter().Interpret(&configUnderTest)
+
+	// then
+	if interpreterUnderTest.Errors() != nil {
+		t.Log(interpreterUnderTest.Errors())
+	}
+	g.Expect(interpreterUnderTest.Errors()).To(Not(BeNil()))
+
+	actualAnnealer := interpreterUnderTest.Annealer()
+	expectedAnnealerType := &annealers.NullAnnealer{}
+	g.Expect(actualAnnealer).To(BeAssignableToTypeOf(expectedAnnealerType))
+}
+
 func TestConfigInterpreter_KirkpatrickAnnealer_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
