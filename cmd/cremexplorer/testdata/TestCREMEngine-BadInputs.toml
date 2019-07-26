@@ -2,9 +2,10 @@
 Name = "Test CREMEngine - Bad Inputs"
 RunNumber = 1
 OutputPath="testdata/solutions"
-
-[Scenario.Observer]
-Type = "MessageObserver"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
+Annealer = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"

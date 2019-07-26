@@ -1,3 +1,5 @@
+// Copyright (c) 2019 Australian Rivers Institute.
+
 package interpreter
 
 import (
@@ -10,7 +12,7 @@ import (
 type ScenarioConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
 
-	observerInterpreter *ObserverConfigInterpreter
+	observerInterpreter *ReportingConfigInterpreter
 
 	scenario scenario.Scenario
 	runner   scenario.CallableRunner
@@ -31,7 +33,7 @@ func (i *ScenarioConfigInterpreter) initialise() *ScenarioConfigInterpreter {
 }
 
 func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data2.ScenarioConfig) *ScenarioConfigInterpreter {
-	i.interpretObserver(&scenarioConfig.Observer)
+	i.interpretObserver(&scenarioConfig.Reporting)
 	i.interpretRunner(scenarioConfig)
 
 	i.scenario = scenario.NewBaseScenario().
@@ -41,7 +43,7 @@ func (i *ScenarioConfigInterpreter) Interpret(scenarioConfig *data2.ScenarioConf
 	return i
 }
 
-func (i *ScenarioConfigInterpreter) interpretObserver(config *data2.ObserverConfig) {
+func (i *ScenarioConfigInterpreter) interpretObserver(config *data2.ReportingConfig) {
 	i.observerInterpreter.Interpret(config)
 	if i.observerInterpreter.Errors() != nil {
 		i.errors.Add(i.observerInterpreter.Errors())

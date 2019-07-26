@@ -79,6 +79,9 @@ func defaultConfig() Config {
 			RunNumber:                  1,
 			MaximumConcurrentRunNumber: 1,
 			OutputPath:                 ".",
+			Reporting: ReportingConfig{
+				ReportEveryNumberOfIterations: 1,
+			},
 		},
 	}
 	return config

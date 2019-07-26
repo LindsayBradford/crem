@@ -3,15 +3,12 @@ Name = "Test CREMEngine - White Box"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
-
-[Scenario.Observer]
-[Scenario.Observer.Parameters]
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1
-[Scenario.Observer.LogLevelDestinations]
-Annealer = "StandardOutput"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 5
+[Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Model = "StandardOutput"
+Annealer = "StandardOutput"
+#Model = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"

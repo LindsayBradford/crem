@@ -1,11 +1,9 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package interpreter
 
 import (
-	data2 "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
+	appData "github.com/LindsayBradford/crem/cmd/cremexplorer/config/data"
 	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
@@ -15,7 +13,9 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
-type ObserverConfigInterpreter struct {
+const defaultReportingIterationNumber = 1
+
+type ReportingConfigInterpreter struct {
 	errors *compositeErrors.CompositeError
 
 	loggingInterpreter *interpreter.LoggingConfigInterpreter
@@ -23,52 +23,55 @@ type ObserverConfigInterpreter struct {
 	observer observer.Observer
 }
 
-func NewObserverConfigInterpreter() *ObserverConfigInterpreter {
-	interpreter := new(ObserverConfigInterpreter).initialise()
+func NewObserverConfigInterpreter() *ReportingConfigInterpreter {
+	interpreter := new(ReportingConfigInterpreter).initialise()
 	return interpreter
 }
 
-func (i *ObserverConfigInterpreter) initialise() *ObserverConfigInterpreter {
-	i.errors = compositeErrors.New("Observer Configuration")
+func (i *ReportingConfigInterpreter) initialise() *ReportingConfigInterpreter {
+	i.errors = compositeErrors.New("Reporting Configuration")
 	i.loggingInterpreter = interpreter.NewLoggingConfigInterpreter()
 	i.initialiseObserving()
 	return i
 }
 
-func (i *ObserverConfigInterpreter) initialiseObserving() {
+func (i *ReportingConfigInterpreter) initialiseObserving() {
 	i.observer = new(annealingObserver.AnnealingMessageObserver).
 		WithLogHandler(i.LogHandler()).
-		WithFilter(new(filters.IterationCountFilter).WithModulo(1))
+		WithFilter(new(filters.IterationCountFilter).WithModulo(defaultReportingIterationNumber))
 }
 
-func (i *ObserverConfigInterpreter) Interpret(config *data2.ObserverConfig) *ObserverConfigInterpreter {
+func (i *ReportingConfigInterpreter) Interpret(config *appData.ReportingConfig) *ReportingConfigInterpreter {
 	i.interpretLogger(&config.LoggingConfig)
 	i.interpretObserver(config)
 	return i
 }
 
-func (i *ObserverConfigInterpreter) interpretLogger(config *data.LoggingConfig) {
+func (i *ReportingConfigInterpreter) interpretLogger(config *data.LoggingConfig) {
 	i.loggingInterpreter.Interpret(config)
 	if i.loggingInterpreter.Errors() != nil {
 		i.errors.Add(i.loggingInterpreter.Errors())
 	}
 }
 
-func (i *ObserverConfigInterpreter) interpretObserver(config *data2.ObserverConfig) {
+func (i *ReportingConfigInterpreter) interpretObserver(config *appData.ReportingConfig) {
 	i.observer = new(annealingObserver.AnnealingMessageObserver).
 		WithLogHandler(i.LogHandler()).
-		WithFilter(new(filters.IterationCountFilter).WithModulo(1))
+		WithFilter(
+			new(filters.IterationCountFilter).
+				WithModulo(config.ReportEveryNumberOfIterations),
+		)
 }
 
-func (i *ObserverConfigInterpreter) Observer() observer.Observer {
+func (i *ReportingConfigInterpreter) Observer() observer.Observer {
 	return i.observer
 }
 
-func (i *ObserverConfigInterpreter) LogHandler() logging.Logger {
+func (i *ReportingConfigInterpreter) LogHandler() logging.Logger {
 	return i.loggingInterpreter.LogHandler()
 }
 
-func (i *ObserverConfigInterpreter) Errors() error {
+func (i *ReportingConfigInterpreter) Errors() error {
 	if i.errors.Size() > 0 {
 		return i.errors
 	}

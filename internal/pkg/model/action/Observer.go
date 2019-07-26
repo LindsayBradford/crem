@@ -2,7 +2,7 @@
 
 package action
 
-// Observer defines an interface allowing the observation of management actions via callback methods.
+// Reporting defines an interface allowing the observation of management actions via callback methods.
 type Observer interface {
 	// ObserveActionInitialising is a callback method, invoked when a management action is activated as part of any
 	// necessary model initialisation.

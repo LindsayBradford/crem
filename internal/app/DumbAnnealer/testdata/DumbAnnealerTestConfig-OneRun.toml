@@ -1,12 +1,8 @@
 [Scenario]
 Name = "Test Dumb Annealer - One run"
-
-[Scenario.Observer]
-Type = "InvariantObserver" # "AttributeObserver" | "MessageObserver" | "InvarantObserver" (default)
-[Scenario.Observer.Parameters]
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 1
-[Scenario.Observer.LogLevelDestinations]
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
 Annealer = "StandardOutput"
 
 [Annealer]

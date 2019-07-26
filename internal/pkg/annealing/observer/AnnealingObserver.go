@@ -1,6 +1,6 @@
 // Copyright (c) 2018 Australian Rivers Institute.
 
-// observer package contains Observer implementations  that capture annealing events and log them to various
+// observer package contains Reporting implementations  that capture annealing events and log them to various
 // destinations in potentially very different formats (as dictated by loggers passed to a logger at build-time)
 package observer
 

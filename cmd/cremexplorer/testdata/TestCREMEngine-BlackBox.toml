@@ -1,9 +1,10 @@
 [Scenario]
 Name = "Test CREMEngine - Black Box"
 OutputPath="testdata/solutions"
-
-[Scenario.Observer]
-Type = "InvariantObserver"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
+Annealer = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"

@@ -34,25 +34,25 @@ type ManagementAction interface {
 	// ModelVariableName reports tha value of the model variableName stored with the management action.
 	ModelVariableValue(variableName ModelVariableName) float64
 
-	// Subscribe allows a number of implementations of Observer to subscribe fur updates (changes in activation state).
+	// Subscribe allows a number of implementations of Reporting to subscribe fur updates (changes in activation state).
 	Subscribe(observers ...Observer)
 
-	// InitialisingActivation activates an inactive management action, triggering Observer method
+	// InitialisingActivation activates an inactive management action, triggering Reporting method
 	// ObserveActionInitialising callbacks.
 	InitialisingActivation()
 
 	// ToggleActivation activates an inactive ManagementAction and vice-versa,
-	// triggering Observer method ObserveAction callbacks.
+	// triggering Reporting method ObserveAction callbacks.
 	ToggleActivation()
 
 	// ToggleActivationUnobserved activates an inactive ManagementAction and vice-versa, without triggering any
-	// Observer method callbacks. Expected to be called when undoing a change that observers shouldn't react to.
+	// Reporting method callbacks. Expected to be called when undoing a change that observers shouldn't react to.
 	ToggleActivationUnobserved()
 
 	// SetActivation activates an the ManagementAction as per the value supplied,
 	SetActivation(value bool)
 
 	// SetActivation activates an the ManagementAction as per the value supplied, without triggering any
-	//  Observer method callbacks. Expected to be called when undoing a change that observers shouldn't react to.
+	//  Reporting method callbacks. Expected to be called when undoing a change that observers shouldn't react to.
 	SetActivationUnobserved(value bool)
 }

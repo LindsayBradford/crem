@@ -15,7 +15,7 @@ type ScenarioConfig struct {
 
 	CpuProfilePath string
 
-	Observer ObserverConfig
+	Reporting ReportingConfig
 
 	UserDetail map[string]interface{}
 }
