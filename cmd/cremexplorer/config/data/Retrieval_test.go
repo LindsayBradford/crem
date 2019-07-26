@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	emptyTestFile        = "testdata/EmptyConfig.toml"
-	minimalValidTestFile = "testdata/MinimalValidConfig.toml"
-	richValidTestFile    = "testdata/RichValidConfig.toml"
-	richInvalidTestFile  = "testdata/RichInvalidConfig.toml"
+	emptyTestFile                = "testdata/EmptyConfig.toml"
+	minimalValidTestFile         = "testdata/MinimalValidConfig.toml"
+	richValidTestFile            = "testdata/RichValidConfig.toml"
+	richInvalidSyntaxTestFile    = "testdata/RichInvalidSyntaxConfig.toml"
+	richInvalidSemanticsTestFile = "testdata/RichInvalidSemanticsConfig.toml"
 
 	expectedScenarioName = "testScenario"
 	testAnnealerType     = "Kirkpatrick"
@@ -105,11 +106,27 @@ func TestRetrieveConfigFromString_RichValidConfig_NoErrors(t *testing.T) {
 	g.Expect(config.Scenario.Name).To(Equal(expectedScenarioName))
 }
 
-func TestRetrieveConfigFromString_RichInvalidConfig_Errors(t *testing.T) {
+func TestRetrieveConfigFromString_RichInvalidSyntaxConfig_Errors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	configText := readTestFileAsText(richInvalidTestFile)
+	configText := readTestFileAsText(richInvalidSyntaxTestFile)
+
+	// when
+	_, retrieveError := RetrieveConfigFromString(configText)
+	if retrieveError != nil {
+		t.Log(retrieveError)
+	}
+
+	// then
+	g.Expect(retrieveError).To(Not(BeNil()))
+}
+
+func TestRetrieveConfigFromString_RichInvalidSemanticsConfig_Errors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	configText := readTestFileAsText(richInvalidSemanticsTestFile)
 
 	// when
 	_, retrieveError := RetrieveConfigFromString(configText)

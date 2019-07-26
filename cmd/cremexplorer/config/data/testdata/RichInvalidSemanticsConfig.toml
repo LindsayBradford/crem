@@ -1,0 +1,15 @@
+[Scenario]
+Name = ""
+RunNumber = 0
+MaximumConcurrentRunNumber = -1
+OutputPath = "notADirectory"
+#OutputType="INVALID"  # "CSV" (default) | "JSON" | "EXCEL"
+
+[Annealer]
+Type="Kirkpatrick"
+
+[Model]
+Type="Unknown"
+
+[SomethingEntireUnexpected]
+TheInquisition = true

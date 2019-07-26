@@ -55,19 +55,25 @@ func RetrieveConfigFromString(tomlString string) (*Config, error) {
 }
 
 func retrieveConfig(source decoderSummary) (*Config, error) {
+	allErrors := errors2.New("configuration retrieval")
+
 	var conf = defaultConfig()
 	metaData, decodeErr := source.decoder(source.content, &conf)
 	if decodeErr != nil {
-		return nil, errors.Wrap(decodeErr, "failed retrieving config from "+source.contentType.String())
+		allErrors.Add(errors.Wrap(decodeErr, "failed retrieving config from "+source.contentType.String()))
 	}
 	if len(metaData.Undecoded()) > 0 {
 		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
-		return nil, errors.New(errorMsg)
+		allErrors.Add(errors.New(errorMsg))
 	}
 	conf.MetaData.FilePath = deriveFilePathFromSource(source)
 
 	if checkErrors := checkMandatoryFields(&conf); checkErrors != nil {
-		return nil, checkErrors
+		allErrors.Add(checkErrors)
+	}
+
+	if allErrors.Size() > 0 {
+		return nil, allErrors
 	}
 
 	return &conf, nil

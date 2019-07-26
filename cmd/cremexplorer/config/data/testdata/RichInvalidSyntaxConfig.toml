@@ -18,3 +18,4 @@ EventNotifier = "NotAnEventNotifier"  # "Synchronous" (default) | Concurrent"
 Type=42
 [Model.Parameters]
 3 = 3
+
