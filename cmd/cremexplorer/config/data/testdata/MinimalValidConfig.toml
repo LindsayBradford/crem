@@ -1,6 +1,5 @@
 [scenario]
 Name = "testScenario"
-RunNumber = 1
 
 [Annealer]
 Type="Kirkpatrick"
