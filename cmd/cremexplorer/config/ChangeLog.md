@@ -2,7 +2,7 @@
 
 ## Version 0.3 ( _TBD_ ):
 ### New Features
-* Simplification of explorer configuration. 
+* Simplified approach to application configuration. 
 
 ## Version 0.2 (23 July 2019):
 ### New Features

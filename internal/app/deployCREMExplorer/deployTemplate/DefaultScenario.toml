@@ -2,13 +2,9 @@
 Name = "Default Scenario"
 OutputPath="output"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
-
-[Scenario.Observer]
-Type = "MessageObserver"
-[Scenario.Observer.Parameters]
-IterationFilter = "EveryNumberOfIterations" # "EveryNumberOfIterations" | "EveryElapsedSeconds" | "EveryPercentileOfFinishedIterations"
-NumberOfIterations = 10_000
-[Scenario.Observer.LogLevelDestinations]
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 10_000
+[Scenario.Reporting.LogLevelDestinations]
 Annealer = "StandardOutput"
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 #Debug = "StandardOutput"
