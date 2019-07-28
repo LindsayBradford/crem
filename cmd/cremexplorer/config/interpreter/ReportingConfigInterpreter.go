@@ -57,6 +57,7 @@ func (i *ReportingConfigInterpreter) interpretLogger(config *data.LoggingConfig)
 func (i *ReportingConfigInterpreter) interpretObserver(config *appData.ReportingConfig) {
 	i.observer = new(annealingObserver.AnnealingMessageObserver).
 		WithLogHandler(i.LogHandler()).
+		WithLoopInvariantObserver(config.CheckingLoopInvariant).
 		WithFilter(
 			new(filters.IterationCountFilter).
 				WithModulo(config.ReportEveryNumberOfIterations),

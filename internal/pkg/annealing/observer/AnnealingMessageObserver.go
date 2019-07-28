@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
@@ -18,6 +19,7 @@ var (
 // Event instances received.
 type AnnealingMessageObserver struct {
 	AnnealingObserver
+	invariantObserver *AnnealingInvariantObserver
 }
 
 func (amo *AnnealingMessageObserver) WithLogHandler(handler logging.Logger) *AnnealingMessageObserver {
@@ -30,9 +32,21 @@ func (amo *AnnealingMessageObserver) WithFilter(filter filters.Filter) *Annealin
 	return amo
 }
 
+func (amo *AnnealingMessageObserver) WithLoopInvariantObserver(watchLoopInvariant bool) *AnnealingMessageObserver {
+	if watchLoopInvariant {
+		assert.That(amo.logHandler != nil)
+		amo.invariantObserver = new(AnnealingInvariantObserver).WithLogHandler(amo.logHandler)
+	}
+	return amo
+}
+
 // ObserveEvent captures and converts Event instances into free-form text strings that it
 // then passes onto its relevant Logger as an Info call.
 func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
+	if amo.invariantObserver != nil {
+		amo.invariantObserver.ObserveEvent(event)
+	}
+
 	if amo.logHandler.BeingDiscarded(AnnealerLogLevel) || amo.filter.ShouldFilter(event) {
 		return
 	}

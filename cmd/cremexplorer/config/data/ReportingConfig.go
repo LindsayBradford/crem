@@ -8,5 +8,6 @@ import (
 
 type ReportingConfig struct {
 	ReportEveryNumberOfIterations uint64
+	CheckingLoopInvariant         bool
 	data.LoggingConfig
 }
