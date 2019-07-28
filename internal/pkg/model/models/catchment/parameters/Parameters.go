@@ -37,6 +37,9 @@ const (
 	RiparianRevegetationCostPerKilometer        string = "RiparianRevegetationCostPerKilometer"
 	GullyRestorationCostPerKilometer            string = "GullyRestorationCostPerKilometer"
 	HillSlopeRestorationCostPerKilometerSquared string = "HillSlopeRestorationCostPerKilometerSquared"
+
+	SedimentProductionDecisionWeight string = "SedimentProductionDecisionWeight"
+	ImplementationCostDecisionWeight string = "ImplementationCostDecisionWeight"
 )
 
 func ParameterSpecifications() *Specifications {
@@ -124,6 +127,18 @@ func ParameterSpecifications() *Specifications {
 			Key:          HillSlopeRestorationCostPerKilometerSquared,
 			Validator:    IsDecimal,
 			DefaultValue: float64(200000),
+		},
+	).Add(
+		Specification{
+			Key:          SedimentProductionDecisionWeight,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.5),
+		},
+	).Add(
+		Specification{
+			Key:          ImplementationCostDecisionWeight,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.5),
 		},
 	)
 	return specs

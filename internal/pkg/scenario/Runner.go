@@ -91,6 +91,7 @@ func (runner *Runner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *Runne
 func (runner *Runner) SetAnnealer(annealer annealing.Annealer) {
 	runner.annealer = annealer
 	annealer.SetLogHandler(runner.logHandler)
+	annealer.AddObserver(runner.saver)
 }
 
 func (runner *Runner) Run() error {

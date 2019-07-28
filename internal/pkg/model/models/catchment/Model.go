@@ -203,14 +203,14 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 
-	const sedimentWeight = float64(0.5)
-	const implementationWeight = float64(0.5)
+	sedimentWeight := m.parameters.GetFloat64(parameters.SedimentProductionDecisionWeight)
+	implementationCostWeight := m.parameters.GetFloat64(parameters.ImplementationCostDecisionWeight)
 
 	sedimentVsCost, buildError := new(variables.SedimentVsCost).
 		Initialise().
 		WithObservers(m).
 		WithWeightedVariable(sedimentProduction, sedimentWeight).
-		WithWeightedVariable(implementationCost, implementationWeight).
+		WithWeightedVariable(implementationCost, implementationCostWeight).
 		Build()
 
 	if buildError != nil {
@@ -219,7 +219,7 @@ func (m *Model) buildSedimentVsCostDecisionVariable() {
 
 	noteBuilder := new(strings.FluentBuilder).
 		Add(sedimentProduction.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
-		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationWeight, 'f', 3, 64))
+		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationCostWeight, 'f', 3, 64))
 
 	m.ObserveDecisionVariableWithNote(sedimentProduction, " Initial Value")
 	m.ObserveDecisionVariableWithNote(implementationCost, " Initial Value")
