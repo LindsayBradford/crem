@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.3 ( _TBD_ ):
+## Version 0.3 (29 July 2019):
 ### New Features
 * Simplified approach to application configuration. 
 

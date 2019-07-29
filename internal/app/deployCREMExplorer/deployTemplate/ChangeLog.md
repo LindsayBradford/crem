@@ -1,10 +1,8 @@
 # Change Log
 
-## Version 0.3 (29 July 2019):
+## Version 0.3 ( _TBD_ ):
 ### New Features
-* Simplified approach to application configuration.
-* Introduced parameters 'SedimentProductionDecisionWeight' & 'ImplementationCostDecisionWeight' to influence 
-  Kirkpatrick Annealer decisions on minimising SedimentVsProduction decision variable. 
+* Simplified approach to application configuration. 
 
 ## Version 0.2 (23 July 2019):
 ### New Features
