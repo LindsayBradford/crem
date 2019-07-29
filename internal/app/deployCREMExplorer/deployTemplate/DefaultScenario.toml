@@ -1,7 +1,7 @@
 [Scenario]
 Name = "Default Scenario"
-OutputPath="output"
-OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+OutputPath = "output"
+OutputType = "EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 10_000
 [Scenario.Reporting.LogLevelDestinations]
@@ -11,18 +11,18 @@ Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "Standar
 #Model = "StandardOutput"
 
 [Annealer]
-Type="Kirkpatrick"
+Type = "Kirkpatrick"
 [Annealer.Parameters]
 DecisionVariable = "SedimentVsCost"
-StartingTemperature = 10_000.0 #10
-CoolingFactor =  0.999  # 0.99
-MaximumIterations = 1_000_000 # 1M
+StartingTemperature = 10_000.0
+CoolingFactor = 0.999
+MaximumIterations = 1_000_000
 
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
-SedimentProductionDecisionWeight = 0.5 # 0.5 (default)
-ImplementationCostDecisionWeight = 0.5 # 0.5 (default)
+SedimentProductionDecisionWeight = 0.5             # 0.5 (default)
+ImplementationCostDecisionWeight = 0.5             # 0.5 (default)
 DataSourcePath = "input/Laidley_data_v1_3.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
@@ -31,7 +31,11 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
+YearsOfErosion = 100                # 100.0 (default)
 
-RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
-GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
+RiparianRevegetationCostPerKilometer = 24000.0          # 24,000 (default)
+RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
+GullyRestorationCostPerKilometer = 44000.0              # 44,000 (default)
+GullySedimentReductionTarget = 0.8                      # 0.8 (default)
 HillSlopeRestorationCostPerKilometerSquared = 200_000.0 # 200_000.0 (default)
+HillSlopeBevegetationProportionTarget = 0.75            # 0.75 (default)
