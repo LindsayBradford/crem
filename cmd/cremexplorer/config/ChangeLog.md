@@ -2,7 +2,9 @@
 
 ## Version 0.3 (29 July 2019):
 ### New Features
-* Simplified approach to application configuration. 
+* Simplified approach to application configuration.
+* Introduced parameters 'SedimentProductionDecisionWeight' & 'ImplementationCostDecisionWeight' to influence 
+  Kirkpatrick Annealer decisions on minimising SedimentVsProduction decision variable. 
 
 ## Version 0.2 (23 July 2019):
 ### New Features
