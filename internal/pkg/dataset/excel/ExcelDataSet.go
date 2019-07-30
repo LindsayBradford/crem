@@ -62,10 +62,10 @@ func (ds *DataSet) loadExcelFileIntoDataSet(excelFilePath string) {
 	defer workbooks.Release()
 
 	workbook := workbooks.Open(excelFilePath)
-	ds.loadWorkbook(workbook)
+	defer workbook.Close(false)
 
+	ds.loadWorkbook(workbook)
 	workbook.SetProperty("Saved", true)
-	workbook.Close(false)
 }
 
 func (ds *DataSet) loadWorkbook(workbook excel.Workbook) {
@@ -197,10 +197,10 @@ func (ds *DataSet) saveDataSetIntoExcelFile(excelFilePath string) {
 	defer workbooks.Release()
 
 	workbook := workbooks.Add()
-	defer workbook.Release()
+	defer workbook.Close(false)
 
 	ds.storeToWorkbook(workbook)
-	ds.saveAndCloseWorkbookAs(workbook, excelFilePath)
+	ds.saveWorkbookAs(workbook, excelFilePath)
 }
 
 func (ds *DataSet) storeToWorkbook(workbook excel.Workbook) {
@@ -319,10 +319,9 @@ func (ds *DataSet) storeCsvTableToWorksheet(table tables.CsvTable, worksheet exc
 	}
 }
 
-func (ds *DataSet) saveAndCloseWorkbookAs(workbook excel.Workbook, filePath string) {
+func (ds *DataSet) saveWorkbookAs(workbook excel.Workbook, filePath string) {
 	workbook.SaveAs(filePath)
 	workbook.SetProperty("Saved", true)
-	workbook.Close(false)
 }
 
 func (ds *DataSet) Teardown() {

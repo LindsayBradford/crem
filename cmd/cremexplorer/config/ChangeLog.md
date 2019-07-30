@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.4 (_TBD_):
+### New Features
+### Fixed
+* Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave. 
+
 ## Version 0.3 (29 July 2019):
 ### New Features
 * Simplified approach to application configuration.
