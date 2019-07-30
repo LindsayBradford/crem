@@ -94,13 +94,16 @@ func Exit(exitValue interface{}) {
 	switch exitValue.(type) {
 	case error:
 		exitingError, _ := exitValue.(error)
-		fmt.Fprintf(os.Stderr, "Critical Error: %v. Exiting.\n", exitingError)
+		fmt.Fprintf(os.Stderr, "Critical Error; forcing application exit: %v\n", exitingError)
 		exitCode = 1
 	case int:
 		exitValueAsInt, _ := exitValue.(int)
 		exitCode = exitValueAsInt
-	default:
+	case nil:
 		exitCode = 0
+	default:
+		fmt.Fprintf(os.Stderr, "Critical Error; forcing application exit for unknown error type %v\n", exitValue)
+		exitCode = 1
 	}
 	os.Exit(exitCode)
 }

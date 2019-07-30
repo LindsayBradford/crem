@@ -26,6 +26,8 @@ func init() {
 }
 
 func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
+	defer gracefullyHandlePanics()
+
 	excel.EnableSpreadsheetSafeties()
 	defer excel.DisableSpreadsheetSafeties()
 
@@ -33,9 +35,29 @@ func RunExcelCompatibleScenarioFromConfigFile(configFile string) {
 	threading.GetMainThreadChannel().RunHandler()
 }
 
+func gracefullyHandlePanics() {
+	if r := recover(); r != nil {
+		if recoveredError, isError := r.(error); isError {
+			wrappingError := errors.Wrap(recoveredError, "running excel-compatible scenario")
+			LogHandler.Error(wrappingError)
+		}
+		commandline.Exit(r)
+	}
+}
+
 func runMainThreadBoundScenarioFromConfigFile(configFile string) {
+	defer func() {
+		if r := recover(); r != nil {
+			if recoveredError, isError := r.(error); isError {
+				wrappingError := errors.Wrap(recoveredError, "running main-thread bound scenario")
+				LogHandler.Error(wrappingError)
+			}
+			commandline.Exit(r)
+		}
+	}()
+
 	RunScenarioFromConfigFile(configFile)
-	threading.GetMainThreadChannel().Close()
+	defer threading.GetMainThreadChannel().Close()
 }
 
 func RunScenarioFromConfigFile(configFile string) {

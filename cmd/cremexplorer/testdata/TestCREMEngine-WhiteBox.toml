@@ -2,7 +2,7 @@
 Name = "Test CREMEngine - White Box"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
-OutputType="JSON"  # "CSV" (default) | "JSON" | "EXCEL"
+OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 5
 CheckingLoopInvariant = true
