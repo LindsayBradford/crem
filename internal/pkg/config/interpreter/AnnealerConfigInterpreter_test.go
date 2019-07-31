@@ -3,6 +3,7 @@
 package interpreter
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/suppapitnarm"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
@@ -157,7 +158,6 @@ func TestConfigInterpreter_SuppapitnarmAnnealer_NoErrors(t *testing.T) {
 	g.Expect(actualAnnealer).To(BeAssignableToTypeOf(expectedAnnealerType))
 
 	actualExplorer := interpreterUnderTest.Annealer().SolutionExplorer()
-	expectedExplorerType := &kirkpatrick.Explorer{} // TODO: Should be dedidicated Suppapitnarm explorer.
+	expectedExplorerType := &suppapitnarm.Explorer{}
 	g.Expect(actualExplorer).To(BeAssignableToTypeOf(expectedExplorerType))
-
 }

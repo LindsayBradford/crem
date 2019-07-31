@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
@@ -57,7 +58,7 @@ func NewAnnealerConfigInterpreter() *AnnealerConfigInterpreter {
 			newAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
 			newAnnealer.Initialise()
 
-			newExplorer := kirkpatrick.New() // TODO: needs a dedicated Supppapitnarm explorer.
+			newExplorer := suppapitnarm.New()
 			newAnnealer.SetSolutionExplorer(newExplorer)
 
 			newAnnealer.SetParameters(config.Parameters)
