@@ -71,8 +71,7 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.parameters.AssignOnlyEnforcedUserValues(params)
 	ke.Coolant.WithParameters(params)
 
-	ke.setOptimisationDirectionFromParams()
-	ke.checkDecisionVariableFromParams()
+	ke.checkDecisionVariablesFromParams()
 
 	return ke.parameters.ValidationErrors()
 }
@@ -85,22 +84,18 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 	return nil
 }
 
-func (ke *Explorer) setOptimisationDirectionFromParams() {
-	optimisationDirectionParam := ke.parameters.GetString(OptimisationDirection)
-	ke.optimisationDirection, _ = parseOptimisationDirection(optimisationDirectionParam)
-}
-
-func (ke *Explorer) checkDecisionVariableFromParams() {
-	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
-
-	defer func() {
-		if r := recover(); r != nil {
-			ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
-		}
-	}()
-
-	ke.Model().DecisionVariable(decisionVariableName)
-	ke.objectiveVariableName = decisionVariableName
+func (ke *Explorer) checkDecisionVariablesFromParams() {
+	// TODO: break up comma-separated lisen and ensure each variable is supported by model.
+	//decisionVariableNames := ke.parameters.GetString(ExplorableDecisionVariables)
+	//
+	//defer func() {
+	//	if r := recover(); r != nil {
+	//		ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
+	//	}
+	//}()
+	//
+	//ke.Model().DecisionVariable(decisionVariableName)
+	//ke.objectiveVariableName = decisionVariableName
 }
 
 func (ke *Explorer) ParameterErrors() error {

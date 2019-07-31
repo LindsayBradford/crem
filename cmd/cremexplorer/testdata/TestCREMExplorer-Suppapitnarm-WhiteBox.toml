@@ -14,8 +14,7 @@ Annealer = "StandardOutput"
 [Annealer]
 Type="Suppapitnarm"
 [Annealer.Parameters]
-DecisionVariable = "SedimentVsCost"
-OptimisationDirection = "Minimising"
+ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 2_000
