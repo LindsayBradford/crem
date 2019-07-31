@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test CREMEngine - White Box"
+Name = "Test CREMEngine - Suppapitnarm - White Box"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
@@ -12,7 +12,7 @@ Annealer = "StandardOutput"
 #Model = "StandardOutput"
 
 [Annealer]
-Type="Kirkpatrick"
+Type="Suppapitnarm"
 [Annealer.Parameters]
 DecisionVariable = "SedimentVsCost"
 OptimisationDirection = "Minimising"

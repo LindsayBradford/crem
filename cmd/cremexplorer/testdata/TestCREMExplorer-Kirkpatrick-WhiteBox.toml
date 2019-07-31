@@ -1,10 +1,15 @@
 [Scenario]
-Name = "Test CREMEngine - Black Box"
+Name = "Test CREMEngine - Kirkpatrick - White Box"
 OutputPath="testdata/solutions"
+#CpuProfilePath="testdata/profile.pprof"
+OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
-ReportEveryNumberOfIterations = 1
+ReportEveryNumberOfIterations = 5
+CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
+Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
+#Model = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"
@@ -24,5 +29,7 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
+RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
+GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 

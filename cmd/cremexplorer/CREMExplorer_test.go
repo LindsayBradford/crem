@@ -16,10 +16,10 @@ const defaultCatchmentModelAnnealerTimeout = 10
 func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "CREMEngine - Black Box",
+		Name:              "CREMExplorer - Black Box",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
-		ConfigFilePath:    "testdata/TestCREMEngine-BlackBox.toml",
+		ConfigFilePath:    "testdata/TestCREMExplorer-BlackBox.toml",
 		ExpectedErrorCode: configTesting.WithSuccess,
 	}
 
@@ -29,21 +29,33 @@ func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
 func TestCREMExplorer_BlackBox_ExitWithError(t *testing.T) {
 	context := configTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "CREMEngine - Black Box with bad inputs",
+		Name:              "CREMExplorer - Black Box with bad inputs",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
-		ConfigFilePath:    "testdata/TestCREMEngine-BadInputs.toml",
+		ConfigFilePath:    "testdata/TestCREMExplorer-BadInputs.toml",
 		ExpectedErrorCode: configTesting.WithFailure,
 	}
 
 	configTesting.TestExecutableAgainstConfigFile(context)
 }
 
-func TestCREMExplorer_WhiteBox_ExitWithSuccess(t *testing.T) {
+func TestCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "CREMEngine - White Box",
+		Name:           "CREMExplorer - Kirkpatrick - White Box",
 		T:              t,
-		ConfigFilePath: "testdata/TestCREMEngine-WhiteBox.toml",
+		ConfigFilePath: "testdata/TestCREMExplorer-Kirkpatrick-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
+func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "CREMExplorer - Suppapitnarm - White Box",
+		T:              t,
+		ConfigFilePath: "testdata/TestCREMExplorer-Suppapitnarm-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
 	}
 

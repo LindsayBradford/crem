@@ -1,6 +1,5 @@
 [Scenario]
-Name = "Test CREMEngine - Bad Inputs"
-RunNumber = 1
+Name = "Test CREMExplorer - Black Box"
 OutputPath="testdata/solutions"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
@@ -26,4 +25,4 @@ GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
-HereIsARogueModelParameter = 0.2    # BADNESS HERE BOSS!
+

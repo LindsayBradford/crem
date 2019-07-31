@@ -1,0 +1,29 @@
+[Scenario]
+Name = "Test CREMExplorer - Bad Inputs"
+RunNumber = 1
+OutputPath="testdata/solutions"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
+Annealer = "StandardOutput"
+
+[Annealer]
+Type="Kirkpatrick"
+[Annealer.Parameters]
+DecisionVariable = "SedimentVsCost"
+OptimisationDirection = "Minimising"
+StartingTemperature = 1_000.0 #10
+CoolingFactor =  0.999  # 0.99
+MaximumIterations = 2_000
+
+[Model]
+Type = "CatchmentModel"
+[Model.Parameters]
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
+HereIsARogueModelParameter = 0.2    # BADNESS HERE BOSS!
