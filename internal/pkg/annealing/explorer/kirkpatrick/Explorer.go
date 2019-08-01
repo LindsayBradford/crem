@@ -93,13 +93,10 @@ func (ke *Explorer) setOptimisationDirectionFromParams() {
 func (ke *Explorer) checkDecisionVariableFromParams() {
 	decisionVariableName := ke.parameters.GetString(DecisionVariableName)
 
-	defer func() {
-		if r := recover(); r != nil {
-			ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
-		}
-	}()
+	if !ke.Model().OffersDecisionVariable(decisionVariableName) {
+		ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
+	}
 
-	ke.Model().DecisionVariable(decisionVariableName)
 	ke.objectiveVariableName = decisionVariableName
 }
 

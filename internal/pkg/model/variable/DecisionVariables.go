@@ -27,6 +27,10 @@ func (c *ContainedDecisionVariables) DecisionVariable(name string) DecisionVaria
 	return c.InductiveDecisionVariables.Variable(name)
 }
 
+func (c *ContainedDecisionVariables) OffersDecisionVariable(name string) bool {
+	return c.InductiveDecisionVariables.Variable(name) != nil
+}
+
 func (c *ContainedDecisionVariables) DecisionVariableChange(variableName string) float64 {
 	return c.InductiveDecisionVariables.DifferenceInValues(variableName)
 }

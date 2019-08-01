@@ -15,7 +15,10 @@ import (
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 	"math"
+	"strings"
 )
+
+const nameSeparater = ","
 
 type Explorer struct {
 	name.NameContainer
@@ -85,17 +88,14 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 }
 
 func (ke *Explorer) checkDecisionVariablesFromParams() {
-	// TODO: break up comma-separated lisen and ensure each variable is supported by model.
-	//decisionVariableNames := ke.parameters.GetString(ExplorableDecisionVariables)
-	//
-	//defer func() {
-	//	if r := recover(); r != nil {
-	//		ke.parameters.AddValidationErrorMessage("decision variable [" + decisionVariableName + "] not recognised by model")
-	//	}
-	//}()
-	//
-	//ke.Model().DecisionVariable(decisionVariableName)
-	//ke.objectiveVariableName = decisionVariableName
+	decisionVariableNames := ke.parameters.GetString(ExplorableDecisionVariables)
+	splitVariableNames := strings.Split(decisionVariableNames, nameSeparater)
+	for _, name := range splitVariableNames {
+		variableOffered := ke.Model().OffersDecisionVariable(name)
+		if !variableOffered {
+			ke.parameters.AddValidationErrorMessage("decision variable [" + name + "] not recognised by model")
+		}
+	}
 }
 
 func (ke *Explorer) ParameterErrors() error {

@@ -57,6 +57,7 @@ type DecisionVariableContainer interface {
 	DecisionVariables() *variable.DecisionVariableMap
 
 	DecisionVariable(name string) variable.DecisionVariable
+	OffersDecisionVariable(name string) bool
 	DecisionVariableChange(decisionVariableName string) float64
 }
 
@@ -89,6 +90,8 @@ func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 	newVariable := variable.NewSimpleDecisionVariable(name)
 	return &newVariable
 }
+
+func (nm *nullModel) OffersDecisionVariable(name string) bool                    { return true }
 func (nm *nullModel) DecisionVariableChange(decisionVariableName string) float64 { return 0 }
 func (nm *nullModel) SetDecisionVariable(name string, value float64)             {}
 
