@@ -68,27 +68,35 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 	case observer.StartedAnnealing:
 		builder.
 			Add("Maximum Iterations [", format(event, "MaximumIterations"), "], ").
-			Add("Objective value [", format(event, "ObjectiveValue"), "], ").
 			Add("Temperature [", format(event, "Temperature"), "], ").
 			Add("Cooling Factor [", format(event, "CoolingFactor"), "]")
+		if event.HasAttribute("ObjectiveValue") {
+			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ")
+		}
 	case observer.StartedIteration:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Temperature [", format(event, "Temperature"), "], ").
-			Add("Objective value [", format(event, "ObjectiveValue"), "]")
+			Add("Temperature [", format(event, "Temperature"), "], ")
+		if event.HasAttribute("ObjectiveValue") {
+			builder.Add("Objective value [", format(event, "ObjectiveValue"), "]")
+		}
 	case observer.FinishedIteration:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Objective value [", format(event, "ObjectiveValue"), "], ").
-			Add("Change [", format(event, "ChangeInObjectiveValue"), "], ").
 			Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
 			Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
 			Add("Accepted? [", format(event, "ChangeAccepted"), "]")
+		if event.HasAttribute("ObjectiveValue") {
+			builder.Add("Change [", format(event, "ChangeInObjectiveValue"), "], ").
+				Add("Objective value [", format(event, "ObjectiveValue"), "]")
+		}
 	case observer.FinishedAnnealing:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").
-			Add("Objective value [", format(event, "ObjectiveValue"), "], ").
 			Add("Temperature [", format(event, "Temperature"), "]")
+		if event.HasAttribute("ObjectiveValue") {
+			builder.Add("Objective value [", format(event, "ObjectiveValue"), "]")
+		}
 	default:
 		// deliberately does nothing extra
 	}

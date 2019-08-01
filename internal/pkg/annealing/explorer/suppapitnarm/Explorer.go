@@ -182,7 +182,6 @@ func (ke *Explorer) setAcceptanceProbability(probability float64) {
 
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	baseAttributes := new(attributes.Attributes).
-		Add(explorer.ObjectiveValue, ke.ObjectiveValue()).
 		Add(explorer.Temperature, ke.Temperature)
 
 	switch eventType {
@@ -192,7 +191,6 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return baseAttributes
 	case observer.FinishedIteration:
 		return baseAttributes.
-			Add(explorer.ChangeInObjectiveValue, ke.objectiveValueChange).
 			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
 			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
 			Add(explorer.ChangeAccepted, ke.changeAccepted)

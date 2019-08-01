@@ -5,7 +5,6 @@ OutputPath="testdata/solutions"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 5
-CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"

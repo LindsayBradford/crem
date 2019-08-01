@@ -51,7 +51,7 @@ func TestCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
 
-func testCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
+func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
 		Name:           "CREMExplorer - Suppapitnarm - White Box",
 		T:              t,

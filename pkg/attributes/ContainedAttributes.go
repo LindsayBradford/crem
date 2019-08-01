@@ -10,6 +10,10 @@ func (ca *ContainedAttributes) Attribute(name string) interface{} {
 	return ca.attributes.Value(name)
 }
 
+func (ca *ContainedAttributes) HasAttribute(name string) bool {
+	return ca.attributes.Value(name) != nil
+}
+
 func (ca *ContainedAttributes) AddAttribute(name string, value interface{}) {
 	ca.attributes = ca.attributes.Add(name, value)
 }
