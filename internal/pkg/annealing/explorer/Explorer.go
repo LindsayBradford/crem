@@ -16,9 +16,7 @@ import (
 const Guaranteed = 1
 
 const (
-	ObjectiveValue         = "ObjectiveValue"
-	ChangeInObjectiveValue = "ChangeInObjectiveValue"
-	ChangeIsDesirable      = "ChangeIsDesirable"
+	ChangeIsDesirable = "ChangeIsDesirable"
 
 	Temperature   = "Temperature"
 	CoolingFactor = "CoolingFactor"

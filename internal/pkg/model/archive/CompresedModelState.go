@@ -27,6 +27,14 @@ func (c *CompressedModelState) variablesMatch(model model.Model) bool {
 	return true
 }
 
+func (c *CompressedModelState) VariableDifferences(otherState *CompressedModelState) []float64 {
+	differences := make([]float64, len(c.Variables))
+	for index := range c.Variables {
+		differences[index] = c.Variables[index] - otherState.Variables[index]
+	}
+	return differences
+}
+
 func (c *CompressedModelState) variableValuesMatch(index int, model model.Model, variableKeys []string) bool {
 	return c.Variables[index] == model.DecisionVariable(variableKeys[index]).Value()
 }

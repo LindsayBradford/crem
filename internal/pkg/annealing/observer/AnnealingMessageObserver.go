@@ -71,14 +71,17 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 			Add("Temperature [", format(event, "Temperature"), "], ").
 			Add("Cooling Factor [", format(event, "CoolingFactor"), "]")
 		if event.HasAttribute("ObjectiveValue") {
-			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ")
+			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
+		}
+		if event.HasAttribute("ArchiveSize") {
+			builder.Add(", Archive size [", format(event, "ArchiveSize"), "]")
 		}
 	case observer.StartedIteration:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Temperature [", format(event, "Temperature"), "], ")
+			Add("Temperature [", format(event, "Temperature"), "]")
 		if event.HasAttribute("ObjectiveValue") {
-			builder.Add("Objective value [", format(event, "ObjectiveValue"), "]")
+			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
 		}
 	case observer.FinishedIteration:
 		builder.
@@ -87,9 +90,14 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 			Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
 			Add("Accepted? [", format(event, "ChangeAccepted"), "]")
 		if event.HasAttribute("ObjectiveValue") {
-			builder.Add("Change [", format(event, "ChangeInObjectiveValue"), "], ").
+			builder.Add(", Change [", format(event, "ChangeInObjectiveValue"), "], ").
 				Add("Objective value [", format(event, "ObjectiveValue"), "]")
 		}
+		if event.HasAttribute("ArchiveSize") {
+			builder.Add(", Archive size [", format(event, "ArchiveSize"), "], ").
+				Add("Archive result [", format(event, "ArchiveResult"), "]")
+		}
+
 	case observer.FinishedAnnealing:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").

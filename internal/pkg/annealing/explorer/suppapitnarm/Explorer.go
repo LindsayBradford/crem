@@ -3,7 +3,10 @@
 package suppapitnarm
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
+	"math"
+	"strings"
+
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
@@ -15,11 +18,14 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
-	"math"
-	"strings"
 )
 
-const nameSeparater = ","
+const (
+	nameSeparater = ","
+
+	ArchiveSize   = "ArchiveSize"
+	ArchiveResult = "ArchiveResult"
+)
 
 type Explorer struct {
 	name.NameContainer
@@ -28,7 +34,7 @@ type Explorer struct {
 	model.ContainedModel
 	loggers.ContainedLogger
 
-	kirkpatrick.Coolant
+	suppapitnarm.Coolant
 
 	scenarioId string
 
@@ -122,23 +128,23 @@ func (ke *Explorer) ObjectiveValue() float64 {
 }
 
 func (ke *Explorer) TryRandomChange() {
+	compressedInitialModelState := ke.modelArchive.Compress(ke.Model())
 	ke.Model().DoRandomChange()
-	ke.archiveStorageResult = ke.modelArchive.AttemptToArchive(ke.Model())
-	ke.defaultAcceptOrRevertChange()
+	compressedChangedModelState := ke.modelArchive.Compress(ke.Model())
+	variableDifferences := compressedChangedModelState.VariableDifferences(compressedInitialModelState)
+	ke.archiveStorageResult = ke.modelArchive.AttemptToArchiveState(compressedChangedModelState)
+	ke.AcceptOrRevertChange(variableDifferences)
 }
 
-func (ke *Explorer) defaultAcceptOrRevertChange() {
-	ke.AcceptOrRevertChange(ke.AcceptLastChange, ke.RevertLastChange)
-}
-
-func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
+func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
+		ke.changeAccepted = true
 	} else {
-		if ke.DecideIfAcceptable(ke.objectiveValueChange) {
-			acceptFunction()
+		if ke.DecideIfAcceptable(variableDifferences) {
+			ke.AcceptLastChange()
 		} else {
-			revertFunction()
+			ke.RevertLastChange()
 		}
 	}
 }
@@ -148,13 +154,13 @@ func (ke *Explorer) changeTriedIsDesirable() bool {
 	case archive.StoredWithNoDominanceDetected, archive.StoredReplacingDominatedEntries:
 		ke.changeIsDesirable = true
 	case archive.RejectedWithStoredEntryDominanceDetected, archive.RejectedWithDuplicateEntryDetected:
-		ke.changeIsDesirable = true
+		ke.changeIsDesirable = false
 	}
 	return ke.changeIsDesirable
 }
 
 func (ke *Explorer) AcceptLastChange() {
-	ke.modelArchive.ForceIntoArchive(ke.Model())
+	ke.archiveStorageResult = ke.modelArchive.ForceIntoArchive(ke.Model())
 	ke.changeAccepted = true
 }
 
@@ -188,9 +194,11 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 	case observer.StartedAnnealing:
 		return baseAttributes.Add(explorer.CoolingFactor, ke.CoolingFactor)
 	case observer.StartedIteration, observer.FinishedAnnealing:
-		return baseAttributes
+		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len())
 	case observer.FinishedIteration:
 		return baseAttributes.
+			Add(ArchiveSize, ke.modelArchive.Len()).
+			Add(ArchiveResult, ke.archiveStorageResult).
 			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
 			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
 			Add(explorer.ChangeAccepted, ke.changeAccepted)

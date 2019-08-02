@@ -15,6 +15,22 @@ const (
 	StoredForcingDominatingStateRemoval
 )
 
+func (sr StorageResult) String() string {
+	switch sr {
+	case StoredWithNoDominanceDetected:
+		return "Stored with no dominance detected"
+	case StoredReplacingDominatedEntries:
+		return "Stored replacing dominated archive entries"
+	case RejectedWithStoredEntryDominanceDetected:
+		return "Rejected with archive reporting dominance of stored entries"
+	case RejectedWithDuplicateEntryDetected:
+		return "Rejected with archive reporting solution already archived"
+	case StoredForcingDominatingStateRemoval:
+		return "Stored, forcing dominance entries out of archive"
+	}
+	return "Can be stored -- but why are you seeing this?!?"
+}
+
 func New() *NonDominanceModelArchive {
 	return new(NonDominanceModelArchive).Initialise()
 }
@@ -32,6 +48,10 @@ func (a *NonDominanceModelArchive) Initialise() *NonDominanceModelArchive {
 func (a *NonDominanceModelArchive) AttemptToArchive(model model.Model) StorageResult {
 	compressedModelState := a.compressor.Compress(model)
 	return a.AttemptToArchiveState(compressedModelState)
+}
+
+func (a *NonDominanceModelArchive) Compress(model model.Model) *CompressedModelState {
+	return a.compressor.Compress(model)
 }
 
 func (a *NonDominanceModelArchive) AttemptToArchiveState(modelState *CompressedModelState) StorageResult {
