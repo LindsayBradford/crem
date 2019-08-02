@@ -136,15 +136,19 @@ func (m *Model) TearDown() {
 	// This model doesn't need any special tearDown.
 }
 
+func (m *Model) DoRandomChange() {
+	m.TryRandomChange()
+	m.AcceptChange()
+}
+
+func (m *Model) UndoChange() {
+	m.managementActions.ToggleLastActivation()
+	m.AcceptChange()
+}
+
 func (m *Model) TryRandomChange() {
 	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
-}
-
-func (m *Model) DoRandomChange() {
-	m.note("Applying Random Change")
-	m.managementActions.RandomlyToggleOneActivation()
-	m.AcceptChange()
 }
 
 func (m *Model) SetDecisionVariable(name string, value float64) {
@@ -157,7 +161,7 @@ func (m *Model) AcceptChange() {
 
 func (m *Model) RevertChange() {
 	m.ContainedDecisionVariables.RejectAll()
-	m.managementActions.UndoLastActivationToggleUnobserved()
+	m.managementActions.ToggleLastActivationUnobserved()
 }
 
 func (m *Model) ManagementActions() []action.ManagementAction {

@@ -63,9 +63,15 @@ func (m *ModelManagementActions) RandomlyInitialise() {
 	}
 }
 
-// UndoLastActivationToggleUnobserved allows for the last recorded management action change to have its
+// ToggleLastActivation allows for the last recorded management action change to have its
+// activation state reverted, alerting any observers  of the change.
+func (m *ModelManagementActions) ToggleLastActivation() {
+	m.lastApplied.ToggleActivation()
+}
+
+// ToggleLastActivationUnobserved allows for the last recorded management action change to have its
 // activation state reverted, without triggering any observation of the change.
-func (m *ModelManagementActions) UndoLastActivationToggleUnobserved() {
+func (m *ModelManagementActions) ToggleLastActivationUnobserved() {
 	m.lastApplied.ToggleActivationUnobserved()
 }
 

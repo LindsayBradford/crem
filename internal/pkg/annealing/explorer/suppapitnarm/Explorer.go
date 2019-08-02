@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -35,6 +36,9 @@ type Explorer struct {
 	optimisationDirection optimisationDirection
 	objectiveVariableName string
 
+	modelArchive         archive.NonDominanceModelArchive
+	archiveStorageResult archive.StorageResult
+
 	changeIsDesirable    bool
 	changeAccepted       bool
 	objectiveValueChange float64
@@ -44,13 +48,14 @@ func New() *Explorer {
 	newExplorer := new(Explorer)
 	newExplorer.parameters.Initialise()
 	newExplorer.Coolant.Initialise()
+	newExplorer.modelArchive.Initialise()
 	newExplorer.SetModel(model.NewNullModel())
 	return newExplorer
 }
 
 func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
-
+	ke.modelArchive.Initialise()
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
 }
@@ -117,7 +122,8 @@ func (ke *Explorer) ObjectiveValue() float64 {
 }
 
 func (ke *Explorer) TryRandomChange() {
-	ke.Model().TryRandomChange()
+	ke.Model().DoRandomChange()
+	ke.archiveStorageResult = ke.modelArchive.AttemptToArchive(ke.Model())
 	ke.defaultAcceptOrRevertChange()
 }
 
@@ -128,7 +134,6 @@ func (ke *Explorer) defaultAcceptOrRevertChange() {
 func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
-		acceptFunction()
 	} else {
 		if ke.DecideIfAcceptable(ke.objectiveValueChange) {
 			acceptFunction()
@@ -139,27 +144,22 @@ func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction f
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
-	switch ke.optimisationDirection {
-	case Minimising:
-		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() <= 0
-	case Maximising:
-		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() > 0
+	switch ke.archiveStorageResult {
+	case archive.StoredWithNoDominanceDetected, archive.StoredReplacingDominatedEntries:
+		ke.changeIsDesirable = true
+	case archive.RejectedWithStoredEntryDominanceDetected, archive.RejectedWithDuplicateEntryDetected:
+		ke.changeIsDesirable = true
 	}
 	return ke.changeIsDesirable
 }
 
-func (ke *Explorer) calculateChangeInObjectiveValue() float64 {
-	ke.objectiveValueChange = ke.Model().DecisionVariableChange(ke.objectiveVariableName)
-	return ke.objectiveValueChange
-}
-
 func (ke *Explorer) AcceptLastChange() {
-	ke.Model().AcceptChange()
+	ke.modelArchive.ForceIntoArchive(ke.Model())
 	ke.changeAccepted = true
 }
 
 func (ke *Explorer) RevertLastChange() {
-	ke.Model().RevertChange()
+	ke.Model().UndoChange()
 	ke.changeAccepted = false
 }
 

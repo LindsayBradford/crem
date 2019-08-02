@@ -8,7 +8,7 @@ ReportEveryNumberOfIterations = 5
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
-#Model = "StandardOutput"
+Model = "StandardOutput"
 
 [Annealer]
 Type="Suppapitnarm"

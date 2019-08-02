@@ -21,7 +21,8 @@ func compressVariables(model model.Model) dominance.Float64Vector {
 	variableKeys := model.DecisionVariables().SortedKeys()
 	compressedVariables := *dominance.NewFloat64(len(variableKeys))
 	for index := range variableKeys {
-		compressedVariables[index] = model.DecisionVariable(variableKeys[index]).Value()
+		valueToCompress := model.DecisionVariable(variableKeys[index]).Value()
+		compressedVariables[index] = valueToCompress
 	}
 	return compressedVariables
 }

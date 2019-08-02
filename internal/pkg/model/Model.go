@@ -20,6 +20,9 @@ type Model interface {
 	Initialise()
 	TearDown()
 
+	DoRandomChange()
+	UndoChange()
+
 	TryRandomChange()
 	AcceptChange()
 	RevertChange()
@@ -80,6 +83,9 @@ func (nm *nullModel) WithName(name string) *nullModel {
 
 func (nm *nullModel) Initialise() {}
 func (nm *nullModel) TearDown()   {}
+
+func (nm *nullModel) DoRandomChange() {}
+func (nm *nullModel) UndoChange()     {}
 
 func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}

@@ -157,7 +157,7 @@ func TestManagementActions_UndoLastActivationToggleUnobserved(t *testing.T) {
 
 	// when
 	actionSpy.Reset()
-	actionsUnderTest.UndoLastActivationToggleUnobserved()
+	actionsUnderTest.ToggleLastActivationUnobserved()
 
 	// then
 	g.Expect(dummyAction.IsActive()).To(BeFalse())

@@ -21,6 +21,7 @@ type Model struct {
 
 	parameters Parameters
 	variable.ContainedDecisionVariables
+	lastIterationValue float64
 }
 
 func NewModel() *Model {
@@ -76,10 +77,20 @@ func (dm *Model) TearDown() {
 	// This model doesn't need any special tearDown.
 }
 
+func (dm *Model) DoRandomChange() {
+	dm.TryRandomChange()
+	dm.AcceptChange()
+}
+
+func (dm *Model) UndoChange() {
+	dm.setObjectiveValue(dm.lastIterationValue)
+	dm.AcceptChange()
+}
+
 func (dm *Model) TryRandomChange() {
-	originalValue := dm.objectiveValue()
+	dm.lastIterationValue = dm.objectiveValue()
 	change := dm.generateRandomChange()
-	newValue := dm.capChangeOverRange(originalValue + change)
+	newValue := dm.capChangeOverRange(dm.lastIterationValue + change)
 	dm.setObjectiveValue(newValue)
 }
 

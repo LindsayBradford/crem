@@ -236,7 +236,7 @@ func (m *Model) AcceptChange() {
 func (m *Model) RevertChange() {
 	m.note("Reverting Change")
 	m.ContainedDecisionVariables.RejectAll()
-	m.managementActions.UndoLastActivationToggleUnobserved()
+	m.managementActions.ToggleLastActivationUnobserved()
 }
 
 func (m *Model) deriveDataSourcePath() string {
@@ -249,9 +249,19 @@ func (m *Model) TearDown() {
 	m.inputDataSet.Teardown()
 }
 
+func (m *Model) DoRandomChange() {
+	m.TryRandomChange()
+	m.AcceptChange()
+}
+
 func (m *Model) TryRandomChange() {
 	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
+}
+
+func (m *Model) UndoChange() {
+	m.note("Undoing Change")
+	m.managementActions.ToggleLastActivation()
 }
 
 func (m *Model) ObserveAction(action action.ManagementAction) {
