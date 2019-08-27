@@ -103,8 +103,7 @@ func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(plannin
 func (h *HillSlopeSedimentContribution) calculateVegetationCover(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
 	// See: CRP final report, section 3.2.3, pg 24.
 	distanceToRiparianBuffer := h.contributionMap[planningUnit].distanceToCatchment
-	area := h.contributionMap[planningUnit].area
-	groundCover := area * proportionOfHillSlopeVegetation
+	groundCover := proportionOfHillSlopeVegetation
 
 	unmodifiedVegetationCoverFactor := 0.5665 * math.Exp(-0.0487*groundCover)
 

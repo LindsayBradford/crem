@@ -79,12 +79,16 @@ func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningU
 		sl.hillSlopeVegetationProportionPerPlanningUnit[planningUnit] =
 			sl.hillSlopeSedimentContribution.OriginalPlanningUnitVegetationProportion(planningUnit)
 
+		bankSedimentContribution := sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
+		gullySedimentContribution := sl.gullySedimentContribution.SedimentContribution(planningUnit)
+
 		riparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
+		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter
 
 		sl.sedimentPerPlanningUnit[planningUnit] =
-			sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) +
-				sl.gullySedimentContribution.SedimentContribution(planningUnit) +
-				(sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter)
+			bankSedimentContribution +
+				gullySedimentContribution +
+				hillSlopeSedimentContribution
 
 		sl.sedimentPerPlanningUnit[planningUnit] = math.RoundFloat(sl.sedimentPerPlanningUnit[planningUnit], int(sl.Precision()))
 	}
