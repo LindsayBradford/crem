@@ -1,9 +1,9 @@
 # Change Log
 
-## Version 0.4 (_TBD_):
-### New Features
+## Version 0.4 (06 September 2019:
 ### Fixed
-* Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave. 
+* Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave.
+* Fixed bug in Hillslope calculation of Vegetation cover  
 
 ## Version 0.3 (29 July 2019):
 ### New Features
