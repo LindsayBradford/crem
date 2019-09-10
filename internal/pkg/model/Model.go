@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -24,6 +25,7 @@ type Model interface {
 	UndoChange()
 
 	TryRandomChange()
+	ChangeIsValid() (bool, *errors.CompositeError)
 	AcceptChange()
 	RevertChange()
 
@@ -87,9 +89,10 @@ func (nm *nullModel) TearDown()   {}
 func (nm *nullModel) DoRandomChange() {}
 func (nm *nullModel) UndoChange()     {}
 
-func (nm *nullModel) TryRandomChange() {}
-func (nm *nullModel) AcceptChange()    {}
-func (nm *nullModel) RevertChange()    {}
+func (nm *nullModel) TryRandomChange()                              {}
+func (nm *nullModel) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
+func (nm *nullModel) AcceptChange()                                 {}
+func (nm *nullModel) RevertChange()                                 {}
 
 func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {

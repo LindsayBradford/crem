@@ -28,12 +28,21 @@ func (m *ModelManagementActions) Add(newActions ...ManagementAction) {
 
 // RandomlyToggleOneActivation randomly picks one of its stored management actions and toggles its activation
 // in a way that will trigger any observers of the selected management action to react to its change in activation state.
-func (m *ModelManagementActions) RandomlyToggleOneActivation() {
-	m.lastApplied = m.pickRandomManagementAction()
+func (m *ModelManagementActions) RandomlyToggleOneActivation() ManagementAction {
+	m.lastApplied = m.PickRandomManagementAction()
 	m.lastApplied.ToggleActivation()
+	return m.lastApplied
 }
 
-func (m *ModelManagementActions) pickRandomManagementAction() ManagementAction {
+// RandomlyToggleOneActivation randomly picks one of its stored management actions and toggles its activation
+// in a way that will trigger any observers of the selected management action to react to its change in activation state.
+func (m *ModelManagementActions) RandomlyToggleOneActivationUnobserved() ManagementAction {
+	m.lastApplied = m.PickRandomManagementAction()
+	m.lastApplied.ToggleActivationUnobserved()
+	return m.lastApplied
+}
+
+func (m *ModelManagementActions) PickRandomManagementAction() ManagementAction {
 	numberOfActions := len(m.actions)
 	if numberOfActions < 1 {
 		return NullManagementAction
@@ -51,15 +60,20 @@ const (
 // each action. Any action chosen for activation triggers its observers to react to its 'initialising' activation.
 func (m *ModelManagementActions) RandomlyInitialise() {
 	for _, action := range m.actions {
-		randomValue := m.RandomNumberGenerator().Intn(2)
-		switch randomValue {
-		case activate:
-			action.InitialisingActivation()
-		case ignore:
-			// Deliberately does nothing
-		default:
-			panic(errors.New("Random value outside range of [0,1]"))
-		}
+		m.RandomlyInitialiseAction(action)
+	}
+}
+
+func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementAction) {
+	randomValue := m.RandomNumberGenerator().Intn(2)
+	switch randomValue {
+	case activate:
+		m.lastApplied = action
+		action.InitialisingActivation()
+	case ignore:
+		// Deliberately does nothing
+	default:
+		panic(errors.New("Random value outside range of [0,1]"))
 	}
 }
 

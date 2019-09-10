@@ -17,6 +17,8 @@ const notImplementedCost float64 = 0
 
 type ImplementationCost struct {
 	variable.BaseInductiveDecisionVariable
+	variable.VariableBounds
+
 	actionObserved action.ManagementAction
 
 	valuePerPlanningUnit map[planningunit.Id]float64

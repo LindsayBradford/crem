@@ -4,6 +4,8 @@ package dumb
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/pkg/errors"
+
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -133,6 +135,8 @@ func (dm *Model) AcceptChange() {
 func (dm *Model) RevertChange() {
 	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
 }
+
+func (dm *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
 func (dm *Model) ManagementActions() []action.ManagementAction        { return nil }
 func (dm *Model) ActiveManagementActions() []action.ManagementAction  { return nil }

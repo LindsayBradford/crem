@@ -14,6 +14,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -163,6 +164,8 @@ func (m *Model) RevertChange() {
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
 }
+
+func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
 func (m *Model) ManagementActions() []action.ManagementAction {
 	return m.managementActions.Actions()

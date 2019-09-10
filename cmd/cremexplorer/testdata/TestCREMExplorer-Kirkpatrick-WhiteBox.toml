@@ -33,3 +33,5 @@ RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 
+MinimumImplementationCost = 5_000_000.00 # $5M Budget
+

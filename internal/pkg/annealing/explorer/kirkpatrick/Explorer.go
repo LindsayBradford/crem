@@ -3,6 +3,8 @@
 package kirkpatrick
 
 import (
+	"math"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -14,7 +16,6 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
-	"math"
 )
 
 const (
@@ -133,6 +134,12 @@ func (ke *Explorer) defaultAcceptOrRevertChange() {
 }
 
 func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
+	if isValid, _ := ke.Model().ChangeIsValid(); !isValid { // TODO: Report errors to log?
+		ke.LogHandler().Info(ke.scenarioId + ": Change is invalid.  Reverting.")
+		revertFunction()
+		return
+	}
+
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()

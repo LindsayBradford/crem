@@ -4,6 +4,8 @@ package catchment
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	errors2 "github.com/LindsayBradford/crem/pkg/errors"
+
 	"math"
 	"os"
 	"path/filepath"
@@ -99,9 +101,25 @@ func (m *Model) Initialise() {
 	m.buildCoreDecisionVariables()
 	m.buildManagementActions()
 
-	m.managementActions.RandomlyInitialise()
+	m.randomlyInitialiseActions()
 
 	m.buildSedimentVsCostDecisionVariable()
+}
+
+func (m *Model) randomlyInitialiseActions() {
+	validCombinationFound := false
+	for _, action := range m.managementActions.Actions() {
+		m.managementActions.RandomlyInitialiseAction(action)
+		isValid, _ := m.ChangeIsValid()
+
+		if isValid {
+			validCombinationFound = true
+		}
+
+		if validCombinationFound && !isValid {
+			m.managementActions.ToggleLastActivationUnobserved()
+		}
+	}
 }
 
 func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
@@ -137,9 +155,25 @@ func (m *Model) buildCoreDecisionVariables() {
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
+	if m.parameters.HasEntry(parameters.MinimumSedimentProduction) {
+		sedimentLoad.SetMinimum(m.parameters.GetFloat64(parameters.MinimumSedimentProduction))
+	}
+
+	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		sedimentLoad.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
+	}
+
 	implementationCost := new(variables.ImplementationCost).
 		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
+
+	if m.parameters.HasEntry(parameters.MinimumImplementationCost) {
+		implementationCost.SetMinimum(m.parameters.GetFloat64(parameters.MinimumImplementationCost))
+	}
+
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		implementationCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumImplementationCost))
+	}
 
 	m.ContainedDecisionVariables.Add(
 		sedimentLoad,
@@ -237,6 +271,30 @@ func (m *Model) RevertChange() {
 	m.note("Reverting Change")
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
+}
+
+func (m *Model) ChangeIsValid() (bool, *errors2.CompositeError) {
+	validationErrors := errors2.New("Validation Errors")
+
+	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
+	if boundSedimentLoad, isBound := sedimentLoad.(variable.Bounded); isBound {
+		if !boundSedimentLoad.WithinBounds(sedimentLoad.InductiveValue()) {
+			validationErrors.AddMessage("SedimentLoad value out of bounds")
+		}
+	}
+
+	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
+	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
+		if !boundImplementationCost.WithinBounds(implementationCost.InductiveValue()) {
+			validationErrors.AddMessage("ImplementationCost value out of bounds")
+		}
+	}
+
+	if validationErrors.Size() > 0 {
+		return false, validationErrors
+	}
+
+	return true, nil
 }
 
 func (m *Model) deriveDataSourcePath() string {

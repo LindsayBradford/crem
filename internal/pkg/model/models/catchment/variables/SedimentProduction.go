@@ -29,6 +29,7 @@ func Float64ToPlanningUnitId(value float64) planningunit.Id {
 
 type SedimentProduction struct {
 	variable.BaseInductiveDecisionVariable
+	variable.VariableBounds
 
 	bankSedimentContribution      actions.BankSedimentContribution
 	gullySedimentContribution     actions.GullySedimentContribution

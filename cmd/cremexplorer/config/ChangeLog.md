@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.5 (_TBD_):
+### New Features
+* Adding Upper and Lower bound limits to CatchmentModel decision variables.  
+
 ## Version 0.4 (06 September 2019):
 ### Fixed
 * Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave.
