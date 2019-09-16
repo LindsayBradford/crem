@@ -49,7 +49,6 @@ func (vb *VariableBounds) WithinBounds(value float64) bool {
 }
 
 func (vb *VariableBounds) BoundErrorAsText(value float64) string {
-
 	boundMessages := make([]string, 0)
 
 	if vb.hasMinimum && value < vb.minimum {

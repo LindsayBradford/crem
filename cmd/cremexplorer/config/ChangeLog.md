@@ -1,8 +1,9 @@
 # Change Log
 
-## Version 0.5 (_TBD_):
+## Version 0.5 (16 September 2019):
 ### New Features
-* Adding Upper and Lower bound limits to CatchmentModel decision variables.  
+* Adding Upper and Lower bound limits to CatchmentModel decision variables SedimentProduction & ImplementationCost.
+* Now deploys with Laidley_data_v1_4.xlxs (with fixes to gully volumes)  
 
 ## Version 0.4 (06 September 2019):
 ### Fixed
