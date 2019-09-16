@@ -50,22 +50,25 @@ func (amo *AnnealingInvariantObserver) loopInvariantUpheld(event observer.Event)
 		return true
 	case observer.FinishedIteration:
 		actualObjectiveValue := event.Attribute("ObjectiveValue").(float64)
-		changeInObjectiveValue := event.Attribute("ChangeInObjectiveValue").(float64)
-		changeAccepted := event.Attribute("ChangeAccepted").(bool)
+		invariantUpheld := true
+		if event.HasAttribute("ChangeAccepted") {
+			changeInObjectiveValue := event.Attribute("ChangeInObjectiveValue").(float64)
+			changeAccepted := event.Attribute("ChangeAccepted").(bool)
 
-		var expectedObjectiveValue float64
+			var expectedObjectiveValue float64
 
-		if changeAccepted {
-			expectedObjectiveValue = amo.previousObjectiveValue + changeInObjectiveValue
-			amo.previousObjectiveValue = actualObjectiveValue
-		} else {
-			expectedObjectiveValue = amo.previousObjectiveValue
+			if changeAccepted {
+				expectedObjectiveValue = amo.previousObjectiveValue + changeInObjectiveValue
+				amo.previousObjectiveValue = actualObjectiveValue
+			} else {
+				expectedObjectiveValue = amo.previousObjectiveValue
+			}
+
+			roundedExpectedObjectiveValue := math.RoundFloat(expectedObjectiveValue, decimalPrecisionRequired)
+			roundedActualObjectiveValue := math.RoundFloat(actualObjectiveValue, decimalPrecisionRequired)
+
+			invariantUpheld = roundedExpectedObjectiveValue == roundedActualObjectiveValue
 		}
-
-		roundedExpectedObjectiveValue := math.RoundFloat(expectedObjectiveValue, decimalPrecisionRequired)
-		roundedActualObjectiveValue := math.RoundFloat(actualObjectiveValue, decimalPrecisionRequired)
-
-		invariantUpheld := roundedExpectedObjectiveValue == roundedActualObjectiveValue
 		return invariantUpheld
 	default:
 		return true

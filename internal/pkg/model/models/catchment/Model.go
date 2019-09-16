@@ -3,6 +3,8 @@
 package catchment
 
 import (
+	"fmt"
+
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 
@@ -276,17 +278,19 @@ func (m *Model) RevertChange() {
 func (m *Model) ChangeIsValid() (bool, *errors2.CompositeError) {
 	validationErrors := errors2.New("Validation Errors")
 
-	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
-	if boundSedimentLoad, isBound := sedimentLoad.(variable.Bounded); isBound {
-		if !boundSedimentLoad.WithinBounds(sedimentLoad.InductiveValue()) {
-			validationErrors.AddMessage("SedimentLoad value out of bounds")
+	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
+	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
+		if !boundSedimentLoad.WithinBounds(sedimentProduction.InductiveValue()) {
+			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.InductiveValue()))
+			validationErrors.AddMessage(validationMessage)
 		}
 	}
 
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
 		if !boundImplementationCost.WithinBounds(implementationCost.InductiveValue()) {
-			validationErrors.AddMessage("ImplementationCost value out of bounds")
+			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.InductiveValue()))
+			validationErrors.AddMessage(validationMessage)
 		}
 	}
 

@@ -23,6 +23,8 @@ const (
 
 	AcceptanceProbability = "AcceptanceProbability"
 	ChangeAccepted        = "ChangeAccepted"
+	ChangeInvalid         = "ChangeInvalid"
+	ReasonChangeInvalid   = "ReasonChangeInvalid"
 )
 
 type Explorer interface {
