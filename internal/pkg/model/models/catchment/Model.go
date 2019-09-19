@@ -116,6 +116,7 @@ func (m *Model) randomlyInitialiseActions() {
 
 		if isValid {
 			validCombinationFound = true
+			m.note("Found at least one valid scenario for specified variable limits")
 		}
 
 		if validCombinationFound && !isValid {
@@ -279,7 +280,7 @@ func (m *Model) ChangeIsValid() (bool, *errors2.CompositeError) {
 	validationErrors := errors2.New("Validation Errors")
 
 	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
-	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
+	if boundSedimentLoad, isSedimentBound := sedimentProduction.(variable.Bounded); isSedimentBound {
 		if !boundSedimentLoad.WithinBounds(sedimentProduction.InductiveValue()) {
 			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.InductiveValue()))
 			validationErrors.AddMessage(validationMessage)
@@ -287,7 +288,7 @@ func (m *Model) ChangeIsValid() (bool, *errors2.CompositeError) {
 	}
 
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
-	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
+	if boundImplementationCost, isCostBound := implementationCost.(variable.Bounded); isCostBound {
 		if !boundImplementationCost.WithinBounds(implementationCost.InductiveValue()) {
 			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.InductiveValue()))
 			validationErrors.AddMessage(validationMessage)

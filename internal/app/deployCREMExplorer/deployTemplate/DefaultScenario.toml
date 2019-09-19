@@ -30,7 +30,7 @@ Type = "CatchmentModel"
 #MinimumImplementationCost = 0.00
 #MaximumImplementationCost = 1_000_000_000.00
 
-DataSourcePath = "input/Laidley_data_v1_4.xlsx"
+DataSourcePath = "input/Laidley_data_v1_5.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
