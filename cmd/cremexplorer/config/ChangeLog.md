@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.6 (20 September 2019):
+### New Features
+* Now deploys with Laidley_data_v1_5.xlxs (with fixes to hillslope RSLK calculations)
+
 ## Version 0.5 (16 September 2019):
 ### New Features
 * Adding Upper and Lower bound limits to CatchmentModel decision variables SedimentProduction & ImplementationCost.
