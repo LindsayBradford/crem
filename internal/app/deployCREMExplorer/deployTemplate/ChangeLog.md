@@ -1,10 +1,18 @@
 # Change Log
 
-## Version 0.4 (_TBD_):
+## Version 0.6 (20 September 2019):
 ### New Features
+* Now deploys with Laidley_data_v1_5.xlxs (with fixes to hillslope RSLK calculations)
+
+## Version 0.5 (16 September 2019):
+### New Features
+* Adding Upper and Lower bound limits to CatchmentModel decision variables SedimentProduction & ImplementationCost.
+* Now deploys with Laidley_data_v1_4.xlxs (with fixes to gully volumes)  
+
+## Version 0.4 (06 September 2019):
 ### Fixed
-* Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave. 
-* Fixed bug in Hillslope calculation of Vegetation cover 
+* Fixed dangling Excel Ole handler on panic over saving to open files, causing Excel to generally misbehave.
+* Fixed bug in Hillslope calculation of Vegetation cover  
 
 ## Version 0.3 (29 July 2019):
 ### New Features
