@@ -41,6 +41,10 @@ type ManagementAction interface {
 	// ObserveActionInitialising callbacks.
 	InitialisingActivation()
 
+	// InitialisingDeactivation deactivates an active management action, triggering Reporting method
+	// ObserveActionInitialising callbacks.
+	InitialisingDeactivation()
+
 	// ToggleActivation activates an inactive ManagementAction and vice-versa,
 	// triggering Reporting method ObserveAction callbacks.
 	ToggleActivation()

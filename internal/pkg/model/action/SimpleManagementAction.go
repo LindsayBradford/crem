@@ -55,6 +55,14 @@ func (sma *SimpleManagementAction) InitialisingActivation() {
 	sma.notifyInitialisingObservers()
 }
 
+func (sma *SimpleManagementAction) InitialisingDeactivation() {
+	if !sma.isActive {
+		panic(errors.New("InitialisingDeactivation should not be called on an inactive action"))
+	}
+	sma.ToggleActivationUnobserved()
+	sma.notifyInitialisingObservers()
+}
+
 func (sma *SimpleManagementAction) ToggleActivation() {
 	sma.ToggleActivationUnobserved()
 	sma.notifyObservers()

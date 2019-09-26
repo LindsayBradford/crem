@@ -114,13 +114,15 @@ func (m *Model) randomlyInitialiseActions() {
 		m.managementActions.RandomlyInitialiseAction(action)
 		isValid, _ := m.ChangeIsValid()
 
-		if isValid {
+		if !validCombinationFound && isValid {
 			validCombinationFound = true
 			m.note("Found at least one valid scenario for specified variable limits")
+			continue
 		}
 
 		if validCombinationFound && !isValid {
-			m.managementActions.ToggleLastActivationUnobserved()
+			m.note("Scenario would be invalid, reverting to last valid solution")
+			m.managementActions.DeactivateLastInitialisedAction()
 		}
 	}
 }

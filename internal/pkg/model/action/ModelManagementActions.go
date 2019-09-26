@@ -77,6 +77,10 @@ func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementActio
 	}
 }
 
+func (m *ModelManagementActions) DeactivateLastInitialisedAction() {
+	m.lastApplied.InitialisingDeactivation()
+}
+
 // ToggleLastActivation allows for the last recorded management action change to have its
 // activation state reverted, alerting any observers  of the change.
 func (m *ModelManagementActions) ToggleLastActivation() {
