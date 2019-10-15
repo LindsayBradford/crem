@@ -1,5 +1,3 @@
-// Copyright (c) 2018 Australian Rivers Institute.
-
 // +build windows
 // Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
 

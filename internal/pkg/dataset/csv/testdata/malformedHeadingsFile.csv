@@ -1,0 +1,4 @@
+NotATableName, NotAFilePath, ShouldNotEvenBeHere
+Table1, Table1.csv, NotAField
+Table2, Table2.csv, NotAField
+Table3, Table3.asc, NotAField
