@@ -155,18 +155,18 @@ func (ds *DataSet) loadCsvIntoTable(csvFilePath string) tables.CsvTable {
 }
 
 func toBaseType(value string) interface{} {
-	valueAsInt, intError := strconv.ParseInt(value, 10, 64)
-	if intError == nil {
-		return valueAsInt
-	}
-	valueAsUInt, uintError := strconv.ParseUint(value, 10, 64)
-	if uintError == nil {
-		return valueAsUInt
-	}
 	valueAsFloat, floatError := strconv.ParseFloat(value, 64)
 	if floatError == nil {
 		return valueAsFloat
 	}
+	// valueAsInt, intError := strconv.ParseInt(value, 10, 64)
+	// if intError == nil {
+	// 	return valueAsInt
+	// }
+	// valueAsUInt, uintError := strconv.ParseUint(value, 10, 64)
+	// if uintError == nil {
+	// 	return valueAsUInt
+	// }
 	valueAsBool, boolError := strconv.ParseBool(value)
 	if boolError == nil {
 		return valueAsBool
