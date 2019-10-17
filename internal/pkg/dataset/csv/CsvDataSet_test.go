@@ -78,7 +78,7 @@ func TestDataSet_Load_ValidDataSet(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	validDataSetPath := "testData/validDataSet.csv"
+	validDataSetPath := "testdata/validDataSet.csv"
 	dataSetUnderTest := NewDataSet("dataSetUnderTest")
 
 	// when
