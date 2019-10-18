@@ -5,10 +5,10 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"testing"
 
 	. "github.com/onsi/gomega"
 )
-import "testing"
 
 func TestCompositeError_add(t *testing.T) {
 	g := NewGomegaWithT(t)

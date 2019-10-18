@@ -7,14 +7,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
-	errors2 "github.com/LindsayBradford/crem/pkg/errors"
+	myErrors "github.com/LindsayBradford/crem/pkg/errors"
+	myStrings "github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/pkg/errors"
 )
+
+var caster *myStrings.BaseCaster
+
+func init() {
+	caster = new(myStrings.BaseCaster).WithNumbersAsFloats()
+}
 
 func NewDataSet(name string) *DataSet {
 	dataSet := new(DataSet)
@@ -27,12 +33,12 @@ var metaTableHeadings = [2]string{"TableName", "FilePath"}
 type DataSet struct {
 	dataset.DataSetImpl
 	filePath string
-	errors   *errors2.CompositeError
+	errors   *myErrors.CompositeError
 }
 
 func (ds *DataSet) Load(baseCsvFilePath string) error {
 	ds.filePath = baseCsvFilePath
-	ds.errors = errors2.New("Csv File Load Errors")
+	ds.errors = myErrors.New("Csv File Load Errors")
 	pathInfo, err := os.Stat(baseCsvFilePath)
 	if os.IsNotExist(err) {
 		newError := errors.Errorf("file specified [%s] does not exist", baseCsvFilePath)
@@ -155,23 +161,7 @@ func (ds *DataSet) loadCsvIntoTable(csvFilePath string) tables.CsvTable {
 }
 
 func toBaseType(value string) interface{} {
-	valueAsFloat, floatError := strconv.ParseFloat(value, 64)
-	if floatError == nil {
-		return valueAsFloat
-	}
-	// valueAsInt, intError := strconv.ParseInt(value, 10, 64)
-	// if intError == nil {
-	// 	return valueAsInt
-	// }
-	// valueAsUInt, uintError := strconv.ParseUint(value, 10, 64)
-	// if uintError == nil {
-	// 	return valueAsUInt
-	// }
-	valueAsBool, boolError := strconv.ParseBool(value)
-	if boolError == nil {
-		return valueAsBool
-	}
-	return value
+	return caster.Cast(value)
 }
 
 func loadCvsRecords(filePath string) ([][]string, error) {
