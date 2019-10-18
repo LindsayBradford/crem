@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/parameters"
+
 	. "github.com/onsi/gomega"
 )
 
@@ -31,15 +33,21 @@ func TestCoreModel_NewCoreModel(t *testing.T) {
 	g.Expect(len(*actualVariables)).To(BeNumerically(equalTo, expectedVariableNumber))
 }
 
-func TestCoreModel_Initialise(t *testing.T) {
+func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
+
+	localExpectedName := "InitialiseTest"
 
 	sourceDataSet := csv.NewDataSet("CatchmentModel")
 	loadError := sourceDataSet.Load("testdata/ValidModel.csv")
 
 	g.Expect(loadError).To(BeNil())
 
-	model := NewCoreModel().WithSourceDataSet(sourceDataSet)
+	model := NewCoreModel().
+		WithSourceDataSet(sourceDataSet).
+		WithName(localExpectedName)
+
+	g.Expect(model.Name()).To(Equal(localExpectedName))
 
 	model.Initialise()
 
@@ -52,4 +60,38 @@ func TestCoreModel_Initialise(t *testing.T) {
 	expectedVariableNumber := 3
 
 	g.Expect(len(*actualVariables)).To(BeNumerically(equalTo, expectedVariableNumber))
+}
+
+func TestCoreModel_Initialise_InvalidDataSet_Errors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	sourceDataSet := csv.NewDataSet("CatchmentModel")
+	loadError := sourceDataSet.Load("testdata/InvalidModel.csv")
+
+	g.Expect(loadError).To(BeNil())
+
+	newModelRunner := func() {
+		NewCoreModel().WithSourceDataSet(sourceDataSet).Initialise()
+	}
+
+	g.Expect(newModelRunner).To(Panic())
+}
+
+func TestCoreModel_WithDefaultParameters_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	sourceDataSet := csv.NewDataSet("CatchmentModel")
+	loadError := sourceDataSet.Load("testdata/ValidModel.csv")
+
+	g.Expect(loadError).To(BeNil())
+
+	parametersUnderTest := parameters.Map{}
+
+	modelUnderTest := NewCoreModel().
+		WithSourceDataSet(sourceDataSet).
+		WithParameters(parametersUnderTest)
+
+	parameterErrors := modelUnderTest.ParameterErrors()
+
+	g.Expect(parameterErrors).To(BeNil())
 }

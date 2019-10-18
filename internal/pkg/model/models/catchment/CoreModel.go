@@ -100,33 +100,6 @@ func (m *CoreModel) Initialise() {
 	m.buildSedimentVsCostDecisionVariable()
 }
 
-func (m *Model) fetchPlanningUnitTable() tables.CsvTable {
-	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
-	if tableError != nil {
-		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
-	}
-
-	csvPlanningUnitTable, ok := planningUnitTable.(tables.CsvTable)
-	if !ok {
-		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
-	}
-	return csvPlanningUnitTable
-}
-
-func (m *Model) fetchGulliesTable() tables.CsvTable {
-
-	gulliesTable, tableError := m.inputDataSet.Table(GulliesTableName)
-	if tableError != nil {
-		panic(errors.New("Expected data set supplied to have a [" + GulliesTableName + "] table"))
-	}
-
-	csvGulliesTable, ok := gulliesTable.(tables.CsvTable)
-	if !ok {
-		panic(errors.New("Expected data set table [" + GulliesTableName + "] to be a CSV type"))
-	}
-	return csvGulliesTable
-}
-
 func (m *CoreModel) randomlyInitialiseActions() {
 	validCombinationFound := false
 	for _, action := range m.managementActions.Actions() {
@@ -147,7 +120,6 @@ func (m *CoreModel) randomlyInitialiseActions() {
 }
 
 func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
-
 	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
 	if tableError != nil {
 		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
@@ -161,7 +133,6 @@ func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
 }
 
 func (m *CoreModel) fetchGulliesTable() tables.CsvTable {
-
 	gulliesTable, tableError := m.inputDataSet.Table(GulliesTableName)
 	if tableError != nil {
 		panic(errors.New("Expected data set supplied to have a [" + GulliesTableName + "] table"))
