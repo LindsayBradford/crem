@@ -51,15 +51,20 @@ const (
 // each action. Any action chosen for activation triggers its observers to react to its 'initialising' activation.
 func (m *ModelManagementActions) RandomlyInitialise() {
 	for _, action := range m.actions {
-		randomValue := m.RandomNumberGenerator().Intn(2)
-		switch randomValue {
-		case activate:
-			action.InitialisingActivation()
-		case ignore:
-			// Deliberately does nothing
-		default:
-			panic(errors.New("Random value outside range of [0,1]"))
-		}
+		m.RandomlyInitialiseAction(action)
+	}
+}
+
+func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementAction) {
+	randomValue := m.RandomNumberGenerator().Intn(2)
+	switch randomValue {
+	case activate:
+		m.lastApplied = action
+		action.InitialisingActivation()
+	case ignore:
+		// Deliberately does nothing
+	default:
+		panic(errors.New("Random value outside range of [0,1]"))
 	}
 }
 
