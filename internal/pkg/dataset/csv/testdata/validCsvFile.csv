@@ -1,0 +1,6 @@
+IntegerColumn,StringColumn,DecimalColumn,BooleanColumn
+1,enrty1,1.001,TRUE
+2,entry2,2.001,FALSE
+3,entry3,3.001,TRUE
+4,entry4,4.001,FALSE
+5,entry5,5.001,TRUE
