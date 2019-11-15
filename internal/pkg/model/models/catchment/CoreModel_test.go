@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 
 	. "github.com/onsi/gomega"
@@ -56,10 +57,12 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 
-	actualVariables := model.DecisionVariables()
-	expectedVariableNumber := 3
+	actualVariables := *model.DecisionVariables()
 
-	g.Expect(len(*actualVariables)).To(BeNumerically(equalTo, expectedVariableNumber))
+	g.Expect(actualVariables).To(HaveKey(variables.ImplementationCostVariableName))
+	g.Expect(actualVariables[variables.ImplementationCostVariableName].Value()).To(BeNumerically("==", 0))
+
+	g.Expect(actualVariables).To(HaveKey(variables.SedimentProductionVariableName))
 }
 
 func TestCoreModel_Initialise_InvalidDataSet_Errors(t *testing.T) {

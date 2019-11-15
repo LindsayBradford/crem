@@ -3,26 +3,24 @@
 package catchment
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/dataset"
-	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"math"
 	"os"
 	"path/filepath"
-	"strconv"
 
+	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
@@ -91,15 +89,11 @@ func (m *CoreModel) Initialise() {
 	m.planningUnitTable = m.fetchPlanningUnitTable()
 	m.gulliesTable = m.fetchGulliesTable()
 
-	m.buildCoreDecisionVariables()
+	m.buildDecisionVariables()
 	m.buildManagementActions()
-
-	m.randomlyInitialiseActions()
-
-	m.buildSedimentVsCostDecisionVariable()
 }
 
-func (m *CoreModel) randomlyInitialiseActions() {
+func (m *CoreModel) RandomlyInitialiseActions() {
 	for _, action := range m.managementActions.Actions() {
 		m.managementActions.RandomlyInitialiseAction(action)
 	}
@@ -133,7 +127,7 @@ func (m *CoreModel) fetchGulliesTable() tables.CsvTable {
 	return csvGulliesTable
 }
 
-func (m *CoreModel) buildCoreDecisionVariables() {
+func (m *CoreModel) buildDecisionVariables() {
 	sedimentLoad := new(variables.SedimentProduction).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
@@ -146,6 +140,7 @@ func (m *CoreModel) buildCoreDecisionVariables() {
 		sedimentLoad,
 		implementationCost,
 	)
+
 }
 
 func (m *CoreModel) buildManagementActions() {
@@ -198,35 +193,6 @@ func (m *CoreModel) PlanningUnits() planningunit.Ids {
 	}
 
 	return planningUnits
-}
-
-func (m *CoreModel) buildSedimentVsCostDecisionVariable() {
-	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
-	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
-
-	sedimentWeight := m.parameters.GetFloat64(parameters.SedimentProductionDecisionWeight)
-	implementationCostWeight := m.parameters.GetFloat64(parameters.ImplementationCostDecisionWeight)
-
-	sedimentVsCost, buildError := new(variables.SedimentVsCost).
-		Initialise().
-		WithObservers(m).
-		WithWeightedVariable(sedimentProduction, sedimentWeight).
-		WithWeightedVariable(implementationCost, implementationCostWeight).
-		Build()
-
-	if buildError != nil {
-		panic(buildError)
-	}
-
-	noteBuilder := new(strings.FluentBuilder).
-		Add(sedimentProduction.Name(), " weight = ", strconv.FormatFloat(sedimentWeight, 'f', 3, 64), ", ").
-		Add(implementationCost.Name(), " weight = ", strconv.FormatFloat(implementationCostWeight, 'f', 3, 64))
-
-	m.ObserveDecisionVariableWithNote(sedimentProduction, " Initial Value")
-	m.ObserveDecisionVariableWithNote(implementationCost, " Initial Value")
-	m.ObserveDecisionVariableWithNote(sedimentVsCost, noteBuilder.String())
-
-	m.ContainedDecisionVariables.Add(sedimentVsCost)
 }
 
 func (m *CoreModel) AcceptChange() {
