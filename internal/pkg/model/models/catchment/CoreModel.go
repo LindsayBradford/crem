@@ -4,8 +4,6 @@ package catchment
 
 import (
 	"math"
-	"os"
-	"path/filepath"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -100,28 +98,26 @@ func (m *CoreModel) RandomlyInitialiseActions() {
 }
 
 func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
-
 	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
 	if tableError != nil {
 		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
 	}
 
-	csvPlanningUnitTable, ok := planningUnitTable.(tables.CsvTable)
-	if !ok {
+	csvPlanningUnitTable, tableIsCsvType := planningUnitTable.(tables.CsvTable)
+	if !tableIsCsvType {
 		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
 	}
 	return csvPlanningUnitTable
 }
 
 func (m *CoreModel) fetchGulliesTable() tables.CsvTable {
-
 	gulliesTable, tableError := m.inputDataSet.Table(GulliesTableName)
 	if tableError != nil {
 		panic(errors.New("Expected data set supplied to have a [" + GulliesTableName + "] table"))
 	}
 
-	csvGulliesTable, ok := gulliesTable.(tables.CsvTable)
-	if !ok {
+	csvGulliesTable, tableIsCsvType := gulliesTable.(tables.CsvTable)
+	if !tableIsCsvType {
 		panic(errors.New("Expected data set table [" + GulliesTableName + "] to be a CSV type"))
 	}
 	return csvGulliesTable
@@ -140,7 +136,6 @@ func (m *CoreModel) buildDecisionVariables() {
 		sedimentLoad,
 		implementationCost,
 	)
-
 }
 
 func (m *CoreModel) buildManagementActions() {
@@ -204,12 +199,6 @@ func (m *CoreModel) RevertChange() {
 	m.note("Reverting Change")
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
-}
-
-func (m *CoreModel) deriveDataSourcePath() string {
-	relativeFilePath := m.parameters.GetString(parameters.DataSourcePath)
-	workingDirectory, _ := os.Getwd()
-	return filepath.Join(workingDirectory, relativeFilePath)
 }
 
 func (m *CoreModel) TearDown() {
