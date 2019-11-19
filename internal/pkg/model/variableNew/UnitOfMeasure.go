@@ -1,6 +1,8 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variable
+// Copyright (c) 2019 Australian Rivers Institute.
+
+package variableNew
 
 type UnitOfMeasure string
 

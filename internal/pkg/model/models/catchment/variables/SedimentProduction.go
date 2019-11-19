@@ -6,6 +6,7 @@ import (
 	math2 "math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -19,7 +20,7 @@ import (
 
 const SedimentProductionVariableName = "SedimentProduction"
 
-var _ variable.DecisionVariable = new(SedimentProduction)
+var _ variableNew.DecisionVariable = new(SedimentProduction)
 
 const planningUnitIndex = 0
 
@@ -45,7 +46,7 @@ type SedimentProduction struct {
 
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
 	sl.SetName(SedimentProductionVariableName)
-	sl.SetUnitOfMeasure(variable.TonnesPerYear)
+	sl.SetUnitOfMeasure(variableNew.TonnesPerYear)
 	sl.SetPrecision(3)
 
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
@@ -58,7 +59,7 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 	return sl
 }
 
-func (sl *SedimentProduction) WithObservers(observers ...variable.Observer) *SedimentProduction {
+func (sl *SedimentProduction) WithObservers(observers ...variableNew.Observer) *SedimentProduction {
 	sl.Subscribe(observers...)
 	return sl
 }
@@ -323,7 +324,7 @@ func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSediment float64, toB
 	sl.sedimentPerPlanningUnit[planningUnit] = math2.Max(0, newPlanningUnitSediment)
 }
 
-func (sl *SedimentProduction) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
+func (sl *SedimentProduction) ValuesPerPlanningUnit() variableNew.PlanningUnitValueMap {
 	return sl.sedimentPerPlanningUnit
 }
 

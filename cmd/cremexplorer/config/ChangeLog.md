@@ -1,6 +1,10 @@
 # Change Log
 
-## Version 0.6 (_TBD_):
+## Version 0.7 (_TBD_):
+### New Features
+* Simplified approach to accepting/rejecting decision variable changes in annealing,
+
+## Version 0.6 (15 November 2019):
 ### New Features
 * Now deploys with Laidley_data_v1_5.xlxs (with fixes to hillslope RSLK calculations)
 ### Fixed

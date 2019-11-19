@@ -17,5 +17,5 @@ func (dv *DecisionVariables) Initialise() *DecisionVariables {
 }
 
 func (dv *DecisionVariables) buildDecisionVariables() {
-	dv.NewForName(variable.ObjectiveValue)
+	dv.NewForName("ObjectiveValue")
 }

@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variable
+package variableNew
 
 type Observer interface {
 	ObserveDecisionVariable(variable DecisionVariable)

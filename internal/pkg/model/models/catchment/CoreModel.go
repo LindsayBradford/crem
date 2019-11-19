@@ -14,6 +14,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -241,7 +242,7 @@ func (m *CoreModel) note(text string) {
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
-func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) {
+func (m *CoreModel) ObserveDecisionVariable(variable variableNew.DecisionVariable) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
@@ -249,7 +250,7 @@ func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) 
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
-func (m *CoreModel) ObserveDecisionVariableWithNote(variable variable.DecisionVariable, note string) {
+func (m *CoreModel) ObserveDecisionVariableWithNote(variable variableNew.DecisionVariable, note string) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).

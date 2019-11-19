@@ -7,6 +7,7 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -22,9 +23,9 @@ type CompositeInductiveDecisionVariable struct {
 	variableScales    map[InductiveDecisionVariable]float64
 	scaleVectorLength float64
 
-	ContainedDecisionVariableObservers
-	ContainedUnitOfMeasure
-	ContainedPrecision
+	variableNew.ContainedDecisionVariableObservers
+	variableNew.ContainedUnitOfMeasure
+	variableNew.ContainedPrecision
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {
@@ -155,5 +156,5 @@ func (v *CompositeInductiveDecisionVariable) ObserveActionInitialising(action ac
 }
 
 func (v *CompositeInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MakeEncodeable(v))
+	return json.Marshal(variableNew.MakeEncodeable(v))
 }

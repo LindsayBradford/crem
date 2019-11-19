@@ -5,7 +5,7 @@ package model
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -57,9 +57,9 @@ func (c *ContainedModel) SetModel(model Model) {
 }
 
 type DecisionVariableContainer interface {
-	DecisionVariables() *variable.DecisionVariableMap
+	DecisionVariables() *variableNew.DecisionVariableMap
 
-	DecisionVariable(name string) variable.DecisionVariable
+	DecisionVariable(name string) variableNew.DecisionVariable
 	OffersDecisionVariable(name string) bool
 	DecisionVariableChange(decisionVariableName string) float64
 }
@@ -91,9 +91,9 @@ func (nm *nullModel) TryRandomChange() {}
 func (nm *nullModel) AcceptChange()    {}
 func (nm *nullModel) RevertChange()    {}
 
-func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
-func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
-	newVariable := variable.NewSimpleDecisionVariable(name)
+func (nm *nullModel) DecisionVariables() *variableNew.DecisionVariableMap { return nil }
+func (nm *nullModel) DecisionVariable(name string) variableNew.DecisionVariable {
+	newVariable := variableNew.NewSimpleDecisionVariable(name)
 	return &newVariable
 }
 

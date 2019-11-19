@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/pkg/errors"
 )
 
@@ -19,7 +20,7 @@ type DumbObjective struct {
 }
 
 func (do *DumbObjective) Initialise() *DumbObjective {
-	do.SetUnitOfMeasure(variable.NotApplicable)
+	do.SetUnitOfMeasure(variableNew.NotApplicable)
 	do.SetPrecision(2)
 	do.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
 	return do
@@ -35,7 +36,7 @@ func (do *DumbObjective) WithStartingValue(value float64) *DumbObjective {
 	return do
 }
 
-func (do *DumbObjective) WithObservers(observers ...variable.Observer) *DumbObjective {
+func (do *DumbObjective) WithObservers(observers ...variableNew.Observer) *DumbObjective {
 	do.Subscribe(observers...)
 	return do
 }

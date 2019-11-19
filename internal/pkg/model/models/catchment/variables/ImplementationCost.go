@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/pkg/errors"
 )
 
@@ -25,12 +26,12 @@ type ImplementationCost struct {
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
-	ic.SetUnitOfMeasure(variable.Dollars)
+	ic.SetUnitOfMeasure(variableNew.Dollars)
 	ic.SetPrecision(2)
 	return ic
 }
 
-func (ic *ImplementationCost) WithObservers(observers ...variable.Observer) *ImplementationCost {
+func (ic *ImplementationCost) WithObservers(observers ...variableNew.Observer) *ImplementationCost {
 	ic.Subscribe(observers...)
 	return ic
 }
@@ -177,7 +178,7 @@ func (ic *ImplementationCost) acceptPlanningUnitChange(asIsCost float64, toBeCos
 	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsCost + toBeCost
 }
 
-func (ic *ImplementationCost) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
+func (ic *ImplementationCost) ValuesPerPlanningUnit() variableNew.PlanningUnitValueMap {
 	return ic.valuePerPlanningUnit
 }
 

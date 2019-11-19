@@ -4,9 +4,9 @@ package kirkpatrick
 
 import (
 	"fmt"
+
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	. "github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 	"github.com/pkg/errors"
 )
@@ -52,7 +52,7 @@ func ParameterSpecifications() *Specifications {
 		Specification{
 			Key:          DecisionVariableName,
 			Validator:    IsString,
-			DefaultValue: variable.ObjectiveValue,
+			DefaultValue: ObjectiveValue,
 		},
 	).Add(
 		Specification{

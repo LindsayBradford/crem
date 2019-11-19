@@ -1,13 +1,15 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variable
+// Copyright (c) 2019 Australian Rivers Institute.
+
+package variableNew
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"sort"
 
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )

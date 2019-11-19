@@ -5,6 +5,7 @@ package variables
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 )
 
 const SedimentVsCostName = "SedimentVsCost"
@@ -17,13 +18,13 @@ type SedimentVsCost struct {
 
 func (sc *SedimentVsCost) Initialise() *SedimentVsCost {
 	sc.SetName(SedimentVsCostName)
-	sc.SetUnitOfMeasure(variable.NotApplicable)
+	sc.SetUnitOfMeasure(variableNew.NotApplicable)
 	sc.SetPrecision(6)
 	sc.CompositeInductiveDecisionVariable.Initialise()
 	return sc
 }
 
-func (sc *SedimentVsCost) WithObservers(observers ...variable.Observer) *SedimentVsCost {
+func (sc *SedimentVsCost) WithObservers(observers ...variableNew.Observer) *SedimentVsCost {
 	sc.Subscribe(observers...)
 	return sc
 }

@@ -2,14 +2,17 @@
 
 package variable
 
-import "github.com/LindsayBradford/crem/internal/pkg/model/action"
+import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+)
 
 // InductiveDecisionVariable is a DecisionVariable that allows an 'inductive' Value to be temporarily stored
 // and retrieved for the decision variable (typically based based on some management action change).
 // The induced Value does not become the actual Value for the decision variable without being explicitly accepted.
 // The induced Value can also be rejected, which sees it revert to the actual Value of the variable.
 type InductiveDecisionVariable interface {
-	DecisionVariable
+	variableNew.DecisionVariable
 
 	// InductiveValue returns an "inductive" Value for the variable.  This Value cannot become the
 	// actual (induced) Value for the variable without a call to AcceptInductiveValue.

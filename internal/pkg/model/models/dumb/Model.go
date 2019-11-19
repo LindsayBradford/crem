@@ -3,8 +3,9 @@
 package dumb
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"math"
+
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -32,10 +33,10 @@ func NewModel() *Model {
 	newModel.parameters.Initialise()
 
 	newModel.ContainedDecisionVariables.Initialise()
-	newModel.ContainedDecisionVariables.NewForName(variable.ObjectiveValue)
+	newModel.ContainedDecisionVariables.NewForName("ObjectiveValue")
 
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
-	newModel.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)
+	newModel.ContainedDecisionVariables.SetValue("ObjectiveValue", initialValue)
 
 	return newModel
 }
@@ -55,7 +56,7 @@ func (dm *Model) SetParameters(params parameters.Map) error {
 	dm.parameters.AssignAllUserValues(params)
 
 	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
-	dm.ContainedDecisionVariables.SetValue(variable.ObjectiveValue, initialValue)
+	dm.ContainedDecisionVariables.SetValue("ObjectiveValue", initialValue)
 
 	return dm.ParameterErrors()
 }
@@ -115,11 +116,11 @@ func (dm *Model) capChangeOverRange(value float64) float64 {
 }
 
 func (dm *Model) objectiveValue() float64 {
-	return dm.ContainedDecisionVariables.Value(variable.ObjectiveValue)
+	return dm.ContainedDecisionVariables.Value("ObjectiveValue")
 }
 
 func (dm *Model) setObjectiveValue(value float64) {
-	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).SetInductiveValue(value)
+	dm.ContainedDecisionVariables.Variable("ObjectiveValue").SetInductiveValue(value)
 }
 
 func (dm *Model) SetDecisionVariable(name string, value float64) {
@@ -127,11 +128,11 @@ func (dm *Model) SetDecisionVariable(name string, value float64) {
 }
 
 func (dm *Model) AcceptChange() {
-	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).AcceptInductiveValue()
+	dm.ContainedDecisionVariables.Variable("ObjectiveValue").AcceptInductiveValue()
 }
 
 func (dm *Model) RevertChange() {
-	dm.ContainedDecisionVariables.Variable(variable.ObjectiveValue).RejectInductiveValue()
+	dm.ContainedDecisionVariables.Variable("ObjectiveValue").RejectInductiveValue()
 }
 
 func (dm *Model) ManagementActions() []action.ManagementAction        { return nil }

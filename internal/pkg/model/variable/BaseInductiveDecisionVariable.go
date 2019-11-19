@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -20,15 +21,13 @@ type BaseInductiveDecisionVariable struct {
 	actualValue    float64
 	inductiveValue float64
 
-	unitOfMeasure UnitOfMeasure
-
-	ContainedDecisionVariableObservers
-	ContainedUnitOfMeasure
-	ContainedPrecision
+	variableNew.ContainedDecisionVariableObservers
+	variableNew.ContainedUnitOfMeasure
+	variableNew.ContainedPrecision
 }
 
 func (v *BaseInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
-	return json.Marshal(MakeEncodeable(v))
+	return json.Marshal(variableNew.MakeEncodeable(v))
 }
 
 func (v *BaseInductiveDecisionVariable) Value() float64 {
@@ -71,7 +70,7 @@ func (v *BaseInductiveDecisionVariable) RejectInductiveValue() {
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change
 // to any observers watching for state changes to the variable.
 func (v *BaseInductiveDecisionVariable) NotifyObservers() {
-	for _, observer := range v.observers {
+	for _, observer := range v.Observers() {
 		observer.ObserveDecisionVariable(v)
 	}
 }

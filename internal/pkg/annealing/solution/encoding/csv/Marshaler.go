@@ -4,10 +4,11 @@ package csv
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+
 	strings2 "strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/strings"
 )
 
@@ -74,7 +75,7 @@ func planningUnitsAsHeaders(planningUnits planningunit.Ids) []string {
 	return headers
 }
 
-func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) string {
+func joinAttributes(variable variableNew.EncodeableDecisionVariable, planningUnits planningunit.Ids) string {
 	planningUnitValues := planningUnitValueList(variable, planningUnits)
 
 	baseVariableValues := join(
@@ -88,15 +89,15 @@ func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits 
 	return join(baseVariableValues, joinedPlanningUnitValues)
 }
 
-func formatVariable(variableToFormat variable.EncodeableDecisionVariable) string {
+func formatVariable(variableToFormat variableNew.EncodeableDecisionVariable) string {
 	return formatVariableValue(variableToFormat, variableToFormat.Value)
 }
 
-func formatVariableValue(variableToFormat variable.EncodeableDecisionVariable, valueToFormat float64) string {
+func formatVariableValue(variableToFormat variableNew.EncodeableDecisionVariable, valueToFormat float64) string {
 	var outputVariable string
 
 	switch variableToFormat.Measure {
-	case variable.Dollars:
+	case variableNew.Dollars:
 		outputVariable = currencyConverter.Convert(valueToFormat)
 	default:
 		outputVariable = defaultConverter.Convert(valueToFormat)
@@ -105,7 +106,7 @@ func formatVariableValue(variableToFormat variable.EncodeableDecisionVariable, v
 	return outputVariable
 }
 
-func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) []string {
+func planningUnitValueList(variable variableNew.EncodeableDecisionVariable, planningUnits planningunit.Ids) []string {
 	headers := make([]string, len(planningUnits))
 
 	if variable.ValuePerPlanningUnit != nil {

@@ -4,6 +4,7 @@ package modumb
 
 import (
 	"fmt"
+
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/actions"
@@ -11,6 +12,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -193,7 +195,7 @@ func (m *Model) note(text string) {
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 
-func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
+func (m *Model) ObserveDecisionVariable(variable variableNew.DecisionVariable) {
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
