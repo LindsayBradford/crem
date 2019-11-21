@@ -29,61 +29,6 @@ func TestBaseCommand_DoUndo_NoPanic(t *testing.T) {
 	g.Expect(undoRunner).ToNot(Panic())
 }
 
-type Counter struct {
-	value int
-}
-
-const (
-	increment = "increment"
-	decrement = "decrement"
-)
-
-type DummyCommand struct {
-	BaseCommand
-}
-
-func (dc *DummyCommand) WithTarget(target interface{}) *DummyCommand {
-	dc.target = target
-	return dc
-}
-
-func (dc *DummyCommand) WithAttribute(name string, value interface{}) *DummyCommand {
-	dc.ContainedAttributes.AddAttribute(name, value)
-	return dc
-}
-
-func (dc *DummyCommand) counter() *Counter {
-	return dc.target.(*Counter)
-}
-
-func (dc *DummyCommand) incrementValue() int {
-	if dc.HasAttribute(increment) {
-		if increment, isInteger := dc.Attribute(increment).(int); isInteger {
-			return increment
-		}
-	}
-	return 0
-}
-
-func (dc *DummyCommand) decrementValue() int {
-	if dc.HasAttribute(decrement) {
-		if decrement, isInteger := dc.Attribute(decrement).(int); isInteger {
-			return decrement
-		}
-	}
-	return 0
-}
-
-func (dc *DummyCommand) Do() {
-	dc.counter().value += dc.incrementValue()
-	dc.counter().value -= dc.decrementValue()
-}
-
-func (dc *DummyCommand) Undo() {
-	dc.counter().value -= dc.incrementValue()
-	dc.counter().value += dc.decrementValue()
-}
-
 func TestDummyCommand_DoUndo_CounterCorrect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
@@ -94,7 +39,7 @@ func TestDummyCommand_DoUndo_CounterCorrect(t *testing.T) {
 	const expectedValue = 4
 	const offset = 2
 
-	commandUnderTest := new(DummyCommand).
+	commandUnderTest := new(dummyCommand).
 		WithTarget(counterUnderTest).
 		WithAttribute(increment, expectedValue+offset).
 		WithAttribute(decrement, offset)
@@ -112,7 +57,7 @@ func TestMultipleDummyCommandSequence_CounterCorrect(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	const loopSize = 5
-	commandSequence := make([]*DummyCommand, loopSize)
+	commandSequence := make([]*dummyCommand, loopSize)
 
 	counterUnderTest := new(Counter)
 	const expectedInitialValue = 0
@@ -120,7 +65,7 @@ func TestMultipleDummyCommandSequence_CounterCorrect(t *testing.T) {
 
 	var buildIndex = 0
 	for range commandSequence {
-		commandSequence[buildIndex] = new(DummyCommand).
+		commandSequence[buildIndex] = new(dummyCommand).
 			WithTarget(counterUnderTest).
 			WithAttribute(increment, buildIndex+1).
 			WithAttribute(decrement, buildIndex)
