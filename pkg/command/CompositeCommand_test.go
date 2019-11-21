@@ -42,7 +42,7 @@ func TestCompositeCommand_DoUndo_CounterCorrect(t *testing.T) {
 	const value2 = 5
 	command2 := new(dummyCommand).
 		WithTarget(counterUnderTest).
-		WithAttribute(increment, value2)
+		WithAttribute(decrement, value2)
 
 	const value3 = 8
 	command3 := new(dummyCommand).
@@ -51,7 +51,7 @@ func TestCompositeCommand_DoUndo_CounterCorrect(t *testing.T) {
 
 	commandUnderTest := NewCompositeCommand().ComposedOf(command1, command2, command3)
 
-	const expectedValue = expectedInitialValue + value1 + value2 + value3
+	const expectedValue = expectedInitialValue + value1 - value2 + value3
 
 	commandUnderTest.Do()
 	g.Expect(counterUnderTest.value).To(BeNumerically(equalTo, expectedValue))

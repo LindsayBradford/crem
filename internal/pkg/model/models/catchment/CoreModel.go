@@ -125,40 +125,51 @@ func (m *CoreModel) fetchGulliesTable() tables.CsvTable {
 }
 
 func (m *CoreModel) buildDecisionVariables() {
-	sedimentLoad := new(variables.SedimentProduction).
+	sedimentProduction := new(variables.SedimentProduction). // TODO: retire this when sedimentProduction2 finalised.
+									Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
+									WithObservers(m)
+
+	sedimentProduction2 := new(variables.SedimentProduction2).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
-	implementationCost := new(variables.ImplementationCost).
+	implementationCost := new(variables.ImplementationCost). // TODO: retire this when implementationCost2 finalised.
+									Initialise(m.planningUnitTable, m.parameters).
+									WithObservers(m)
+
+	implementationCost2 := new(variables.ImplementationCost2).
 		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
 	m.ContainedDecisionVariables.Add(
-		sedimentLoad,
-		implementationCost,
+		sedimentProduction, sedimentProduction2,
+		implementationCost, implementationCost2,
 	)
 }
 
 func (m *CoreModel) buildManagementActions() {
-	sedimentLoad := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
+	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
+	sedimentProduction2 := m.ContainedDecisionVariables.Variable(variables.SedimentProduction2VariableName)
+
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
+	implementationCost2 := m.ContainedDecisionVariables.Variable(variables.ImplementationCost2VariableName)
 
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range riverBankRestorations.ManagementActions() {
 		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentLoad, implementationCost)
+		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
 	}
 
 	gullyRestorations := new(actions.GullyRestorationGroup).Initialise(m.gulliesTable, m.parameters)
 	for _, action := range gullyRestorations.ManagementActions() {
 		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentLoad, implementationCost)
+		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
 	}
 
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
 	for _, action := range hillSlopeRestorations.ManagementActions() {
 		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentLoad, implementationCost)
+		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
 	}
 }
 
