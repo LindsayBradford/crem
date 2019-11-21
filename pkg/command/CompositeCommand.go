@@ -18,9 +18,7 @@ func (c *CompositeCommand) ComposedOf(commands ...Command) *CompositeCommand {
 }
 
 func (c *CompositeCommand) Add(commands ...Command) {
-	for _, command := range commands {
-		c.composedCommands = append(c.composedCommands, command)
-	}
+	c.composedCommands = append(c.composedCommands, commands...)
 }
 
 func (c *CompositeCommand) Do() {
