@@ -9,16 +9,16 @@ CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
-#Model = "StandardOutput"
+Model = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"
 [Annealer.Parameters]
-DecisionVariable = "SedimentVsCost"
+DecisionVariable = "SedimentProduction"
 OptimisationDirection = "Minimising"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
-MaximumIterations = 2_000
+MaximumIterations = 5
 
 [Model]
 Type = "CatchmentModel"

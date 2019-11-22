@@ -9,7 +9,7 @@ Annealer = "StandardOutput"
 [Annealer]
 Type="Kirkpatrick"
 [Annealer.Parameters]
-DecisionVariable = "SedimentVsCost"
+DecisionVariable = "SedimentProduction"
 OptimisationDirection = "Minimising"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
