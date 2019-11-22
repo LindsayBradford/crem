@@ -5,6 +5,7 @@ package catchment
 import (
 	"testing"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
@@ -97,4 +98,32 @@ func TestCoreModel_WithDefaultParameters_NoErrors(t *testing.T) {
 	parameterErrors := modelUnderTest.ParameterErrors()
 
 	g.Expect(parameterErrors).To(BeNil())
+}
+
+func TestCoreModel_Testing_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	sourceDataSet := csv.NewDataSet("CatchmentModel")
+	loadError := sourceDataSet.Load("testdata/TestingModel.csv")
+
+	g.Expect(loadError).To(BeNil())
+
+	parametersUnderTest := parameters.Map{}
+
+	modelUnderTest := NewCoreModel().
+		WithSourceDataSet(sourceDataSet).
+		WithParameters(parametersUnderTest)
+
+	parameterErrors := modelUnderTest.ParameterErrors()
+	g.Expect(parameterErrors).To(BeNil())
+
+	modelUnderTest.Initialise()
+
+	solution := new(annealers.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest).
+		Build()
+
+	g.Expect(solution).To(Not(BeNil()))
+
 }
