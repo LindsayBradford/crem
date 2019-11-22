@@ -58,6 +58,7 @@ type CoreModel struct {
 
 	oleFunctionWrapper threading.MainThreadFunctionWrapper
 	inputDataSet       dataset.DataSet
+	initialising       bool
 }
 
 func (m *CoreModel) WithName(name string) *CoreModel {
@@ -93,9 +94,13 @@ func (m *CoreModel) Initialise() {
 }
 
 func (m *CoreModel) RandomlyInitialiseActions() {
+	m.note("Started Randomly Initialising Actions")
+	m.initialising = true
 	for _, action := range m.managementActions.Actions() {
 		m.managementActions.RandomlyInitialiseAction(action)
 	}
+	m.initialising = false
+	m.note("Finished Randomly Initialising Actions")
 }
 
 func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
@@ -203,6 +208,9 @@ func (m *CoreModel) PlanningUnits() planningunit.Ids {
 }
 
 func (m *CoreModel) AcceptChange() {
+	if m.initialising {
+		return
+	}
 	m.note("Accepting Change")
 	m.ContainedDecisionVariables.AcceptAll()
 }
@@ -241,6 +249,9 @@ func (m *CoreModel) ObserveActionInitialising(action action.ManagementAction) {
 }
 
 func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) {
+	if m.initialising {
+		return
+	}
 	event := observer.NewEvent(observer.ManagementAction).
 		WithId(m.Id()).
 		WithAttribute("Type", action.Type()).
@@ -254,6 +265,9 @@ func (m *CoreModel) note(text string) {
 }
 
 func (m *CoreModel) ObserveDecisionVariable(variable variableNew.DecisionVariable) {
+	if m.initialising {
+		return
+	}
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
@@ -262,6 +276,9 @@ func (m *CoreModel) ObserveDecisionVariable(variable variableNew.DecisionVariabl
 }
 
 func (m *CoreModel) ObserveDecisionVariableWithNote(variable variableNew.DecisionVariable, note string) {
+	if m.initialising {
+		return
+	}
 	event := observer.NewEvent(observer.DecisionVariable).
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
