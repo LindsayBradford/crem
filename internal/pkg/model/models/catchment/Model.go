@@ -52,6 +52,16 @@ func (m *Model) Initialise() {
 	m.RandomlyInitialiseActions()
 }
 
+func (m *Model) RandomlyInitialiseActions() {
+	m.note("Started Randomly Initialising Actions")
+	m.initialising = true
+	for _, action := range m.managementActions.Actions() {
+		m.managementActions.RandomlyInitialiseAction(action)
+	}
+	m.initialising = false
+	m.note("Finished Randomly Initialising Actions")
+}
+
 func (m *Model) loadSourceDataSet() {
 	m.sourceDataSet = *excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
 	dataSourcePath := m.deriveDataSourcePath()

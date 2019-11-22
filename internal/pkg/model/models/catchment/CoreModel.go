@@ -93,16 +93,6 @@ func (m *CoreModel) Initialise() {
 	m.buildManagementActions()
 }
 
-func (m *CoreModel) RandomlyInitialiseActions() {
-	m.note("Started Randomly Initialising Actions")
-	m.initialising = true
-	for _, action := range m.managementActions.Actions() {
-		m.managementActions.RandomlyInitialiseAction(action)
-	}
-	m.initialising = false
-	m.note("Finished Randomly Initialising Actions")
-}
-
 func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
 	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
 	if tableError != nil {
