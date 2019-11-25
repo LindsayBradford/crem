@@ -16,20 +16,22 @@ type GullyRestorationGroup struct {
 	actionMap map[planningunit.Id]*GullyRestoration
 }
 
-func (g *GullyRestorationGroup) Initialise(gullyTable tables.CsvTable, parameters parameters.Parameters) *GullyRestorationGroup {
-	g.sedimentContribution = new(GullySedimentContribution)
-	g.sedimentContribution.Initialise(gullyTable, parameters)
+func (g *GullyRestorationGroup) WithParameters(parameters parameters.Parameters) *GullyRestorationGroup {
 	g.parameters = parameters
-	g.createManagementActions()
+	return g
+}
 
+func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *GullyRestorationGroup {
+	g.sedimentContribution = new(GullySedimentContribution)
+	g.sedimentContribution.Initialise(gullyTable, g.parameters)
 	return g
 }
 
 func (g *GullyRestorationGroup) ManagementActions() []action.ManagementAction {
+	g.createManagementActions()
 	actions := make([]action.ManagementAction, 0)
 	for _, value := range g.actionMap {
 		actions = append(actions, value)
-
 	}
 	return actions
 }

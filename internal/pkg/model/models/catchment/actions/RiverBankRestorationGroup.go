@@ -16,19 +16,21 @@ type RiverBankRestorationGroup struct {
 	actionMap map[planningunit.Id]*RiverBankRestoration
 }
 
-func (r *RiverBankRestorationGroup) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *RiverBankRestorationGroup {
+func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *RiverBankRestorationGroup {
 	r.planningUnitTable = planningUnitTable
-	r.parameters = parameters
-	r.createManagementActions()
+	return r
+}
 
+func (r *RiverBankRestorationGroup) WithParameters(parameters parameters.Parameters) *RiverBankRestorationGroup {
+	r.parameters = parameters
 	return r
 }
 
 func (r *RiverBankRestorationGroup) ManagementActions() []action.ManagementAction {
+	r.createManagementActions()
 	actions := make([]action.ManagementAction, 0)
 	for _, value := range r.actionMap {
 		actions = append(actions, value)
-
 	}
 	return actions
 }

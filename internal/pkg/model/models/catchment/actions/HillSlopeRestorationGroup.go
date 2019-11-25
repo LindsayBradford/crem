@@ -16,19 +16,21 @@ type HillSlopeRestorationGroup struct {
 	actionMap map[planningunit.Id]*HillSlopeRestoration
 }
 
-func (h *HillSlopeRestorationGroup) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *HillSlopeRestorationGroup {
-	h.planningUnitTable = planningUnitTable
+func (h *HillSlopeRestorationGroup) WithParameters(parameters parameters.Parameters) *HillSlopeRestorationGroup {
 	h.parameters = parameters
-	h.createManagementActions()
+	return h
+}
 
+func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *HillSlopeRestorationGroup {
+	h.planningUnitTable = planningUnitTable
 	return h
 }
 
 func (h *HillSlopeRestorationGroup) ManagementActions() []action.ManagementAction {
+	h.createManagementActions()
 	actions := make([]action.ManagementAction, 0)
 	for _, value := range h.actionMap {
 		actions = append(actions, value)
-
 	}
 	return actions
 }

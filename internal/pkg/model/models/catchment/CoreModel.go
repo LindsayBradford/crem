@@ -133,17 +133,20 @@ func (m *CoreModel) buildManagementActions() {
 	modelActions := make([]action.ManagementAction, 0)
 
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).
-		Initialise(m.planningUnitTable, m.parameters).
+		WithPlanningUnitTable(m.planningUnitTable).
+		WithParameters(m.parameters).
 		ManagementActions()
 	modelActions = append(modelActions, riverBankRestorations...)
 
 	gullyRestorations := new(actions.GullyRestorationGroup).
-		Initialise(m.gulliesTable, m.parameters).
+		WithParameters(m.parameters).
+		WithGullyTable(m.gulliesTable).
 		ManagementActions()
 	modelActions = append(modelActions, gullyRestorations...)
 
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
-		Initialise(m.planningUnitTable, m.parameters).
+		WithPlanningUnitTable(m.planningUnitTable).
+		WithParameters(m.parameters).
 		ManagementActions()
 	modelActions = append(modelActions, hillSlopeRestorations...)
 
