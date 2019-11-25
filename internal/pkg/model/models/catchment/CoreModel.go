@@ -20,7 +20,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
-	"github.com/LindsayBradford/crem/pkg/threading"
 	"github.com/pkg/errors"
 )
 
@@ -56,9 +55,8 @@ type CoreModel struct {
 
 	variable.ContainedDecisionVariables
 
-	oleFunctionWrapper threading.MainThreadFunctionWrapper
-	inputDataSet       dataset.DataSet
-	initialising       bool
+	inputDataSet dataset.DataSet
+	initialising bool
 }
 
 func (m *CoreModel) WithName(name string) *CoreModel {
