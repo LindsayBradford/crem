@@ -4,6 +4,7 @@ package actions
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
@@ -23,8 +24,13 @@ func (r *RiverBankRestorationGroup) Initialise(planningUnitTable tables.CsvTable
 	return r
 }
 
-func (r *RiverBankRestorationGroup) ManagementActions() map[planningunit.Id]*RiverBankRestoration {
-	return r.actionMap
+func (r *RiverBankRestorationGroup) ManagementActions() []action.ManagementAction {
+	actions := make([]action.ManagementAction, 0)
+	for _, value := range r.actionMap {
+		actions = append(actions, value)
+
+	}
+	return actions
 }
 
 func (r *RiverBankRestorationGroup) createManagementActions() {

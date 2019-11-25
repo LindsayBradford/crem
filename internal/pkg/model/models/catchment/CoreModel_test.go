@@ -6,15 +6,21 @@ import (
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 
 	. "github.com/onsi/gomega"
 )
 
 const expectedName = "CatchmentModel"
+
 const equalTo = "=="
+const approx = "~"
+
+const desiredPrecision = 1e-3
 
 func TestCoreModel_NewCoreModel(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -61,7 +67,7 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 	actualVariables := *model.DecisionVariables()
 
 	g.Expect(actualVariables).To(HaveKey(variables.ImplementationCostVariableName))
-	g.Expect(actualVariables[variables.ImplementationCostVariableName].Value()).To(BeNumerically("==", 0))
+	g.Expect(actualVariables[variables.ImplementationCostVariableName].Value()).To(BeNumerically(equalTo, 0))
 
 	g.Expect(actualVariables).To(HaveKey(variables.SedimentProductionVariableName))
 }
@@ -126,4 +132,26 @@ func TestCoreModel_Testing_NoErrors(t *testing.T) {
 
 	g.Expect(solution).To(Not(BeNil()))
 
+	verifyVariableValue(g, solution, variables.ImplementationCostVariableName, 0)
+	verifyVariableValue(g, solution, variables.SedimentProductionVariableName, 38310.166)
+}
+
+func verifyVariableValue(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {
+	actualImplementationCost := solutionVariable(solution, variableName)
+	g.Expect(actualImplementationCost.Value).To(BeNumerically(equalTo, expectedValue))
+
+	var planningUnitImplementationCost float64
+	for _, currValue := range actualImplementationCost.ValuePerPlanningUnit {
+		planningUnitImplementationCost += currValue.Value
+	}
+	g.Expect(actualImplementationCost.Value).To(BeNumerically(approx, planningUnitImplementationCost, desiredPrecision))
+}
+
+func solutionVariable(solution *solution.Solution, variableName string) *variableNew.EncodeableDecisionVariable {
+	for _, currSolution := range solution.DecisionVariables {
+		if currSolution.Name == variableName {
+			return &currSolution
+		}
+	}
+	return nil
 }

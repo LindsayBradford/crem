@@ -4,6 +4,7 @@ package actions
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
@@ -15,42 +16,47 @@ type HillSlopeRestorationGroup struct {
 	actionMap map[planningunit.Id]*HillSlopeRestoration
 }
 
-func (r *HillSlopeRestorationGroup) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *HillSlopeRestorationGroup {
-	r.planningUnitTable = planningUnitTable
-	r.parameters = parameters
-	r.createManagementActions()
+func (h *HillSlopeRestorationGroup) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *HillSlopeRestorationGroup {
+	h.planningUnitTable = planningUnitTable
+	h.parameters = parameters
+	h.createManagementActions()
 
-	return r
+	return h
 }
 
-func (r *HillSlopeRestorationGroup) ManagementActions() map[planningunit.Id]*HillSlopeRestoration {
-	return r.actionMap
+func (h *HillSlopeRestorationGroup) ManagementActions() []action.ManagementAction {
+	actions := make([]action.ManagementAction, 0)
+	for _, value := range h.actionMap {
+		actions = append(actions, value)
+
+	}
+	return actions
 }
 
-func (r *HillSlopeRestorationGroup) createManagementActions() {
-	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
-	r.actionMap = make(map[planningunit.Id]*HillSlopeRestoration, rowCount)
+func (h *HillSlopeRestorationGroup) createManagementActions() {
+	_, rowCount := h.planningUnitTable.ColumnAndRowSize()
+	h.actionMap = make(map[planningunit.Id]*HillSlopeRestoration, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
-		r.createManagementAction(row)
+		h.createManagementAction(row)
 	}
 }
 
-func (r *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
-	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
+func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
+	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
-	hillSlopeArea := r.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
-	vegetationTarget := r.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
-	originalHillSlopeVegetation := r.originalHillSlopeVegetation(rowNumber)
+	hillSlopeArea := h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
+	vegetationTarget := h.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
+	originalHillSlopeVegetation := h.originalHillSlopeVegetation(rowNumber)
 
 	if hillSlopeArea == 0 || originalHillSlopeVegetation >= vegetationTarget {
 		return
 	}
 
-	costInDollars := r.calculateImplementationCost(rowNumber)
+	costInDollars := h.calculateImplementationCost(rowNumber)
 
-	r.actionMap[planningUnitAsId] =
+	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalHillSlopeVegetation(originalHillSlopeVegetation).
@@ -58,24 +64,24 @@ func (r *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithImplementationCost(costInDollars)
 }
 
-func (r *HillSlopeRestorationGroup) originalHillSlopeVegetation(rowNumber uint) float64 {
-	proportionOfRiparianVegetation := r.planningUnitTable.CellFloat64(proportionOfHillSlopeVegetationIndex, rowNumber)
+func (h *HillSlopeRestorationGroup) originalHillSlopeVegetation(rowNumber uint) float64 {
+	proportionOfRiparianVegetation := h.planningUnitTable.CellFloat64(proportionOfHillSlopeVegetationIndex, rowNumber)
 	return proportionOfRiparianVegetation
 }
 
-func (r *HillSlopeRestorationGroup) calculateChangeInHillSlopeVegetation(rowNumber uint) float64 {
-	proportionOfRiparianVegetation := r.originalHillSlopeVegetation(rowNumber)
-	vegetationTarget := r.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
+func (h *HillSlopeRestorationGroup) calculateChangeInHillSlopeVegetation(rowNumber uint) float64 {
+	proportionOfRiparianVegetation := h.originalHillSlopeVegetation(rowNumber)
+	vegetationTarget := h.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
 	changeInRiparianVegetation := vegetationTarget - proportionOfRiparianVegetation
 	return changeInRiparianVegetation
 }
 
-func (r *HillSlopeRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
-	implementationCostPerKmSquared := r.parameters.GetFloat64(parameters.HillSlopeRestorationCostPerKilometerSquared)
-	hillSlopeAreaInMetresSquared := r.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
+func (h *HillSlopeRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
+	implementationCostPerKmSquared := h.parameters.GetFloat64(parameters.HillSlopeRestorationCostPerKilometerSquared)
+	hillSlopeAreaInMetresSquared := h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
 	hillSlopeAreaInKilometresSquared := hillSlopeAreaInMetresSquared / 1000
 
-	vegetationChange := r.calculateChangeInHillSlopeVegetation(rowNumber)
+	vegetationChange := h.calculateChangeInHillSlopeVegetation(rowNumber)
 
 	vegetationChangeInKilometresSquared := vegetationChange * hillSlopeAreaInKilometresSquared
 

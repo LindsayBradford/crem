@@ -4,6 +4,7 @@ package actions
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 )
@@ -24,8 +25,13 @@ func (g *GullyRestorationGroup) Initialise(gullyTable tables.CsvTable, parameter
 	return g
 }
 
-func (g *GullyRestorationGroup) ManagementActions() map[planningunit.Id]*GullyRestoration {
-	return g.actionMap
+func (g *GullyRestorationGroup) ManagementActions() []action.ManagementAction {
+	actions := make([]action.ManagementAction, 0)
+	for _, value := range g.actionMap {
+		actions = append(actions, value)
+
+	}
+	return actions
 }
 
 func (g *GullyRestorationGroup) createManagementActions() {

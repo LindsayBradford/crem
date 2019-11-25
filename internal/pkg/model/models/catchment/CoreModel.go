@@ -86,37 +86,24 @@ func (m *CoreModel) ParameterErrors() error {
 }
 
 func (m *CoreModel) Initialise() {
-	m.planningUnitTable = m.fetchPlanningUnitTable()
-	m.gulliesTable = m.fetchGulliesTable()
+	m.planningUnitTable = m.fetchCsvTable(PlanningUnitsTableName)
+	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
 
 	m.buildDecisionVariables()
 	m.buildManagementActions()
 }
 
-func (m *CoreModel) fetchPlanningUnitTable() tables.CsvTable {
-	planningUnitTable, tableError := m.inputDataSet.Table(PlanningUnitsTableName)
-	if tableError != nil {
-		panic(errors.New("Expected data set supplied to have a [" + PlanningUnitsTableName + "] table"))
+func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
+	namedTable, namedTableError := m.inputDataSet.Table(tableName)
+	if namedTableError != nil {
+		panic(errors.New("Expected data set supplied to have a [" + tableName + "] table"))
 	}
 
-	csvPlanningUnitTable, tableIsCsvType := planningUnitTable.(tables.CsvTable)
-	if !tableIsCsvType {
-		panic(errors.New("Expected data set table [" + PlanningUnitsTableName + "] to be a CSV type"))
+	namedCsvTable, isCsvType := namedTable.(tables.CsvTable)
+	if !isCsvType {
+		panic(errors.New("Expected data set table [" + tableName + "] to be a CSV type"))
 	}
-	return csvPlanningUnitTable
-}
-
-func (m *CoreModel) fetchGulliesTable() tables.CsvTable {
-	gulliesTable, tableError := m.inputDataSet.Table(GulliesTableName)
-	if tableError != nil {
-		panic(errors.New("Expected data set supplied to have a [" + GulliesTableName + "] table"))
-	}
-
-	csvGulliesTable, tableIsCsvType := gulliesTable.(tables.CsvTable)
-	if !tableIsCsvType {
-		panic(errors.New("Expected data set table [" + GulliesTableName + "] to be a CSV type"))
-	}
-	return csvGulliesTable
+	return namedCsvTable
 }
 
 func (m *CoreModel) buildDecisionVariables() {
@@ -143,28 +130,39 @@ func (m *CoreModel) buildDecisionVariables() {
 }
 
 func (m *CoreModel) buildManagementActions() {
+	modelActions := make([]action.ManagementAction, 0)
+
+	riverBankRestorations := new(actions.RiverBankRestorationGroup).
+		Initialise(m.planningUnitTable, m.parameters).
+		ManagementActions()
+	modelActions = append(modelActions, riverBankRestorations...)
+
+	gullyRestorations := new(actions.GullyRestorationGroup).
+		Initialise(m.gulliesTable, m.parameters).
+		ManagementActions()
+	modelActions = append(modelActions, gullyRestorations...)
+
+	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
+		Initialise(m.planningUnitTable, m.parameters).
+		ManagementActions()
+	modelActions = append(modelActions, hillSlopeRestorations...)
+
+	actionObservers := m.buildActionObservers()
+	for _, action := range modelActions {
+		m.managementActions.Add(action)
+		action.Subscribe(actionObservers...)
+	}
+}
+
+func (m *CoreModel) buildActionObservers() []action.Observer {
 	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
 	sedimentProduction2 := m.ContainedDecisionVariables.Variable(variables.SedimentProduction2VariableName)
 
 	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
 	implementationCost2 := m.ContainedDecisionVariables.Variable(variables.ImplementationCost2VariableName)
 
-	riverBankRestorations := new(actions.RiverBankRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
-	for _, action := range riverBankRestorations.ManagementActions() {
-		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
-	}
-
-	gullyRestorations := new(actions.GullyRestorationGroup).Initialise(m.gulliesTable, m.parameters)
-	for _, action := range gullyRestorations.ManagementActions() {
-		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
-	}
-
-	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).Initialise(m.planningUnitTable, m.parameters)
-	for _, action := range hillSlopeRestorations.ManagementActions() {
-		m.managementActions.Add(action)
-		action.Subscribe(m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
+	return []action.Observer{
+		m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2,
 	}
 }
 
@@ -209,10 +207,6 @@ func (m *CoreModel) RevertChange() {
 	m.note("Reverting Change")
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
-}
-
-func (m *CoreModel) TearDown() {
-	// deliberately does nothing.
 }
 
 func (m *CoreModel) DoRandomChange() {
@@ -285,4 +279,8 @@ func (m *CoreModel) DeepClone() model.Model {
 	clone := *m
 	clone.managementActions.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return &clone
+}
+
+func (m *CoreModel) TearDown() {
+	// deliberately does nothing.
 }
