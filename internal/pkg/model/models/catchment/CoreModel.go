@@ -90,7 +90,7 @@ func (m *CoreModel) Initialise() {
 	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
 
 	m.buildDecisionVariables()
-	m.buildManagementActions()
+	m.buildAndObserveManagementActions()
 }
 
 func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
@@ -129,32 +129,44 @@ func (m *CoreModel) buildDecisionVariables() {
 	)
 }
 
-func (m *CoreModel) buildManagementActions() {
+func (m *CoreModel) buildAndObserveManagementActions() {
+	actions := m.buildModelActions()
+	observers := m.buildActionObservers()
+	m.observeActions(observers, actions)
+}
+
+func (m *CoreModel) buildModelActions() []action.ManagementAction {
 	modelActions := make([]action.ManagementAction, 0)
 
+	modelActions = append(modelActions, m.buildRiverBankRestorations()...)
+	modelActions = append(modelActions, m.buildGullyRestorations()...)
+	modelActions = append(modelActions, m.buildHillSlopeRestorations()...)
+
+	return modelActions
+}
+
+func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
 		WithParameters(m.parameters).
 		ManagementActions()
-	modelActions = append(modelActions, riverBankRestorations...)
+	return riverBankRestorations
+}
 
+func (m *CoreModel) buildGullyRestorations() []action.ManagementAction {
 	gullyRestorations := new(actions.GullyRestorationGroup).
 		WithParameters(m.parameters).
 		WithGullyTable(m.gulliesTable).
 		ManagementActions()
-	modelActions = append(modelActions, gullyRestorations...)
+	return gullyRestorations
+}
 
+func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
 		WithParameters(m.parameters).
 		ManagementActions()
-	modelActions = append(modelActions, hillSlopeRestorations...)
-
-	actionObservers := m.buildActionObservers()
-	for _, action := range modelActions {
-		m.managementActions.Add(action)
-		action.Subscribe(actionObservers...)
-	}
+	return hillSlopeRestorations
 }
 
 func (m *CoreModel) buildActionObservers() []action.Observer {
@@ -166,6 +178,13 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 
 	return []action.Observer{
 		m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2,
+	}
+}
+
+func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []action.ManagementAction) {
+	for _, action := range actions {
+		m.managementActions.Add(action)
+		action.Subscribe(actionObservers...)
 	}
 }
 
