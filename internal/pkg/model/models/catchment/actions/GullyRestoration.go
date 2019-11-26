@@ -10,13 +10,16 @@ import (
 const GullyRestorationType action.ManagementActionType = "GullyRestoration"
 
 func NewGullyRestoration() *GullyRestoration {
-	action := new(GullyRestoration)
-	action.WithType(GullyRestorationType)
-	return action
+	return new(GullyRestoration).WithType(GullyRestorationType)
 }
 
 type GullyRestoration struct {
 	action.SimpleManagementAction
+}
+
+func (g *GullyRestoration) WithType(actionType action.ManagementActionType) *GullyRestoration {
+	g.SimpleManagementAction.WithType(actionType)
+	return g
 }
 
 func (g *GullyRestoration) WithPlanningUnit(planningUnit planningunit.Id) *GullyRestoration {
@@ -26,21 +29,23 @@ func (g *GullyRestoration) WithPlanningUnit(planningUnit planningunit.Id) *Gully
 
 const GullyRestorationCost action.ModelVariableName = "GullyRestorationCost"
 
-func (r *GullyRestoration) WithImplementationCost(costInDollars float64) *GullyRestoration {
-	r.SimpleManagementAction.WithVariable(GullyRestorationCost, costInDollars)
-	return r
+func (g *GullyRestoration) WithImplementationCost(costInDollars float64) *GullyRestoration {
+	return g.WithVariable(GullyRestorationCost, costInDollars)
 }
 
 const OriginalGullySediment action.ModelVariableName = "OriginalGullySediment"
 
-func (r *GullyRestoration) WithOriginalGullySediment(gullyVolume float64) *GullyRestoration {
-	r.SimpleManagementAction.WithVariable(OriginalGullySediment, gullyVolume)
-	return r
+func (g *GullyRestoration) WithOriginalGullySediment(gullyVolume float64) *GullyRestoration {
+	return g.WithVariable(OriginalGullySediment, gullyVolume)
 }
 
 const ActionedGullySediment action.ModelVariableName = "ActionedGullySediment"
 
-func (r *GullyRestoration) WithActionedGullySediment(gullyVolume float64) *GullyRestoration {
-	r.SimpleManagementAction.WithVariable(ActionedGullySediment, gullyVolume)
-	return r
+func (g *GullyRestoration) WithActionedGullySediment(gullyVolume float64) *GullyRestoration {
+	return g.WithVariable(ActionedGullySediment, gullyVolume)
+}
+
+func (g *GullyRestoration) WithVariable(variableName action.ModelVariableName, value float64) *GullyRestoration {
+	g.SimpleManagementAction.WithVariable(variableName, value)
+	return g
 }

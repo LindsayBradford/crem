@@ -61,7 +61,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithoRIGINALBufferVegetation(originalBufferVegetation).
+			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
 			WithImplementationCost(costInDollars)
 }

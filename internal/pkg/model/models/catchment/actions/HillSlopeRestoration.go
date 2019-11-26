@@ -10,13 +10,16 @@ import (
 const HillSlopeRestorationType action.ManagementActionType = "HillSlopeRestoration"
 
 func NewHillSlopeRestoration() *HillSlopeRestoration {
-	action := new(HillSlopeRestoration)
-	action.WithType(HillSlopeRestorationType)
-	return action
+	return new(HillSlopeRestoration).WithType(HillSlopeRestorationType)
 }
 
 type HillSlopeRestoration struct {
 	action.SimpleManagementAction
+}
+
+func (h *HillSlopeRestoration) WithType(actionType action.ManagementActionType) *HillSlopeRestoration {
+	h.SimpleManagementAction.WithType(actionType)
+	return h
 }
 
 func (h *HillSlopeRestoration) WithPlanningUnit(planningUnit planningunit.Id) *HillSlopeRestoration {
@@ -27,20 +30,22 @@ func (h *HillSlopeRestoration) WithPlanningUnit(planningUnit planningunit.Id) *H
 const HillSlopeRestorationCost action.ModelVariableName = "HillSlopeRestorationCost"
 
 func (h *HillSlopeRestoration) WithImplementationCost(costInDollars float64) *HillSlopeRestoration {
-	h.SimpleManagementAction.WithVariable(HillSlopeRestorationCost, costInDollars)
-	return h
+	return h.WithVariable(HillSlopeRestorationCost, costInDollars)
 }
 
 const OriginalHillSlopeVegetation action.ModelVariableName = "OriginalHillSlopeVegetation"
 
 func (h *HillSlopeRestoration) WithOriginalHillSlopeVegetation(proportionOfVegetation float64) *HillSlopeRestoration {
-	h.SimpleManagementAction.WithVariable(OriginalHillSlopeVegetation, proportionOfVegetation)
-	return h
+	return h.WithVariable(OriginalHillSlopeVegetation, proportionOfVegetation)
 }
 
 const ActionedHillSlopeVegetation action.ModelVariableName = "ActionedHillSlopeVegetation"
 
 func (h *HillSlopeRestoration) WithActionedHillSlopeVegetation(proportionOfVegetation float64) *HillSlopeRestoration {
-	h.SimpleManagementAction.WithVariable(ActionedHillSlopeVegetation, proportionOfVegetation)
+	return h.WithVariable(ActionedHillSlopeVegetation, proportionOfVegetation)
+}
+
+func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {
+	h.SimpleManagementAction.WithVariable(variableName, value)
 	return h
 }

@@ -15,8 +15,8 @@ const (
 	hillSlopeDistanceIndex               = 14
 )
 
-type hillslopeSedimentTracker struct {
-	rslk                         float64
+type hillSlopeSedimentTracker struct {
+	rkls                         float64
 	originalProportionVegetation float64
 	distanceToCatchment          float64
 	area                         float64
@@ -26,7 +26,7 @@ type HillSlopeSedimentContribution struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	contributionMap map[planningunit.Id]hillslopeSedimentTracker
+	contributionMap map[planningunit.Id]hillSlopeSedimentTracker
 }
 
 func (h *HillSlopeSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
@@ -37,7 +37,7 @@ func (h *HillSlopeSedimentContribution) Initialise(planningUnitTable tables.CsvT
 
 func (h *HillSlopeSedimentContribution) populateContributionMap() {
 	_, rowCount := h.planningUnitTable.ColumnAndRowSize()
-	h.contributionMap = make(map[planningunit.Id]hillslopeSedimentTracker, rowCount)
+	h.contributionMap = make(map[planningunit.Id]hillSlopeSedimentTracker, rowCount)
 
 	for row := uint(0); row < rowCount; row++ {
 		h.populateContributionMapEntry(row)
@@ -48,22 +48,22 @@ func (h *HillSlopeSedimentContribution) populateContributionMapEntry(rowNumber u
 	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	mapKey := planningunit.Float64ToId(planningUnit)
 
-	h.contributionMap[mapKey] = hillslopeSedimentTracker{
-		rslk:                         h.hillslopeRkls(rowNumber),
+	h.contributionMap[mapKey] = hillSlopeSedimentTracker{
+		rkls:                         h.hillSlopeRkls(rowNumber),
 		originalProportionVegetation: h.originalHillSlopeVegetation(rowNumber),
 		distanceToCatchment:          h.distanceToCatchment(rowNumber),
-		area:                         h.hillslopArea(rowNumber),
+		area:                         h.hillSlopeArea(rowNumber),
 	}
 }
 
-func (h *HillSlopeSedimentContribution) hillslopeRkls(rowNumber uint) float64 {
+func (h *HillSlopeSedimentContribution) hillSlopeRkls(rowNumber uint) float64 {
 	// rkls: Rainfall erosivity factor  (R) * Soil Erodibility Factor (K) * Slope length (L) * Slope Steepness (S)
 	// See Catchment Rehabilitation Planner final report, section 3.2.3
 	rkls := h.planningUnitTable.CellFloat64(hillSlopeRKLSIndex, rowNumber)
 	return rkls
 }
 
-func (h *HillSlopeSedimentContribution) hillslopArea(rowNumber uint) float64 {
+func (h *HillSlopeSedimentContribution) hillSlopeArea(rowNumber uint) float64 {
 	return h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
 }
 
@@ -87,7 +87,7 @@ func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution
 	assert.That(planningUnitIsPresent).Holds()
 
 	originalVegetationCover := h.calculateVegetationCover(id, planningUnitSedimentTracker.originalProportionVegetation)
-	sedimentContribution := planningUnitSedimentTracker.rslk * originalVegetationCover
+	sedimentContribution := planningUnitSedimentTracker.rkls * originalVegetationCover
 	return sedimentContribution
 }
 
@@ -95,7 +95,7 @@ func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(plannin
 	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[planningUnit]
 	assert.That(planningUnitIsPresent).Holds()
 
-	sedimentContribution := planningUnitSedimentTracker.rslk * h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation)
+	sedimentContribution := planningUnitSedimentTracker.rkls * h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation)
 
 	return sedimentContribution
 }
