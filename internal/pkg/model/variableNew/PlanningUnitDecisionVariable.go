@@ -2,26 +2,39 @@
 
 package variableNew
 
+import "C"
 import "github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 
 type PlanningUnitValueMap map[planningunit.Id]float64
 
 type PlanningUnitDecisionVariable interface {
+	DecisionVariable
 	ValuesPerPlanningUnit() PlanningUnitValueMap
 }
 
-type ContainedValuesPerPlanningUnit struct {
+func NewPerPlanningUnitDecisionVariable() *PerPlanningUnitDecisionVariable {
+	variable := new(PerPlanningUnitDecisionVariable)
+	variable.planningUnitValues = make(PlanningUnitValueMap, 0)
+	return variable
+}
+
+type PerPlanningUnitDecisionVariable struct {
+	SimpleDecisionVariable
 	planningUnitValues PlanningUnitValueMap
 }
 
-func (c *ContainedValuesPerPlanningUnit) ValuesPerPlanningUnit() PlanningUnitValueMap {
-	return c.planningUnitValues
+func (c *PerPlanningUnitDecisionVariable) SetPlanningUnitValue(planningUnit planningunit.Id, newValue float64) {
+	oldValue := c.planningUnitValues[planningUnit]
+	c.planningUnitValues[planningUnit] = newValue
+
+	difference := newValue - oldValue
+	c.value += difference
 }
 
-func (c *ContainedValuesPerPlanningUnit) PlanningUnitValue(planningUnit planningunit.Id) float64 {
+func (c *PerPlanningUnitDecisionVariable) PlanningUnitValue(planningUnit planningunit.Id) float64 {
 	return c.planningUnitValues[planningUnit]
 }
 
-func (c *ContainedValuesPerPlanningUnit) SetPlanningUnitValue(planningUnit planningunit.Id, value float64) {
-	c.planningUnitValues[planningUnit] = value
+func (c *PerPlanningUnitDecisionVariable) ValuesPerPlanningUnit() PlanningUnitValueMap {
+	return c.planningUnitValues
 }

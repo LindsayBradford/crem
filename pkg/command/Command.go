@@ -19,6 +19,10 @@ func (bc *BaseCommand) WithTarget(target interface{}) *BaseCommand {
 	return bc
 }
 
+func (bc *BaseCommand) Target() interface{} {
+	return bc.target
+}
+
 func (bc *BaseCommand) Do() {
 	// deliberately does nothing
 }
