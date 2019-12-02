@@ -119,7 +119,8 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 	case observer.ManagementAction:
 		builder.
 			Add("Type [", format(event, "Type"), "], ").
-			Add("Planning Unit [", format(event, "PlanningUnit"), "], ")
+			Add("Planning Unit [", format(event, "PlanningUnit"), "], ").
+			Add("Active [", format(event, "IsActive"), "]")
 
 		if event.HasNote() {
 			builder.Add(", Note [", event.Note(), "]")

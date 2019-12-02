@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variables
+package implementationcost
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -10,38 +10,38 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 )
 
-const ImplementationCost2VariableName = "ImplementationCost2"
-const notImplementedCost float64 = 0
+const ImplementationCostVariableName = "ImplementationCost"
 
-type ImplementationCost2 struct {
+type ImplementationCost struct {
 	variable.BaseInductiveDecisionVariable
 	actionObserved action.ManagementAction
 
-	valuePerPlanningUnit map[planningunit.Id]float64
+	planningUnitValues variableNew.PlanningUnitValueMap
 }
 
-func (ic *ImplementationCost2) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost2 {
-	ic.SetName(ImplementationCost2VariableName)
+func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
+	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure(variableNew.Dollars)
 	ic.SetPrecision(2)
 	return ic
 }
 
-func (ic *ImplementationCost2) WithObservers(observers ...variableNew.Observer) *ImplementationCost2 {
+func (ic *ImplementationCost) WithObservers(observers ...variableNew.Observer) *ImplementationCost {
 	ic.Subscribe(observers...)
 	return ic
 }
 
-func (ic *ImplementationCost2) deriveInitialImplementationCost() float64 {
-	ic.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
+func (ic *ImplementationCost) deriveInitialImplementationCost() float64 {
+	ic.planningUnitValues = make(map[planningunit.Id]float64, 0)
 	return notImplementedCost
 }
 
-func (ic *ImplementationCost2) ObserveAction(action action.ManagementAction) {
+func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
 	ic.actionObserved = action
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
@@ -55,7 +55,7 @@ func (ic *ImplementationCost2) ObserveAction(action action.ManagementAction) {
 	}
 }
 
-func (ic *ImplementationCost2) ObserveActionInitialising(action action.ManagementAction) {
+func (ic *ImplementationCost) ObserveActionInitialising(action action.ManagementAction) {
 	ic.actionObserved = action
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
@@ -70,10 +70,14 @@ func (ic *ImplementationCost2) ObserveActionInitialising(action action.Managemen
 	ic.NotifyObservers()
 }
 
-func (ic *ImplementationCost2) handleRiverBankRestorationAction() {
+func (ic *ImplementationCost) handleRiverBankRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+
+		ic.BaseInductiveDecisionVariable.SetInductiveValue(newValue)
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
@@ -87,10 +91,14 @@ func (ic *ImplementationCost2) handleRiverBankRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) handleInitialisingRiverBankRestorationAction() {
+func (ic *ImplementationCost) handleInitialisingRiverBankRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+
+		ic.BaseInductiveDecisionVariable.SetValue(newValue)
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
@@ -104,10 +112,14 @@ func (ic *ImplementationCost2) handleInitialisingRiverBankRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) handleGullyRestorationAction() {
+func (ic *ImplementationCost) handleGullyRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+
+		ic.BaseInductiveDecisionVariable.SetInductiveValue(newValue)
 
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
@@ -122,10 +134,14 @@ func (ic *ImplementationCost2) handleGullyRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) handleInitialisingGullyRestorationAction() {
+func (ic *ImplementationCost) handleInitialisingGullyRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+
+		ic.BaseInductiveDecisionVariable.SetValue(newValue)
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
@@ -139,10 +155,14 @@ func (ic *ImplementationCost2) handleInitialisingGullyRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) handleHillSlopeRestorationAction() {
+func (ic *ImplementationCost) handleHillSlopeRestorationAction() {
 	setTempVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+
+		ic.BaseInductiveDecisionVariable.SetInductiveValue(newValue)
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
@@ -156,10 +176,14 @@ func (ic *ImplementationCost2) handleHillSlopeRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) handleInitialisingHillSlopeRestorationAction() {
+func (ic *ImplementationCost) handleInitialisingHillSlopeRestorationAction() {
 	setVariable := func(asIsCost float64, toBeCost float64) {
 		currentValue := ic.BaseInductiveDecisionVariable.Value()
-		ic.BaseInductiveDecisionVariable.SetValue(currentValue - asIsCost + toBeCost)
+
+		newValue := currentValue - asIsCost + toBeCost
+		newValue = math.RoundFloat(newValue, int(ic.Precision()))
+		ic.BaseInductiveDecisionVariable.SetValue(newValue)
+
 		ic.acceptPlanningUnitChange(asIsCost, toBeCost)
 	}
 
@@ -173,23 +197,32 @@ func (ic *ImplementationCost2) handleInitialisingHillSlopeRestorationAction() {
 	}
 }
 
-func (ic *ImplementationCost2) acceptPlanningUnitChange(asIsCost float64, toBeCost float64) {
+func (ic *ImplementationCost) acceptPlanningUnitChange(asIsCost float64, toBeCost float64) {
 	planningUnit := ic.actionObserved.PlanningUnit()
-	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - asIsCost + toBeCost
+	ic.planningUnitValues[planningUnit] = ic.planningUnitValues[planningUnit] - asIsCost + toBeCost
+	ic.planningUnitValues[planningUnit] = math.RoundFloat(ic.planningUnitValues[planningUnit], int(ic.Precision()))
 }
 
-func (ic *ImplementationCost2) ValuesPerPlanningUnit() variableNew.PlanningUnitValueMap {
-	return ic.valuePerPlanningUnit
+func (ic *ImplementationCost) ValuesPerPlanningUnit() variableNew.PlanningUnitValueMap {
+	return ic.planningUnitValues
 }
 
-func (ic *ImplementationCost2) RejectInductiveValue() {
+func (ic *ImplementationCost) RejectInductiveValue() {
 	ic.rejectPlanningUnitChange()
 	ic.BaseInductiveDecisionVariable.RejectInductiveValue()
 }
 
-func (ic *ImplementationCost2) rejectPlanningUnitChange() {
+func (ic *ImplementationCost) rejectPlanningUnitChange() {
 	change := ic.BaseInductiveDecisionVariable.DifferenceInValues()
 	planningUnit := ic.actionObserved.PlanningUnit()
 
-	ic.valuePerPlanningUnit[planningUnit] = ic.valuePerPlanningUnit[planningUnit] - change
+	ic.planningUnitValues[planningUnit] = ic.planningUnitValues[planningUnit] - change
+}
+
+func (ic *ImplementationCost) SetPlanningUnitValue(planningUnit planningunit.Id, newValue float64) {
+	ic.planningUnitValues[planningUnit] = newValue
+}
+
+func (ic *ImplementationCost) PlanningUnitValue(planningUnit planningunit.Id) float64 {
+	return ic.planningUnitValues[planningUnit]
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/math"
 	. "github.com/onsi/gomega"
 )
 
@@ -52,7 +53,7 @@ func TestVariable_SetSeveralPlanningUnits_WorksAsExpected(t *testing.T) {
 		value := rnd.Float64Unitary()
 		planningUnit := planningunit.Id(i)
 		variableUnderTest.SetPlanningUnitValue(planningUnit, value)
-		total += value
+		total += math.RoundFloat(value, int(variableUnderTest.Precision()))
 	}
 
 	g.Expect(variableUnderTest.Value()).To(BeNumerically(approx, total))
@@ -68,14 +69,15 @@ func TestVariable_SetPlanningUnitRepeatedly_WorksAsExpected(t *testing.T) {
 	loops := 1 + rnd.Intn(maxLoops)
 
 	variableUnderTest := NewPerPlanningUnitDecisionVariable()
+	variableUnderTest.SetPrecision(3)
 
-	var lastValue float64
+	var roundedLastValue float64
 	for i := 0; i < loops; i++ {
 		value := rnd.Float64Unitary()
 		variableUnderTest.SetPlanningUnitValue(planningUnitUnderTest, value)
-		lastValue = value
+		roundedLastValue = math.RoundFloat(value, int(variableUnderTest.Precision()))
 	}
 
-	g.Expect(variableUnderTest.PlanningUnitValue(planningUnitUnderTest)).To(BeNumerically(approx, lastValue))
-	g.Expect(variableUnderTest.Value()).To(BeNumerically(approx, lastValue))
+	g.Expect(variableUnderTest.PlanningUnitValue(planningUnitUnderTest)).To(BeNumerically(equalTo, roundedLastValue))
+	g.Expect(variableUnderTest.Value()).To(BeNumerically(equalTo, roundedLastValue))
 }

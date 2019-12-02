@@ -3,6 +3,7 @@
 package catchment
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
@@ -11,7 +12,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/implementationcost"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
@@ -105,19 +107,19 @@ func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
 }
 
 func (m *CoreModel) buildDecisionVariables() {
-	sedimentProduction := new(variables.SedimentProduction). // TODO: retire this when sedimentProduction2 finalised.
-									Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
-									WithObservers(m)
+	sedimentProduction := new(sedimentproduction.SedimentProduction). // TODO: retire this when sedimentProduction2 finalised.
+										Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
+										WithObservers(m)
 
-	sedimentProduction2 := new(variables.SedimentProduction2).
+	sedimentProduction2 := new(sedimentproduction.SedimentProduction2).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
-	implementationCost := new(variables.ImplementationCost). // TODO: retire this when implementationCost2 finalised.
-									Initialise(m.planningUnitTable, m.parameters).
-									WithObservers(m)
+	implementationCost := new(implementationcost.ImplementationCost). // TODO: retire this when implementationCost2 finalised.
+										Initialise(m.planningUnitTable, m.parameters).
+										WithObservers(m)
 
-	implementationCost2 := new(variables.ImplementationCost2).
+	implementationCost2 := new(implementationcost.ImplementationCost2).
 		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
@@ -168,15 +170,16 @@ func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 }
 
 func (m *CoreModel) buildActionObservers() []action.Observer {
-	sedimentProduction := m.ContainedDecisionVariables.Variable(variables.SedimentProductionVariableName)
-	sedimentProduction2 := m.ContainedDecisionVariables.Variable(variables.SedimentProduction2VariableName)
+	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.SedimentProductionVariableName)
+	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction.SedimentProduction2VariableName)
 
-	implementationCost := m.ContainedDecisionVariables.Variable(variables.ImplementationCostVariableName)
-	implementationCost2 := m.ContainedDecisionVariables.Variable(variables.ImplementationCost2VariableName)
+	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.ImplementationCostVariableName)
+	implementationCost2 := m.ContainedDecisionVariables.Variable(implementationcost.ImplementationCost2VariableName)
 
-	return []action.Observer{
-		m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2,
-	}
+	observers := make([]action.Observer, 0)
+	observers = append(observers, m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
+
+	return observers
 }
 
 func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []action.ManagementAction) {
@@ -234,6 +237,13 @@ func (m *CoreModel) DoRandomChange() {
 	m.AcceptChange()
 }
 
+func (m *CoreModel) ToggleAction(planningUnit planningunit.Id, actionType action.ManagementActionType) {
+	message := fmt.Sprintf("Toggling action [%v] for planning unit [%d]", actionType, planningUnit)
+	m.note(message)
+	m.managementActions.ToggleAction(planningUnit, actionType)
+	m.AcceptChange()
+}
+
 func (m *CoreModel) TryRandomChange() {
 	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
@@ -259,7 +269,8 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 	event := observer.NewEvent(observer.ManagementAction).
 		WithId(m.Id()).
 		WithAttribute("Type", action.Type()).
-		WithAttribute("PlanningUnit", action.PlanningUnit())
+		WithAttribute("PlanningUnit", action.PlanningUnit()).
+		WithAttribute("IsActive", action.IsActive())
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
 

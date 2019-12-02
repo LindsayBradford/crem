@@ -7,6 +7,13 @@ import (
 	"github.com/LindsayBradford/crem/pkg/command"
 )
 
+type ChangeCommand interface {
+	command.Command
+	Value() float64
+	SetChange(change float64)
+	Change() float64
+}
+
 type ChangePerPlanningUnitDecisionVariableCommand struct {
 	command.BaseCommand
 
@@ -15,15 +22,19 @@ type ChangePerPlanningUnitDecisionVariableCommand struct {
 	planningUnit planningunit.Id
 }
 
-func (c *ChangePerPlanningUnitDecisionVariableCommand) ForVariable(variable *PerPlanningUnitDecisionVariable) *ChangePerPlanningUnitDecisionVariableCommand {
+func (c *ChangePerPlanningUnitDecisionVariableCommand) ForVariable(variable PlanningUnitDecisionVariable) *ChangePerPlanningUnitDecisionVariableCommand {
 	c.WithTarget(variable)
 	return c
 }
 
-func (c *ChangePerPlanningUnitDecisionVariableCommand) WithValue(newValue float64) *ChangePerPlanningUnitDecisionVariableCommand {
-	c.undoneValue = c.variable().value
-	c.doneValue = newValue
+func (c *ChangePerPlanningUnitDecisionVariableCommand) WithChange(changeValue float64) *ChangePerPlanningUnitDecisionVariableCommand {
+	c.SetChange(changeValue)
 	return c
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) SetChange(changeValue float64) {
+	c.undoneValue = c.Variable().ValuesPerPlanningUnit()[c.planningUnit]
+	c.doneValue = c.undoneValue + changeValue
 }
 
 func (c *ChangePerPlanningUnitDecisionVariableCommand) InPlanningUnit(planningUnit planningunit.Id) *ChangePerPlanningUnitDecisionVariableCommand {
@@ -31,14 +42,42 @@ func (c *ChangePerPlanningUnitDecisionVariableCommand) InPlanningUnit(planningUn
 	return c
 }
 
-func (c *ChangePerPlanningUnitDecisionVariableCommand) Do() {
-	c.variable().SetPlanningUnitValue(c.planningUnit, c.doneValue)
+func (c *ChangePerPlanningUnitDecisionVariableCommand) PlanningUnit() planningunit.Id {
+	return c.planningUnit
 }
 
-func (c *ChangePerPlanningUnitDecisionVariableCommand) Undo() {
-	c.variable().SetPlanningUnitValue(c.planningUnit, c.undoneValue)
+func (c *ChangePerPlanningUnitDecisionVariableCommand) Do() command.CommandStatus {
+	if c.BaseCommand.Do() == command.NoChange {
+		return command.NoChange
+	} // TODO: DEEPLY Broken when nesting outer Commands\!!
+	c.DoUnguarded()
+	return command.Done
 }
 
-func (c *ChangePerPlanningUnitDecisionVariableCommand) variable() *PerPlanningUnitDecisionVariable {
-	return c.Target().(*PerPlanningUnitDecisionVariable)
+func (c *ChangePerPlanningUnitDecisionVariableCommand) DoUnguarded() {
+	c.Variable().SetPlanningUnitValue(c.planningUnit, c.doneValue)
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) Undo() command.CommandStatus {
+	if c.BaseCommand.Undo() == command.NoChange {
+		return command.NoChange
+	}
+	c.UndoUnguarded()
+	return command.UnDone
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) UndoUnguarded() {
+	c.Variable().SetPlanningUnitValue(c.planningUnit, c.undoneValue)
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) Variable() PlanningUnitDecisionVariable {
+	return c.Target().(PlanningUnitDecisionVariable)
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) Value() float64 {
+	return c.doneValue
+}
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) Change() float64 {
+	return c.doneValue - c.undoneValue
 }

@@ -47,12 +47,24 @@ func (dc *dummyCommand) decrementValue() int {
 	return 0
 }
 
-func (dc *dummyCommand) Do() {
+func (dc *dummyCommand) Do() CommandStatus {
+	if dc.BaseCommand.Do() == NoChange {
+		return NoChange
+	}
+
 	dc.counter().value += dc.incrementValue()
 	dc.counter().value -= dc.decrementValue()
+
+	return Done
 }
 
-func (dc *dummyCommand) Undo() {
+func (dc *dummyCommand) Undo() CommandStatus {
+	if dc.BaseCommand.Undo() == NoChange {
+		return NoChange
+	}
+
 	dc.counter().value -= dc.incrementValue()
 	dc.counter().value += dc.decrementValue()
+
+	return UnDone
 }

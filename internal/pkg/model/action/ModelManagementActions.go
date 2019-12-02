@@ -3,6 +3,7 @@
 package action
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/pkg/errors"
 )
@@ -28,9 +29,10 @@ func (m *ModelManagementActions) Add(newActions ...ManagementAction) {
 
 // RandomlyToggleOneActivation randomly picks one of its stored management actions and toggles its activation
 // in a way that will trigger any observers of the selected management action to react to its change in activation state.
-func (m *ModelManagementActions) RandomlyToggleOneActivation() {
+func (m *ModelManagementActions) RandomlyToggleOneActivation() ManagementAction {
 	m.lastApplied = m.pickRandomManagementAction()
 	m.lastApplied.ToggleActivation()
+	return m.lastApplied
 }
 
 func (m *ModelManagementActions) pickRandomManagementAction() ManagementAction {
@@ -65,6 +67,24 @@ func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementActio
 		// Deliberately does nothing
 	default:
 		panic(errors.New("Random value outside range of [0,1]"))
+	}
+}
+
+func (m *ModelManagementActions) ToggleActionUnobserved(planningUnit planningunit.Id, actionType ManagementActionType) {
+	for _, action := range m.actions {
+		if action.PlanningUnit() == planningUnit && actionType == action.Type() {
+			m.lastApplied = action
+			m.ToggleLastActivationUnobserved()
+		}
+	}
+}
+
+func (m *ModelManagementActions) ToggleAction(planningUnit planningunit.Id, actionType ManagementActionType) {
+	for _, action := range m.actions {
+		if action.PlanningUnit() == planningUnit && actionType == action.Type() {
+			m.lastApplied = action
+			m.ToggleLastActivation()
+		}
 	}
 }
 

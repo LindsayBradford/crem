@@ -49,7 +49,7 @@ func TestCommand_DoUndo_ChangesAsExpected(t *testing.T) {
 	commandUnderTest := new(ChangePerPlanningUnitDecisionVariableCommand).
 		ForVariable(variableUnderTest).
 		InPlanningUnit(planningUnit).
-		WithValue(newValue)
+		WithChange(newValue)
 
 	// then
 
@@ -58,8 +58,8 @@ func TestCommand_DoUndo_ChangesAsExpected(t *testing.T) {
 
 	commandUnderTest.Do()
 
-	g.Expect(variableUnderTest.Value()).To(BeNumerically(equalTo, newValue))
-	g.Expect(variableUnderTest.PlanningUnitValue(planningUnit)).To(BeNumerically(equalTo, newValue))
+	g.Expect(variableUnderTest.Value()).To(BeNumerically(equalTo, oldValue+newValue))
+	g.Expect(variableUnderTest.PlanningUnitValue(planningUnit)).To(BeNumerically(equalTo, oldValue+newValue))
 
 	commandUnderTest.Undo()
 
