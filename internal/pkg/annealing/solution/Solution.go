@@ -3,8 +3,11 @@
 package solution
 
 import (
+	"fmt"
+
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 
 	"sort"
 	"strings"
@@ -71,4 +74,62 @@ func (s Solution) FileNameSafeId() string {
 	safeId := strings.Replace(s.Id, " ", "", -1)
 	safeId = strings.Replace(safeId, "/", "_of_", -1)
 	return safeId
+}
+
+func (s *Solution) MatchErrors(other *Solution) *compositeErrors.CompositeError {
+	matchErrors := compositeErrors.New("Solution Match Errors")
+
+	s.checkIds(other, matchErrors)
+	s.checkDecisionVariables(other, matchErrors)
+
+	if matchErrors.Size() > 0 {
+		return matchErrors
+	}
+	return nil
+}
+
+func (s *Solution) checkIds(other *Solution, errors *compositeErrors.CompositeError) {
+	if s.Id != other.Id {
+		idError := fmt.Sprintf("Solutions have mismatching Ids [%s, %s]", s.Id, other.Id)
+		errors.AddMessage(idError)
+	}
+}
+
+func (s *Solution) checkDecisionVariables(other *Solution, errors *compositeErrors.CompositeError) {
+	s.checkForMissingDecisionVariables(other, errors)
+	s.checkForMismatchedDecisionVariableValues(other, errors)
+}
+
+func (s *Solution) checkForMissingDecisionVariables(other *Solution, errors *compositeErrors.CompositeError) {
+	variableSolutionMap := make(map[string]*Solution, 0)
+
+	for _, variable := range s.DecisionVariables {
+		variableSolutionMap[variable.Name] = s
+	}
+
+	for _, variable := range other.DecisionVariables {
+		if variableSolutionMap[variable.Name] != nil {
+			delete(variableSolutionMap, variable.Name)
+		} else {
+			variableSolutionMap[variable.Name] = other
+		}
+	}
+
+	for variableName, solution := range variableSolutionMap {
+		variableError := fmt.Sprintf("Only solution [%s] has variable [%s]", solution.Id, variableName)
+		errors.AddMessage(variableError)
+	}
+}
+
+func (s *Solution) checkForMismatchedDecisionVariableValues(other *Solution, errors *compositeErrors.CompositeError) {
+	for _, myVariable := range s.DecisionVariables {
+		for _, otherVariable := range other.DecisionVariables {
+			if myVariable.Name == otherVariable.Name {
+				if myVariable.Value != otherVariable.Value {
+					variableError := fmt.Sprintf("variable [%s] has mismatching values [%f, %f]", myVariable.Name, myVariable.Value, otherVariable.Value)
+					errors.AddMessage(variableError)
+				}
+			}
+		}
+	}
 }
