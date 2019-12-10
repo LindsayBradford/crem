@@ -97,7 +97,6 @@ func (sl *SedimentProduction2) ObserveAction(action action.ManagementAction) {
 func (sl *SedimentProduction2) ObserveActionInitialising(action action.ManagementAction) {
 	sl.observeAction(action)
 	sl.command.Do()
-	sl.NotifyObservers() // TODO: Needed?
 }
 
 func (sl *SedimentProduction2) observeAction(action action.ManagementAction) {
@@ -221,10 +220,8 @@ func (sl *SedimentProduction2) DifferenceInValues() float64 {
 
 func (sl *SedimentProduction2) AcceptInductiveValue() {
 	sl.command.Do()
-	sl.NotifyObservers() // TODO: Needed?
 }
 
 func (sl *SedimentProduction2) RejectInductiveValue() {
 	sl.command.Undo()
-	sl.NotifyObservers() // TODO: Needed?
 }

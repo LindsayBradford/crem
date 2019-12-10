@@ -53,7 +53,7 @@ func (ic *ImplementationCost2) ObserveAction(action action.ManagementAction) {
 func (ic *ImplementationCost2) ObserveActionInitialising(action action.ManagementAction) {
 	ic.observeAction(action)
 	ic.command.Do()
-	ic.NotifyObservers() // TODO: Needed?
+	// ic.NotifyObservers() // TODO: Needed?
 }
 
 func (ic *ImplementationCost2) observeAction(action action.ManagementAction) {
@@ -105,10 +105,10 @@ func (ic *ImplementationCost2) DifferenceInValues() float64 {
 
 func (ic *ImplementationCost2) AcceptInductiveValue() {
 	ic.command.Do()
-	ic.NotifyObservers() // TODO: Needed?
+	// ic.NotifyObservers() // TODO: Needed?
 }
 
 func (ic *ImplementationCost2) RejectInductiveValue() {
 	ic.command.Undo()
-	ic.NotifyObservers() // TODO: Needed?
+	// ic.NotifyObservers() // TODO: Needed?
 }

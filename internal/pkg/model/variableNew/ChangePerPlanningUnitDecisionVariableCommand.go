@@ -49,7 +49,7 @@ func (c *ChangePerPlanningUnitDecisionVariableCommand) PlanningUnit() planningun
 func (c *ChangePerPlanningUnitDecisionVariableCommand) Do() command.CommandStatus {
 	if c.BaseCommand.Do() == command.NoChange {
 		return command.NoChange
-	} // TODO: DEEPLY Broken when nesting outer Commands\!!
+	}
 	c.DoUnguarded()
 	return command.Done
 }
