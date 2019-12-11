@@ -3,37 +3,32 @@
 package sedimentproduction
 
 import (
-	math2 "math"
-
-	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
-
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/pkg/assert/release"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 )
 
 const SedimentProductionVariableName = "SedimentProduction"
 
-func Float64ToPlanningUnitId(value float64) planningunit.Id {
-	return planningunit.Id(value)
-}
+var _ variableNew.DecisionVariable = new(SedimentProduction)
+
+const planningUnitIndex = 0
 
 type SedimentProduction struct {
-	variable.BaseInductiveDecisionVariable
+	variableNew.PerPlanningUnitDecisionVariable
+
+	actionObserved action.ManagementAction
+
+	command variableNew.ChangeCommand
 
 	bankSedimentContribution      actions.BankSedimentContribution
 	gullySedimentContribution     actions.GullySedimentContribution
 	hillSlopeSedimentContribution actions.HillSlopeSedimentContribution
-
-	actionObserved action.ManagementAction
-
-	planningUnitValues variableNew.PlanningUnitValueMap
 
 	cachedPlanningUnitSediment float64
 
@@ -41,16 +36,8 @@ type SedimentProduction struct {
 	hillSlopeVegetationProportionPerPlanningUnit map[planningunit.Id]float64
 }
 
-func (sl *SedimentProduction) SetPlanningUnitValue(planningUnit planningunit.Id, newValue float64) {
-	sl.planningUnitValues[planningUnit] = newValue
-}
-
-func (sl *SedimentProduction) PlanningUnitValue(planningUnit planningunit.Id) float64 {
-	return sl.planningUnitValues[planningUnit]
-}
-
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
-	sl.planningUnitValues = make(variableNew.PlanningUnitValueMap, 0)
+	sl.PerPlanningUnitDecisionVariable.Initialise()
 
 	sl.SetName(SedimentProductionVariableName)
 	sl.SetUnitOfMeasure(variableNew.TonnesPerYear)
@@ -61,7 +48,6 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 	sl.hillSlopeSedimentContribution.Initialise(planningUnitTable, parameters)
 
 	sl.deriveInitialPerPlanningUnitSedimentLoad(planningUnitTable)
-	sl.SetValue(sl.deriveInitialSedimentLoad())
 
 	return sl
 }
@@ -73,7 +59,7 @@ func (sl *SedimentProduction) WithObservers(observers ...variableNew.Observer) *
 
 func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningUnitTable tables.CsvTable) {
 	_, rowCount := planningUnitTable.ColumnAndRowSize()
-	sl.planningUnitValues = make(variableNew.PlanningUnitValueMap, rowCount)
+
 	sl.riparianVegetationProportionPerPlanningUnit = make(map[planningunit.Id]float64, rowCount)
 	sl.hillSlopeVegetationProportionPerPlanningUnit = make(map[planningunit.Id]float64, rowCount)
 
@@ -93,27 +79,41 @@ func (sl *SedimentProduction) deriveInitialPerPlanningUnitSedimentLoad(planningU
 		riparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
 		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter
 
-		sl.planningUnitValues[planningUnit] =
+		sedimentProduced :=
 			bankSedimentContribution +
 				gullySedimentContribution +
 				hillSlopeSedimentContribution
 
-		sl.planningUnitValues[planningUnit] = math.RoundFloat(sl.planningUnitValues[planningUnit], int(sl.Precision()))
+		roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(sl.Precision()))
+
+		sl.SetPlanningUnitValue(planningUnit, roundedSedimentProduced)
 	}
 }
 
-func (sl *SedimentProduction) deriveInitialSedimentLoad() float64 {
-	initialSedimentLoad := float64(0)
-	for _, sedimentAtPlanningUnit := range sl.planningUnitValues {
-		initialSedimentLoad += sedimentAtPlanningUnit
+func Float64ToPlanningUnitId(value float64) planningunit.Id {
+	return planningunit.Id(value)
+}
+
+func riparianBufferFilter(proportionOfRiparianBufferVegetation float64) float64 {
+	if proportionOfRiparianBufferVegetation < 0.25 {
+		return 1
 	}
-
-	initialSedimentLoad = math.RoundFloat(initialSedimentLoad, int(sl.Precision()))
-
-	return initialSedimentLoad
+	if proportionOfRiparianBufferVegetation > 0.75 {
+		return 0.25
+	}
+	return 1 - proportionOfRiparianBufferVegetation
 }
 
 func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
+	sl.observeAction(action)
+}
+
+func (sl *SedimentProduction) ObserveActionInitialising(action action.ManagementAction) {
+	sl.observeAction(action)
+	sl.command.Do()
+}
+
+func (sl *SedimentProduction) observeAction(action action.ManagementAction) {
 	sl.actionObserved = action
 	switch sl.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
@@ -127,250 +127,115 @@ func (sl *SedimentProduction) ObserveAction(action action.ManagementAction) {
 	}
 }
 
-func (sl *SedimentProduction) ObserveActionInitialising(action action.ManagementAction) {
-	sl.actionObserved = action
-	switch sl.actionObserved.Type() {
-	case actions.RiverBankRestorationType:
-		sl.handleInitialisingRiverBankRestorationAction()
-	case actions.GullyRestorationType:
-		sl.handleInitialisingGullyRestorationAction()
-	case actions.HillSlopeRestorationType:
-		sl.handleInitialisingHillSlopeRestorationAction()
-	default:
-		panic(errors.New("Unhandled observation of initialising management action type [" + string(action.Type()) + "]"))
-	}
-	sl.NotifyObservers()
-}
-
 func (sl *SedimentProduction) handleRiverBankRestorationAction() {
-	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsRiparianVegetation := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeRiparianVegetation := sl.actionObserved.ModelVariableValue(toBeName)
-
-		asIsRiparianFilter := riparianBufferFilter(sl.actionObserved.ModelVariableValue(asIsName))
-
-		sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-			sl.actionObserved.ModelVariableValue(toBeName)
-
-		planningUnit := sl.actionObserved.PlanningUnit()
-
-		asIsRiparianSediment := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsRiparianVegetation)
-		toBeRiparianSediment := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeRiparianVegetation)
-
-		hillSlopeVegetation := sl.hillSlopeVegetationProportionPerPlanningUnit[planningUnit]
-		toBeRiparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
-
-		rawHillSlopeSediment := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, hillSlopeVegetation)
-
-		asIsHillSlopeSediment := rawHillSlopeSediment * asIsRiparianFilter
-		toBeHillSlopeSediment := rawHillSlopeSediment * toBeRiparianFilter
-
-		currentSediment := sl.BaseInductiveDecisionVariable.Value()
-		asIsPlanningUnitSediment := asIsRiparianSediment + asIsHillSlopeSediment
-		toBePlanningUnitSediment := toBeRiparianSediment + toBeHillSlopeSediment
-		newSediment := currentSediment - asIsPlanningUnitSediment + toBePlanningUnitSediment
-
-		sl.BaseInductiveDecisionVariable.SetInductiveValue(newSediment)
-
-		sl.acceptPlanningUnitChange(asIsPlanningUnitSediment, toBePlanningUnitSediment)
-	}
-
+	var asIsSediment, toBeSediment, vegetationBuffer float64
 	switch sl.actionObserved.IsActive() {
 	case true:
-		setTempVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
+		vegetationBuffer = sl.actionObserved.ModelVariableValue(actions.ActionedBufferVegetation)
+		toBeSediment = sl.planningUnitSediment(actions.ActionedBufferVegetation)
+		asIsSediment = sl.planningUnitSediment(actions.OriginalBufferVegetation)
 	case false:
-		setTempVariable(actions.ActionedBufferVegetation, actions.OriginalBufferVegetation)
+		vegetationBuffer = sl.actionObserved.ModelVariableValue(actions.OriginalBufferVegetation)
+		toBeSediment = sl.planningUnitSediment(actions.OriginalBufferVegetation)
+		asIsSediment = sl.planningUnitSediment(actions.ActionedBufferVegetation)
 	}
+
+	sl.command = new(RiverBankRestorationCommand).
+		ForVariable(sl).
+		InPlanningUnit(sl.actionObserved.PlanningUnit()).
+		WithVegetationBuffer(vegetationBuffer).
+		WithChange(toBeSediment - asIsSediment)
 }
 
-func (sl *SedimentProduction) handleInitialisingRiverBankRestorationAction() {
-	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsRiparianVegetation := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeRiparianVegetation := sl.actionObserved.ModelVariableValue(toBeName)
+func (sl *SedimentProduction) planningUnitSediment(riparianVegetationBufferName action.ModelVariableName) float64 {
+	planningUnit := sl.actionObserved.PlanningUnit()
 
-		planningUnit := sl.actionObserved.PlanningUnit()
+	riparianSediment := sl.riparianSediment(riparianVegetationBufferName, planningUnit)
+	hillSlopeSediment := sl.hillSlopeSediment(planningUnit)
 
-		asIsRiparianFilter := riparianBufferFilter(asIsRiparianVegetation)
+	return riparianSediment + hillSlopeSediment
+}
 
-		sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] = sl.actionObserved.ModelVariableValue(toBeName)
+func (sl *SedimentProduction) riparianSediment(vegetationBufferName action.ModelVariableName, planningUnit planningunit.Id) float64 {
+	riparianVegetation := sl.actionObserved.ModelVariableValue(vegetationBufferName)
+	riparianSediment := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, riparianVegetation)
+	return riparianSediment
+}
 
-		asIsRiparianSediment := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsRiparianVegetation)
-		toBeRiparianSediment := sl.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeRiparianVegetation)
-
-		hillSlopeVegetation := sl.hillSlopeVegetationProportionPerPlanningUnit[planningUnit]
-		toBeRiparianFilter := riparianBufferFilter(toBeRiparianVegetation)
-
-		rawHillSlopeSediment := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, hillSlopeVegetation)
-
-		asIsHillSlopeSediment := rawHillSlopeSediment * asIsRiparianFilter
-		toBeHillSlopeSediment := rawHillSlopeSediment * toBeRiparianFilter
-
-		currentSediment := sl.BaseInductiveDecisionVariable.Value()
-
-		asIsSediment := asIsRiparianSediment + asIsHillSlopeSediment
-		toBeSediment := toBeRiparianSediment + toBeHillSlopeSediment
-
-		newSediment := currentSediment - asIsSediment + toBeSediment
-
-		sl.BaseInductiveDecisionVariable.SetValue(newSediment)
-
-		sl.acceptPlanningUnitChange(asIsSediment, toBeSediment)
-	}
-
-	assert.That(sl.actionObserved.IsActive()).WithFailureMessage("initialising action should always be active").Holds()
-	setVariable(actions.OriginalBufferVegetation, actions.ActionedBufferVegetation)
+func (sl *SedimentProduction) hillSlopeSediment(planningUnit planningunit.Id) float64 {
+	hillSlopeVegetation := sl.hillSlopeVegetationProportionPerPlanningUnit[planningUnit]
+	filteredHillSlopeSediment := sl.filteredHillSlopeSediment(planningUnit, hillSlopeVegetation)
+	return filteredHillSlopeSediment
 }
 
 func (sl *SedimentProduction) handleGullyRestorationAction() {
-	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsSedimentContribution := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeSedimentContribution := sl.actionObserved.ModelVariableValue(toBeName)
-
-		currentValue := sl.BaseInductiveDecisionVariable.Value()
-		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
-
-		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
-	}
+	var toBeSediment, asIsSediment float64
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		setVariable(actions.OriginalGullySediment, actions.ActionedGullySediment)
+		toBeSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
+		asIsSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
 	case false:
-		setVariable(actions.ActionedGullySediment, actions.OriginalGullySediment)
-	}
-}
-
-func (sl *SedimentProduction) handleInitialisingGullyRestorationAction() {
-	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsSedimentContribution := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeSedimentContribution := sl.actionObserved.ModelVariableValue(toBeName)
-
-		currentValue := sl.BaseInductiveDecisionVariable.Value()
-		sl.BaseInductiveDecisionVariable.SetValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
-
-		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
+		toBeSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
+		asIsSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 	}
 
-	assert.That(sl.actionObserved.IsActive()).Holds()
-	setVariable(actions.OriginalGullySediment, actions.ActionedGullySediment)
+	sl.command = new(variableNew.ChangePerPlanningUnitDecisionVariableCommand).
+		ForVariable(sl).
+		InPlanningUnit(sl.actionObserved.PlanningUnit()).
+		WithChange(toBeSediment - asIsSediment)
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
-	setTempVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
-
-		planningUnit := sl.actionObserved.PlanningUnit()
-		riparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
-
-		rawAsIsSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
-		asIsSedimentContribution := rawAsIsSedimentContribution * riparianFilter
-		rawToBeSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
-		toBeSedimentContribution := rawToBeSedimentContribution * riparianFilter
-
-		currentValue := sl.BaseInductiveDecisionVariable.Value()
-		sl.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsSedimentContribution + toBeSedimentContribution)
-
-		sl.hillSlopeVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] = toBeVegetation
-
-		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
-	}
-
+	var asIsSediment, toBeSediment, vegetationBuffer float64
 	switch sl.actionObserved.IsActive() {
 	case true:
-		setTempVariable(actions.OriginalHillSlopeVegetation, actions.ActionedHillSlopeVegetation)
+		vegetationBuffer = sl.actionObserved.ModelVariableValue(actions.ActionedHillSlopeVegetation)
+		toBeSediment = sl.hillSlopeSedimentForVariable(actions.ActionedHillSlopeVegetation)
+		asIsSediment = sl.hillSlopeSedimentForVariable(actions.OriginalHillSlopeVegetation)
 	case false:
-		setTempVariable(actions.ActionedHillSlopeVegetation, actions.OriginalHillSlopeVegetation)
-	}
-}
-
-func (sl *SedimentProduction) handleInitialisingHillSlopeRestorationAction() {
-	setVariable := func(asIsName action.ModelVariableName, toBeName action.ModelVariableName) {
-		asIsVegetation := sl.actionObserved.ModelVariableValue(asIsName)
-		toBeVegetation := sl.actionObserved.ModelVariableValue(toBeName)
-
-		planningUnit := sl.actionObserved.PlanningUnit()
-		riparianFilter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
-
-		rawAsIsSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, asIsVegetation)
-		asIsSedimentContribution := rawAsIsSedimentContribution * riparianFilter
-		rawToBeSedimentContribution := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, toBeVegetation)
-		toBeSedimentContribution := rawToBeSedimentContribution * riparianFilter
-
-		previousSediment := sl.BaseInductiveDecisionVariable.Value()
-		newSediment := previousSediment - asIsSedimentContribution + toBeSedimentContribution
-		sl.BaseInductiveDecisionVariable.SetValue(newSediment)
-
-		sl.hillSlopeVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] = toBeVegetation
-
-		sl.acceptPlanningUnitChange(asIsSedimentContribution, toBeSedimentContribution)
+		vegetationBuffer = sl.actionObserved.ModelVariableValue(actions.OriginalHillSlopeVegetation)
+		toBeSediment = sl.hillSlopeSedimentForVariable(actions.OriginalHillSlopeVegetation)
+		asIsSediment = sl.hillSlopeSedimentForVariable(actions.ActionedHillSlopeVegetation)
 	}
 
-	assert.That(sl.actionObserved.IsActive()).WithFailureMessage("initialising action should always be active").Holds()
-	setVariable(actions.OriginalHillSlopeVegetation, actions.ActionedHillSlopeVegetation)
+	sl.command = new(HillSlopeRevegetationCommand).
+		ForVariable(sl).
+		InPlanningUnit(sl.actionObserved.PlanningUnit()).
+		WithVegetationBuffer(vegetationBuffer).
+		WithChange(toBeSediment - asIsSediment)
 }
 
-func riparianBufferFilter(proportionOfRiparianBufferVegetation float64) float64 {
-	if proportionOfRiparianBufferVegetation < 0.25 {
-		return 1
-	}
-	if proportionOfRiparianBufferVegetation > 0.75 {
-		return 0.25
-	}
-	return 1 - proportionOfRiparianBufferVegetation
+func (sl *SedimentProduction) hillSlopeSedimentForVariable(vegetationBufferName action.ModelVariableName) float64 {
+	hillSlopeVegetation := sl.actionObserved.ModelVariableValue(vegetationBufferName)
+	filteredHillSlopeSediment := sl.filteredHillSlopeSediment(sl.actionObserved.PlanningUnit(), hillSlopeVegetation)
+	return filteredHillSlopeSediment
 }
 
-func (sl *SedimentProduction) acceptPlanningUnitChange(asIsSediment float64, toBeSediment float64) {
-	planningUnit := sl.actionObserved.PlanningUnit()
+func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planningunit.Id, hillSlopeVegetation float64) float64 {
+	hillSlopeSediment := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, hillSlopeVegetation)
+	filter := riparianBufferFilter(sl.riparianVegetationProportionPerPlanningUnit[planningUnit])
+	filteredHillSlopeSediment := hillSlopeSediment * filter
 
-	newPlanningUnitSediment := sl.planningUnitValues[planningUnit] + toBeSediment - asIsSediment
-	newPlanningUnitSediment = math.RoundFloat(newPlanningUnitSediment, int(sl.Precision()))
-
-	// max against 0 here to stop tiny rounding errors resulting in negative sediment for a planning unit.
-	sl.cachedPlanningUnitSediment = sl.planningUnitValues[planningUnit]
-	sl.planningUnitValues[planningUnit] = math2.Max(0, newPlanningUnitSediment)
+	return filteredHillSlopeSediment
 }
 
-func (sl *SedimentProduction) ValuesPerPlanningUnit() variableNew.PlanningUnitValueMap {
-	return sl.planningUnitValues
+func (sl *SedimentProduction) InductiveValue() float64 {
+	return sl.command.Value()
+}
+
+func (sl *SedimentProduction) SetInductiveValue(value float64) {
+	sl.command.SetChange(value)
+}
+
+func (sl *SedimentProduction) DifferenceInValues() float64 {
+	return sl.command.Change()
+}
+
+func (sl *SedimentProduction) AcceptInductiveValue() {
+	sl.command.Do()
 }
 
 func (sl *SedimentProduction) RejectInductiveValue() {
-	sl.rejectPlanningUnitChange()
-	sl.BaseInductiveDecisionVariable.RejectInductiveValue()
-}
-
-func (sl *SedimentProduction) rejectPlanningUnitChange() {
-	planningUnit := sl.actionObserved.PlanningUnit()
-	sl.planningUnitValues[planningUnit] = sl.cachedPlanningUnitSediment
-
-	if sl.actionObserved.Type() == actions.RiverBankRestorationType {
-		switch sl.actionObserved.IsActive() {
-		case true:
-			{
-				sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-					sl.actionObserved.ModelVariableValue(actions.OriginalBufferVegetation)
-			}
-		default:
-			{
-				sl.riparianVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-					sl.actionObserved.ModelVariableValue(actions.ActionedBufferVegetation)
-			}
-		}
-	}
-
-	if sl.actionObserved.Type() == actions.HillSlopeRestorationType {
-		switch sl.actionObserved.IsActive() {
-		case true:
-			{
-				sl.hillSlopeVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-					sl.actionObserved.ModelVariableValue(actions.OriginalHillSlopeVegetation)
-			}
-		default:
-			{
-				sl.hillSlopeVegetationProportionPerPlanningUnit[sl.actionObserved.PlanningUnit()] =
-					sl.actionObserved.ModelVariableValue(actions.ActionedHillSlopeVegetation)
-			}
-		}
-	}
+	sl.command.Undo()
 }

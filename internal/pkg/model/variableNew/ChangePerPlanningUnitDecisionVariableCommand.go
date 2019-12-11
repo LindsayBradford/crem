@@ -5,6 +5,7 @@ package variableNew
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/pkg/command"
+	"github.com/LindsayBradford/crem/pkg/math"
 )
 
 type ChangeCommand interface {
@@ -34,7 +35,8 @@ func (c *ChangePerPlanningUnitDecisionVariableCommand) WithChange(changeValue fl
 
 func (c *ChangePerPlanningUnitDecisionVariableCommand) SetChange(changeValue float64) {
 	c.undoneValue = c.Variable().ValuesPerPlanningUnit()[c.planningUnit]
-	c.doneValue = c.undoneValue + changeValue
+	roundedChangeValue := math.RoundFloat(changeValue, int(c.Variable().Precision()))
+	c.doneValue = c.undoneValue + roundedChangeValue
 }
 
 func (c *ChangePerPlanningUnitDecisionVariableCommand) InPlanningUnit(planningUnit planningunit.Id) *ChangePerPlanningUnitDecisionVariableCommand {

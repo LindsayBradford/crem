@@ -36,8 +36,8 @@ func (c *RiverBankRestorationCommand) WithChange(changeValue float64) *RiverBank
 	return c
 }
 
-func (c *RiverBankRestorationCommand) variable() *SedimentProduction2 {
-	return c.Target().(*SedimentProduction2)
+func (c *RiverBankRestorationCommand) variable() *SedimentProduction {
+	return c.Target().(*SedimentProduction)
 }
 
 func (c *RiverBankRestorationCommand) Do() command.CommandStatus {

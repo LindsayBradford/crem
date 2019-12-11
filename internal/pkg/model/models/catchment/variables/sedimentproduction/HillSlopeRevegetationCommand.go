@@ -36,8 +36,8 @@ func (c *HillSlopeRevegetationCommand) WithChange(changeValue float64) *HillSlop
 	return c
 }
 
-func (c *HillSlopeRevegetationCommand) variable() *SedimentProduction2 {
-	return c.Target().(*SedimentProduction2)
+func (c *HillSlopeRevegetationCommand) variable() *SedimentProduction {
+	return c.Target().(*SedimentProduction)
 }
 
 func (c *HillSlopeRevegetationCommand) Do() command.CommandStatus {

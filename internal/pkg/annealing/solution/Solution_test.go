@@ -34,7 +34,12 @@ func TestSolution_MatchErrors_MismatchedIds(t *testing.T) {
 		t.Log(matchErrors)
 	}
 
+	const expectedErrors = 1
+	const expectedErrorMsg = ""
+
 	g.Expect(matchErrors).To(Not(BeNil()))
+	g.Expect(matchErrors.Size()).To(BeNumerically(equalTo, expectedErrors))
+	g.Expect(matchErrors.SubError(0).Error()).To(ContainSubstring("Solutions have mismatching Ids"))
 }
 
 func TestSolution_MatchErrors_MissingVariables(t *testing.T) {
@@ -88,6 +93,12 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	solutionUnderTest.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 1.0,
+		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 42,
+				Value:        1.0,
+			},
+		},
 	}
 
 	mismatchedSolution.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 2)
@@ -98,9 +109,16 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	mismatchedSolution.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 42.0,
+		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 42,
+				Value:        42.0,
+			},
+		},
 	}
 
 	const expectedErrors = 1
+	const expectedErrorMsg = "variable [mismatchingValues] has mismatching values"
 
 	matchErrors := solutionUnderTest.MatchErrors(mismatchedSolution)
 
@@ -109,4 +127,69 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	}
 	g.Expect(matchErrors).To(Not(BeNil()))
 	g.Expect(matchErrors.Size()).To(BeNumerically(equalTo, expectedErrors))
+	g.Expect(matchErrors.SubError(0).Error()).To(ContainSubstring(expectedErrorMsg))
+}
+
+func TestSolution_MatchErrors_VariableValueMatchesSumOfPlanningUnits_NoMatchErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	solutionUnderTest := NewSolution("test")
+
+	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 1)
+	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+		Name:  "mismatchingValues",
+		Value: 2.25,
+		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 0,
+				Value:        1.5,
+			},
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 1,
+				Value:        0.75,
+			},
+		},
+	}
+
+	matchErrors := solutionUnderTest.MatchErrors(solutionUnderTest)
+
+	if matchErrors != nil {
+		t.Log(matchErrors)
+	}
+
+	g.Expect(matchErrors).To(BeNil())
+}
+
+func TestSolution_MatchErrors_VariableValueDoesntMatchSumOfPlanningUnits_MatchErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	solutionUnderTest := NewSolution("test")
+
+	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 1)
+	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+		Name:  "mismatchingValues",
+		Value: 3.0,
+		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 0,
+				Value:        1.5,
+			},
+			variableNew.PlanningUnitValue{
+				PlanningUnit: 1,
+				Value:        0.75,
+			},
+		},
+	}
+
+	const expectedErrors = 1
+
+	matchErrors := solutionUnderTest.MatchErrors(solutionUnderTest)
+
+	if matchErrors != nil {
+		t.Log(matchErrors)
+	}
+
+	g.Expect(matchErrors).To(Not(BeNil()))
+	g.Expect(matchErrors.Size()).To(BeNumerically(equalTo, expectedErrors))
+	g.Expect(matchErrors.SubError(0).Error()).To(ContainSubstring("but sum of planning units is"))
 }

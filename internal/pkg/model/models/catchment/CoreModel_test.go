@@ -3,7 +3,6 @@
 package catchment
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
@@ -16,15 +15,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
+	"github.com/LindsayBradford/crem/pkg/math"
 	. "github.com/onsi/gomega"
 )
 
 const expectedName = "CatchmentModel"
 
 const equalTo = "=="
-const approx = "~"
-
-const desiredPrecision = 1e-2
 
 func TestCoreModel_NewCoreModel(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -124,20 +121,20 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 
 	verifyPlanningUnitValues(g, solution, implementationcost.ImplementationCostVariableName, 0)
 	verifyPlanningUnitValues(g, solution, sedimentproduction.SedimentProductionVariableName, 38310.166)
-
-	verifyPlanningUnitValues(g, solution, implementationcost.ImplementationCost2VariableName, 0)
-	verifyPlanningUnitValues(g, solution, sedimentproduction.SedimentProduction2VariableName, 38310.166)
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {
-	actualImplementationCost := solutionVariable(solution, variableName)
-	g.Expect(actualImplementationCost.Value).To(BeNumerically(equalTo, expectedValue))
+	variableUnderTest := solutionVariable(solution, variableName)
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, expectedValue))
 
-	var planningUnitImplementationCost float64
-	for _, currValue := range actualImplementationCost.ValuePerPlanningUnit {
-		planningUnitImplementationCost += currValue.Value
+	var planningUnitValues float64
+	for _, currValue := range variableUnderTest.ValuePerPlanningUnit {
+		planningUnitValues += currValue.Value
 	}
-	g.Expect(actualImplementationCost.Value).To(BeNumerically(approx, planningUnitImplementationCost, desiredPrecision))
+	precisionOfVariable := math.DerivePrecision(variableUnderTest.Value)
+	roundedPlanningUnitValues := math.RoundFloat(planningUnitValues, precisionOfVariable)
+
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, roundedPlanningUnitValues))
 }
 
 func TestCoreModel_ToggleRiverBankRestoration_AsExpected(t *testing.T) {
@@ -167,57 +164,6 @@ func TestCoreModel_ToggleHillSlopeRestoration_AsExpected(t *testing.T) {
 	verifyActionToggle(t, modelUnderTest, planningUnit, actions.HillSlopeRestorationType, g)
 }
 
-func TestCoreModel_RiverBankVsHillSlopeRestoration_AsExpected(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	modelUnderTest := buildTestingModel(g)
-	planningUnit := planningunit.Id(17)
-
-	modelUnderTest.note("Toggling River Bank Restoration 17 On")
-	modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
-
-	solution := new(annealers.SolutionBuilder).
-		WithId("testingBuilder").
-		ForModel(modelUnderTest).
-		Build()
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
-	modelUnderTest.note("Toggling Hill Slope Restoration 17 On")
-	modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
-
-	solution = new(annealers.SolutionBuilder).
-		WithId("testingBuilder").
-		ForModel(modelUnderTest).
-		Build()
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
-	modelUnderTest.note("Toggling Hill Slope Restoration 17 Off")
-	modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
-
-	solution = new(annealers.SolutionBuilder).
-		WithId("testingBuilder").
-		ForModel(modelUnderTest).
-		Build()
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
-	modelUnderTest.note("Toggling River Bank Restoration 17 Off")
-	modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
-
-	solution = new(annealers.SolutionBuilder).
-		WithId("testingBuilder").
-		ForModel(modelUnderTest).
-		Build()
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-}
-
 func buildTestingModel(g *GomegaWithT) *CoreModel {
 	sourceDataSet := csv.NewDataSet("CatchmentModel")
 	loadError := sourceDataSet.Load("testdata/TestingModel.csv")
@@ -238,89 +184,29 @@ func buildTestingModel(g *GomegaWithT) *CoreModel {
 }
 
 func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit planningunit.Id, actionType action.ManagementActionType, g *GomegaWithT) {
-	solution := new(annealers.SolutionBuilder).
+	firstSolution := new(annealers.SolutionBuilder).
 		WithId("testingBuilder").
 		ForModel(modelUnderTest).
 		Build()
 
 	modelUnderTest.ToggleAction(planningUnit, actionType)
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
 	modelUnderTest.ToggleAction(planningUnit, actionType)
 
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
+	secondSolution := new(annealers.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest).
+		Build()
+
+	verifySolutionsMatch(t, g, firstSolution, secondSolution)
 }
 
-func verifyVariablesMatch(t *testing.T, g *GomegaWithT, solution *solution.Solution, firstVariableName string, secondVariableName string) {
-	firstVariable := solutionVariable(solution, firstVariableName)
-	secondVariable := solutionVariable(solution, secondVariableName)
-
-	for planningUnit := range firstVariable.ValuePerPlanningUnit {
-		if firstVariable.ValuePerPlanningUnit[planningUnit].Value != secondVariable.ValuePerPlanningUnit[planningUnit].Value {
-			difference := firstVariable.ValuePerPlanningUnit[planningUnit].Value - secondVariable.ValuePerPlanningUnit[planningUnit].Value
-			t.Logf("Planning Unit[%v], [%s].Value = [%f], [%s].Value = [%f], Difference = [%f]", firstVariable.ValuePerPlanningUnit[planningUnit].PlanningUnit,
-				firstVariableName, firstVariable.ValuePerPlanningUnit[planningUnit].Value,
-				secondVariableName, secondVariable.ValuePerPlanningUnit[planningUnit].Value, difference)
-		}
-		g.Expect(firstVariable.ValuePerPlanningUnit[planningUnit].Value).To(BeNumerically(approx, secondVariable.ValuePerPlanningUnit[planningUnit].Value, desiredPrecision))
+func verifySolutionsMatch(t *testing.T, g *GomegaWithT, firstSolution *solution.Solution, secondSolution *solution.Solution) {
+	matchErrors := firstSolution.MatchErrors(secondSolution)
+	if matchErrors != nil {
+		t.Log(matchErrors)
 	}
 
-	g.Expect(firstVariable.Value).To(BeNumerically(approx, secondVariable.Value, desiredPrecision))
-}
-
-func TestCoreModel_RandomVariableValuesMatch_AsExpected(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	modelUnderTest := buildTestingModel(g)
-
-	const loops = 100
-	for i := 0; i < loops; i++ {
-		iterationMsg := fmt.Sprintf("Invoking Model loop # %d", i)
-		modelUnderTest.note(iterationMsg)
-
-		iterationMsg = fmt.Sprintf("Model loop # %d, doing random change", i)
-		modelUnderTest.note(iterationMsg)
-		modelUnderTest.DoRandomChange()
-
-		doSolution := new(annealers.SolutionBuilder).
-			WithId("testingBuilder").
-			ForModel(modelUnderTest).
-			Build()
-
-		verifyVariablesMatch(t, g, doSolution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-		verifyVariablesMatch(t, g, doSolution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
-		iterationMsg = fmt.Sprintf("Model loop # %d, trying and accepting random change", i)
-		modelUnderTest.note(iterationMsg)
-
-		modelUnderTest.TryRandomChange()
-		modelUnderTest.AcceptChange()
-
-		tryAcceptSolution := new(annealers.SolutionBuilder).
-			WithId("testingBuilder").
-			ForModel(modelUnderTest).
-			Build()
-
-		verifyVariablesMatch(t, g, tryAcceptSolution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-		verifyVariablesMatch(t, g, tryAcceptSolution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-
-		iterationMsg = fmt.Sprintf("Model loop # %d, trying and reverting random change", i)
-		modelUnderTest.note(iterationMsg)
-
-		modelUnderTest.TryRandomChange()
-		modelUnderTest.RevertChange()
-
-		tryRevertSolution := new(annealers.SolutionBuilder).
-			WithId("testingBuilder").
-			ForModel(modelUnderTest).
-			Build()
-
-		verifyVariablesMatch(t, g, tryRevertSolution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-		verifyVariablesMatch(t, g, tryRevertSolution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
-	}
+	g.Expect(matchErrors).To(BeNil())
 }
 
 func solutionVariable(solution *solution.Solution, variableName string) *variableNew.EncodeableDecisionVariable {
@@ -330,24 +216,4 @@ func solutionVariable(solution *solution.Solution, variableName string) *variabl
 		}
 	}
 	return nil
-}
-
-func TestCoreModel_InitialisedValuesMatch_AsExpected(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	modelUnderTest := buildTestingModel(g)
-
-	modelUnderTest.initialising = true
-	for _, action := range modelUnderTest.managementActions.Actions() {
-		modelUnderTest.managementActions.RandomlyInitialiseAction(action)
-	}
-	modelUnderTest.initialising = false
-
-	solution := new(annealers.SolutionBuilder).
-		WithId("testingBuilder").
-		ForModel(modelUnderTest).
-		Build()
-
-	verifyVariablesMatch(t, g, solution, implementationcost.ImplementationCostVariableName, implementationcost.ImplementationCost2VariableName)
-	verifyVariablesMatch(t, g, solution, sedimentproduction.SedimentProductionVariableName, sedimentproduction.SedimentProduction2VariableName)
 }

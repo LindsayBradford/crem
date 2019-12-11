@@ -4,13 +4,13 @@ package solution
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
-
-	"sort"
-	"strings"
+	"github.com/LindsayBradford/crem/pkg/math"
 )
 
 func NewSolution(id string) *Solution {
@@ -98,6 +98,7 @@ func (s *Solution) checkIds(other *Solution, errors *compositeErrors.CompositeEr
 func (s *Solution) checkDecisionVariables(other *Solution, errors *compositeErrors.CompositeError) {
 	s.checkForMissingDecisionVariables(other, errors)
 	s.checkForMismatchedDecisionVariableValues(other, errors)
+	s.checkDecisionVariablesAreSumOfPlanningUnits(other, errors)
 }
 
 func (s *Solution) checkForMissingDecisionVariables(other *Solution, errors *compositeErrors.CompositeError) {
@@ -130,6 +131,20 @@ func (s *Solution) checkForMismatchedDecisionVariableValues(other *Solution, err
 					errors.AddMessage(variableError)
 				}
 			}
+		}
+	}
+}
+
+func (s *Solution) checkDecisionVariablesAreSumOfPlanningUnits(other *Solution, errors *compositeErrors.CompositeError) {
+	for _, myVariable := range s.DecisionVariables {
+		var planningUnitValues float64
+		for _, planningUnitValue := range myVariable.ValuePerPlanningUnit {
+			planningUnitValues += planningUnitValue.Value
+		}
+		precisionOfVariable := math.DerivePrecision(myVariable.Value)
+		if myVariable.Value != math.RoundFloat(planningUnitValues, precisionOfVariable) {
+			variableError := fmt.Sprintf("variable [%s] has value [%f], but sum of planning units is [%f]", myVariable.Name, myVariable.Value, planningUnitValues)
+			errors.AddMessage(variableError)
 		}
 	}
 }

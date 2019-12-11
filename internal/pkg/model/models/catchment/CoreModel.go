@@ -107,25 +107,16 @@ func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
 }
 
 func (m *CoreModel) buildDecisionVariables() {
-	sedimentProduction := new(sedimentproduction.SedimentProduction). // TODO: retire this when sedimentProduction2 finalised.
-										Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
-										WithObservers(m)
-
-	sedimentProduction2 := new(sedimentproduction.SedimentProduction2).
+	sedimentProduction2 := new(sedimentproduction.SedimentProduction).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
-	implementationCost := new(implementationcost.ImplementationCost). // TODO: retire this when implementationCost2 finalised.
-										Initialise(m.planningUnitTable, m.parameters).
-										WithObservers(m)
-
-	implementationCost2 := new(implementationcost.ImplementationCost2).
+	implementationCost2 := new(implementationcost.ImplementationCost).
 		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, sedimentProduction2,
-		implementationCost, implementationCost2,
+		sedimentProduction2, implementationCost2,
 	)
 }
 
@@ -171,13 +162,10 @@ func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 
 func (m *CoreModel) buildActionObservers() []action.Observer {
 	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.SedimentProductionVariableName)
-	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction.SedimentProduction2VariableName)
-
 	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.ImplementationCostVariableName)
-	implementationCost2 := m.ContainedDecisionVariables.Variable(implementationcost.ImplementationCost2VariableName)
 
 	observers := make([]action.Observer, 0)
-	observers = append(observers, m, sedimentProduction, sedimentProduction2, implementationCost, implementationCost2)
+	observers = append(observers, m, sedimentProduction, implementationCost)
 
 	return observers
 }
