@@ -1,7 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 // Variable package supplies generalised model variables that allow watchers of models to make decisions on those
 // models by reacting the changes in model decision variables. Decision variables for a model are considered part of
 // that model's public interface.

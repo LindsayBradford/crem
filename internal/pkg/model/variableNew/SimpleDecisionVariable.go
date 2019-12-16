@@ -1,14 +1,8 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package variableNew
 
 type SimpleDecisionVariables map[string]*SimpleDecisionVariable
-
-func NewSimpleDecisionVariables() SimpleDecisionVariables {
-	return make(SimpleDecisionVariables, 1)
-}
 
 func NewSimpleDecisionVariable(name string) SimpleDecisionVariable {
 	return SimpleDecisionVariable{name: name, value: 0}
