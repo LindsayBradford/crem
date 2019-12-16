@@ -2,10 +2,13 @@
 
 package variableNew
 
-type SimpleDecisionVariables map[string]*SimpleDecisionVariable
+const defaultPrecision = 3
 
 func NewSimpleDecisionVariable(name string) SimpleDecisionVariable {
-	return SimpleDecisionVariable{name: name, value: 0}
+	variable := SimpleDecisionVariable{name: name, value: 0}
+	variable.SetPrecision(defaultPrecision)
+	variable.SetUnitOfMeasure(NotApplicable)
+	return variable
 }
 
 type SimpleDecisionVariable struct {
