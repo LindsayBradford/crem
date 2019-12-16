@@ -2,6 +2,7 @@
 Name = "Test Dumb Annealer - Three concurrent runs"
 RunNumber = 3
 MaximumConcurrentRunNumber = 3
+OutputPath="testdata/solutions"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]

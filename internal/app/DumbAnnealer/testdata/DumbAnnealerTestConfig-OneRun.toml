@@ -1,5 +1,6 @@
 [Scenario]
 Name = "Test Dumb Annealer - One run"
+OutputPath="testdata/solutions"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]
