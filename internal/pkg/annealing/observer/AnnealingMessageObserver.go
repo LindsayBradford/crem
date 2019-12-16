@@ -103,7 +103,7 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").
 			Add("Temperature [", format(event, "Temperature"), "]")
 		if event.HasAttribute("ObjectiveValue") {
-			builder.Add("Objective value [", format(event, "ObjectiveValue"), "]")
+			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
 		}
 	default:
 		// deliberately does nothing extra

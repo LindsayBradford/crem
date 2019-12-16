@@ -89,8 +89,6 @@ func (ic *ImplementationCost) handleActionForModelVariable(name action.ModelVari
 		WithChange(newValue)
 }
 
-// TODO: This still feels janky!!
-
 func (ic *ImplementationCost) InductiveValue() float64 {
 	return ic.command.Value()
 }
@@ -105,10 +103,8 @@ func (ic *ImplementationCost) DifferenceInValues() float64 {
 
 func (ic *ImplementationCost) AcceptInductiveValue() {
 	ic.command.Do()
-	// ic.NotifyObservers() // TODO: Needed?
 }
 
 func (ic *ImplementationCost) RejectInductiveValue() {
 	ic.command.Undo()
-	// ic.NotifyObservers() // TODO: Needed?
 }

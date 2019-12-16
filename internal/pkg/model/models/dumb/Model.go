@@ -6,10 +6,10 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/LindsayBradford/crem/pkg/name"
@@ -21,48 +21,43 @@ type Model struct {
 	rand.RandContainer
 
 	parameters Parameters
-	variable.ContainedDecisionVariables
-	lastIterationValue float64
+	variable   *variableNew.UndoableDecisionVariable
 }
 
 func NewModel() *Model {
 	newModel := new(Model)
 	newModel.SetName("DumbModel")
 
-	newModel.DecisionVariables()
 	newModel.parameters.Initialise()
-
-	newModel.ContainedDecisionVariables.Initialise()
-	newModel.ContainedDecisionVariables.NewForName("ObjectiveValue")
-
+	newModel.variable = variableNew.NewUndoableDecisionVariable("ObjectiveValue")
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
-	newModel.ContainedDecisionVariables.SetValue("ObjectiveValue", initialValue)
+	newModel.variable.SetValue(initialValue)
 
 	return newModel
 }
 
-func (dm *Model) WithName(name string) *Model {
-	dm.SetName(name)
-	return dm
+func (m *Model) WithName(name string) *Model {
+	m.SetName(name)
+	return m
 }
 
-func (dm *Model) WithParameters(params parameters.Map) *Model {
-	dm.SetParameters(params)
+func (m *Model) WithParameters(params parameters.Map) *Model {
+	m.SetParameters(params)
 
-	return dm
+	return m
 }
 
-func (dm *Model) SetParameters(params parameters.Map) error {
-	dm.parameters.AssignAllUserValues(params)
+func (m *Model) SetParameters(params parameters.Map) error {
+	m.parameters.AssignAllUserValues(params)
 
-	initialValue := dm.parameters.GetFloat64(InitialObjectiveValue)
-	dm.ContainedDecisionVariables.SetValue("ObjectiveValue", initialValue)
+	initialValue := m.parameters.GetFloat64(InitialObjectiveValue)
+	m.variable.SetValue(initialValue)
 
-	return dm.ParameterErrors()
+	return m.ParameterErrors()
 }
 
-func (dm *Model) ParameterErrors() error {
-	return dm.parameters.ValidationErrors()
+func (m *Model) ParameterErrors() error {
+	return m.parameters.ValidationErrors()
 }
 
 const (
@@ -70,33 +65,30 @@ const (
 	upward   = 1
 )
 
-func (dm *Model) Initialise() {
-	dm.SetRandomNumberGenerator(rand.NewTimeSeeded())
+func (m *Model) Initialise() {
+	m.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
-func (dm *Model) TearDown() {
+func (m *Model) TearDown() {
 	// This model doesn't need any special tearDown.
 }
 
-func (dm *Model) DoRandomChange() {
-	dm.TryRandomChange()
-	dm.AcceptChange()
+func (m *Model) DoRandomChange() {
+	m.TryRandomChange()
+	m.AcceptChange()
 }
 
-func (dm *Model) UndoChange() {
-	dm.setObjectiveValue(dm.lastIterationValue)
-	dm.AcceptChange()
+func (m *Model) UndoChange() {
+	m.variable.RejectInductiveValue()
 }
 
-func (dm *Model) TryRandomChange() {
-	dm.lastIterationValue = dm.objectiveValue()
-	change := dm.generateRandomChange()
-	newValue := dm.capChangeOverRange(dm.lastIterationValue + change)
-	dm.setObjectiveValue(newValue)
+func (m *Model) TryRandomChange() {
+	change := m.generateRandomChange()
+	m.variable.SetInductiveChange(change)
 }
 
-func (dm *Model) generateRandomChange() float64 {
-	randomValue := dm.RandomNumberGenerator().Intn(2)
+func (m *Model) generateRandomChange() float64 {
+	randomValue := m.RandomNumberGenerator().Intn(2)
 
 	var changeInObjectiveValue float64
 	switch randomValue {
@@ -109,41 +101,58 @@ func (dm *Model) generateRandomChange() float64 {
 	return changeInObjectiveValue
 }
 
-func (dm *Model) capChangeOverRange(value float64) float64 {
-	maxCappedValue := math.Max(dm.parameters.GetFloat64(MinimumObjectiveValue), value)
-	bothCappedValue := math.Min(dm.parameters.GetFloat64(MaximumObjectiveValue), maxCappedValue)
+func (m *Model) capChangeOverRange(value float64) float64 {
+	maxCappedValue := math.Max(m.parameters.GetFloat64(MinimumObjectiveValue), value)
+	bothCappedValue := math.Min(m.parameters.GetFloat64(MaximumObjectiveValue), maxCappedValue)
 	return bothCappedValue
 }
 
-func (dm *Model) objectiveValue() float64 {
-	return dm.ContainedDecisionVariables.Value("ObjectiveValue")
+func (m *Model) objectiveValue() float64 {
+	return m.variable.Value()
 }
 
-func (dm *Model) setObjectiveValue(value float64) {
-	dm.ContainedDecisionVariables.Variable("ObjectiveValue").SetInductiveValue(value)
+func (m *Model) SetDecisionVariable(name string, value float64) {
+	m.variable.SetValue(value)
 }
 
-func (dm *Model) SetDecisionVariable(name string, value float64) {
-	dm.ContainedDecisionVariables.SetValue(name, value)
+func (m *Model) AcceptChange() {
+	m.variable.AcceptInductiveValue()
 }
 
-func (dm *Model) AcceptChange() {
-	dm.ContainedDecisionVariables.Variable("ObjectiveValue").AcceptInductiveValue()
+func (m *Model) RevertChange() {
+	m.variable.RejectInductiveValue()
 }
 
-func (dm *Model) RevertChange() {
-	dm.ContainedDecisionVariables.Variable("ObjectiveValue").RejectInductiveValue()
-}
+func (m *Model) ManagementActions() []action.ManagementAction        { return nil }
+func (m *Model) ActiveManagementActions() []action.ManagementAction  { return nil }
+func (m *Model) SetManagementAction(index int, value bool)           {}
+func (m *Model) SetManagementActionUnobserved(index int, value bool) {}
 
-func (dm *Model) ManagementActions() []action.ManagementAction        { return nil }
-func (dm *Model) ActiveManagementActions() []action.ManagementAction  { return nil }
-func (dm *Model) SetManagementAction(index int, value bool)           {}
-func (dm *Model) SetManagementActionUnobserved(index int, value bool) {}
+func (m *Model) PlanningUnits() planningunit.Ids { return nil }
 
-func (dm *Model) PlanningUnits() planningunit.Ids { return nil }
-
-func (dm *Model) DeepClone() model.Model {
-	clone := *dm
+func (m *Model) DeepClone() model.Model {
+	clone := *m
 	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return &clone
+}
+
+func (m *Model) DecisionVariables() *variableNew.DecisionVariableMap {
+	varMap := make(variableNew.DecisionVariableMap, 1)
+	varMap["ObjectiveValue"] = m.variable
+	return &varMap
+}
+
+func (m *Model) DecisionVariable(name string) variableNew.DecisionVariable {
+	return m.variable
+}
+
+func (m *Model) OffersDecisionVariable(name string) bool {
+	if name == "ObjectiveValue" {
+		return true
+	}
+	return false
+}
+
+func (m *Model) DecisionVariableChange(decisionVariableName string) float64 {
+	return m.variable.DifferenceInValues()
 }

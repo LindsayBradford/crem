@@ -18,7 +18,7 @@ type SimpleDecisionVariable struct {
 	ContainedPrecision
 }
 
-func (dvi *SimpleDecisionVariable) Name() string           { return dvi.name }
-func (dvi *SimpleDecisionVariable) SetName(name string)    { dvi.name = name }
-func (dvi *SimpleDecisionVariable) Value() float64         { return dvi.value }
-func (dvi *SimpleDecisionVariable) SetValue(value float64) { dvi.value = value }
+func (v *SimpleDecisionVariable) Name() string           { return v.name }
+func (v *SimpleDecisionVariable) SetName(name string)    { v.name = name }
+func (v *SimpleDecisionVariable) Value() float64         { return v.value }
+func (v *SimpleDecisionVariable) SetValue(value float64) { v.value = value }
