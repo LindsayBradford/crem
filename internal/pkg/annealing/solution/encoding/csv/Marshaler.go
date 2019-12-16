@@ -4,7 +4,7 @@ package csv
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 
 	strings2 "strings"
 
@@ -75,7 +75,7 @@ func planningUnitsAsHeaders(planningUnits planningunit.Ids) []string {
 	return headers
 }
 
-func joinAttributes(variable variableNew.EncodeableDecisionVariable, planningUnits planningunit.Ids) string {
+func joinAttributes(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) string {
 	planningUnitValues := planningUnitValueList(variable, planningUnits)
 
 	baseVariableValues := join(
@@ -89,15 +89,15 @@ func joinAttributes(variable variableNew.EncodeableDecisionVariable, planningUni
 	return join(baseVariableValues, joinedPlanningUnitValues)
 }
 
-func formatVariable(variableToFormat variableNew.EncodeableDecisionVariable) string {
+func formatVariable(variableToFormat variable.EncodeableDecisionVariable) string {
 	return formatVariableValue(variableToFormat, variableToFormat.Value)
 }
 
-func formatVariableValue(variableToFormat variableNew.EncodeableDecisionVariable, valueToFormat float64) string {
+func formatVariableValue(variableToFormat variable.EncodeableDecisionVariable, valueToFormat float64) string {
 	var outputVariable string
 
 	switch variableToFormat.Measure {
-	case variableNew.Dollars:
+	case variable.Dollars:
 		outputVariable = currencyConverter.Convert(valueToFormat)
 	default:
 		outputVariable = defaultConverter.Convert(valueToFormat)
@@ -106,7 +106,7 @@ func formatVariableValue(variableToFormat variableNew.EncodeableDecisionVariable
 	return outputVariable
 }
 
-func planningUnitValueList(variable variableNew.EncodeableDecisionVariable, planningUnits planningunit.Ids) []string {
+func planningUnitValueList(variable variable.EncodeableDecisionVariable, planningUnits planningunit.Ids) []string {
 	headers := make([]string, len(planningUnits))
 
 	if variable.ValuePerPlanningUnit != nil {

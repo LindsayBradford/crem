@@ -6,7 +6,7 @@ import (
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -21,7 +21,7 @@ type Model struct {
 	rand.RandContainer
 
 	parameters Parameters
-	variable   *variableNew.UndoableDecisionVariable
+	variable   *variable.UndoableDecisionVariable
 }
 
 func NewModel() *Model {
@@ -29,7 +29,7 @@ func NewModel() *Model {
 	newModel.SetName("DumbModel")
 
 	newModel.parameters.Initialise()
-	newModel.variable = variableNew.NewUndoableDecisionVariable("ObjectiveValue")
+	newModel.variable = variable.NewUndoableDecisionVariable("ObjectiveValue")
 	initialValue := newModel.parameters.GetFloat64(InitialObjectiveValue)
 	newModel.variable.SetValue(initialValue)
 
@@ -136,13 +136,13 @@ func (m *Model) DeepClone() model.Model {
 	return &clone
 }
 
-func (m *Model) DecisionVariables() *variableNew.DecisionVariableMap {
-	varMap := make(variableNew.DecisionVariableMap, 1)
+func (m *Model) DecisionVariables() *variable.DecisionVariableMap {
+	varMap := make(variable.DecisionVariableMap, 1)
 	varMap["ObjectiveValue"] = m.variable
 	return &varMap
 }
 
-func (m *Model) DecisionVariable(name string) variableNew.DecisionVariable {
+func (m *Model) DecisionVariable(name string) variable.DecisionVariable {
 	return m.variable
 }
 

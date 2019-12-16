@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
 )
@@ -17,7 +17,7 @@ func NewSolution(id string) *Solution {
 	newSolution := new(Solution)
 
 	newSolution.Id = id
-	newSolution.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 0)
+	newSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 0)
 
 	newSolution.ManagementActions = make(map[ManagementActionType]bool, 0)
 	newSolution.ActiveManagementActions = make(map[planningunit.Id]ManagementActions, 0)
@@ -44,7 +44,7 @@ func (m ManagementActions) Less(i, j int) bool {
 
 type Solution struct {
 	Id                        string
-	DecisionVariables         variableNew.EncodeableDecisionVariables
+	DecisionVariables         variable.EncodeableDecisionVariables
 	PlanningUnits             planningunit.Ids              `json:"-"`
 	ManagementActions         map[ManagementActionType]bool `json:"-"`
 	ActiveManagementActions   map[planningunit.Id]ManagementActions
@@ -117,7 +117,7 @@ func (s *Solution) checkForMissingDecisionVariables(other *Solution, errors *com
 	}
 
 	for variableName, solution := range variableSolutionMap {
-		variableError := fmt.Sprintf("Only solution [%s] has variable [%s]", solution.Id, variableName)
+		variableError := fmt.Sprintf("Only solution [%s] has variableOld [%s]", solution.Id, variableName)
 		errors.AddMessage(variableError)
 	}
 }
@@ -127,7 +127,7 @@ func (s *Solution) checkForMismatchedDecisionVariableValues(other *Solution, err
 		for _, otherVariable := range other.DecisionVariables {
 			if myVariable.Name == otherVariable.Name {
 				if myVariable.Value != otherVariable.Value {
-					variableError := fmt.Sprintf("variable [%s] has mismatching values [%f, %f]", myVariable.Name, myVariable.Value, otherVariable.Value)
+					variableError := fmt.Sprintf("variableOld [%s] has mismatching values [%f, %f]", myVariable.Name, myVariable.Value, otherVariable.Value)
 					errors.AddMessage(variableError)
 				}
 			}
@@ -143,7 +143,7 @@ func (s *Solution) checkDecisionVariablesAreSumOfPlanningUnits(other *Solution, 
 		}
 		precisionOfVariable := math.DerivePrecision(myVariable.Value)
 		if myVariable.Value != math.RoundFloat(planningUnitValues, precisionOfVariable) {
-			variableError := fmt.Sprintf("variable [%s] has value [%f], but sum of planning units is [%f]", myVariable.Name, myVariable.Value, planningUnitValues)
+			variableError := fmt.Sprintf("variableOld [%s] has value [%f], but sum of planning units is [%f]", myVariable.Name, myVariable.Value, planningUnitValues)
 			errors.AddMessage(variableError)
 		}
 	}

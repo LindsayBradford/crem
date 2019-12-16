@@ -8,7 +8,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
 )
@@ -16,14 +16,14 @@ import (
 const ImplementationCostVariableName = "ImplementationCost"
 const notImplementedCost float64 = 0
 
-var _ variable.InductiveDecisionVariable = new(ImplementationCost)
+var _ variableOld.InductiveDecisionVariable = new(ImplementationCost)
 
 type ImplementationCost struct {
-	variableNew.PerPlanningUnitDecisionVariable
+	variable.PerPlanningUnitDecisionVariable
 
 	actionObserved action.ManagementAction
 
-	command *variableNew.ChangePerPlanningUnitDecisionVariableCommand
+	command *variable.ChangePerPlanningUnitDecisionVariableCommand
 }
 
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
@@ -31,13 +31,13 @@ func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, para
 
 	ic.SetName(ImplementationCostVariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
-	ic.SetUnitOfMeasure(variableNew.Dollars)
+	ic.SetUnitOfMeasure(variable.Dollars)
 	ic.SetPrecision(2)
 
 	return ic
 }
 
-func (ic *ImplementationCost) WithObservers(observers ...variableNew.Observer) *ImplementationCost {
+func (ic *ImplementationCost) WithObservers(observers ...variable.Observer) *ImplementationCost {
 	ic.Subscribe(observers...)
 	return ic
 }
@@ -83,7 +83,7 @@ func (ic *ImplementationCost) handleActionForModelVariable(name action.ModelVari
 
 	newValue = math.RoundFloat(newValue, int(ic.Precision()))
 
-	ic.command = new(variableNew.ChangePerPlanningUnitDecisionVariableCommand).
+	ic.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
 		ForVariable(ic).
 		InPlanningUnit(ic.actionObserved.PlanningUnit()).
 		WithChange(newValue)

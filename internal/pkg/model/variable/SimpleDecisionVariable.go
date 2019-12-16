@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variableNew
+package variable
 
 const defaultPrecision = 3
 

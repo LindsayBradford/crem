@@ -13,7 +13,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/implementationcost"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/pkg/math"
 	. "github.com/onsi/gomega"
@@ -209,7 +209,7 @@ func verifySolutionsMatch(t *testing.T, g *GomegaWithT, firstSolution *solution.
 	g.Expect(matchErrors).To(BeNil())
 }
 
-func solutionVariable(solution *solution.Solution, variableName string) *variableNew.EncodeableDecisionVariable {
+func solutionVariable(solution *solution.Solution, variableName string) *variable.EncodeableDecisionVariable {
 	for _, currSolution := range solution.DecisionVariables {
 		if currSolution.Name == variableName {
 			return &currSolution

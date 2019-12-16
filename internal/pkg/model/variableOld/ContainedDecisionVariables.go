@@ -1,8 +1,8 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variable
+package variableOld
 
-import "github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+import "github.com/LindsayBradford/crem/internal/pkg/model/variable"
 
 const (
 	_ = iota
@@ -16,16 +16,16 @@ func (c *ContainedDecisionVariables) Initialise() {
 	c.InductiveDecisionVariables = NewInductiveDecisionVariables()
 }
 
-func (c *ContainedDecisionVariables) DecisionVariables() *variableNew.DecisionVariableMap {
+func (c *ContainedDecisionVariables) DecisionVariables() *variable.DecisionVariableMap {
 	inductiveVariables := c.InductiveDecisionVariables
-	vanillaVariables := make(variableNew.DecisionVariableMap, 0)
+	vanillaVariables := make(variable.DecisionVariableMap, 0)
 	for _, inductiveVariable := range inductiveVariables {
 		vanillaVariables[inductiveVariable.Name()] = inductiveVariable
 	}
 	return &vanillaVariables
 }
 
-func (c *ContainedDecisionVariables) DecisionVariable(name string) variableNew.DecisionVariable {
+func (c *ContainedDecisionVariables) DecisionVariable(name string) variable.DecisionVariable {
 	return c.InductiveDecisionVariables.Variable(name)
 }
 

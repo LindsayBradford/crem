@@ -5,7 +5,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
 type SolutionBuilder struct {
@@ -40,10 +40,10 @@ func (sb *SolutionBuilder) addDecisionVariables() {
 		return
 	}
 
-	solutionVariables := make(variableNew.EncodeableDecisionVariables, 0)
+	solutionVariables := make(variable.EncodeableDecisionVariables, 0)
 
 	for _, rawVariable := range *sb.model.DecisionVariables() {
-		solutionVariables = append(solutionVariables, variableNew.MakeEncodeable(rawVariable))
+		solutionVariables = append(solutionVariables, variable.MakeEncodeable(rawVariable))
 	}
 
 	sort.Sort(solutionVariables)

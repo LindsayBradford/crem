@@ -7,20 +7,20 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 	"github.com/pkg/errors"
 )
 
 const notImplementedValue float64 = 0
 
 type DumbObjective struct {
-	variable.BaseInductiveDecisionVariable
+	variableOld.BaseInductiveDecisionVariable
 	actionObserved       action.ManagementAction
 	valuePerPlanningUnit map[planningunit.Id]float64
 }
 
 func (do *DumbObjective) Initialise() *DumbObjective {
-	do.SetUnitOfMeasure(variableNew.NotApplicable)
+	do.SetUnitOfMeasure(variable.NotApplicable)
 	do.SetPrecision(2)
 	do.valuePerPlanningUnit = make(map[planningunit.Id]float64, 0)
 	return do
@@ -36,7 +36,7 @@ func (do *DumbObjective) WithStartingValue(value float64) *DumbObjective {
 	return do
 }
 
-func (do *DumbObjective) WithObservers(observers ...variableNew.Observer) *DumbObjective {
+func (do *DumbObjective) WithObservers(observers ...variable.Observer) *DumbObjective {
 	do.Subscribe(observers...)
 	return do
 }

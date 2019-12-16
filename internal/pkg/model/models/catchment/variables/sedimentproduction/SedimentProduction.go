@@ -8,23 +8,23 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 )
 
 const SedimentProductionVariableName = "SedimentProduction"
 
-var _ variableNew.DecisionVariable = new(SedimentProduction)
+var _ variable.DecisionVariable = new(SedimentProduction)
 
 const planningUnitIndex = 0
 
 type SedimentProduction struct {
-	variableNew.PerPlanningUnitDecisionVariable
+	variable.PerPlanningUnitDecisionVariable
 
 	actionObserved action.ManagementAction
 
-	command variableNew.ChangeCommand
+	command variable.ChangeCommand
 
 	bankSedimentContribution      actions.BankSedimentContribution
 	gullySedimentContribution     actions.GullySedimentContribution
@@ -40,7 +40,7 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 	sl.PerPlanningUnitDecisionVariable.Initialise()
 
 	sl.SetName(SedimentProductionVariableName)
-	sl.SetUnitOfMeasure(variableNew.TonnesPerYear)
+	sl.SetUnitOfMeasure(variable.TonnesPerYear)
 	sl.SetPrecision(3)
 
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
@@ -52,7 +52,7 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 	return sl
 }
 
-func (sl *SedimentProduction) WithObservers(observers ...variableNew.Observer) *SedimentProduction {
+func (sl *SedimentProduction) WithObservers(observers ...variable.Observer) *SedimentProduction {
 	sl.Subscribe(observers...)
 	return sl
 }
@@ -180,7 +180,7 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 		asIsSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 	}
 
-	sl.command = new(variableNew.ChangePerPlanningUnitDecisionVariableCommand).
+	sl.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
 		ForVariable(sl).
 		InPlanningUnit(sl.actionObserved.PlanningUnit()).
 		WithChange(toBeSediment - asIsSediment)

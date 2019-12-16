@@ -4,18 +4,18 @@ package sedimentproduction
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/command"
 )
 
 type RiverBankRestorationCommand struct {
-	variableNew.ChangePerPlanningUnitDecisionVariableCommand
+	variable.ChangePerPlanningUnitDecisionVariableCommand
 
 	doneRiparianVegetationProportion   float64
 	undoneRiparianVegetationProportion float64
 }
 
-func (c *RiverBankRestorationCommand) ForVariable(variable variableNew.PlanningUnitDecisionVariable) *RiverBankRestorationCommand {
+func (c *RiverBankRestorationCommand) ForVariable(variable variable.PlanningUnitDecisionVariable) *RiverBankRestorationCommand {
 	c.WithTarget(variable)
 	return c
 }

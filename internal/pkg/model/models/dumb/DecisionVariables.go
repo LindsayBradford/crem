@@ -3,15 +3,15 @@
 package dumb
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 )
 
 type DecisionVariables struct {
-	variable.InductiveDecisionVariables
+	variableOld.InductiveDecisionVariables
 }
 
 func (dv *DecisionVariables) Initialise() *DecisionVariables {
-	dv.InductiveDecisionVariables = variable.NewInductiveDecisionVariables()
+	dv.InductiveDecisionVariables = variableOld.NewInductiveDecisionVariables()
 	dv.buildDecisionVariables()
 	return dv
 }

@@ -1,13 +1,13 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variable
+package variableOld
 
 import (
 	"encoding/json"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -23,9 +23,9 @@ type CompositeInductiveDecisionVariable struct {
 	variableScales    map[InductiveDecisionVariable]float64
 	scaleVectorLength float64
 
-	variableNew.ContainedDecisionVariableObservers
-	variableNew.ContainedUnitOfMeasure
-	variableNew.ContainedPrecision
+	variable.ContainedDecisionVariableObservers
+	variable.ContainedUnitOfMeasure
+	variable.ContainedPrecision
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {
@@ -140,7 +140,7 @@ func (v *CompositeInductiveDecisionVariable) DifferenceInValues() float64 {
 }
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change
-// to any observers watching for state changes to the variable.
+// to any observers watching for state changes to the variableOld.
 func (v *CompositeInductiveDecisionVariable) NotifyObservers() {
 	for _, observer := range v.Observers() {
 		observer.ObserveDecisionVariable(v)
@@ -156,5 +156,5 @@ func (v *CompositeInductiveDecisionVariable) ObserveActionInitialising(action ac
 }
 
 func (v *CompositeInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
-	return json.Marshal(variableNew.MakeEncodeable(v))
+	return json.Marshal(variable.MakeEncodeable(v))
 }

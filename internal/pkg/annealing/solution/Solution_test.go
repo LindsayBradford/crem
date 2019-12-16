@@ -5,7 +5,7 @@ package solution
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableNew"
+	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	. "github.com/onsi/gomega"
 )
 
@@ -49,23 +49,23 @@ func TestSolution_MatchErrors_MissingVariables(t *testing.T) {
 	solutionUnderTest := NewSolution("mine")
 	mismatchedSolution := NewSolution("other") // expected error #1, mismatching ids
 
-	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 2)
-	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
-		Name:  "only in mine", // expected error #2, variable only present here
+	solutionUnderTest.DecisionVariables = make(variable.EncodeableDecisionVariables, 2)
+	solutionUnderTest.DecisionVariables[0] = variable.EncodeableDecisionVariable{
+		Name:  "only in mine", // expected error #2, variableOld only present here
 		Value: 0,
 	}
-	solutionUnderTest.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
+	solutionUnderTest.DecisionVariables[1] = variable.EncodeableDecisionVariable{
 		Name:  "match",
 		Value: 0,
 	}
 
-	mismatchedSolution.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 2)
-	mismatchedSolution.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+	mismatchedSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 2)
+	mismatchedSolution.DecisionVariables[0] = variable.EncodeableDecisionVariable{
 		Name:  "match",
 		Value: 0,
 	}
-	mismatchedSolution.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
-		Name:  "only in other", // expected error #3, variable only present here
+	mismatchedSolution.DecisionVariables[1] = variable.EncodeableDecisionVariable{
+		Name:  "only in other", // expected error #3, variableOld only present here
 		Value: 0,
 	}
 
@@ -86,32 +86,32 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	solutionUnderTest := NewSolution(testSolutionId)
 	mismatchedSolution := NewSolution(testSolutionId)
 
-	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 2)
-	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+	solutionUnderTest.DecisionVariables = make(variable.EncodeableDecisionVariables, 2)
+	solutionUnderTest.DecisionVariables[0] = variable.EncodeableDecisionVariable{
 		Name:  "matchingValues",
 		Value: 0.0,
 	}
-	solutionUnderTest.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
+	solutionUnderTest.DecisionVariables[1] = variable.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 1.0,
-		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
-			variableNew.PlanningUnitValue{
+		ValuePerPlanningUnit: variable.PlanningUnitValues{
+			variable.PlanningUnitValue{
 				PlanningUnit: 42,
 				Value:        1.0,
 			},
 		},
 	}
 
-	mismatchedSolution.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 2)
-	mismatchedSolution.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+	mismatchedSolution.DecisionVariables = make(variable.EncodeableDecisionVariables, 2)
+	mismatchedSolution.DecisionVariables[0] = variable.EncodeableDecisionVariable{
 		Name:  "matchingValues",
 		Value: 0,
 	}
-	mismatchedSolution.DecisionVariables[1] = variableNew.EncodeableDecisionVariable{
+	mismatchedSolution.DecisionVariables[1] = variable.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 42.0,
-		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
-			variableNew.PlanningUnitValue{
+		ValuePerPlanningUnit: variable.PlanningUnitValues{
+			variable.PlanningUnitValue{
 				PlanningUnit: 42,
 				Value:        42.0,
 			},
@@ -119,7 +119,7 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	}
 
 	const expectedErrors = 1
-	const expectedErrorMsg = "variable [mismatchingValues] has mismatching values"
+	const expectedErrorMsg = "variableOld [mismatchingValues] has mismatching values"
 
 	matchErrors := solutionUnderTest.MatchErrors(mismatchedSolution)
 
@@ -136,16 +136,16 @@ func TestSolution_MatchErrors_VariableValueMatchesSumOfPlanningUnits_NoMatchErro
 
 	solutionUnderTest := NewSolution(testSolutionId)
 
-	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 1)
-	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+	solutionUnderTest.DecisionVariables = make(variable.EncodeableDecisionVariables, 1)
+	solutionUnderTest.DecisionVariables[0] = variable.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 2.25,
-		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
-			variableNew.PlanningUnitValue{
+		ValuePerPlanningUnit: variable.PlanningUnitValues{
+			variable.PlanningUnitValue{
 				PlanningUnit: 0,
 				Value:        1.5,
 			},
-			variableNew.PlanningUnitValue{
+			variable.PlanningUnitValue{
 				PlanningUnit: 1,
 				Value:        0.75,
 			},
@@ -166,16 +166,16 @@ func TestSolution_MatchErrors_VariableValueDoesntMatchSumOfPlanningUnits_MatchEr
 
 	solutionUnderTest := NewSolution(testSolutionId)
 
-	solutionUnderTest.DecisionVariables = make(variableNew.EncodeableDecisionVariables, 1)
-	solutionUnderTest.DecisionVariables[0] = variableNew.EncodeableDecisionVariable{
+	solutionUnderTest.DecisionVariables = make(variable.EncodeableDecisionVariables, 1)
+	solutionUnderTest.DecisionVariables[0] = variable.EncodeableDecisionVariable{
 		Name:  "mismatchingValues",
 		Value: 3.0,
-		ValuePerPlanningUnit: variableNew.PlanningUnitValues{
-			variableNew.PlanningUnitValue{
+		ValuePerPlanningUnit: variable.PlanningUnitValues{
+			variable.PlanningUnitValue{
 				PlanningUnit: 0,
 				Value:        1.5,
 			},
-			variableNew.PlanningUnitValue{
+			variable.PlanningUnitValue{
 				PlanningUnit: 1,
 				Value:        0.75,
 			},
