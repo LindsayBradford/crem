@@ -2,105 +2,30 @@
 
 package variable
 
-import (
-	"github.com/LindsayBradford/crem/pkg/command"
-	"github.com/LindsayBradford/crem/pkg/math"
-)
+// UndoableDecisionVariable is a DecisionVariable that allows an 'inductive' Value to be temporarily stored
+// and retrieved for the decision variableOld (typically based based on some management action change).
+// The induced Value does not become the actual Value for the decision variableOld without being explicitly accepted.
+// The induced Value can also be rejected, which sees it revert to the actual Value of the variableOld.
+type UndoableDecisionVariable interface {
+	DecisionVariable
 
-func NewUndoableDecisionVariable(name string) *UndoableDecisionVariable {
-	variable := new(UndoableDecisionVariable)
+	// UndoableValue returns an "inductive" Value for the variableOld.  This Value cannot become the
+	// actual (induced) Value for the variableOld without a call to ApplyDoneValue.
+	UndoableValue() float64
 
-	variable.SetName(name)
-	variable.SetPrecision(defaultPrecision)
-	variable.SetUnitOfMeasure(NotApplicable)
+	// SetUndoableValue allows an "undoable"vValue for the variable to be set.  This undoable Value is not the
+	// variable's actual value. It is a Value that would result (or be induced) from, some management action change.
+	// This Value  is expected to be a temporary, lasting only as long as it takes for decision-making logic to decide
+	// whether to accept the variable value, or reject/undo it.
+	SetUndoableValue(value float64)
 
-	variable.command = new(UndoableValueCommand).ForVariable(variable)
+	// DifferenceInValues report the difference in taking the variableOld's actual Value for its inductive Value.
+	// This difference is often used in decision making around whether to accept the inductive Value.
+	DifferenceInValues() float64
 
-	return variable
-}
+	// Accepts the inductive Value of the variableOld as the variableOld's actual Value.
+	ApplyDoneValue()
 
-type UndoableDecisionVariable struct {
-	SimpleDecisionVariable
-
-	ContainedDecisionVariableObservers
-	command *UndoableValueCommand
-}
-
-func (v *UndoableDecisionVariable) InductiveValue() float64 {
-	return v.command.Value()
-}
-
-func (v *UndoableDecisionVariable) SetInductiveChange(change float64) {
-	v.command.WithChange(change)
-}
-
-func (v *UndoableDecisionVariable) DifferenceInValues() float64 {
-	return v.command.Change()
-}
-
-func (v *UndoableDecisionVariable) AcceptInductiveValue() {
-	v.command.Do()
-}
-
-func (v *UndoableDecisionVariable) RejectInductiveValue() {
-	v.command.Undo()
-}
-
-type UndoableValueCommand struct {
-	command.BaseCommand
-
-	undoneValue float64
-	doneValue   float64
-}
-
-func (c *UndoableValueCommand) ForVariable(variable *UndoableDecisionVariable) *UndoableValueCommand {
-	c.WithTarget(variable)
-	return c
-}
-
-func (c *UndoableValueCommand) WithChange(changeValue float64) *UndoableValueCommand {
-	c.SetChange(changeValue)
-	return c
-}
-
-func (c *UndoableValueCommand) SetChange(changeValue float64) {
-	c.undoneValue = c.Variable().Value()
-	roundedChangeValue := math.RoundFloat(changeValue, int(c.Variable().Precision()))
-	c.doneValue = c.undoneValue + roundedChangeValue
-}
-
-func (c *UndoableValueCommand) Do() command.CommandStatus {
-	if c.BaseCommand.Do() == command.NoChange {
-		return command.NoChange
-	}
-	c.DoUnguarded()
-	return command.Done
-}
-
-func (c *UndoableValueCommand) DoUnguarded() {
-	c.Variable().SetValue(c.doneValue)
-}
-
-func (c *UndoableValueCommand) Undo() command.CommandStatus {
-	if c.BaseCommand.Undo() == command.NoChange {
-		return command.NoChange
-	}
-	c.UndoUnguarded()
-	return command.UnDone
-}
-
-func (c *UndoableValueCommand) UndoUnguarded() {
-	c.Variable().SetValue(c.undoneValue)
-}
-
-func (c *UndoableValueCommand) Variable() *UndoableDecisionVariable {
-	return c.Target().(*UndoableDecisionVariable)
-}
-
-func (c *UndoableValueCommand) Value() float64 {
-	return c.doneValue
-}
-
-func (c *UndoableValueCommand) Change() float64 {
-	return c.doneValue - c.undoneValue
+	// Rejects the inductive Value of the variableOld, resetting the inductive Value to the variableOld's actual Value.
+	ApplyUndoneValue()
 }

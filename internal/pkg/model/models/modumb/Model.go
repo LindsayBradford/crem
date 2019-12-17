@@ -12,7 +12,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb/variables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -26,7 +25,7 @@ type Model struct {
 
 	parameters parameters.Parameters
 
-	variableOld.ContainedDecisionVariables
+	variable.ContainedDecisionVariables
 	managementActions action.ModelManagementActions
 
 	observer.ContainedEventNotifier
@@ -128,9 +127,20 @@ func (m *Model) buildManagementActions() {
 
 		m.managementActions.Add(actionOne, actionTwo, actionThree)
 
-		actionOne.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[0]))
-		actionTwo.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[1]))
-		actionThree.Subscribe(m, m.ContainedDecisionVariables.Variable(Objectives[2]))
+		objectiveOne := m.ContainedDecisionVariables.Variable(Objectives[0])
+		if objectiveOneAsObserver, isObserver := objectiveOne.(action.Observer); isObserver {
+			actionOne.Subscribe(m, objectiveOneAsObserver)
+		}
+
+		objectiveTwo := m.ContainedDecisionVariables.Variable(Objectives[1])
+		if objectiveTwoAsObserver, isObserver := objectiveTwo.(action.Observer); isObserver {
+			actionTwo.Subscribe(m, objectiveTwoAsObserver)
+		}
+
+		objectiveThree := m.ContainedDecisionVariables.Variable(Objectives[2])
+		if objectiveThreeAsObserver, isObserver := objectiveThree.(action.Observer); isObserver {
+			actionThree.Subscribe(m, objectiveThreeAsObserver)
+		}
 	}
 }
 

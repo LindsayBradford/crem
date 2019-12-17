@@ -73,7 +73,7 @@ func (o *OldDumbObjective) handleDumbAction() {
 			return
 		}
 		currentValue := o.BaseInductiveDecisionVariable.Value()
-		o.BaseInductiveDecisionVariable.SetInductiveValue(currentValue - asIsValue + toBeValue)
+		o.BaseInductiveDecisionVariable.SetUndoableValue(currentValue - asIsValue + toBeValue)
 		o.acceptPlanningUnitChange(asIsValue, toBeValue)
 	}
 
@@ -118,9 +118,9 @@ func (o *OldDumbObjective) ValuesPerPlanningUnit() map[planningunit.Id]float64 {
 	return o.valuePerPlanningUnit
 }
 
-func (o *OldDumbObjective) RejectInductiveValue() {
+func (o *OldDumbObjective) ApplyUndoneValue() {
 	o.rejectPlanningUnitChange()
-	o.BaseInductiveDecisionVariable.RejectInductiveValue()
+	o.BaseInductiveDecisionVariable.ApplyUndoneValue()
 }
 
 func (o *OldDumbObjective) rejectPlanningUnitChange() {

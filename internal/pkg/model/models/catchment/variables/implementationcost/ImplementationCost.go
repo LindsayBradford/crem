@@ -8,15 +8,14 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
 )
 
-const ImplementationCostVariableName = "ImplementationCost"
+const VariableName = "ImplementationCost"
 const notImplementedCost float64 = 0
 
-var _ variableOld.InductiveDecisionVariable = new(ImplementationCost)
+var _ variable.UndoableDecisionVariable = new(ImplementationCost)
 
 type ImplementationCost struct {
 	variable.PerPlanningUnitDecisionVariable
@@ -29,7 +28,7 @@ type ImplementationCost struct {
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.PerPlanningUnitDecisionVariable.Initialise()
 
-	ic.SetName(ImplementationCostVariableName)
+	ic.SetName(VariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure(variable.Dollars)
 	ic.SetPrecision(2)
@@ -89,11 +88,11 @@ func (ic *ImplementationCost) handleActionForModelVariable(name action.ModelVari
 		WithChange(newValue)
 }
 
-func (ic *ImplementationCost) InductiveValue() float64 {
+func (ic *ImplementationCost) UndoableValue() float64 {
 	return ic.command.Value()
 }
 
-func (ic *ImplementationCost) SetInductiveValue(value float64) {
+func (ic *ImplementationCost) SetUndoableValue(value float64) {
 	ic.command.WithChange(value)
 }
 
@@ -101,10 +100,10 @@ func (ic *ImplementationCost) DifferenceInValues() float64 {
 	return ic.command.Change()
 }
 
-func (ic *ImplementationCost) AcceptInductiveValue() {
+func (ic *ImplementationCost) ApplyDoneValue() {
 	ic.command.Do()
 }
 
-func (ic *ImplementationCost) RejectInductiveValue() {
+func (ic *ImplementationCost) ApplyUndoneValue() {
 	ic.command.Undo()
 }

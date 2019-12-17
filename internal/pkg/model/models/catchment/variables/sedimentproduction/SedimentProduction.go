@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-const SedimentProductionVariableName = "SedimentProduction"
+const VariableName = "SedimentProduction"
 
 var _ variable.DecisionVariable = new(SedimentProduction)
 
@@ -39,7 +39,7 @@ type SedimentProduction struct {
 func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters parameters.Parameters) *SedimentProduction {
 	sl.PerPlanningUnitDecisionVariable.Initialise()
 
-	sl.SetName(SedimentProductionVariableName)
+	sl.SetName(VariableName)
 	sl.SetUnitOfMeasure(variable.TonnesPerYear)
 	sl.SetPrecision(3)
 
@@ -220,11 +220,11 @@ func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planninguni
 	return filteredHillSlopeSediment
 }
 
-func (sl *SedimentProduction) InductiveValue() float64 {
+func (sl *SedimentProduction) UndoableValue() float64 {
 	return sl.command.Value()
 }
 
-func (sl *SedimentProduction) SetInductiveValue(value float64) {
+func (sl *SedimentProduction) SetUndoableValue(value float64) {
 	sl.command.SetChange(value)
 }
 
@@ -232,10 +232,10 @@ func (sl *SedimentProduction) DifferenceInValues() float64 {
 	return sl.command.Change()
 }
 
-func (sl *SedimentProduction) AcceptInductiveValue() {
+func (sl *SedimentProduction) ApplyDoneValue() {
 	sl.command.Do()
 }
 
-func (sl *SedimentProduction) RejectInductiveValue() {
+func (sl *SedimentProduction) ApplyUndoneValue() {
 	sl.command.Undo()
 }

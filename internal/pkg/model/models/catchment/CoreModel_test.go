@@ -67,10 +67,10 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 
 	actualVariables := *model.DecisionVariables()
 
-	g.Expect(actualVariables).To(HaveKey(implementationcost.ImplementationCostVariableName))
-	g.Expect(actualVariables[implementationcost.ImplementationCostVariableName].Value()).To(BeNumerically(equalTo, 0))
+	g.Expect(actualVariables).To(HaveKey(implementationcost.VariableName))
+	g.Expect(actualVariables[implementationcost.VariableName].Value()).To(BeNumerically(equalTo, 0))
 
-	g.Expect(actualVariables).To(HaveKey(sedimentproduction.SedimentProductionVariableName))
+	g.Expect(actualVariables).To(HaveKey(sedimentproduction.VariableName))
 }
 
 func TestCoreModel_Initialise_InvalidDataSet_Errors(t *testing.T) {
@@ -119,8 +119,8 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 
 	g.Expect(solution).To(Not(BeNil()))
 
-	verifyPlanningUnitValues(g, solution, implementationcost.ImplementationCostVariableName, 0)
-	verifyPlanningUnitValues(g, solution, sedimentproduction.SedimentProductionVariableName, 38310.166)
+	verifyPlanningUnitValues(g, solution, implementationcost.VariableName, 0)
+	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 38310.166)
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {

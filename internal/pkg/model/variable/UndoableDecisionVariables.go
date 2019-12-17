@@ -1,41 +1,41 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package variableOld
+package variable
 
 import (
 	"github.com/pkg/errors"
 )
 
-func NewInductiveDecisionVariables() InductiveDecisionVariables {
-	return make(InductiveDecisionVariables, 1)
+func NewUndoableDecisionVariables() UndoableDecisionVariables {
+	return make(UndoableDecisionVariables, 1)
 }
 
-// InductiveDecisionVariables offers up a name-indexed collection of InductiveDecisionVariable instances, along with
+// UndoableDecisionVariables offers up a name-indexed collection of UndoableDecisionVariable instances, along with
 // convenience methods for the collection's management.  It is typically expected that a model would contain only a
-// single instance of InductiveDecisionVariables to house all of its decision variables.
-type InductiveDecisionVariables map[string]InductiveDecisionVariable
+// single instance of UndoableDecisionVariables to house all of its decision variables.
+type UndoableDecisionVariables map[string]UndoableDecisionVariable
 
-// Adds a number of InductiveDecisionVariables to the collection
-func (vs *InductiveDecisionVariables) Add(newVariables ...InductiveDecisionVariable) {
+// Adds a number of UndoableDecisionVariables to the collection
+func (vs *UndoableDecisionVariables) Add(newVariables ...UndoableDecisionVariable) {
 	for _, newVariable := range newVariables {
 		vs.asMap()[newVariable.Name()] = newVariable
 	}
 }
 
 // NewForName creates and adds to its collection, a new BaseInductiveDecisionVariable with the supplied name.
-func (vs *InductiveDecisionVariables) NewForName(name string) {
-	newVariable := new(BaseInductiveDecisionVariable)
+func (vs *UndoableDecisionVariables) NewForName(name string) {
+	newVariable := new(SimpleUndoableDecisionVariable)
 	newVariable.SetName(name)
 	vs.asMap()[name] = newVariable
 }
 
-func (vs *InductiveDecisionVariables) asMap() InductiveDecisionVariables {
+func (vs *UndoableDecisionVariables) asMap() UndoableDecisionVariables {
 	return *vs
 }
 
 // SetValue finds the variableOld with supplied name in its collection, and sets its Value appropriately.
 // If the collection has no variableOld for the supplied name, it panics.
-func (vs *InductiveDecisionVariables) SetValue(name string, value float64) {
+func (vs *UndoableDecisionVariables) SetValue(name string, value float64) {
 	if variable, isPresent := vs.asMap()[name]; isPresent {
 		variable.SetValue(value)
 		return
@@ -49,7 +49,7 @@ func variableMissing(name string) error {
 
 // Variable returns a pointer to the variableOld in its collection with the supplied name.
 // If the collection has no variableOld for the supplied name, it panics.
-func (vs *InductiveDecisionVariables) Variable(name string) InductiveDecisionVariable {
+func (vs *UndoableDecisionVariables) Variable(name string) UndoableDecisionVariable {
 	if variable, isPresent := vs.asMap()[name]; isPresent {
 		return variable
 	}
@@ -58,7 +58,7 @@ func (vs *InductiveDecisionVariables) Variable(name string) InductiveDecisionVar
 
 // Value returns the Value of the variableOld in its collection with the supplied name.
 // If the collection has no variableOld for the supplied name, it panics.
-func (vs *InductiveDecisionVariables) Value(name string) float64 {
+func (vs *UndoableDecisionVariables) Value(name string) float64 {
 	if variable, isPresent := vs.asMap()[name]; isPresent {
 		return variable.Value()
 	}
@@ -66,21 +66,21 @@ func (vs *InductiveDecisionVariables) Value(name string) float64 {
 }
 
 // DifferenceInValues reports the difference in values of the variableOld in its collection with the supplied name.
-func (vs *InductiveDecisionVariables) DifferenceInValues(variableName string) float64 {
+func (vs *UndoableDecisionVariables) DifferenceInValues(variableName string) float64 {
 	decisionVariable := vs.Variable(variableName)
 	return decisionVariable.DifferenceInValues()
 }
 
 // AcceptAll accepts the inductive Value of all the BaseInductiveDecisionVariable instances in its collection.
-func (vs *InductiveDecisionVariables) AcceptAll() {
+func (vs *UndoableDecisionVariables) AcceptAll() {
 	for _, variable := range vs.asMap() {
-		variable.AcceptInductiveValue()
+		variable.ApplyDoneValue()
 	}
 }
 
 // RejectAll rejects the inductive Value of all the BaseInductiveDecisionVariable instances in its collection.
-func (vs *InductiveDecisionVariables) RejectAll() {
+func (vs *UndoableDecisionVariables) RejectAll() {
 	for _, variable := range vs.asMap() {
-		variable.RejectInductiveValue()
+		variable.ApplyUndoneValue()
 	}
 }

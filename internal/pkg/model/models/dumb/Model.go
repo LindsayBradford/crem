@@ -21,7 +21,7 @@ type Model struct {
 	rand.RandContainer
 
 	parameters Parameters
-	variable   *variable.UndoableDecisionVariable
+	variable   *variable.SimpleUndoableDecisionVariable
 }
 
 func NewModel() *Model {
@@ -79,12 +79,12 @@ func (m *Model) DoRandomChange() {
 }
 
 func (m *Model) UndoChange() {
-	m.variable.RejectInductiveValue()
+	m.variable.ApplyUndoneValue()
 }
 
 func (m *Model) TryRandomChange() {
 	change := m.generateRandomChange()
-	m.variable.SetInductiveChange(change)
+	m.variable.SetUndoableChange(change)
 }
 
 func (m *Model) generateRandomChange() float64 {
@@ -116,11 +116,11 @@ func (m *Model) SetDecisionVariable(name string, value float64) {
 }
 
 func (m *Model) AcceptChange() {
-	m.variable.AcceptInductiveValue()
+	m.variable.ApplyDoneValue()
 }
 
 func (m *Model) RevertChange() {
-	m.variable.RejectInductiveValue()
+	m.variable.ApplyUndoneValue()
 }
 
 func (m *Model) ManagementActions() []action.ManagementAction        { return nil }

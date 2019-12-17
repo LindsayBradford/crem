@@ -12,22 +12,22 @@ import (
 	"github.com/pkg/errors"
 )
 
-var _ InductiveDecisionVariable = new(CompositeInductiveDecisionVariable)
+var _ variable.UndoableDecisionVariable = new(CompositeInductiveDecisionVariable)
 
 type CompositeInductiveDecisionVariable struct {
 	variable.SimpleDecisionVariable
 
-	weightedVariables map[InductiveDecisionVariable]float64
+	weightedVariables map[variable.UndoableDecisionVariable]float64
 
-	variableScales    map[InductiveDecisionVariable]float64
+	variableScales    map[variable.UndoableDecisionVariable]float64
 	scaleVectorLength float64
 
 	variable.ContainedDecisionVariableObservers
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {
-	v.weightedVariables = make(map[InductiveDecisionVariable]float64, 0)
-	v.variableScales = make(map[InductiveDecisionVariable]float64, 0)
+	v.weightedVariables = make(map[variable.UndoableDecisionVariable]float64, 0)
+	v.variableScales = make(map[variable.UndoableDecisionVariable]float64, 0)
 	return v
 }
 
@@ -36,7 +36,7 @@ func (v *CompositeInductiveDecisionVariable) WithName(name string) *CompositeInd
 	return v
 }
 
-func (v *CompositeInductiveDecisionVariable) WithWeightedVariable(variable InductiveDecisionVariable, weight float64) *CompositeInductiveDecisionVariable {
+func (v *CompositeInductiveDecisionVariable) WithWeightedVariable(variable variable.UndoableDecisionVariable, weight float64) *CompositeInductiveDecisionVariable {
 	v.weightedVariables[variable] = weight
 	return v
 }
@@ -102,11 +102,11 @@ func (v *CompositeInductiveDecisionVariable) SetValue(value float64) {
 	// Deliberately does nothing
 }
 
-func (v *CompositeInductiveDecisionVariable) InductiveValue() float64 {
+func (v *CompositeInductiveDecisionVariable) UndoableValue() float64 {
 	numberOfVariables := float64(len(v.variableScales))
 	value := float64(0)
 	for variable, scale := range v.variableScales {
-		variableValue := variable.InductiveValue()
+		variableValue := variable.UndoableValue()
 		scaledValue := variableValue / scale
 		weight := v.weightedVariables[variable]
 		value += scaledValue * weight * numberOfVariables
@@ -114,26 +114,26 @@ func (v *CompositeInductiveDecisionVariable) InductiveValue() float64 {
 	return value / v.scaleVectorLength
 }
 
-func (v *CompositeInductiveDecisionVariable) SetInductiveValue(value float64) {
+func (v *CompositeInductiveDecisionVariable) SetUndoableValue(value float64) {
 	// Deliberately does nothing
 }
 
-func (v *CompositeInductiveDecisionVariable) AcceptInductiveValue() {
+func (v *CompositeInductiveDecisionVariable) ApplyDoneValue() {
 	for variable := range v.weightedVariables {
-		variable.AcceptInductiveValue()
+		variable.ApplyDoneValue()
 	}
 	v.NotifyObservers()
 }
 
-func (v *CompositeInductiveDecisionVariable) RejectInductiveValue() {
+func (v *CompositeInductiveDecisionVariable) ApplyUndoneValue() {
 	for variable := range v.weightedVariables {
-		variable.RejectInductiveValue()
+		variable.ApplyUndoneValue()
 	}
 	v.NotifyObservers()
 }
 
 func (v *CompositeInductiveDecisionVariable) DifferenceInValues() float64 {
-	return v.InductiveValue() - v.Value()
+	return v.UndoableValue() - v.Value()
 }
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change

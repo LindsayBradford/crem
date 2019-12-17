@@ -10,7 +10,7 @@ import (
 
 const SedimentVsCostName = "SedimentVsCost"
 
-var _ variableOld.InductiveDecisionVariable = new(SedimentVsCost)
+var _ variable.UndoableDecisionVariable = new(SedimentVsCost)
 
 type SedimentVsCost struct {
 	variableOld.CompositeInductiveDecisionVariable

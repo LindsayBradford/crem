@@ -16,7 +16,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/internal/pkg/model/variableOld"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
@@ -55,7 +54,7 @@ type CoreModel struct {
 	planningUnitTable tables.CsvTable
 	gulliesTable      tables.CsvTable
 
-	variableOld.ContainedDecisionVariables
+	variable.ContainedDecisionVariables
 
 	inputDataSet dataset.DataSet
 	initialising bool
@@ -161,11 +160,18 @@ func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 }
 
 func (m *CoreModel) buildActionObservers() []action.Observer {
-	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.SedimentProductionVariableName)
-	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.ImplementationCostVariableName)
-
 	observers := make([]action.Observer, 0)
-	observers = append(observers, m, sedimentProduction, implementationCost)
+	observers = append(observers, m)
+
+	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
+	if sedimentProductionAsObserver, isObserver := sedimentProduction.(action.Observer); isObserver {
+		observers = append(observers, sedimentProductionAsObserver)
+	}
+
+	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
+	if implementationCostAsObserver, isObserver := implementationCost.(action.Observer); isObserver {
+		observers = append(observers, implementationCostAsObserver)
+	}
 
 	return observers
 }

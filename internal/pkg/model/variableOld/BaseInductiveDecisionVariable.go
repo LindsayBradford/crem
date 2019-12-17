@@ -9,7 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
 
-var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
+var _ variable.UndoableDecisionVariable = new(BaseInductiveDecisionVariable)
 
 // BaseInductiveDecisionVariable offers a simple implementation of the InductiveDecisionVariable interface with
 // the expectation that specific decisions variables will embed this struct to make use of typical
@@ -36,19 +36,19 @@ func (v *BaseInductiveDecisionVariable) SetValue(value float64) {
 	v.inductiveValue = value
 }
 
-func (v *BaseInductiveDecisionVariable) InductiveValue() float64 {
+func (v *BaseInductiveDecisionVariable) UndoableValue() float64 {
 	return v.inductiveValue
 }
 
 func (v *BaseInductiveDecisionVariable) DifferenceInValues() float64 {
-	return v.InductiveValue() - v.Value()
+	return v.UndoableValue() - v.Value()
 }
 
-func (v *BaseInductiveDecisionVariable) SetInductiveValue(value float64) {
+func (v *BaseInductiveDecisionVariable) SetUndoableValue(value float64) {
 	v.inductiveValue = value
 }
 
-func (v *BaseInductiveDecisionVariable) AcceptInductiveValue() {
+func (v *BaseInductiveDecisionVariable) ApplyDoneValue() {
 	if v.actualValue == v.inductiveValue {
 		return
 	}
@@ -56,7 +56,7 @@ func (v *BaseInductiveDecisionVariable) AcceptInductiveValue() {
 	v.NotifyObservers()
 }
 
-func (v *BaseInductiveDecisionVariable) RejectInductiveValue() {
+func (v *BaseInductiveDecisionVariable) ApplyUndoneValue() {
 	if v.actualValue == v.inductiveValue {
 		return
 	}
