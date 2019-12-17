@@ -33,6 +33,48 @@ type DecisionVariable interface {
 	Value() float64
 	SetValue(value float64)
 
-	UnitOfMeasureContainer
-	PrecisionContainer
+	UnitOfMeasure() UnitOfMeasure
+	Precision() Precision
 }
+
+type UnitOfMeasure string
+
+func (uom UnitOfMeasure) String() string { return string(uom) }
+
+const (
+	NotApplicable UnitOfMeasure = "Not Applicable (NA)"
+	TonnesPerYear UnitOfMeasure = "Tonnes per Year (t/y)"
+	Dollars       UnitOfMeasure = "Dollars ($)"
+)
+
+const defaultUnitOfMeasure = NotApplicable
+
+type Precision int
+
+const defaultPrecision = 3
+
+func NewSimpleDecisionVariable(name string) SimpleDecisionVariable {
+	return SimpleDecisionVariable{
+		name:          name,
+		value:         0,
+		unitOfMeasure: defaultUnitOfMeasure,
+		precision:     defaultPrecision,
+	}
+}
+
+type SimpleDecisionVariable struct {
+	name  string
+	value float64
+
+	unitOfMeasure UnitOfMeasure
+	precision     Precision
+}
+
+func (v *SimpleDecisionVariable) Name() string                           { return v.name }
+func (v *SimpleDecisionVariable) SetName(name string)                    { v.name = name }
+func (v *SimpleDecisionVariable) Value() float64                         { return v.value }
+func (v *SimpleDecisionVariable) SetValue(value float64)                 { v.value = value }
+func (v *SimpleDecisionVariable) UnitOfMeasure() UnitOfMeasure           { return v.unitOfMeasure }
+func (v *SimpleDecisionVariable) SetUnitOfMeasure(measure UnitOfMeasure) { v.unitOfMeasure = measure }
+func (v *SimpleDecisionVariable) Precision() Precision                   { return v.precision }
+func (v *SimpleDecisionVariable) SetPrecision(precision Precision)       { v.precision = precision }

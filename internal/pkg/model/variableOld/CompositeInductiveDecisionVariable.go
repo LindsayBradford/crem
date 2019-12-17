@@ -9,14 +9,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
-	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 )
 
 var _ InductiveDecisionVariable = new(CompositeInductiveDecisionVariable)
 
 type CompositeInductiveDecisionVariable struct {
-	name.NameContainer
+	variable.SimpleDecisionVariable
 
 	weightedVariables map[InductiveDecisionVariable]float64
 
@@ -24,8 +23,6 @@ type CompositeInductiveDecisionVariable struct {
 	scaleVectorLength float64
 
 	variable.ContainedDecisionVariableObservers
-	variable.ContainedUnitOfMeasure
-	variable.ContainedPrecision
 }
 
 func (v *CompositeInductiveDecisionVariable) Initialise() *CompositeInductiveDecisionVariable {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
-	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
@@ -16,14 +15,12 @@ var _ InductiveDecisionVariable = new(BaseInductiveDecisionVariable)
 // the expectation that specific decisions variables will embed this struct to make use of typical
 // InductiveDecisionVariable behaviour.
 type BaseInductiveDecisionVariable struct {
-	name.NameContainer
+	variable.SimpleDecisionVariable
 
 	actualValue    float64
 	inductiveValue float64
 
 	variable.ContainedDecisionVariableObservers
-	variable.ContainedUnitOfMeasure
-	variable.ContainedPrecision
 }
 
 func (v *BaseInductiveDecisionVariable) MarshalJSON() ([]byte, error) {
