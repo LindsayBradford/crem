@@ -27,7 +27,6 @@ type ImplementationCost struct {
 
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.PerPlanningUnitDecisionVariable.Initialise()
-
 	ic.SetName(VariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure(variable.Dollars)
@@ -52,7 +51,6 @@ func (ic *ImplementationCost) ObserveAction(action action.ManagementAction) {
 func (ic *ImplementationCost) ObserveActionInitialising(action action.ManagementAction) {
 	ic.observeAction(action)
 	ic.command.Do()
-	// ic.NotifyObservers() // TODO: Needed?
 }
 
 func (ic *ImplementationCost) observeAction(action action.ManagementAction) {

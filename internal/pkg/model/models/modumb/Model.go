@@ -78,19 +78,19 @@ func (m *Model) Initialise() {
 
 func (m *Model) buildDecisionVariables() {
 	m.ContainedDecisionVariables.Initialise()
-	objectiveOne := new(variables.OldDumbObjective).
+	objectiveOne := new(variables.DumbObjective).
 		Initialise().
 		WithName(Objectives[0]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveOneValue)).
 		WithObservers(m)
 
-	objectiveTwo := new(variables.OldDumbObjective).
+	objectiveTwo := new(variables.DumbObjective).
 		Initialise().
 		WithName(Objectives[1]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveTwoValue)).
 		WithObservers(m)
 
-	objectiveThree := new(variables.OldDumbObjective).
+	objectiveThree := new(variables.DumbObjective).
 		Initialise().
 		WithName(Objectives[2]).
 		WithStartingValue(m.parameters.GetFloat64(parameters.InitialObjectiveThreeValue)).
