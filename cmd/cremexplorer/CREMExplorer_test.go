@@ -62,3 +62,15 @@ func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	bootstrap.LogHandler = loggers.DefaultTestingLogger
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
+
+func TestBoundedCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "CREMExplorer - Kirkpatrick - White Box",
+		T:              t,
+		ConfigFilePath: "testdata/TestBoundedCREMExplorer-Kirkpatrick-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}

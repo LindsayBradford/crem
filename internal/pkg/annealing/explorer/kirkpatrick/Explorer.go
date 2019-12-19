@@ -39,6 +39,8 @@ type Explorer struct {
 
 	changeIsDesirable    bool
 	changeAccepted       bool
+	changeInvalid        bool
+	reasonChangeInvalid  string
 	objectiveValueChange float64
 }
 
@@ -133,6 +135,15 @@ func (ke *Explorer) defaultAcceptOrRevertChange() {
 }
 
 func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
+	ke.changeInvalid = false
+	if isValid, invalidationErrors := ke.Model().ChangeIsValid(); !isValid {
+		ke.calculateChangeInObjectiveValue()
+		ke.changeInvalid = true
+		ke.reasonChangeInvalid = invalidationErrors.Error()
+		revertFunction()
+		return
+	}
+
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		acceptFunction()
@@ -198,11 +209,23 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes
 	case observer.FinishedIteration:
-		return baseAttributes.
-			Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
-			Add(explorer.ChangeAccepted, ke.changeAccepted)
+		// return baseAttributes.
+		// 	Add(ChangeInObjectiveValue, ke.objectiveValueChange).
+		// 	Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
+		// 	Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
+		// 	Add(explorer.ChangeAccepted, ke.changeAccepted)
+		if ke.changeInvalid {
+			return baseAttributes.
+				Add(ChangeInObjectiveValue, ke.objectiveValueChange).
+				Add(explorer.ChangeInvalid, ke.changeInvalid).
+				Add(explorer.ReasonChangeInvalid, ke.reasonChangeInvalid)
+		} else {
+			return baseAttributes.
+				Add(ChangeInObjectiveValue, ke.objectiveValueChange).
+				Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
+				Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
+				Add(explorer.ChangeAccepted, ke.changeAccepted)
+		}
 	}
 	return nil
 }

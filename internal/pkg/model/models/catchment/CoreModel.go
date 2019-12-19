@@ -19,6 +19,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
@@ -106,16 +107,24 @@ func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
 }
 
 func (m *CoreModel) buildDecisionVariables() {
-	sedimentProduction2 := new(sedimentproduction.SedimentProduction).
+	sedimentProduction := new(sedimentproduction.SedimentProduction).
 		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
 		WithObservers(m)
 
-	implementationCost2 := new(implementationcost.ImplementationCost).
+	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		sedimentProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
+	}
+
+	implementationCost := new(implementationcost.ImplementationCost).
 		Initialise(m.planningUnitTable, m.parameters).
 		WithObservers(m)
 
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		implementationCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumImplementationCost))
+	}
+
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction2, implementationCost2,
+		sedimentProduction, implementationCost,
 	)
 }
 
@@ -304,6 +313,32 @@ func (m *CoreModel) DeepClone() model.Model {
 	clone := *m
 	clone.managementActions.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return &clone
+}
+
+func (m *CoreModel) ChangeIsValid() (bool, *compositeErrors.CompositeError) {
+	validationErrors := compositeErrors.New("Validation Errors")
+
+	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
+	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
+		if !boundSedimentLoad.WithinBounds(sedimentProduction.UndoableValue()) {
+			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.UndoableValue()))
+			validationErrors.AddMessage(validationMessage)
+		}
+	}
+
+	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
+	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
+		if !boundImplementationCost.WithinBounds(implementationCost.UndoableValue()) {
+			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.UndoableValue()))
+			validationErrors.AddMessage(validationMessage)
+		}
+	}
+
+	if validationErrors.Size() > 0 {
+		return false, validationErrors
+	}
+
+	return true, nil
 }
 
 func (m *CoreModel) TearDown() {

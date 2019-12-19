@@ -15,6 +15,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
 
@@ -240,3 +241,5 @@ func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction
 
 	m.EventNotifier().NotifyObserversOfEvent(*event)
 }
+
+func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }

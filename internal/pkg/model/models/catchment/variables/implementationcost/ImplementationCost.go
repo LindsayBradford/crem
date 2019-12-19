@@ -19,6 +19,7 @@ var _ variable.UndoableDecisionVariable = new(ImplementationCost)
 
 type ImplementationCost struct {
 	variable.PerPlanningUnitDecisionVariable
+	variable.Bounds
 
 	actionObserved action.ManagementAction
 

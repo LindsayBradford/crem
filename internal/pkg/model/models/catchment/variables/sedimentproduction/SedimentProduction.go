@@ -21,6 +21,7 @@ const planningUnitIndex = 0
 
 type SedimentProduction struct {
 	variable.PerPlanningUnitDecisionVariable
+	variable.Bounds
 
 	actionObserved action.ManagementAction
 

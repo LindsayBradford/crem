@@ -84,14 +84,25 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
 		}
 	case observer.FinishedIteration:
-		builder.
-			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
-			Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
-			Add("Accepted? [", format(event, "ChangeAccepted"), "]")
+		builder.Add("Iteration [",
+			format(event, "CurrentIteration"), "/",
+			format(event, "MaximumIterations"), "], ")
+
+		if event.HasAttribute("ChangeInvalid") {
+			builder.
+				Add("Invalid [", format(event, "ChangeInvalid"), "], ").
+				Add("Reason [", format(event, "ReasonChangeInvalid"), "], ")
+		}
+		if event.HasAttribute("ChangeAccepted") {
+			builder.
+				Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
+				Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
+				Add("Accepted? [", format(event, "ChangeAccepted"), "], ")
+		}
+
 		if event.HasAttribute("ObjectiveValue") {
-			builder.Add(", Change [", format(event, "ChangeInObjectiveValue"), "], ").
-				Add("Objective value [", format(event, "ObjectiveValue"), "]")
+			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ").
+				Add(", Change [", format(event, "ChangeInObjectiveValue"), "] ")
 		}
 		if event.HasAttribute("ArchiveSize") {
 			builder.Add(", Archive size [", format(event, "ArchiveSize"), "], ").

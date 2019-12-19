@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/pkg/errors"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -156,3 +157,5 @@ func (m *Model) OffersDecisionVariable(name string) bool {
 func (m *Model) DecisionVariableChange(decisionVariableName string) float64 {
 	return m.variable.DifferenceInValues()
 }
+
+func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }

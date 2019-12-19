@@ -40,6 +40,9 @@ const (
 
 	SedimentProductionDecisionWeight string = "SedimentProductionDecisionWeight"
 	ImplementationCostDecisionWeight string = "ImplementationCostDecisionWeight"
+
+	MaximumSedimentProduction = "MaximumSedimentProduction"
+	MaximumImplementationCost = "MaximumImplementationCost"
 )
 
 func ParameterSpecifications() *Specifications {
@@ -139,6 +142,18 @@ func ParameterSpecifications() *Specifications {
 			Key:          ImplementationCostDecisionWeight,
 			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(0.5),
+		},
+	).Add(
+		Specification{
+			Key:        MaximumSedimentProduction,
+			Validator:  IsNonNegativeDecimal,
+			IsOptional: true,
+		},
+	).Add(
+		Specification{
+			Key:        MaximumImplementationCost,
+			Validator:  IsNonNegativeDecimal,
+			IsOptional: true,
 		},
 	)
 	return specs
