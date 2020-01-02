@@ -24,31 +24,31 @@ type BaseCommand struct {
 	status CommandStatus
 }
 
-func (bc *BaseCommand) WithTarget(target interface{}) *BaseCommand {
-	bc.target = target
-	return bc
+func (c *BaseCommand) WithTarget(target interface{}) *BaseCommand {
+	c.target = target
+	return c
 }
 
-func (bc *BaseCommand) Target() interface{} {
-	return bc.target
+func (c *BaseCommand) Target() interface{} {
+	return c.target
 }
 
-func (bc *BaseCommand) Reset() {
-	bc.status = UnDone
+func (c *BaseCommand) Reset() {
+	c.status = UnDone
 }
 
-func (bc *BaseCommand) Do() CommandStatus {
-	if bc.status == UnDone {
-		bc.status = Done
-		return bc.status
+func (c *BaseCommand) Do() CommandStatus {
+	if c.status == UnDone {
+		c.status = Done
+		return c.status
 	}
 	return NoChange
 }
 
-func (bc *BaseCommand) Undo() CommandStatus {
-	if bc.status == Done {
-		bc.status = UnDone
-		return bc.status
+func (c *BaseCommand) Undo() CommandStatus {
+	if c.status == Done {
+		c.status = UnDone
+		return c.status
 	}
 	return NoChange
 }
