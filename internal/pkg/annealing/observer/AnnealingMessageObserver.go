@@ -102,7 +102,7 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 
 		if event.HasAttribute("ObjectiveValue") {
 			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ").
-				Add(", Change [", format(event, "ChangeInObjectiveValue"), "] ")
+				Add("Change [", format(event, "ChangeInObjectiveValue"), "] ")
 		}
 		if event.HasAttribute("ArchiveSize") {
 			builder.Add(", Archive size [", format(event, "ArchiveSize"), "], ").
