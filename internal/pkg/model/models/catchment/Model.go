@@ -53,13 +53,9 @@ func (m *Model) Initialise() {
 }
 
 func (m *Model) RandomlyInitialiseActions() {
-	m.note("Started Randomly Initialising Actions")
 	m.initialising = true
-	for _, action := range m.managementActions.Actions() {
-		m.managementActions.RandomlyInitialiseAction(action)
-	}
+	m.CoreModel.randomlyInitialiseActions()
 	m.initialising = false
-	m.note("Finished Randomly Initialising Actions")
 }
 
 func (m *Model) loadSourceDataSet() {

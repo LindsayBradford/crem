@@ -20,6 +20,7 @@ import (
 )
 
 const expectedName = "CatchmentModel"
+const expectedMaximumImplementationCost = 65_000.0
 
 const equalTo = "=="
 
@@ -164,14 +165,127 @@ func TestCoreModel_ToggleHillSlopeRestoration_AsExpected(t *testing.T) {
 	verifyActionToggle(t, modelUnderTest, planningUnit, actions.HillSlopeRestorationType, g)
 }
 
-func buildTestingModel(g *GomegaWithT) *CoreModel {
-	sourceDataSet := csv.NewDataSet("CatchmentModel")
-	loadError := sourceDataSet.Load("testdata/TestingModel.csv")
+func TestCoreModel_Bounded_InitialisationValid(t *testing.T) {
+	g := NewGomegaWithT(t)
 
-	g.Expect(loadError).To(BeNil())
+	modelUnderTest := buildBoundedTestingModel(g)
+
+	changeState, changeErrors := modelUnderTest.ChangeIsValid()
+
+	g.Expect(changeState).To(BeTrue())
+	if changeErrors != nil {
+		t.Log(changeErrors)
+	}
+	g.Expect(changeErrors).To(BeNil())
+}
+
+func TestCoreModel_Bounded_RandomisationStaysValid(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	modelUnderTest := buildBoundedTestingModel(g)
+
+	modelUnderTest.randomlyInitialiseActions()
+
+	changeState, changeErrors := modelUnderTest.StateIsValid()
+
+	if changeErrors != nil {
+		t.Log(changeErrors)
+	}
+	g.Expect(changeState).To(BeTrue())
+	g.Expect(changeErrors).To(BeNil())
+
+	implementationCost := modelUnderTest.DecisionVariable("ImplementationCost")
+	t.Logf("Against bound of %f, ImplementationCost = %f", expectedMaximumImplementationCost, implementationCost.Value())
+
+	g.Expect(implementationCost.Value()).To(BeNumerically("<", expectedMaximumImplementationCost))
+}
+
+func TestCoreModel_Bounded_ValidityAsExpected(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	modelUnderTest := buildBoundedTestingModel(g)
+	changeState, changeErrors := modelUnderTest.ChangeIsValid()
+
+	if changeErrors != nil {
+		t.Log(changeErrors)
+	}
+	g.Expect(changeState).To(BeTrue())
+	g.Expect(changeErrors).To(BeNil())
+
+	modelUnderTest.ToggleAction(17, actions.GullyRestorationType)
+
+	changeState, changeErrors = modelUnderTest.ChangeIsValid()
+
+	if changeErrors != nil {
+		t.Log(changeErrors)
+	}
+	g.Expect(changeState).To(BeTrue())
+	g.Expect(changeErrors).To(BeNil())
+
+	modelUnderTest.AcceptChange()
+
+	modelSnapshot := new(annealers.SolutionBuilder).
+		WithId("modelUnderTest").
+		ForModel(modelUnderTest).
+		Build()
+
+	state, stateErrors := modelUnderTest.StateIsValid()
+
+	if stateErrors != nil {
+		t.Log(stateErrors)
+	}
+	g.Expect(state).To(BeTrue())
+	g.Expect(stateErrors).To(BeNil())
+
+	modelUnderTest.ToggleAction(18, actions.GullyRestorationType)
+
+	changeState, changeErrors = modelUnderTest.ChangeIsValid()
+
+	if changeErrors != nil {
+		t.Log(changeErrors)
+	}
+	g.Expect(changeState).To(BeFalse())
+	g.Expect(changeErrors).To(Not(BeNil()))
+
+	modelUnderTest.RevertChange()
+
+	state, stateErrors = modelUnderTest.StateIsValid()
+
+	if stateErrors != nil {
+		t.Log(stateErrors)
+	}
+	g.Expect(state).To(BeTrue())
+	g.Expect(stateErrors).To(BeNil())
+
+	currentSnapshot := new(annealers.SolutionBuilder).
+		WithId("modelUnderTest").
+		ForModel(modelUnderTest).
+		Build()
+
+	verifySolutionsMatch(t, g, modelSnapshot, currentSnapshot)
+}
+
+func buildTestingModel(g *GomegaWithT) *CoreModel {
+	sourceDataSet := buildTestingModelDataSet(g)
 
 	parametersUnderTest := parameters.Map{}
 
+	modelUnderTest := buildModelUnderTest(sourceDataSet, parametersUnderTest, g)
+	return modelUnderTest
+}
+
+func buildBoundedTestingModel(g *GomegaWithT) *CoreModel {
+	sourceDataSet := buildTestingModelDataSet(g)
+
+	parametersUnderTest := parameters.Map{
+		"MaximumImplementationCost": expectedMaximumImplementationCost,
+	}
+
+	modelUnderTest := buildModelUnderTest(sourceDataSet, parametersUnderTest, g)
+	return modelUnderTest
+}
+
+func buildModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest parameters.Map, g *GomegaWithT) *CoreModel {
 	modelUnderTest := NewCoreModel().
 		WithSourceDataSet(sourceDataSet).
 		WithParameters(parametersUnderTest)
@@ -181,6 +295,14 @@ func buildTestingModel(g *GomegaWithT) *CoreModel {
 
 	modelUnderTest.Initialise()
 	return modelUnderTest
+}
+
+func buildTestingModelDataSet(g *GomegaWithT) *csv.DataSet {
+	sourceDataSet := csv.NewDataSet("CatchmentModel")
+	loadError := sourceDataSet.Load("testdata/TestingModel.csv")
+
+	g.Expect(loadError).To(BeNil())
+	return sourceDataSet
 }
 
 func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit planningunit.Id, actionType action.ManagementActionType, g *GomegaWithT) {

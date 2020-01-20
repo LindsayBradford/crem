@@ -128,6 +128,7 @@ func (ke *Explorer) ObjectiveValue() float64 {
 func (ke *Explorer) TryRandomChange() {
 	ke.Model().TryRandomChange()
 	ke.defaultAcceptOrRevertChange()
+	ke.LogHandler().Debug(ke.scenarioId + ": Finished processing random change")
 }
 
 func (ke *Explorer) defaultAcceptOrRevertChange() {

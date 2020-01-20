@@ -25,6 +25,7 @@ func (a *Null) IsActive() bool                                            { retu
 func (a *Null) ModelVariableValue(variableName ModelVariableName) float64 { return 0 }
 func (a *Null) Subscribe(observers ...Observer)                           {}
 func (a *Null) InitialisingActivation()                                   {}
+func (a *Null) InitialisingDeactivation()                                 {}
 func (a *Null) ToggleActivation()                                         {}
 func (a *Null) ToggleActivationUnobserved()                               {}
 func (a *Null) SetActivation(value bool)                                  {}

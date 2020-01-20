@@ -100,6 +100,10 @@ func (m *ModelManagementActions) ToggleLastActivationUnobserved() {
 	m.lastApplied.ToggleActivationUnobserved()
 }
 
+func (m *ModelManagementActions) DeactivateLastInitialisedAction() {
+	m.lastApplied.InitialisingDeactivation()
+}
+
 func (m *ModelManagementActions) Actions() []ManagementAction {
 	return m.actions
 }

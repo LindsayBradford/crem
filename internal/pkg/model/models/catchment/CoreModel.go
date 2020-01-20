@@ -192,6 +192,28 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 	}
 }
 
+func (m *CoreModel) randomlyInitialiseActions() {
+	m.note("Starting randomly initialising model actions")
+	for _, action := range m.managementActions.Actions() {
+		m.randomlyInitialiseAction(action)
+	}
+	m.note("Finished randomly initialising model actions")
+}
+
+func (m *CoreModel) randomlyInitialiseAction(action action.ManagementAction) {
+	m.managementActions.RandomlyInitialiseAction(action)
+
+	if !action.IsActive() {
+		return // Nothing to if it wasn't activated.
+	}
+
+	isValid, _ := m.ChangeIsValid()
+	if !isValid {
+		m.note("Scenario would be invalid, reverting to last valid solution")
+		m.RevertChange()
+	}
+}
+
 func (m *CoreModel) ManagementActions() []action.ManagementAction {
 	return m.managementActions.Actions()
 }
@@ -244,7 +266,6 @@ func (m *CoreModel) ToggleAction(planningUnit planningunit.Id, actionType action
 	message := fmt.Sprintf("Toggling action [%v] for planning unit [%d]", actionType, planningUnit)
 	m.note(message)
 	m.managementActions.ToggleAction(planningUnit, actionType)
-	m.AcceptChange()
 }
 
 func (m *CoreModel) TryRandomChange() {
@@ -330,6 +351,32 @@ func (m *CoreModel) ChangeIsValid() (bool, *compositeErrors.CompositeError) {
 	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
 		if !boundImplementationCost.WithinBounds(implementationCost.UndoableValue()) {
 			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.UndoableValue()))
+			validationErrors.AddMessage(validationMessage)
+		}
+	}
+
+	if validationErrors.Size() > 0 {
+		return false, validationErrors
+	}
+
+	return true, nil
+}
+
+func (m *CoreModel) StateIsValid() (bool, *compositeErrors.CompositeError) {
+	validationErrors := compositeErrors.New("Validation Errors")
+
+	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
+	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
+		if !boundSedimentLoad.WithinBounds(sedimentProduction.Value()) {
+			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.Value()))
+			validationErrors.AddMessage(validationMessage)
+		}
+	}
+
+	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
+	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
+		if !boundImplementationCost.WithinBounds(implementationCost.Value()) {
+			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.Value()))
 			validationErrors.AddMessage(validationMessage)
 		}
 	}

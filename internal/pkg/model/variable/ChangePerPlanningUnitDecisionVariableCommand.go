@@ -15,6 +15,15 @@ type ChangeCommand interface {
 	Change() float64
 }
 
+type NullChangeCommand struct{}
+
+func (c *NullChangeCommand) Do() command.CommandStatus   { return command.Done }
+func (c *NullChangeCommand) Undo() command.CommandStatus { return command.UnDone }
+func (c *NullChangeCommand) Reset()                      {}
+func (c *NullChangeCommand) Value() float64              { return 0 }
+func (c *NullChangeCommand) SetChange(change float64)    {}
+func (c *NullChangeCommand) Change() float64             { return 0 }
+
 type ChangePerPlanningUnitDecisionVariableCommand struct {
 	command.BaseCommand
 

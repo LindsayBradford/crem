@@ -23,11 +23,15 @@ type ImplementationCost struct {
 
 	actionObserved action.ManagementAction
 
-	command *variable.ChangePerPlanningUnitDecisionVariableCommand
+	command variable.ChangeCommand
+	// command *variable.ChangePerPlanningUnitDecisionVariableCommand
 }
 
 func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
 	ic.PerPlanningUnitDecisionVariable.Initialise()
+
+	ic.command = new(variable.NullChangeCommand)
+
 	ic.SetName(VariableName)
 	ic.SetValue(ic.deriveInitialImplementationCost())
 	ic.SetUnitOfMeasure(variable.Dollars)
@@ -88,11 +92,11 @@ func (ic *ImplementationCost) handleActionForModelVariable(name action.ModelVari
 }
 
 func (ic *ImplementationCost) UndoableValue() float64 {
-	return ic.command.Value()
+	return ic.Value() + ic.command.Value()
 }
 
 func (ic *ImplementationCost) SetUndoableValue(value float64) {
-	ic.command.WithChange(value)
+	ic.command.SetChange(value)
 }
 
 func (ic *ImplementationCost) DifferenceInValues() float64 {

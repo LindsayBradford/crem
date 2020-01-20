@@ -18,7 +18,7 @@ DecisionVariable = "SedimentProduction"
 OptimisationDirection = "Minimising"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
-MaximumIterations = 10
+MaximumIterations = 1_000
 
 [Model]
 Type = "CatchmentModel"
@@ -31,6 +31,6 @@ SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
 RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
-MaximumImplementationCost = 70_000_000.0
+MaximumImplementationCost = 400_000.0
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 

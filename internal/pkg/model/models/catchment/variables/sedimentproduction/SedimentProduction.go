@@ -44,6 +44,8 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 	sl.SetUnitOfMeasure(variable.TonnesPerYear)
 	sl.SetPrecision(3)
 
+	sl.command = new(variable.NullChangeCommand)
+
 	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
 	sl.gullySedimentContribution.Initialise(gulliesTable, parameters)
 	sl.hillSlopeSedimentContribution.Initialise(planningUnitTable, parameters)
