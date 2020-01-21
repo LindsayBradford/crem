@@ -206,23 +206,57 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 
 func (m *CoreModel) randomlyInitialiseActions() {
 	m.note("Starting randomly initialising model actions")
-	for _, action := range m.managementActions.Actions() {
-		m.randomlyInitialiseAction(action)
+
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		m.randomlyInitialiseActionForMaximumImplementationCost()
+	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		m.randomlyInitialiseActionForMaximumSedimentProduction()
+	} else {
+		m.randomlyInitialiseActionsUnbounded()
 	}
+
 	m.note("Finished randomly initialising model actions")
 }
 
-func (m *CoreModel) randomlyInitialiseAction(action action.ManagementAction) {
-	m.managementActions.RandomlyInitialiseAction(action)
+func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
+	for _, action := range m.managementActions.Actions() {
+		m.managementActions.RandomlyInitialiseAction(action)
 
-	if !action.IsActive() {
-		return // Nothing to if it wasn't activated.
+		if !action.IsActive() {
+			continue // Nothing to if it wasn't activated.
+		}
+
+		isValid, _ := m.ChangeIsValid()
+		if !isValid {
+			m.note("Scenario would be invalid, reverting to last valid solution")
+			m.RevertChange()
+		}
+	}
+}
+
+func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
+	for _, action := range m.managementActions.Actions() {
+		action.InitialisingActivation()
 	}
 
-	isValid, _ := m.ChangeIsValid()
-	if !isValid {
-		m.note("Scenario would be invalid, reverting to last valid solution")
-		m.RevertChange()
+	for _, action := range m.managementActions.Actions() {
+		m.managementActions.RandomlyDeinitialiseAction(action)
+
+		if action.IsActive() {
+			continue // Nothing to if it wasn't deactivated.
+		}
+
+		isValid, _ := m.ChangeIsValid()
+		if !isValid {
+			m.note("Scenario would be invalid, reverting to last valid solution")
+			m.RevertChange()
+		}
+	}
+}
+
+func (m *CoreModel) randomlyInitialiseActionsUnbounded() {
+	for _, action := range m.managementActions.Actions() {
+		m.managementActions.RandomlyInitialiseAction(action)
 	}
 }
 

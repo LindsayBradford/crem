@@ -63,11 +63,23 @@ func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
 
-func TestBoundedCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
+func TestCostBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "CREMExplorer - Kirkpatrick - White Box",
+		Name:           "Bound Cost CREMExplorer - Kirkpatrick - White Box",
 		T:              t,
-		ConfigFilePath: "testdata/TestBoundedCREMExplorer-Kirkpatrick-WhiteBox.toml",
+		ConfigFilePath: "testdata/TestCostBoundCREMExplorer-Kirkpatrick-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
+func TestSedimentBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "Bound Sediment CREMExplorer - Kirkpatrick - White Box",
+		T:              t,
+		ConfigFilePath: "testdata/TestSedimentBoundCREMExplorer-Kirkpatrick-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
 	}
 

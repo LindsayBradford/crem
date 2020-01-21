@@ -45,8 +45,9 @@ func (m *ModelManagementActions) pickRandomManagementAction() ManagementAction {
 }
 
 const (
-	activate = 0
-	ignore   = 1
+	deactivate = 0
+	activate   = 0
+	ignore     = 1
 )
 
 // RandomlyInitialise will pass through its stored management actions, applying a 50/50 chance to activate
@@ -63,6 +64,19 @@ func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementActio
 	case activate:
 		m.lastApplied = action
 		action.InitialisingActivation()
+	case ignore:
+		// Deliberately does nothing
+	default:
+		panic(errors.New("Random value outside range of [0,1]"))
+	}
+}
+
+func (m *ModelManagementActions) RandomlyDeinitialiseAction(action ManagementAction) {
+	randomValue := m.RandomNumberGenerator().Intn(2)
+	switch randomValue {
+	case deactivate:
+		m.lastApplied = action
+		action.InitialisingDeactivation()
 	case ignore:
 		// Deliberately does nothing
 	default:

@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test BoundedCREMEngine - Kirkpatrick - White Box"
+Name = "Test SedimentBoundCREMEngine - Kirkpatrick - White Box"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
@@ -14,7 +14,7 @@ Model = "StandardOutput"
 [Annealer]
 Type="Kirkpatrick"
 [Annealer.Parameters]
-DecisionVariable = "SedimentProduction"
+DecisionVariable = "ImplementationCost"
 OptimisationDirection = "Minimising"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
@@ -31,6 +31,6 @@ SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
 RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
-MaximumImplementationCost = 400_000.0
+MaximumSedimentProduction = 10_000.0
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 
