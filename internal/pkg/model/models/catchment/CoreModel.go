@@ -78,7 +78,19 @@ func (m *CoreModel) WithSourceDataSet(sourceDataSet dataset.DataSet) *CoreModel 
 
 func (m *CoreModel) SetParameters(params baseParameters.Map) error {
 	m.parameters.AssignAllUserValues(params)
+	m.validateModelParameters()
 	return m.parameters.ValidationErrors()
+}
+
+func (m *CoreModel) validateModelParameters() {
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) &&
+		m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+
+		errorText := fmt.Sprintf("Only one of [%s], [%s] allowed as variable limit.",
+			parameters.MaximumImplementationCost, parameters.MaximumSedimentProduction)
+
+		m.parameters.AddValidationErrorMessage(errorText)
+	}
 }
 
 func (m *CoreModel) ParameterErrors() error {

@@ -21,6 +21,7 @@ import (
 
 const expectedName = "CatchmentModel"
 const expectedMaximumImplementationCost = 65_000.0
+const expectedMaximumSedimentProduction = 65_000.0
 
 const equalTo = "=="
 
@@ -265,6 +266,17 @@ func TestCoreModel_Bounded_ValidityAsExpected(t *testing.T) {
 	verifySolutionsMatch(t, g, modelSnapshot, currentSnapshot)
 }
 
+func TestCoreModel_MoreThanOneBoundedParameter_ParameterErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	errors := buildInvalidBoundedTestingModel(g)
+
+	if errors != nil {
+		t.Log(errors)
+	}
+	g.Expect(errors).To(Not(BeNil()))
+}
+
 func buildTestingModel(g *GomegaWithT) *CoreModel {
 	sourceDataSet := buildTestingModelDataSet(g)
 
@@ -283,6 +295,29 @@ func buildBoundedTestingModel(g *GomegaWithT) *CoreModel {
 
 	modelUnderTest := buildModelUnderTest(sourceDataSet, parametersUnderTest, g)
 	return modelUnderTest
+}
+
+func buildInvalidBoundedTestingModel(g *GomegaWithT) error {
+	sourceDataSet := buildTestingModelDataSet(g)
+
+	parametersUnderTest := parameters.Map{
+		"MaximumImplementationCost": expectedMaximumImplementationCost,
+		"MaximumSedimentProduction": expectedMaximumSedimentProduction,
+	}
+
+	errors := buildInvalidModelUnderTest(sourceDataSet, parametersUnderTest, g)
+	return errors
+}
+
+func buildInvalidModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest parameters.Map, g *GomegaWithT) error {
+	modelUnderTest := NewCoreModel().
+		WithSourceDataSet(sourceDataSet).
+		WithParameters(parametersUnderTest)
+
+	parameterErrors := modelUnderTest.ParameterErrors()
+	g.Expect(parameterErrors).To(Not(BeNil()))
+
+	return parameterErrors
 }
 
 func buildModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest parameters.Map, g *GomegaWithT) *CoreModel {
