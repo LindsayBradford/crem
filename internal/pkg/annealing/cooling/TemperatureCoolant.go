@@ -9,9 +9,7 @@ import (
 
 type TemperatureCoolant interface {
 	rand.Container
-
-	SetParameters(params parameters.Map)
-	ParameterErrors() error
+	parameters.Container
 
 	SetTemperature(temperature float64) error
 	Temperature() float64

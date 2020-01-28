@@ -38,11 +38,13 @@ func (c *Coolant) WithParameters(params parameters.Map) *Coolant {
 	return c
 }
 
-func (c *Coolant) SetParameters(params parameters.Map) {
+func (c *Coolant) SetParameters(params parameters.Map) error {
 	c.parameters.AssignOnlyEnforcedUserValues(params)
 
 	c.temperature = c.parameters.GetFloat64(StartingTemperature)
 	c.coolingFactor = c.parameters.GetFloat64(CoolingFactor)
+
+	return nil
 }
 
 func (c *Coolant) ParameterErrors() error {
