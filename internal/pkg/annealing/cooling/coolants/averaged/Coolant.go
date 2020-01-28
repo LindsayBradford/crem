@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package suppapitnarm
+package averaged
 
 import (
 	"math"
@@ -56,7 +56,9 @@ func (c *Coolant) DecideIfAcceptable(variableChanges []float64) bool {
 }
 
 func (c *Coolant) calculateAcceptanceProbability(variableChanges []float64) {
-	probabilities := make([]float64, len(variableChanges))
+	numberOfChanges := len(variableChanges)
+
+	probabilities := make([]float64, numberOfChanges)
 	for index, individualChange := range variableChanges {
 		absoluteChangeInObjectiveValue := math.Abs(individualChange)
 		probabilities[index] = math.Exp(-absoluteChangeInObjectiveValue / c.temperature)
@@ -64,8 +66,12 @@ func (c *Coolant) calculateAcceptanceProbability(variableChanges []float64) {
 
 	finalProbability := float64(1)
 	for _, probability := range probabilities {
-		finalProbability = finalProbability * probability
+		finalProbability = finalProbability + probability
 	}
+
+	numberOfChangesAsFloat := float64(numberOfChanges)
+	finalProbability = finalProbability / numberOfChangesAsFloat
+
 	c.acceptanceProbability = finalProbability
 }
 

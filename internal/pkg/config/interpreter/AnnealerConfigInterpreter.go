@@ -5,6 +5,8 @@ package interpreter
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/averaged"
+	coolingSuppapitnarm "github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
@@ -58,7 +60,22 @@ func NewAnnealerConfigInterpreter() *AnnealerConfigInterpreter {
 			newAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
 			newAnnealer.Initialise()
 
-			newExplorer := suppapitnarm.New()
+			newExplorer := suppapitnarm.New().WithCoolant(coolingSuppapitnarm.NewCoolant())
+
+			newAnnealer.SetSolutionExplorer(newExplorer)
+
+			newAnnealer.SetParameters(config.Parameters)
+
+			return newAnnealer
+		},
+	).RegisteringAnnealer(
+		data.AveragedSuppapitnarm,
+		func(config data.AnnealerConfig) annealing.Annealer {
+			newAnnealer := new(annealers.ElapsedTimeTrackingAnnealer)
+			newAnnealer.Initialise()
+
+			newExplorer := suppapitnarm.New().WithCoolant(averaged.NewCoolant())
+
 			newAnnealer.SetSolutionExplorer(newExplorer)
 
 			newAnnealer.SetParameters(config.Parameters)

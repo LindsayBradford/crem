@@ -13,7 +13,7 @@ Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "Standar
 [Annealer]
 Type = "Kirkpatrick"
 [Annealer.Parameters]
-DecisionVariable = "SedimentVsCost"
+DecisionVariable = "SedimentProduction"
 StartingTemperature = 10_000.0
 CoolingFactor = 0.999
 MaximumIterations = 1_000_000
@@ -21,8 +21,7 @@ MaximumIterations = 1_000_000
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
-SedimentProductionDecisionWeight = 0.5             # 0.5 (default)
-ImplementationCostDecisionWeight = 0.5             # 0.5 (default)
+MaximumImplementationCost = 1_000_000.0
 DataSourcePath = "input/Laidley_data_v1_5.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)

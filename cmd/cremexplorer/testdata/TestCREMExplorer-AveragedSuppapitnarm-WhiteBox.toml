@@ -1,0 +1,33 @@
+[Scenario]
+Name = "Test CREMEngine - Averaged Suppapitnarm - White Box"
+OutputPath="testdata/solutions"
+#CpuProfilePath="testdata/profile.pprof"
+OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
+Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Annealer = "StandardOutput"
+#Model = "StandardOutput"
+
+[Annealer]
+Type="AveragedSuppapitnarm"
+[Annealer.Parameters]
+ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
+StartingTemperature = 10.0 #10
+CoolingFactor =  0.999  # 0.99
+MaximumIterations = 2_000
+
+[Model]
+Type = "CatchmentModel"
+[Model.Parameters]
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
+GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
+DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
+

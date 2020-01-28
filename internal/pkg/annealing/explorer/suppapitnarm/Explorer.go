@@ -6,6 +6,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -34,7 +35,7 @@ type Explorer struct {
 	model.ContainedModel
 	loggers.ContainedLogger
 
-	suppapitnarm.Coolant
+	coolant cooling.TemperatureCoolant
 
 	scenarioId string
 
@@ -53,7 +54,7 @@ type Explorer struct {
 func New() *Explorer {
 	newExplorer := new(Explorer)
 	newExplorer.parameters.Initialise()
-	newExplorer.Coolant.Initialise()
+	newExplorer.SetCoolant(suppapitnarm.NewCoolant())
 	newExplorer.modelArchive.Initialise()
 	newExplorer.SetModel(model.NewNullModel())
 	return newExplorer
@@ -62,7 +63,7 @@ func New() *Explorer {
 func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 	ke.modelArchive.Initialise()
-	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	ke.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
 }
 
@@ -76,6 +77,15 @@ func (ke *Explorer) WithModel(model model.Model) *Explorer {
 	return ke
 }
 
+func (ke *Explorer) WithCoolant(coolant cooling.TemperatureCoolant) *Explorer {
+	ke.SetCoolant(coolant)
+	return ke
+}
+
+func (ke *Explorer) SetCoolant(coolant cooling.TemperatureCoolant) {
+	ke.coolant = coolant
+}
+
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
 	ke.SetParameters(params)
 	return ke
@@ -83,7 +93,7 @@ func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
 
 func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.parameters.AssignOnlyEnforcedUserValues(params)
-	ke.Coolant.WithParameters(params)
+	ke.coolant.SetParameters(params)
 
 	ke.checkDecisionVariablesFromParams()
 
@@ -94,7 +104,7 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 	if temperature <= 0 {
 		return errors.New("invalid attempt to set annealer temperature to value <= 0")
 	}
-	ke.Temperature = temperature
+	ke.coolant.SetTemperature(temperature)
 	return nil
 }
 
@@ -113,7 +123,7 @@ func (ke *Explorer) ParameterErrors() error {
 	mergedErrors := errors2.New("Kirkpatrick Explorer Parameter Validation")
 
 	mergedErrors.Add(ke.parameters.ValidationErrors())
-	mergedErrors.Add(ke.Coolant.ParameterErrors())
+	mergedErrors.Add(ke.coolant.ParameterErrors())
 
 	if mergedErrors.Size() > 0 {
 		return mergedErrors
@@ -141,7 +151,7 @@ func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		ke.changeAccepted = true
 	} else {
-		if ke.DecideIfAcceptable(variableDifferences) {
+		if ke.coolant.DecideIfAcceptable(variableDifferences) {
 			ke.AcceptLastChange()
 		} else {
 			ke.RevertLastChange()
@@ -171,7 +181,7 @@ func (ke *Explorer) RevertLastChange() {
 
 func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
-	clone.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	clone.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	modelClone := ke.Model().DeepClone()
 	clone.SetModel(modelClone)
 	return &clone
@@ -183,16 +193,16 @@ func (ke *Explorer) TearDown() {
 }
 
 func (ke *Explorer) setAcceptanceProbability(probability float64) {
-	ke.AcceptanceProbability = math.Min(explorer.Guaranteed, probability)
+	ke.coolant.SetAcceptanceProbability(math.Min(explorer.Guaranteed, probability))
 }
 
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	baseAttributes := new(attributes.Attributes).
-		Add(explorer.Temperature, ke.Temperature)
+		Add(explorer.Temperature, ke.coolant.Temperature())
 
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes.Add(explorer.CoolingFactor, ke.CoolingFactor)
+		return baseAttributes.Add(explorer.CoolingFactor, ke.coolant.CoolingFactor())
 	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len())
 	case observer.FinishedIteration:
@@ -200,8 +210,12 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 			Add(ArchiveSize, ke.modelArchive.Len()).
 			Add(ArchiveResult, ke.archiveStorageResult).
 			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
+			Add(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability()).
 			Add(explorer.ChangeAccepted, ke.changeAccepted)
 	}
 	return nil
+}
+
+func (ke *Explorer) CoolDown() {
+	ke.coolant.CoolDown()
 }

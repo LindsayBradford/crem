@@ -1,8 +1,12 @@
 # Change Log
 
-## Version 0.7 (_TBD_):
+## Version 0.7 (21 January 2020):
 ### New Features
-* Simplified approach to accepting/rejecting decision variable changes in annealing,
+* Reintroduced (only) upper bound limit parameters 
+  MaximumImplementationCost and MaximumSedimentProduction to limit single 
+  objective annealing runs on SedimentProduction and ImplementationCost 
+  decision variables respectively.
+* Removed decision variable "SedimentVsProduction" and parameters 'SedimentProductionDecisionWeight' & 'ImplementationCostDecisionWeight'. 
 
 ## Version 0.6 (15 November 2019):
 ### New Features

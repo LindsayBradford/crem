@@ -24,13 +24,14 @@ var (
 	UnspecifiedAnnealerType = AnnealerType{""}
 	Kirkpatrick             = AnnealerType{"Kirkpatrick"}
 	Suppapitnarm            = AnnealerType{"Suppapitnarm"}
+	AveragedSuppapitnarm    = AnnealerType{"AveragedSuppapitnarm"}
 )
 
 func (at *AnnealerType) UnmarshalText(text []byte) error {
 	context := UnmarshalContext{
 		ConfigKey: "Annealer.Type",
 		ValidValues: []string{
-			Kirkpatrick.Value, Suppapitnarm.Value,
+			Kirkpatrick.Value, Suppapitnarm.Value, AveragedSuppapitnarm.Value,
 		},
 		TextToValidate: string(text),
 		AssignmentFunction: func() {

@@ -63,6 +63,18 @@ func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
 
+func TestCREMExplorer_AveragedSuppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "CREMExplorer - Averaged Suppapitnarm - White Box",
+		T:              t,
+		ConfigFilePath: "testdata/TestCREMExplorer-AveragedSuppapitnarm-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
 func TestCostBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
 		Name:           "Bound Cost CREMExplorer - Kirkpatrick - White Box",
