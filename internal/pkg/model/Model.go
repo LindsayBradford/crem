@@ -97,7 +97,7 @@ func (nm *nullModel) RevertChange()                                 {}
 func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 	newVariable := variable.NewSimpleDecisionVariable(name)
-	return &newVariable
+	return newVariable
 }
 
 func (nm *nullModel) OffersDecisionVariable(name string) bool                    { return true }

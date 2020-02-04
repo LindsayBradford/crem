@@ -6,20 +6,8 @@
 package variable
 
 import (
-	"sort"
-
 	"github.com/LindsayBradford/crem/pkg/name"
 )
-
-type DecisionVariableMap map[string]DecisionVariable
-
-func (m DecisionVariableMap) SortedKeys() (keys []string) {
-	for key := range m {
-		keys = append(keys, key)
-	}
-	sort.Strings(keys)
-	return
-}
 
 // DecisionVariable describes an interface between a Model and any decision making logic observing the model via its
 // decision variables.  This Value of a decision Variable should be a fine-grained indicator of how well a model is
@@ -53,8 +41,10 @@ type Precision int
 
 const defaultPrecision = 3
 
-func NewSimpleDecisionVariable(name string) SimpleDecisionVariable {
-	return SimpleDecisionVariable{
+var _ DecisionVariable = NewSimpleDecisionVariable("test")
+
+func NewSimpleDecisionVariable(name string) *SimpleDecisionVariable {
+	return &SimpleDecisionVariable{
 		name:          name,
 		value:         0,
 		unitOfMeasure: defaultUnitOfMeasure,
