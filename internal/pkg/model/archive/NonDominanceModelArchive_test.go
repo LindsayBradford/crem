@@ -185,6 +185,111 @@ func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
 	showArchiveState(t, archiveUnderTest)
 }
 
+func TestNonDominanceModelArchiveSummary_EmptyArchive_NoSummary(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// when
+	archiveUnderTest := New()
+	// then
+	g.Expect(archiveUnderTest.ArchiveSummary()).To(BeNil())
+}
+
+func TestNonDominanceModelArchiveSummary_OneModelArchive_NoRange(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	modelToChange := buildSilentMultiObjectiveDumbModel()
+	archiveUnderTest := New()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+
+	// when
+	summary := archiveUnderTest.ArchiveSummary()
+
+	// then
+	for _, entry := range summary {
+		g.Expect(entry.Minimum).To(BeNumerically(equalTo, entry.Maximum))
+		g.Expect(entry.Range).To(BeNumerically(equalTo, 0))
+	}
+}
+
+func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	modelToChange := buildSilentMultiObjectiveDumbModel()
+	archiveUnderTest := New()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+
+	// when
+	summary := archiveUnderTest.ArchiveSummary()
+
+	// then
+	for _, entry := range summary {
+		g.Expect(entry.Minimum).To(BeNumerically(equalTo, entry.Maximum))
+		g.Expect(entry.Range).To(BeNumerically(equalTo, 0))
+	}
+
+	// when
+	modelToChange.SetManagementAction(0, true)
+	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+
+	summary = archiveUnderTest.ArchiveSummary()
+
+	// then
+	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 1))
+
+	for _, entry := range summary {
+		g.Expect(entry.Minimum).To(BeNumerically(equalTo, entry.Maximum))
+		g.Expect(entry.Range).To(BeNumerically(equalTo, 0))
+	}
+	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
+
+	// when
+	modelToChange.SetManagementAction(0, false)
+	modelToChange.AcceptChange()
+	modelToChange.SetManagementAction(1, true)
+	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+
+	summary = archiveUnderTest.ArchiveSummary()
+
+	// then
+	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 2))
+
+	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
+	g.Expect(summary[0].Maximum).To(BeNumerically(equalTo, 1000))
+	g.Expect(summary[0].Range).To(BeNumerically(equalTo, 1))
+
+	g.Expect(summary[1].Minimum).To(BeNumerically(equalTo, 1998))
+	g.Expect(summary[1].Maximum).To(BeNumerically(equalTo, 2000))
+	g.Expect(summary[1].Range).To(BeNumerically(equalTo, 2))
+
+	// when
+	modelToChange.SetManagementAction(1, false)
+	modelToChange.AcceptChange()
+	modelToChange.SetManagementAction(2, true)
+	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+
+	summary = archiveUnderTest.ArchiveSummary()
+
+	// then
+	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 3))
+
+	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
+	g.Expect(summary[0].Maximum).To(BeNumerically(equalTo, 1000))
+	g.Expect(summary[0].Range).To(BeNumerically(equalTo, 1))
+
+	g.Expect(summary[1].Minimum).To(BeNumerically(equalTo, 1998))
+	g.Expect(summary[1].Maximum).To(BeNumerically(equalTo, 2000))
+	g.Expect(summary[1].Range).To(BeNumerically(equalTo, 2))
+
+	g.Expect(summary[2].Minimum).To(BeNumerically(equalTo, 2997))
+	g.Expect(summary[2].Maximum).To(BeNumerically(equalTo, 3000))
+	g.Expect(summary[2].Range).To(BeNumerically(equalTo, 3))
+}
+
 func buildSilentMultiObjectiveDumbModel() *modumb.Model {
 	model := modumb.NewModel().WithId("Test Mo Dumb Model")
 	model.SetEventNotifier(loggers.NullTestingEventNotifier)

@@ -17,7 +17,7 @@ var _ variable.UndoableDecisionVariable = new(DumbObjective)
 type DumbObjective struct {
 	variable.PerPlanningUnitDecisionVariable
 
-	command *variable.ChangePerPlanningUnitDecisionVariableCommand
+	command variable.ChangeCommand
 
 	actionObserved action.ManagementAction
 }
@@ -25,10 +25,7 @@ type DumbObjective struct {
 func (o *DumbObjective) Initialise() *DumbObjective {
 	o.PerPlanningUnitDecisionVariable.Initialise()
 
-	o.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
-		ForVariable(o).
-		InPlanningUnit(0).
-		WithChange(0)
+	o.command = new(variable.NullChangeCommand)
 
 	o.SetUnitOfMeasure(variable.NotApplicable)
 	o.SetPrecision(2)
@@ -86,20 +83,20 @@ func (o *DumbObjective) handleDumbAction() {
 	variableName := action.ModelVariableName(o.Name())
 	actionCost := o.actionObserved.ModelVariableValue(variableName)
 
-	var newValue float64
+	var change float64
 	switch o.actionObserved.IsActive() {
 	case true:
-		newValue = actionCost
+		change = actionCost
 	case false:
-		newValue = -1 * actionCost
+		change = actionCost * -1
 	}
 
-	newValue = math.RoundFloat(newValue, int(o.Precision()))
+	change = math.RoundFloat(change, int(o.Precision()))
 
 	o.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
 		ForVariable(o).
 		InPlanningUnit(o.actionObserved.PlanningUnit()).
-		WithChange(newValue)
+		WithChange(change)
 }
 
 func (o *DumbObjective) UndoableValue() float64 {
@@ -107,7 +104,7 @@ func (o *DumbObjective) UndoableValue() float64 {
 }
 
 func (o *DumbObjective) SetUndoableValue(value float64) {
-	o.command.WithChange(value)
+	o.command.SetChange(value)
 }
 
 func (o *DumbObjective) DifferenceInValues() float64 {

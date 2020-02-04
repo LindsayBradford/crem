@@ -2,7 +2,11 @@
 
 package archive
 
-import "github.com/LindsayBradford/crem/internal/pkg/model"
+import (
+	"math"
+
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+)
 
 type StorageResult uint
 
@@ -133,4 +137,55 @@ func (a *NonDominanceModelArchive) IsNonDominant() bool {
 		}
 	}
 	return true
+}
+
+func (a *NonDominanceModelArchive) ArchiveSummary() ArchiveSummary {
+	summary := a.buildSummary()
+
+	for variableIndex, variableValue := range a.archive[0].Variables {
+		summary[variableIndex].Minimum = variableValue
+		summary[variableIndex].Maximum = variableValue
+		summary[variableIndex].Range = 0
+	}
+
+	for _, entry := range a.archive {
+		for variableIndex, variableValue := range entry.Variables {
+			rangeChanged := false
+			if variableValue < summary[variableIndex].Minimum {
+				summary[variableIndex].Minimum = variableValue
+				rangeChanged = true
+			}
+			if variableValue > summary[variableIndex].Maximum {
+				summary[variableIndex].Maximum = variableValue
+				rangeChanged = true
+			}
+			if rangeChanged {
+				summary[variableIndex].Range = math.Abs(summary[variableIndex].Maximum - summary[variableIndex].Minimum)
+			}
+		}
+	}
+
+	return summary
+}
+
+func (a *NonDominanceModelArchive) buildSummary() ArchiveSummary {
+	summary := make(ArchiveSummary, 0)
+
+	if a.IsEmpty() {
+		return nil
+	}
+
+	for index := range a.archive[0].Variables {
+		summary[index] = &VariableSummary{}
+	}
+
+	return summary
+}
+
+type ArchiveSummary map[int]*VariableSummary
+
+type VariableSummary struct {
+	Minimum float64
+	Maximum float64
+	Range   float64
 }
