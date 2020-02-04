@@ -22,10 +22,11 @@ import (
 )
 
 const (
-	nameSeparater = ","
+	nameSeparator = ","
 
-	ArchiveSize   = "ArchiveSize"
-	ArchiveResult = "ArchiveResult"
+	ArchiveSize                     = "ArchiveSize"
+	ArchiveResult                   = "ArchiveResult"
+	IterationsUntilNextReturnToBase = "IterationsUntilNextReturnToBase"
 )
 
 type Explorer struct {
@@ -46,6 +47,9 @@ type Explorer struct {
 	modelArchive         archive.NonDominanceModelArchive
 	archiveStorageResult archive.StorageResult
 
+	iterationsUntilReturnToBase uint64
+	returnToBaseStep            float64
+
 	changeIsDesirable    bool
 	changeAccepted       bool
 	objectiveValueChange float64
@@ -65,6 +69,7 @@ func (ke *Explorer) Initialise() {
 	ke.modelArchive.Initialise()
 	ke.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
+	ke.deriveIterationsUntilReturnToBase()
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -95,6 +100,8 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.parameters.AssignOnlyEnforcedUserValues(params)
 	ke.coolant.SetParameters(params)
 
+	ke.returnToBaseStep = float64(ke.parameters.GetInt64(InitialReturnToBaseStep))
+
 	ke.checkDecisionVariablesFromParams()
 
 	return ke.parameters.ValidationErrors()
@@ -110,7 +117,7 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 
 func (ke *Explorer) checkDecisionVariablesFromParams() {
 	decisionVariableNames := ke.parameters.GetString(ExplorableDecisionVariables)
-	splitVariableNames := strings.Split(decisionVariableNames, nameSeparater)
+	splitVariableNames := strings.Split(decisionVariableNames, nameSeparator)
 	for _, name := range splitVariableNames {
 		variableOffered := ke.Model().OffersDecisionVariable(name)
 		if !variableOffered {
@@ -144,6 +151,7 @@ func (ke *Explorer) TryRandomChange() {
 	variableDifferences := compressedChangedModelState.VariableDifferences(compressedInitialModelState)
 	ke.archiveStorageResult = ke.modelArchive.AttemptToArchiveState(compressedChangedModelState)
 	ke.AcceptOrRevertChange(variableDifferences)
+	ke.ReturnToBaseIfRequired()
 }
 
 func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
@@ -179,6 +187,34 @@ func (ke *Explorer) RevertLastChange() {
 	ke.changeAccepted = false
 }
 
+func (ke *Explorer) ReturnToBaseIfRequired() {
+	if !ke.shouldReturnToBase() {
+		return
+	}
+	ke.returnToBase()
+	ke.adjustReturnToBaseRate()
+}
+
+func (ke *Explorer) shouldReturnToBase() bool {
+	ke.iterationsUntilReturnToBase--
+	return ke.iterationsUntilReturnToBase <= 0
+}
+
+func (ke *Explorer) returnToBase() {
+	// TODO: Implement.
+}
+
+func (ke *Explorer) adjustReturnToBaseRate() {
+	const minimumBaseRate = 10.0
+	rateAdjustment := ke.parameters.GetFloat64(ReturnToBaseAdjustmentFactor)
+	ke.returnToBaseStep = math.Max(minimumBaseRate, ke.returnToBaseStep*rateAdjustment)
+	ke.deriveIterationsUntilReturnToBase()
+}
+
+func (ke *Explorer) deriveIterationsUntilReturnToBase() {
+	ke.iterationsUntilReturnToBase = uint64(ke.returnToBaseStep)
+}
+
 func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
 	clone.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
@@ -199,7 +235,6 @@ func (ke *Explorer) setAcceptanceProbability(probability float64) {
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	baseAttributes := new(attributes.Attributes).
 		Add(explorer.Temperature, ke.coolant.Temperature())
-
 	switch eventType {
 	case observer.StartedAnnealing:
 		return baseAttributes.Add(explorer.CoolingFactor, ke.coolant.CoolingFactor())
@@ -209,6 +244,7 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return baseAttributes.
 			Add(ArchiveSize, ke.modelArchive.Len()).
 			Add(ArchiveResult, ke.archiveStorageResult).
+			Add(IterationsUntilNextReturnToBase, ke.iterationsUntilReturnToBase).
 			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
 			Add(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability()).
 			Add(explorer.ChangeAccepted, ke.changeAccepted)

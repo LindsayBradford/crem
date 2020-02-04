@@ -6,7 +6,7 @@ OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]
-Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+#Debugging = "StandardOutput"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
 #Model = "StandardOutput"
 
@@ -17,6 +17,7 @@ ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 2_000
+InitialReturnToBaseStep = 50 # 20_000
 
 [Model]
 Type = "CatchmentModel"
@@ -30,4 +31,3 @@ SuspendedSedimentProportion = 0.5   # 0.5 (default)
 RiparianRevegetationCostPerKilometer = 24000.0 # 24,000 (default)
 GullyRestorationCostPerKilometer = 44000.0 # 44,000 (default)
 DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
-

@@ -99,14 +99,14 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 				Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
 				Add("Accepted? [", format(event, "ChangeAccepted"), "], ")
 		}
-
 		if event.HasAttribute("ObjectiveValue") {
 			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ").
-				Add("Change [", format(event, "ChangeInObjectiveValue"), "] ")
+				Add("Change [", format(event, "ChangeInObjectiveValue"), "], ")
 		}
 		if event.HasAttribute("ArchiveSize") {
-			builder.Add(", Archive size [", format(event, "ArchiveSize"), "], ").
-				Add("Archive result [", format(event, "ArchiveResult"), "]")
+			builder.Add("Archive size [", format(event, "ArchiveSize"), "], ").
+				Add("Archive result [", format(event, "ArchiveResult"), "], ").
+				Add("Iterations until next Return-To-Base [", format(event, "IterationsUntilNextReturnToBase"), "]")
 		}
 
 	case observer.FinishedAnnealing:

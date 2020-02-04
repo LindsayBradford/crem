@@ -15,7 +15,7 @@ type Parameters struct {
 
 func (p *Parameters) Initialise() *Parameters {
 	p.Parameters.
-		Initialise("Suppapitnarm Coolant Parameter Validation").
+		Initialise("Suppapitnarm Parameter Validation").
 		Enforcing(ParameterSpecifications())
 	return p
 }
