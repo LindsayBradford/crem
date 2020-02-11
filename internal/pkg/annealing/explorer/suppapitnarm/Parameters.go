@@ -22,9 +22,11 @@ func (p *Parameters) Initialise() *Parameters {
 }
 
 const (
-	ExplorableDecisionVariables  = "ExplorableDecisionVariables"
-	ReturnToBaseAdjustmentFactor = "ReturnToBaseAdjustmentFactor"
-	InitialReturnToBaseStep      = "InitialReturnToBaseStep"
+	ExplorableDecisionVariables   = "ExplorableDecisionVariables"
+	ReturnToBaseAdjustmentFactor  = "ReturnToBaseAdjustmentFactor"
+	InitialReturnToBaseStep       = "InitialReturnToBaseStep"
+	MinimumReturnToBaseRate       = "MinimumReturnToBaseRate"
+	ReturnToBaseIsolationFraction = "ReturnToBaseIsolationFraction"
 )
 
 type optimisationDirection int
@@ -54,6 +56,18 @@ func ParameterSpecifications() *Specifications {
 			Key:          InitialReturnToBaseStep,
 			Validator:    IsNonNegativeInteger,
 			DefaultValue: int64(20_000), // following initial CRP hard-coded default
+		},
+	).Add(
+		Specification{
+			Key:          MinimumReturnToBaseRate,
+			Validator:    IsNonNegativeInteger,
+			DefaultValue: int64(10), // following initial CRP hard-coded default
+		},
+	).Add(
+		Specification{
+			Key:          ReturnToBaseIsolationFraction,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.9), // following initial CRP hard-coded default
 		},
 	)
 	return specs

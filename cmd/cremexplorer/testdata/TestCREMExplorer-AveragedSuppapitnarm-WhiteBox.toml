@@ -18,6 +18,7 @@ StartingTemperature = 10.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 2_000
 InitialReturnToBaseStep = 50 # 20_000
+MinimumReturnToBaseRate = 10 # 10
 
 [Model]
 Type = "CatchmentModel"

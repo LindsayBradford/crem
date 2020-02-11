@@ -47,8 +47,9 @@ type Explorer struct {
 	modelArchive         archive.NonDominanceModelArchive
 	archiveStorageResult archive.StorageResult
 
-	iterationsUntilReturnToBase uint64
-	returnToBaseStep            float64
+	iterationsUntilReturnToBase   uint64
+	returnToBaseStep              float64
+	returnToBaseIsolationFraction float64
 
 	changeIsDesirable    bool
 	changeAccepted       bool
@@ -101,6 +102,7 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.coolant.SetParameters(params)
 
 	ke.returnToBaseStep = float64(ke.parameters.GetInt64(InitialReturnToBaseStep))
+	ke.returnToBaseIsolationFraction = 1
 
 	ke.checkDecisionVariablesFromParams()
 
@@ -201,12 +203,22 @@ func (ke *Explorer) shouldReturnToBase() bool {
 }
 
 func (ke *Explorer) returnToBase() {
-	// TODO: Implement.
+	const minFraction = 1e-63
+	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
+	compressedModel := ke.modelArchive.SelectRandomIsolatedModel(selectionRangeLimit)
+	ke.modelArchive.Decompress(compressedModel, ke.Model())
+	if ke.returnToBaseIsolationFraction == 1 {
+		ke.returnToBaseIsolationFraction = ke.parameters.GetFloat64(ReturnToBaseIsolationFraction)
+	} else {
+		ke.returnToBaseIsolationFraction *= ke.returnToBaseIsolationFraction
+		ke.returnToBaseIsolationFraction = math.Max(ke.returnToBaseIsolationFraction, minFraction)
+	}
 }
 
 func (ke *Explorer) adjustReturnToBaseRate() {
-	const minimumBaseRate = 10.0
+	minimumBaseRate := float64(ke.parameters.GetInt64(MinimumReturnToBaseRate))
 	rateAdjustment := ke.parameters.GetFloat64(ReturnToBaseAdjustmentFactor)
+
 	ke.returnToBaseStep = math.Max(minimumBaseRate, ke.returnToBaseStep*rateAdjustment)
 	ke.deriveIterationsUntilReturnToBase()
 }

@@ -4,8 +4,11 @@ package archive
 
 import (
 	"math"
+	"sort"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 )
 
 type StorageResult uint
@@ -39,13 +42,19 @@ func New() *NonDominanceModelArchive {
 	return new(NonDominanceModelArchive).Initialise()
 }
 
+const notIsolated = math.MaxFloat64
+
 type NonDominanceModelArchive struct {
-	archive    []*CompressedModelState
+	archive   []*CompressedModelState
+	isolation []float64
+
 	compressor ModelCompressor
+	rand.RandContainer
 }
 
 func (a *NonDominanceModelArchive) Initialise() *NonDominanceModelArchive {
 	a.archive = make([]*CompressedModelState, 0)
+	a.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	return a
 }
 
@@ -56,6 +65,10 @@ func (a *NonDominanceModelArchive) AttemptToArchive(model model.Model) StorageRe
 
 func (a *NonDominanceModelArchive) Compress(model model.Model) *CompressedModelState {
 	return a.compressor.Compress(model)
+}
+
+func (a *NonDominanceModelArchive) Decompress(condensedModelState *CompressedModelState, model model.Model) {
+	a.compressor.Decompress(condensedModelState, model)
 }
 
 func (a *NonDominanceModelArchive) AttemptToArchiveState(modelState *CompressedModelState) StorageResult {
@@ -139,8 +152,12 @@ func (a *NonDominanceModelArchive) IsNonDominant() bool {
 	return true
 }
 
-func (a *NonDominanceModelArchive) ArchiveSummary() ArchiveSummary {
+func (a *NonDominanceModelArchive) ArchiveSummary() Summary {
 	summary := a.buildSummary()
+
+	if summary == nil {
+		return nil
+	}
 
 	for variableIndex, variableValue := range a.archive[0].Variables {
 		summary[variableIndex].Minimum = variableValue
@@ -168,8 +185,68 @@ func (a *NonDominanceModelArchive) ArchiveSummary() ArchiveSummary {
 	return summary
 }
 
-func (a *NonDominanceModelArchive) buildSummary() ArchiveSummary {
-	summary := make(ArchiveSummary, 0)
+func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int) *CompressedModelState {
+	a.calculateArchiveIsolation()
+	sort.Sort(a)
+	return a.selectRandomModel(selectionRange)
+}
+
+func (a *NonDominanceModelArchive) sortByIsolation() {
+	// TODO: implemnent
+}
+
+func (a *NonDominanceModelArchive) selectRandomModel(selectionRange int) *CompressedModelState {
+	selectedIndex := a.selectRandomIndex(selectionRange)
+	return a.archive[selectedIndex]
+}
+
+func (a *NonDominanceModelArchive) selectRandomIndex(selectionRange int) int {
+	assert.That(selectionRange < len(a.archive))
+	randomIndex := a.RandomNumberGenerator().Intn(selectionRange)
+	return randomIndex
+}
+
+func (a *NonDominanceModelArchive) calculateArchiveIsolation() {
+	summary := a.ArchiveSummary()
+	a.isolation = make([]float64, len(a.archive))
+	for index, modelState := range a.archive {
+		a.isolation[index] = a.calculatedModelStateIsolation(modelState, summary)
+	}
+}
+
+func (a *NonDominanceModelArchive) calculatedModelStateIsolation(state *CompressedModelState, summary Summary) float64 {
+	if a.isIsolated(summary, state) {
+		return a.deriveIsolation(summary, state)
+	}
+	return notIsolated
+}
+
+func (a *NonDominanceModelArchive) isIsolated(summary Summary, state *CompressedModelState) bool {
+	for index, variableSummary := range summary {
+		// TODO: As these are floats, a precision match might be needed instead?
+		if variableSummary.Minimum == state.Variables[index] {
+			return false
+		}
+	}
+	return true
+}
+
+func (a *NonDominanceModelArchive) deriveIsolation(summary Summary, state *CompressedModelState) float64 {
+	var isolation float64
+	for _, modelState := range a.archive {
+		if state.IsEquivalentTo(modelState) {
+			continue
+		}
+		for summaryIndex, _ := range summary {
+			numerator := (state.Variables[summaryIndex] - modelState.Variables[summaryIndex]) / summary[summaryIndex].Range
+			isolation += math.Pow(numerator, 2)
+		}
+	}
+	return isolation
+}
+
+func (a *NonDominanceModelArchive) buildSummary() Summary {
+	summary := make(Summary, 0)
 
 	if a.IsEmpty() {
 		return nil
@@ -182,7 +259,16 @@ func (a *NonDominanceModelArchive) buildSummary() ArchiveSummary {
 	return summary
 }
 
-type ArchiveSummary map[int]*VariableSummary
+func (a NonDominanceModelArchive) Swap(i, j int) {
+	a.archive[i], a.archive[j] = a.archive[j], a.archive[i]
+	a.isolation[i], a.isolation[j] = a.isolation[j], a.isolation[i]
+}
+
+func (a NonDominanceModelArchive) Less(i, j int) bool {
+	return a.isolation[i] < a.isolation[j]
+}
+
+type Summary map[int]*VariableSummary
 
 type VariableSummary struct {
 	Minimum float64
