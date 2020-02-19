@@ -224,7 +224,8 @@ func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planninguni
 }
 
 func (sl *SedimentProduction) UndoableValue() float64 {
-	return sl.command.Value()
+	// return sl.command.Value()
+	return sl.Value() + sl.command.Value()
 }
 
 func (sl *SedimentProduction) SetUndoableValue(value float64) {

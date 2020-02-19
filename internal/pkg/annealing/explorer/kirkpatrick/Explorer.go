@@ -158,12 +158,14 @@ func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction f
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
+	changeIsDesirable := false
 	switch ke.optimisationDirection {
 	case Minimising:
-		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() <= 0
+		changeIsDesirable = ke.calculateChangeInObjectiveValue() < 0
 	case Maximising:
-		ke.changeIsDesirable = ke.calculateChangeInObjectiveValue() > 0
+		changeIsDesirable = ke.calculateChangeInObjectiveValue() > 0
 	}
+	ke.changeIsDesirable = changeIsDesirable
 	return ke.changeIsDesirable
 }
 

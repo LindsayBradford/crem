@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.8 (TBD):
+### Bug Fixes
+* Fixed bug in how "SedimentProduction" reports changes to the annealer.
+* Changed Kirkpatrick explorer to consider "no objective change" updates to be undesirable.
+
 ## Version 0.7 (21 January 2020):
 ### New Features
 * Reintroduced (only) upper bound limit parameters 
