@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test CREMExplorer - Black Box"
+Name = "Kirkpatrick - Black Box"
 OutputPath="testdata/solutions"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1

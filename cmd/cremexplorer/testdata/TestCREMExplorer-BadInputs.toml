@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test CREMExplorer - Bad Inputs"
+Name = "Kirkpatrick - Bad Inputs"
 RunNumber = 1
 OutputPath="testdata/solutions"
 [Scenario.Reporting]

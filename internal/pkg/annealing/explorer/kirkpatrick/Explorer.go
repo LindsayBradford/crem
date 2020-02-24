@@ -215,9 +215,14 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes.Add(explorer.CoolingFactor, ke.CoolingFactor)
+		return new(attributes.Attributes).
+			Add(explorer.Temperature, ke.Temperature).
+			Add(explorer.CoolingFactor, ke.CoolingFactor).
+			Add(ObjectiveValue, ke.ObjectiveValue())
 	case observer.StartedIteration, observer.FinishedAnnealing:
-		return baseAttributes
+		return new(attributes.Attributes).
+			Add(explorer.Temperature, ke.Temperature).
+			Add(ObjectiveValue, ke.ObjectiveValue())
 	case observer.DuringIteration:
 		return baseAttributes
 	case observer.InvalidChange:

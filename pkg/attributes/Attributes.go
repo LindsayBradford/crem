@@ -39,6 +39,43 @@ func (a Attributes) Join(attributes Attributes) Attributes {
 	return append(a, attributes...)
 }
 
+func (a Attributes) Rename(oldName string, newName string) Attributes {
+	for index, attrib := range a {
+		if attrib.Name == oldName {
+			newEntry := NameValuePair{Name: newName, Value: attrib.Value}
+			a[index] = newEntry
+		}
+	}
+	return a
+}
+
+func (a Attributes) Remove(name string) Attributes {
+	removeIndex := -1
+	for index, attrib := range a {
+		if attrib.Name == name {
+			removeIndex = index
+		}
+	}
+
+	frontAttributes := make(Attributes, 0)
+	frontAttributes = a[:removeIndex]
+
+	backAttributes := make(Attributes, 0)
+	backAttributes = a[removeIndex+1:]
+
+	return append(frontAttributes, backAttributes...)
+}
+
+func (a Attributes) Replace(name string, value interface{}) Attributes {
+	for index, attrib := range a {
+		if attrib.Name == name {
+			newEntry := NameValuePair{Name: name, Value: value}
+			a[index] = newEntry
+		}
+	}
+	return a
+}
+
 // NameValuePair is a struct allowing some Name as text to be associated with a matching Value of any type.
 type NameValuePair struct {
 	Name  string

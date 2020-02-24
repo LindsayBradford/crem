@@ -168,18 +168,25 @@ func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attribut
 	baseAttributes := new(attributes.Attributes).
 		Add(Id, sa.Id()).
 		Add(MaximumIterations, sa.maximumIterations).
-		Join(
-			sa.SolutionExplorer().EventAttributes(eventType),
-		)
+		Join(sa.SolutionExplorer().EventAttributes(eventType))
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes
-	case observer.StartedIteration, observer.FinishedIteration:
+		return new(attributes.Attributes).
+			Add(Id, sa.Id()).
+			Add(MaximumIterations, sa.maximumIterations).
+			Join(sa.SolutionExplorer().EventAttributes(eventType))
+	case observer.StartedIteration:
+		return baseAttributes.
+			Add(CurrentIteration, sa.currentIteration)
+	case observer.FinishedIteration:
 		return baseAttributes.
 			Add(CurrentIteration, sa.currentIteration)
 	case observer.FinishedAnnealing:
-		return baseAttributes.
+		return new(attributes.Attributes).
+			Add(Id, sa.Id()).
 			Add(CurrentIteration, sa.currentIteration).
+			Add(MaximumIterations, sa.maximumIterations).
+			Join(sa.SolutionExplorer().EventAttributes(eventType)).
 			Add(Solution, *sa.fetchFinalModelSolution())
 	}
 	return nil
@@ -210,7 +217,6 @@ func (sa *SimpleAnnealer) Observers() []observer.Observer {
 
 func (sa *SimpleAnnealer) ObserveEvent(event observer.Event) {
 	if event.EventType.IsAnnealingIterationState() {
-		event.AddAttribute(Id, sa.Id())
 		event.AddAttribute(CurrentIteration, sa.currentIteration)
 		event.AddAttribute(MaximumIterations, sa.maximumIterations)
 	}

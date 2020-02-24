@@ -4,7 +4,6 @@ package observer
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/observer/filters"
-	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -56,118 +55,62 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 		Add("Id [", event.Id(), "], ").
 		Add("Event [", event.EventType.String(), "]: ")
 
-	if event.EventType.IsAnnealingState() {
-		amo.observeAnnealerEvent(event, &builder)
-	} else {
-		amo.observeEvent(event, &builder)
-	}
+	amo.observeEvent(event, &builder)
+
 }
 
-func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, builder *strings.FluentBuilder) {
+func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.StartedAnnealing:
-		builder.
-			Add("Maximum Iterations [", format(event, "MaximumIterations"), "], ").
-			Add("Temperature [", format(event, "Temperature"), "], ").
-			Add("Cooling Factor [", format(event, "CoolingFactor"), "]")
-		if event.HasAttribute("ObjectiveValue") {
-			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
-		}
-		if event.HasAttribute("ArchiveSize") {
-			builder.Add(", Archive size [", format(event, "ArchiveSize"), "]")
-		}
-	case observer.StartedIteration:
-		builder.
-			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ").
-			Add("Temperature [", format(event, "Temperature"), "]")
-		if event.HasAttribute("ObjectiveValue") {
-			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
-		}
-	case observer.DuringIteration:
-		builder.Add("Iteration [", format(event, "CurrentIteration"), "/",
-			format(event, "MaximumIterations"), "], ").
-			Add("Note [", event.Note(), "], ")
-	case observer.InvalidChange:
-		builder.Add("Iteration [", format(event, "CurrentIteration"), "/",
-			format(event, "MaximumIterations"), "], ").
-			Add("Reason [", format(event, "ReasonChangeInvalid"), "], ")
-	case observer.Model:
-		if event.HasAttribute("CurrentIteration") {
-			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
-		}
-
-		if event.HasNote() {
-			builder.Add("Note [", event.Note(), "]")
-		}
-	case observer.ManagementAction:
-		if event.HasAttribute("CurrentIteration") {
-			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
-		}
-
-		builder.
-			Add("Type [", format(event, "Type"), "], ").
-			Add("Planning Unit [", format(event, "PlanningUnit"), "], ").
-			Add("Active [", format(event, "IsActive"), "]")
-
-		if event.HasNote() {
-			builder.Add(", Note [", event.Note(), "]")
-		}
-	case observer.DecisionVariable:
-		if event.HasAttribute("CurrentIteration") {
-			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
-		}
-
-		builder.
-			Add("Name [", format(event, "Name"), "], ").
-			Add("Value [", format(event, "Value"), "]")
-
-		if event.HasNote() {
-			builder.Add(", Note [", event.Note(), "]")
-		}
-	case observer.FinishedIteration:
-		builder.Add("Iteration [",
-			format(event, "CurrentIteration"), "/",
-			format(event, "MaximumIterations"), "], ")
-		if event.HasAttribute("ChangeAccepted") {
-			builder.
-				Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
-				Add("Acceptance Probability [", format(event, "AcceptanceProbability"), "], ").
-				Add("Accepted? [", format(event, "ChangeAccepted"), "], ")
-		}
-		if event.HasAttribute("ObjectiveValue") {
-			builder.Add("Objective value [", format(event, "ObjectiveValue"), "], ").
-				Add("Change [", format(event, "ChangeInObjectiveValue"), "], ")
-		}
-		if event.HasAttribute("ArchiveSize") {
-			builder.Add("Archive size [", format(event, "ArchiveSize"), "], ").
-				Add("Archive result [", format(event, "ArchiveResult"), "], ").
-				Add("Iterations until next Return-To-Base [", format(event, "IterationsUntilNextReturnToBase"), "]")
-		}
+		amo.stringifyEvent(event, builder)
 	case observer.FinishedAnnealing:
-		builder.
-			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").
-			Add("Temperature [", format(event, "Temperature"), "]")
-		if event.HasAttribute("ObjectiveValue") {
-			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
-		}
+		event.RemoveAttribute("Solution")
+		fusedIterationsEvent := fuseIterationAttributes(event)
+		amo.stringifyEvent(fusedIterationsEvent, builder)
 	default:
-		// deliberately does nothing extra
+		fusedIterationsEvent := fuseIterationAttributes(event)
+		amo.stringifyEvent(fusedIterationsEvent, builder)
 	}
 
 	amo.logHandler.LogAtLevel(AnnealingLogLevel, builder.String())
 }
 
-func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
-	switch event.EventType {
-	case observer.Note:
-		builder.Add("[", event.Note(), "]")
-	default:
-		// deliberately does nothing extra
-	}
+const leftBrace = " ["
+const rightBrace = "]"
+const comma = ", "
 
-	amo.logHandler.LogAtLevel(model.LogLevel, builder.String())
+func (amo *AnnealingMessageObserver) stringifyEvent(event observer.Event, builder *strings.FluentBuilder) {
+	for index, attrib := range event.AllAttributes() {
+		builder.Add(attrib.Name, leftBrace, format(event, attrib.Name), rightBrace)
+		if index < len(event.AllAttributes())-1 {
+			builder.Add(comma)
+		}
+	}
 }
 
 func format(event observer.Event, attributeName string) string {
 	return defaultConverter.Convert(event.Attribute(attributeName))
+}
+
+func fuseIterationAttributes(event observer.Event) observer.Event {
+	if !event.HasAttribute("CurrentIteration") && !event.HasAttribute("MaximumIterations") {
+		return event
+	}
+
+	if event.Attribute("CurrentIteration").(uint64) == 0 {
+		duplicateEvent := &event
+		duplicateEvent.RemoveAttribute("CurrentIteration")
+		duplicateEvent.RemoveAttribute("MaximumIterations")
+		return *duplicateEvent
+	}
+
+	fusedIterationsValue := new(strings.FluentBuilder).
+		Add(format(event, "CurrentIteration"), "/", format(event, "MaximumIterations")).String()
+
+	duplicateEvent := &event
+	duplicateEvent.RemoveAttribute("MaximumIterations")
+	duplicateEvent.ReplaceAttribute("CurrentIteration", fusedIterationsValue)
+	duplicateEvent.RenameAttribute("CurrentIteration", "Iteration")
+
+	return *duplicateEvent
 }

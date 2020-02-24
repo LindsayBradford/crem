@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test SedimentBoundCREMEngine - Kirkpatrick - White Box"
+Name = "Kirkpatrick - Sediment Bound"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"

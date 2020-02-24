@@ -16,7 +16,7 @@ const defaultCatchmentModelAnnealerTimeout = 10
 func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "CREMExplorer - Black Box",
+		Name:              "Black Box Kirkpatrick",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/TestCREMExplorer-BlackBox.toml",
@@ -29,7 +29,7 @@ func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
 func TestCREMExplorer_BlackBox_ExitWithError(t *testing.T) {
 	context := configTesting.BlackboxTestingContext{
 		T:                 t,
-		Name:              "CREMExplorer - Black Box with bad inputs",
+		Name:              "Black Box Kirkpatrick - Bad Inputs",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/TestCREMExplorer-BadInputs.toml",
@@ -41,7 +41,7 @@ func TestCREMExplorer_BlackBox_ExitWithError(t *testing.T) {
 
 func TestCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "CREMExplorer - Kirkpatrick - White Box",
+		Name:           "Kirkpatrick",
 		T:              t,
 		ConfigFilePath: "testdata/TestCREMExplorer-Kirkpatrick-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
@@ -53,7 +53,7 @@ func TestCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 
 func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "CREMExplorer - Suppapitnarm - White Box",
+		Name:           "Suppapitnarm",
 		T:              t,
 		ConfigFilePath: "testdata/TestCREMExplorer-Suppapitnarm-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
@@ -65,7 +65,7 @@ func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 
 func TestCREMExplorer_AveragedSuppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "CREMExplorer - Averaged Suppapitnarm - White Box",
+		Name:           "Averaged Suppapitnarm",
 		T:              t,
 		ConfigFilePath: "testdata/TestCREMExplorer-AveragedSuppapitnarm-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
@@ -77,7 +77,7 @@ func TestCREMExplorer_AveragedSuppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T
 
 func TestCostBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "Bound Cost CREMExplorer - Kirkpatrick - White Box",
+		Name:           "Bound Cost Kirkpatrick",
 		T:              t,
 		ConfigFilePath: "testdata/TestCostBoundCREMExplorer-Kirkpatrick-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
@@ -89,7 +89,7 @@ func TestCostBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T
 
 func TestSedimentBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
-		Name:           "Bound Sediment CREMExplorer - Kirkpatrick - White Box",
+		Name:           "Bound Sediment Kirkpatrick",
 		T:              t,
 		ConfigFilePath: "testdata/TestSedimentBoundCREMExplorer-Kirkpatrick-WhiteBox.toml",
 		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,

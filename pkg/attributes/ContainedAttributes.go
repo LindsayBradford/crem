@@ -18,6 +18,18 @@ func (ca *ContainedAttributes) AddAttribute(name string, value interface{}) {
 	ca.attributes = ca.attributes.Add(name, value)
 }
 
+func (ca *ContainedAttributes) RenameAttribute(currentName string, newName string) {
+	ca.attributes = ca.attributes.Rename(currentName, newName)
+}
+
+func (ca *ContainedAttributes) ReplaceAttribute(name string, value interface{}) {
+	ca.attributes = ca.attributes.Replace(name, value)
+}
+
+func (ca *ContainedAttributes) RemoveAttribute(name string) {
+	ca.attributes = ca.attributes.Remove(name)
+}
+
 func (ca *ContainedAttributes) JoiningAttributes(newAttributes Attributes) {
 	ca.attributes = ca.attributes.Join(newAttributes)
 }

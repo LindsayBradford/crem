@@ -289,14 +289,14 @@ func (m *CoreModel) PlanningUnits() planningunit.Ids {
 }
 
 func (m *CoreModel) AcceptChange() {
-	if m.initialising {
+	if !m.initialising {
 		m.note("Accepting Change")
 	}
 	m.ContainedDecisionVariables.AcceptAll()
 }
 
 func (m *CoreModel) RevertChange() {
-	if m.initialising {
+	if !m.initialising {
 		m.note("Reverting Change")
 	}
 	m.ContainedDecisionVariables.RejectAll()

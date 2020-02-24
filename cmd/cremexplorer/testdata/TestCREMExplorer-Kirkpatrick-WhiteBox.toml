@@ -1,5 +1,5 @@
 [Scenario]
-Name = "Test CREMEngine - Kirkpatrick - White Box"
+Name = "Kirkpatrick"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
