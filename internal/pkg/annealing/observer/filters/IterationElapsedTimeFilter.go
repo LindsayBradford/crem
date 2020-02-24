@@ -27,7 +27,7 @@ func (m *IterationElapsedTimeFilter) WithWait(wait time.Duration) *IterationElap
 // are either 1) the very first or very last event, or 2) the closest FinishedIteration event to have
 // occurred after the wait duration has passed since the last previous event allowed through.
 func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
-	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
+	if !event.EventType.IsAnnealingIterationState() {
 		return allowThroughFilter
 	}
 
@@ -35,11 +35,11 @@ func (m *IterationElapsedTimeFilter) ShouldFilter(event observer.Event) bool {
 }
 
 func (m *IterationElapsedTimeFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
-	if event.EventType != observer.FinishedIteration && event.EventType != observer.StartedIteration {
+	if !event.EventType.IsAnnealingIterationState() {
 		return blockAtFilter
 	}
 
-	if eventOnnFirstOrLastIteration(event) {
+	if eventOnFirstOrLastIteration(event) {
 		m.lastTimeAllowed = time.Now()
 		return allowThroughFilter
 	}

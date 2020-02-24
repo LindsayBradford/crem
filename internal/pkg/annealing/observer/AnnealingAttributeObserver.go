@@ -29,7 +29,7 @@ func (aao *AnnealingAttributeObserver) WithFilter(Filter filters.Filter) *Anneal
 // ObserveEvent captures and converts Event instances into a Attributes instance that
 // captures key attributes associated with the event, and passes them to the Logger for processing.
 func (aao *AnnealingAttributeObserver) ObserveEvent(event observer.Event) {
-	if aao.logHandler.BeingDiscarded(AnnealerLogLevel) || aao.filter.ShouldFilter(event) {
+	if aao.logHandler.BeingDiscarded(AnnealingLogLevel) || aao.filter.ShouldFilter(event) {
 		return
 	}
 
@@ -52,6 +52,9 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(event observer.Even
 	case observer.StartedIteration:
 		logAttributes = append(logAttributes,
 			event.AttributesNamed("CurrentIteration", "Temperature", "ObjectiveValue")...)
+	case observer.InvalidChange:
+		logAttributes = append(logAttributes,
+			event.AttributesNamed("CurrentIteration", "ReasonChangeInvalid")...)
 	case observer.FinishedIteration:
 		logAttributes = append(logAttributes,
 			event.AttributesNamed(
@@ -62,7 +65,7 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(event observer.Even
 	default:
 		// deliberately does nothing extra
 	}
-	aao.logHandler.LogAtLevelWithAttributes(AnnealerLogLevel, logAttributes)
+	aao.logHandler.LogAtLevelWithAttributes(AnnealingLogLevel, logAttributes)
 }
 
 func (aao *AnnealingAttributeObserver) observeEvent(event observer.Event, logAttributes attributes.Attributes) {

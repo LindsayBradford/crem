@@ -39,7 +39,7 @@ func (amo *AnnealingInvariantObserver) ObserveEvent(event observer.Event) {
 		Add("Id [", event.Id(), "], ").
 		Add("Event [", event.EventType.String(), "]: ").
 		Add("Loop Invariant Broken.")
-	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+	amo.logHandler.LogAtLevel(AnnealingLogLevel, builder.String())
 	panic(builder.String())
 }
 

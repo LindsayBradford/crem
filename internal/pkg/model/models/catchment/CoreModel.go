@@ -20,7 +20,6 @@ import (
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
 )
@@ -34,7 +33,7 @@ func NewCoreModel() *CoreModel {
 	newModel := new(CoreModel)
 
 	newModel.SetName("CatchmentModel")
-	newModel.SetEventNotifier(loggers.DefaultTestingEventNotifier)
+	newModel.SetId("TestCatchmentModel")
 
 	newModel.parameters.Initialise()
 	newModel.managementActions.Initialise()
@@ -46,8 +45,6 @@ func NewCoreModel() *CoreModel {
 type CoreModel struct {
 	name.NameContainer
 	name.IdentifiableContainer
-	observer.ContainedEventNotifier
-
 	parameters parameters.Parameters
 
 	managementActions action.ModelManagementActions
@@ -59,6 +56,8 @@ type CoreModel struct {
 
 	inputDataSet dataset.DataSet
 	initialising bool
+
+	observer.SynchronousAnnealingEventNotifier
 }
 
 func (m *CoreModel) WithName(name string) *CoreModel {
@@ -207,6 +206,7 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 func (m *CoreModel) randomlyInitialiseActions() {
 	m.note("Starting randomly initialising model actions")
 
+	m.initialising = true
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		m.randomlyInitialiseActionForMaximumImplementationCost()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
@@ -214,6 +214,7 @@ func (m *CoreModel) randomlyInitialiseActions() {
 	} else {
 		m.randomlyInitialiseActionsUnbounded()
 	}
+	m.initialising = false
 
 	m.note("Finished randomly initialising model actions")
 }
@@ -228,7 +229,6 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
 
 		isValid, _ := m.ChangeIsValid()
 		if !isValid {
-			m.note("Scenario would be invalid, reverting to last valid solution")
 			m.RevertChange()
 		}
 	}
@@ -248,7 +248,6 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
 
 		isValid, _ := m.ChangeIsValid()
 		if !isValid {
-			m.note("Scenario would be invalid, reverting to last valid solution")
 			m.RevertChange()
 		}
 	}
@@ -291,14 +290,15 @@ func (m *CoreModel) PlanningUnits() planningunit.Ids {
 
 func (m *CoreModel) AcceptChange() {
 	if m.initialising {
-		return
+		m.note("Accepting Change")
 	}
-	m.note("Accepting Change")
 	m.ContainedDecisionVariables.AcceptAll()
 }
 
 func (m *CoreModel) RevertChange() {
-	m.note("Reverting Change")
+	if m.initialising {
+		m.note("Reverting Change")
+	}
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
 }
@@ -341,12 +341,12 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 		WithAttribute("Type", action.Type()).
 		WithAttribute("PlanningUnit", action.PlanningUnit()).
 		WithAttribute("IsActive", action.IsActive())
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *CoreModel) note(text string) {
-	event := observer.NewEvent(observer.Note).WithId(m.Id()).WithNote(text)
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	event := observer.NewEvent(observer.Model).WithId(m.Id()).WithNote(text)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) {
@@ -357,7 +357,7 @@ func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) 
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value())
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *CoreModel) ObserveDecisionVariableWithNote(variable variable.DecisionVariable, note string) {
@@ -369,7 +369,7 @@ func (m *CoreModel) ObserveDecisionVariableWithNote(variable variable.DecisionVa
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value()).
 		WithNote(note)
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *CoreModel) capChangeOverRange(value float64) float64 {

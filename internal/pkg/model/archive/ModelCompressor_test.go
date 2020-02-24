@@ -3,10 +3,10 @@
 package archive
 
 import (
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
 )
 
@@ -68,7 +68,7 @@ func TestModelCompressor_Decompress_AlteredModel(t *testing.T) {
 
 func buildMultiObjectiveDumbModel() *modumb.Model {
 	model := modumb.NewModel().WithId("Test Mo Dumb Model")
-	model.SetEventNotifier(loggers.DefaultTestingEventNotifier)
+	model.AddObserver(loggers.DefaultTestingAnnealingObserver)
 	model.Initialise()
 	return model
 }

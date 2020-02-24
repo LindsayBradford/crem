@@ -22,18 +22,22 @@ func (m *IterationCountFilter) WithModulo(modulo uint64) *IterationCountFilter {
 // events. Every modulo FinishedIteration events received, one is allowed through to the LogHandler.
 // The very first and very last FinishedIteration events are exceptions, and are also not filtered.
 func (m *IterationCountFilter) ShouldFilter(event observer.Event) bool {
-	if event.EventType != observer.StartedIteration && event.EventType != observer.FinishedIteration {
+	if !event.EventType.IsAnnealingIterationState() {
 		return allowThroughFilter
 	}
-
 	return m.ShouldFilterAnnealerSource(event)
 }
 
 func (m *IterationCountFilter) ShouldFilterAnnealerSource(event observer.Event) bool {
-	currentIteration := event.Attribute("CurrentIteration").(uint64)
-	if (event.EventType == observer.FinishedIteration || event.EventType == observer.StartedIteration) &&
-		(eventOnnFirstOrLastIteration(event) || currentIteration%m.iterationModulo == 0) {
+	if !event.HasAttribute("CurrentIteration") {
 		return allowThroughFilter
 	}
+
+	currentIteration := event.Attribute("CurrentIteration").(uint64)
+	if event.EventType.IsAnnealingIterationState() &&
+		(eventOnFirstOrLastIteration(event) || currentIteration%m.iterationModulo == 0) {
+		return allowThroughFilter
+	}
+
 	return blockAtFilter
 }

@@ -5,7 +5,9 @@ package interpreter
 import (
 	"testing"
 
+	annealingObserver "github.com/LindsayBradford/crem/internal/pkg/annealing/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/logging/formatters"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	. "github.com/onsi/gomega"
@@ -24,8 +26,8 @@ func TestConfigInterpreter_NewLoggingConfigInterpreter_DefaultLoggerNoErrors(t *
 	// then
 	actualLogHandler := interpreterUnderTest.LogHandler()
 	g.Expect(actualLogHandler.Name()).To(Equal(expectedLogHandlerName))
-	g.Expect(actualLogHandler.SupportsLogLevel("Annealer")).To(BeTrue())
-	g.Expect(actualLogHandler.SupportsLogLevel("Model")).To(BeTrue())
+	g.Expect(actualLogHandler.SupportsLogLevel(annealingObserver.AnnealingLogLevel)).To(BeTrue())
+	g.Expect(actualLogHandler.SupportsLogLevel(model.LogLevel)).To(BeTrue())
 
 	g.Expect(interpreterUnderTest.Errors()).To(BeNil())
 }
@@ -47,8 +49,8 @@ func TestConfigInterpreter_ValidNativeDefaultingLoggingConfig_NoErrors(t *testin
 	actualFormatter := actualLogger.Formatter()
 
 	g.Expect(actualLogger).To(BeAssignableToTypeOf(&loggers.NativeLibraryLogger{}))
-	g.Expect(actualLogger.SupportsLogLevel("Annealer")).To(BeTrue())
-	g.Expect(actualLogger.SupportsLogLevel("Model")).To(BeTrue())
+	g.Expect(actualLogger.SupportsLogLevel(annealingObserver.AnnealingLogLevel)).To(BeTrue())
+	g.Expect(actualLogger.SupportsLogLevel(model.LogLevel)).To(BeTrue())
 
 	g.Expect(actualFormatter).To(BeAssignableToTypeOf(&formatters.JsonFormatter{}))
 
@@ -72,8 +74,8 @@ func TestConfigInterpreter_ValidBareBonesDefaultingLoggingConfig_NoErrors(t *tes
 	actualFormatter := actualLogger.Formatter()
 
 	g.Expect(actualLogger).To(BeAssignableToTypeOf(&loggers.BareBonesLogger{}))
-	g.Expect(actualLogger.SupportsLogLevel("Annealer")).To(BeTrue())
-	g.Expect(actualLogger.SupportsLogLevel("Model")).To(BeTrue())
+	g.Expect(actualLogger.SupportsLogLevel(annealingObserver.AnnealingLogLevel)).To(BeTrue())
+	g.Expect(actualLogger.SupportsLogLevel(model.LogLevel)).To(BeTrue())
 
 	g.Expect(actualFormatter).To(BeAssignableToTypeOf(&formatters.NameValuePairFormatter{}))
 

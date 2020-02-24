@@ -29,9 +29,9 @@ func (nm *NullFilter) ShouldFilter(event observer.Event) bool {
 	return allowThroughFilter
 }
 
-func eventOnnFirstOrLastIteration(event observer.Event) bool {
+func eventOnFirstOrLastIteration(event observer.Event) bool {
 	currentIteration := event.Attribute("CurrentIteration").(uint64)
-	maximumIteratons := event.Attribute("MaximumIterations").(uint64)
+	maximumIterations := event.Attribute("MaximumIterations").(uint64)
 
-	return currentIteration == 1 || currentIteration == maximumIteratons
+	return currentIteration == 1 || currentIteration == maximumIterations
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
-	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
@@ -19,7 +18,6 @@ func NewModel() *Model {
 	newModel := new(Model)
 
 	newModel.SetName("CatchmentModel")
-	newModel.SetEventNotifier(loggers.DefaultTestingEventNotifier)
 
 	newModel.parameters.Initialise()
 	newModel.managementActions.Initialise()

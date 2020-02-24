@@ -10,7 +10,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
-const AnnealerLogLevel logging.Level = "Annealer"
+const AnnealingLogLevel logging.Level = "Annealing"
 
 // AnnealingObserver is a base-implementation of an annealing logger.  It has a logHandler, but deliberately
 // drops any AnnealingEvents received.

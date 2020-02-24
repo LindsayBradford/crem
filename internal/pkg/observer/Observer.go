@@ -77,10 +77,13 @@ const (
 	InvalidEvent EventType = iota
 	StartedAnnealing
 	StartedIteration
-	FinishedIteration
-	FinishedAnnealing
+	DuringIteration
+	InvalidChange
+	Model
 	ManagementAction
 	DecisionVariable
+	FinishedIteration
+	FinishedAnnealing
 	Note
 )
 
@@ -89,10 +92,13 @@ func (eventType EventType) String() string {
 		"InvalidEvent",
 		"StartedAnnealing",
 		"StartedIteration",
-		"FinishedIteration",
-		"FinishedAnnealing",
+		"DuringIteration",
+		"InvalidChange",
+		"Model",
 		"ManagementAction",
 		"DecisionVariable",
+		"FinishedIteration",
+		"FinishedAnnealing",
 		"Note",
 	}
 
@@ -105,4 +111,11 @@ func (eventType EventType) String() string {
 
 func (eventType EventType) IsAnnealingState() bool {
 	return eventType >= StartedAnnealing && eventType <= FinishedAnnealing
+}
+
+func (eventType EventType) IsAnnealingIterationState() bool {
+	return eventType >= StartedIteration && eventType <= FinishedIteration
+}
+func (eventType EventType) IsModelState() bool {
+	return eventType >= Model && eventType <= DecisionVariable
 }

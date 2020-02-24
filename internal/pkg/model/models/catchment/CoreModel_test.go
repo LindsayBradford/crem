@@ -15,6 +15,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/math"
 	. "github.com/onsi/gomega"
 )
@@ -327,6 +328,8 @@ func buildModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest paramet
 
 	parameterErrors := modelUnderTest.ParameterErrors()
 	g.Expect(parameterErrors).To(BeNil())
+
+	modelUnderTest.AddObserver(loggers.DefaultTestingAnnealingObserver)
 
 	modelUnderTest.Initialise()
 	return modelUnderTest

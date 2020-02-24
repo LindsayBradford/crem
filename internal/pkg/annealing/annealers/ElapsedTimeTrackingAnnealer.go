@@ -41,5 +41,6 @@ func (annealer *ElapsedTimeTrackingAnnealer) DeepClone() annealing.Annealer {
 	clone := *annealer
 	explorerClone := annealer.SolutionExplorer().DeepClone()
 	clone.SetSolutionExplorer(explorerClone)
+
 	return &clone
 }

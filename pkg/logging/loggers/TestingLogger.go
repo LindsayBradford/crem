@@ -21,17 +21,26 @@ func buildTestingLogger() logging.Logger {
 		WithFormatter(new(formatters.RawMessageFormatter)).
 		WithLogLevelDestination(logging.DEBUG, logging.STDOUT).
 		WithLogLevelDestination(model.LogLevel, logging.STDOUT).
+		WithLogLevelDestination(annealingObserver.AnnealingLogLevel, logging.STDOUT).
 		Build()
+
 	return testLogger
+}
+
+var DefaultTestingAnnealingObserver = buildDefaultTestingAnnealingObserver()
+
+func buildDefaultTestingAnnealingObserver() *annealingObserver.AnnealingMessageObserver {
+	filter := new(filters.IterationCountFilter)
+	messageObserver := new(annealingObserver.AnnealingMessageObserver).
+		WithLogHandler(DefaultTestingLogger).
+		WithFilter(filter)
+	return messageObserver
 }
 
 var DefaultTestingEventNotifier = buildTestingEventNotifier()
 
 func buildTestingEventNotifier() observer.EventNotifier {
-	filter := new(filters.IterationCountFilter)
-	messageObserver := new(annealingObserver.AnnealingMessageObserver).
-		WithLogHandler(DefaultTestingLogger).
-		WithFilter(filter)
+	messageObserver := buildDefaultTestingAnnealingObserver()
 
 	eventNotifier := new(observer.SynchronousAnnealingEventNotifier)
 	eventNotifier.AddObserver(messageObserver)

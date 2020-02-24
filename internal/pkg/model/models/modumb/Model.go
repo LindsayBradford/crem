@@ -29,7 +29,7 @@ type Model struct {
 	variable.ContainedDecisionVariables
 	managementActions action.ModelManagementActions
 
-	observer.ContainedEventNotifier
+	observer.SynchronousAnnealingEventNotifier
 }
 
 var Objectives = []string{
@@ -203,7 +203,7 @@ func (m *Model) DeepClone() model.Model {
 
 func (m *Model) note(text string) {
 	event := observer.NewEvent(observer.Note).WithId(m.Id()).WithNote(text)
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
@@ -211,7 +211,7 @@ func (m *Model) ObserveDecisionVariable(variable variable.DecisionVariable) {
 		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value())
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) ObserveAction(action action.ManagementAction) {
@@ -239,7 +239,7 @@ func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction
 		}
 	}
 
-	m.EventNotifier().NotifyObserversOfEvent(*event)
+	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }

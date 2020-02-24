@@ -42,6 +42,8 @@ type Explorer struct {
 	changeInvalid        bool
 	reasonChangeInvalid  string
 	objectiveValueChange float64
+
+	observer.SynchronousAnnealingEventNotifier
 }
 
 func New() *Explorer {
@@ -128,33 +130,38 @@ func (ke *Explorer) ObjectiveValue() float64 {
 func (ke *Explorer) TryRandomChange() {
 	ke.Model().TryRandomChange()
 	ke.defaultAcceptOrRevertChange()
-	ke.LogHandler().Debug(ke.scenarioId + ": Finished processing random change")
 }
 
 func (ke *Explorer) defaultAcceptOrRevertChange() {
 	ke.AcceptOrRevertChange(ke.AcceptLastChange, ke.RevertLastChange)
 }
 
-func (ke *Explorer) AcceptOrRevertChange(acceptFunction func(), revertFunction func()) {
+func (ke *Explorer) AcceptOrRevertChange(acceptChange func(), revertChange func()) {
 	ke.changeInvalid = false
 	if isValid, invalidationErrors := ke.Model().ChangeIsValid(); !isValid {
-		ke.calculateChangeInObjectiveValue()
-		ke.changeInvalid = true
-		ke.reasonChangeInvalid = invalidationErrors.Error()
-		revertFunction()
+		ke.reportInvalidChange(invalidationErrors)
+		revertChange()
 		return
 	}
 
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
-		acceptFunction()
+		acceptChange()
 	} else {
 		if ke.DecideIfAcceptable(ke.objectiveValueChange) {
-			acceptFunction()
+			acceptChange()
 		} else {
-			revertFunction()
+			revertChange()
 		}
 	}
+}
+
+func (ke *Explorer) reportInvalidChange(invalidationErrors *errors2.CompositeError) {
+	ke.calculateChangeInObjectiveValue()
+	ke.changeInvalid = true
+	ke.reasonChangeInvalid = invalidationErrors.Error()
+
+	ke.newEvent(observer.InvalidChange)
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
@@ -211,24 +218,32 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return baseAttributes.Add(explorer.CoolingFactor, ke.CoolingFactor)
 	case observer.StartedIteration, observer.FinishedAnnealing:
 		return baseAttributes
+	case observer.DuringIteration:
+		return baseAttributes
+	case observer.InvalidChange:
+		return baseAttributes.
+			Add(ChangeInObjectiveValue, ke.objectiveValueChange).
+			Add(explorer.ReasonChangeInvalid, ke.reasonChangeInvalid)
 	case observer.FinishedIteration:
-		// return baseAttributes.
-		// 	Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-		// 	Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-		// 	Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
-		// 	Add(explorer.ChangeAccepted, ke.changeAccepted)
-		if ke.changeInvalid {
-			return baseAttributes.
-				Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-				Add(explorer.ChangeInvalid, ke.changeInvalid).
-				Add(explorer.ReasonChangeInvalid, ke.reasonChangeInvalid)
-		} else {
-			return baseAttributes.
-				Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-				Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-				Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
-				Add(explorer.ChangeAccepted, ke.changeAccepted)
-		}
+		return baseAttributes.
+			Add(ChangeInObjectiveValue, ke.objectiveValueChange).
+			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
+			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
+			Add(explorer.ChangeAccepted, ke.changeAccepted)
 	}
 	return nil
+}
+
+func (ke *Explorer) newEvent(eventType observer.EventType) {
+	event := observer.NewEvent(eventType).
+		WithId(ke.Id()).
+		JoiningAttributes(ke.EventAttributes(eventType))
+	ke.NotifyObserversOfEvent(*event)
+}
+
+func (ke *Explorer) note(note string) {
+	noteEvent := observer.NewEvent(observer.DuringIteration).
+		WithId(ke.Id()).
+		WithAttribute(observer.Note.String(), note)
+	ke.NotifyObserversOfEvent(*noteEvent)
 }

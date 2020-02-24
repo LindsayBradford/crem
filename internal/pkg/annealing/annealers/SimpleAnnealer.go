@@ -25,6 +25,8 @@ const (
 	CurrentIteration = "CurrentIteration"
 )
 
+var _ observer.Observer = new(SimpleAnnealer)
+
 type SimpleAnnealer struct {
 	name.IdentifiableContainer
 
@@ -65,10 +67,7 @@ func (sa *SimpleAnnealer) SetLogHandler(logHandler logging.Logger) {
 }
 
 func (sa *SimpleAnnealer) SetModel(model model.Model) {
-	//TODO: Code-stink.  Why do I need to tie the model event notifier in at the annnealer level?
-	if eventNotifyingModel, isEventNotifier := model.(observer.EventNotifierContainer); isEventNotifier {
-		eventNotifyingModel.SetEventNotifier(sa.EventNotifier())
-	}
+	model.SetId(sa.Id())
 	sa.SolutionExplorer().SetModel(model)
 }
 
@@ -172,7 +171,6 @@ func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attribut
 		Join(
 			sa.SolutionExplorer().EventAttributes(eventType),
 		)
-
 	switch eventType {
 	case observer.StartedAnnealing:
 		return baseAttributes
@@ -184,9 +182,7 @@ func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attribut
 			Add(CurrentIteration, sa.currentIteration).
 			Add(Solution, *sa.fetchFinalModelSolution())
 	}
-
 	return nil
-
 }
 
 func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
@@ -210,4 +206,22 @@ func (sa *SimpleAnnealer) AddObserver(observer observer.Observer) error {
 
 func (sa *SimpleAnnealer) Observers() []observer.Observer {
 	return sa.EventNotifier().Observers()
+}
+
+func (sa *SimpleAnnealer) ObserveEvent(event observer.Event) {
+	if event.EventType.IsAnnealingIterationState() {
+		event.AddAttribute(Id, sa.Id())
+		event.AddAttribute(CurrentIteration, sa.currentIteration)
+		event.AddAttribute(MaximumIterations, sa.maximumIterations)
+	}
+	sa.EventNotifier().NotifyObserversOfEvent(event)
+}
+
+func (sa *SimpleAnnealer) SetSolutionExplorer(explorer explorer.Explorer) error {
+	explorerError := sa.ContainedExplorer.SetSolutionExplorer(explorer)
+	if explorerError != nil {
+		return explorerError
+	}
+	explorer.SetId(sa.Id())
+	return nil
 }

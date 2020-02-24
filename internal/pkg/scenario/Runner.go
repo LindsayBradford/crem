@@ -8,6 +8,7 @@ import (
 	. "time"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
+	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 )
 
@@ -161,6 +162,7 @@ func (runner *Runner) run(runNumber uint64) {
 	annealerCopy := runner.annealer.DeepClone()
 
 	runner.assignNewRunId(runNumber, annealerCopy)
+	runner.wireObservers(annealerCopy)
 
 	annealerCopy.Anneal()
 	runner.logRunFinishedMessage(runNumber)
@@ -172,6 +174,19 @@ func (runner *Runner) assignNewRunId(runNumber uint64, annealerCopy annealing.An
 	annealerCopy.SolutionExplorer().SetId(runId)
 	annealerCopy.SolutionExplorer().Model().SetId(runId)
 	runner.logRunStartMessage(runNumber)
+}
+
+func (runner *Runner) wireObservers(annealer annealing.Annealer) {
+	if observingAnnealer, annealerIsObserver := annealer.(observer.Observer); annealerIsObserver {
+		explorer := annealer.SolutionExplorer()
+		if eventNotifyingExplorer, explorerIssEventNotifier := explorer.(observer.EventNotifier); explorerIssEventNotifier {
+			eventNotifyingExplorer.AddObserver(observingAnnealer)
+		}
+		model := annealer.Model()
+		if eventNotifyingModel, modelIssEventNotifier := model.(observer.EventNotifier); modelIssEventNotifier {
+			eventNotifyingModel.AddObserver(observingAnnealer)
+		}
+	}
 }
 
 func (runner *Runner) generateCloneId(runNumber uint64) string {

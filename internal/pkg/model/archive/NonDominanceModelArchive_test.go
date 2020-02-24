@@ -292,7 +292,7 @@ func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
 
 func buildSilentMultiObjectiveDumbModel() *modumb.Model {
 	model := modumb.NewModel().WithId("Test Mo Dumb Model")
-	model.SetEventNotifier(loggers.NullTestingEventNotifier)
+	model.AddObserver(loggers.DefaultTestingAnnealingObserver)
 	model.Initialise()
 	return model
 }

@@ -47,7 +47,7 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 		amo.invariantObserver.ObserveEvent(event)
 	}
 
-	if amo.logHandler.BeingDiscarded(AnnealerLogLevel) || amo.filter.ShouldFilter(event) {
+	if amo.logHandler.BeingDiscarded(AnnealingLogLevel) || amo.filter.ShouldFilter(event) {
 		return
 	}
 
@@ -83,16 +83,51 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 		if event.HasAttribute("ObjectiveValue") {
 			builder.Add(", Objective value [", format(event, "ObjectiveValue"), "]")
 		}
+	case observer.DuringIteration:
+		builder.Add("Iteration [", format(event, "CurrentIteration"), "/",
+			format(event, "MaximumIterations"), "], ").
+			Add("Note [", event.Note(), "], ")
+	case observer.InvalidChange:
+		builder.Add("Iteration [", format(event, "CurrentIteration"), "/",
+			format(event, "MaximumIterations"), "], ").
+			Add("Reason [", format(event, "ReasonChangeInvalid"), "], ")
+	case observer.Model:
+		if event.HasAttribute("CurrentIteration") {
+			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
+		}
+
+		if event.HasNote() {
+			builder.Add("Note [", event.Note(), "]")
+		}
+	case observer.ManagementAction:
+		if event.HasAttribute("CurrentIteration") {
+			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
+		}
+
+		builder.
+			Add("Type [", format(event, "Type"), "], ").
+			Add("Planning Unit [", format(event, "PlanningUnit"), "], ").
+			Add("Active [", format(event, "IsActive"), "]")
+
+		if event.HasNote() {
+			builder.Add(", Note [", event.Note(), "]")
+		}
+	case observer.DecisionVariable:
+		if event.HasAttribute("CurrentIteration") {
+			builder.Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "MaximumIterations"), "], ")
+		}
+
+		builder.
+			Add("Name [", format(event, "Name"), "], ").
+			Add("Value [", format(event, "Value"), "]")
+
+		if event.HasNote() {
+			builder.Add(", Note [", event.Note(), "]")
+		}
 	case observer.FinishedIteration:
 		builder.Add("Iteration [",
 			format(event, "CurrentIteration"), "/",
 			format(event, "MaximumIterations"), "], ")
-
-		if event.HasAttribute("ChangeInvalid") {
-			builder.
-				Add("Invalid [", format(event, "ChangeInvalid"), "], ").
-				Add("Reason [", format(event, "ReasonChangeInvalid"), "], ")
-		}
 		if event.HasAttribute("ChangeAccepted") {
 			builder.
 				Add("Desirable? [", format(event, "ChangeIsDesirable"), "], ").
@@ -108,7 +143,6 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 				Add("Archive result [", format(event, "ArchiveResult"), "], ").
 				Add("Iterations until next Return-To-Base [", format(event, "IterationsUntilNextReturnToBase"), "]")
 		}
-
 	case observer.FinishedAnnealing:
 		builder.
 			Add("Iteration [", format(event, "CurrentIteration"), "/", format(event, "CurrentIteration"), "], ").
@@ -120,30 +154,13 @@ func (amo *AnnealingMessageObserver) observeAnnealerEvent(event observer.Event, 
 		// deliberately does nothing extra
 	}
 
-	amo.logHandler.LogAtLevel(AnnealerLogLevel, builder.String())
+	amo.logHandler.LogAtLevel(AnnealingLogLevel, builder.String())
 }
 
 func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {
 	switch event.EventType {
 	case observer.Note:
 		builder.Add("[", event.Note(), "]")
-	case observer.ManagementAction:
-		builder.
-			Add("Type [", format(event, "Type"), "], ").
-			Add("Planning Unit [", format(event, "PlanningUnit"), "], ").
-			Add("Active [", format(event, "IsActive"), "]")
-
-		if event.HasNote() {
-			builder.Add(", Note [", event.Note(), "]")
-		}
-	case observer.DecisionVariable:
-		builder.
-			Add("Name [", format(event, "Name"), "], ").
-			Add("Value [", format(event, "Value"), "], ")
-
-		if event.HasNote() {
-			builder.Add(", Note [", event.Note(), "]")
-		}
 	default:
 		// deliberately does nothing extra
 	}
