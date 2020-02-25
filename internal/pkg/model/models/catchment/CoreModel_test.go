@@ -325,6 +325,7 @@ func buildModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest paramet
 	modelUnderTest := NewCoreModel().
 		WithSourceDataSet(sourceDataSet).
 		WithParameters(parametersUnderTest)
+	modelUnderTest.SetId("ModelUnderTest")
 
 	parameterErrors := modelUnderTest.ParameterErrors()
 	g.Expect(parameterErrors).To(BeNil())

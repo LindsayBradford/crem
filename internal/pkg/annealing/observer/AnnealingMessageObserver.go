@@ -51,12 +51,13 @@ func (amo *AnnealingMessageObserver) ObserveEvent(event observer.Event) {
 	}
 
 	var builder strings.FluentBuilder
-	builder.
-		Add("Id [", event.Id(), "], ").
-		Add("Event [", event.EventType.String(), "]: ")
+	if event.HasAttribute("Id'") {
+		builder.Add("Id [", event.Id(), "], ")
+		event.RemoveAttribute("Id")
+	}
 
+	builder.Add("Event [", event.EventType.String(), "]: ")
 	amo.observeEvent(event, &builder)
-
 }
 
 func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder *strings.FluentBuilder) {

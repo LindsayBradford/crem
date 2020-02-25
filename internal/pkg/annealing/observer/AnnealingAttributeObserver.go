@@ -52,7 +52,7 @@ func (aao *AnnealingAttributeObserver) observeAnnealingEvent(event observer.Even
 	case observer.StartedIteration:
 		logAttributes = append(logAttributes,
 			event.AttributesNamed("CurrentIteration", "Temperature", "ObjectiveValue")...)
-	case observer.InvalidChange:
+	case observer.Explorer:
 		logAttributes = append(logAttributes,
 			event.AttributesNamed("CurrentIteration", "ReasonChangeInvalid")...)
 	case observer.FinishedIteration:

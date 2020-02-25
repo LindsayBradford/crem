@@ -77,8 +77,7 @@ const (
 	InvalidEvent EventType = iota
 	StartedAnnealing
 	StartedIteration
-	DuringIteration
-	InvalidChange
+	Explorer
 	Model
 	ManagementAction
 	DecisionVariable
@@ -92,8 +91,7 @@ func (eventType EventType) String() string {
 		"InvalidEvent",
 		"StartedAnnealing",
 		"StartedIteration",
-		"DuringIteration",
-		"InvalidChange",
+		"Explorer",
 		"Model",
 		"ManagementAction",
 		"DecisionVariable",

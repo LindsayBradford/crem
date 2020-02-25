@@ -16,7 +16,7 @@ Type="Kirkpatrick"
 [Annealer.Parameters]
 DecisionVariable = "ImplementationCost"
 OptimisationDirection = "Minimising"
-StartingTemperature = 1_000.0 #10
+StartingTemperature = 10_000_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 1_000
 

@@ -118,6 +118,10 @@ func (m *ModelManagementActions) DeactivateLastInitialisedAction() {
 	m.lastApplied.InitialisingDeactivation()
 }
 
+func (m *ModelManagementActions) LastAppliedAction() ManagementAction {
+	return m.lastApplied
+}
+
 func (m *ModelManagementActions) Actions() []ManagementAction {
 	return m.actions
 }

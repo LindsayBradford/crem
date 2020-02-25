@@ -289,15 +289,15 @@ func (m *CoreModel) PlanningUnits() planningunit.Ids {
 }
 
 func (m *CoreModel) AcceptChange() {
-	if !m.initialising {
-		m.note("Accepting Change")
-	}
 	m.ContainedDecisionVariables.AcceptAll()
+	if !m.initialising {
+		m.noteManagementAction("Accepting Action", m.managementActions.LastAppliedAction())
+	}
 }
 
 func (m *CoreModel) RevertChange() {
 	if !m.initialising {
-		m.note("Reverting Change")
+		m.noteManagementAction("Rejecting Action", m.managementActions.LastAppliedAction())
 	}
 	m.ContainedDecisionVariables.RejectAll()
 	m.managementActions.ToggleLastActivationUnobserved()
@@ -315,21 +315,21 @@ func (m *CoreModel) ToggleAction(planningUnit planningunit.Id, actionType action
 }
 
 func (m *CoreModel) TryRandomChange() {
-	m.note("Trying Random Change")
 	m.managementActions.RandomlyToggleOneActivation()
+	m.noteManagementAction("Trying Action", m.managementActions.LastAppliedAction())
 }
 
 func (m *CoreModel) UndoChange() {
-	m.note("Undoing Change")
+	m.noteManagementAction("Undoing Action", m.managementActions.LastAppliedAction())
 	m.managementActions.ToggleLastActivation()
 }
 
 func (m *CoreModel) ObserveAction(action action.ManagementAction) {
-	m.noteAppliedManagementAction(action)
+	// m.noteAppliedManagementAction(action)
 }
 
 func (m *CoreModel) ObserveActionInitialising(action action.ManagementAction) {
-	m.noteAppliedManagementAction(action)
+	// m.noteAppliedManagementAction(action)
 }
 
 func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) {
@@ -337,7 +337,6 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 		return
 	}
 	event := observer.NewEvent(observer.ManagementAction).
-		WithId(m.Id()).
 		WithAttribute("Type", action.Type()).
 		WithAttribute("PlanningUnit", action.PlanningUnit()).
 		WithAttribute("IsActive", action.IsActive())
@@ -345,7 +344,16 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 }
 
 func (m *CoreModel) note(text string) {
-	event := observer.NewEvent(observer.Model).WithId(m.Id()).WithNote(text)
+	event := observer.NewEvent(observer.Model).WithNote(text)
+	m.NotifyObserversOfEvent(*event)
+}
+
+func (m *CoreModel) noteManagementAction(text string, action action.ManagementAction) {
+	event := observer.NewEvent(observer.Model).
+		WithNote(text).
+		WithAttribute("Type", action.Type()).
+		WithAttribute("PlanningUnit", action.PlanningUnit()).
+		WithAttribute("IsActive", action.IsActive())
 	m.NotifyObserversOfEvent(*event)
 }
 
@@ -354,7 +362,6 @@ func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) 
 		return
 	}
 	event := observer.NewEvent(observer.DecisionVariable).
-		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value())
 	m.NotifyObserversOfEvent(*event)
@@ -365,7 +372,6 @@ func (m *CoreModel) ObserveDecisionVariableWithNote(variable variable.DecisionVa
 		return
 	}
 	event := observer.NewEvent(observer.DecisionVariable).
-		WithId(m.Id()).
 		WithAttribute("Name", variable.Name()).
 		WithAttribute("Value", variable.Value()).
 		WithNote(note)

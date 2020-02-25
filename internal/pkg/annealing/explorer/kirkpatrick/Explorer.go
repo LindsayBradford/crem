@@ -3,6 +3,8 @@
 package kirkpatrick
 
 import (
+	"math"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -14,7 +16,6 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
-	"math"
 )
 
 const (
@@ -57,8 +58,19 @@ func New() *Explorer {
 func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 
+	ke.notifyInitialisation()
+
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
+}
+
+func (ke *Explorer) notifyInitialisation() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Initialising").
+		WithAttribute("OptimisationDirection", ke.optimisationDirection).
+		WithAttribute("ObjectiveVariable", ke.objectiveVariableName)
+
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -128,6 +140,7 @@ func (ke *Explorer) ObjectiveValue() float64 {
 }
 
 func (ke *Explorer) TryRandomChange() {
+	ke.note("Trying Random Model Change")
 	ke.Model().TryRandomChange()
 	ke.defaultAcceptOrRevertChange()
 }
@@ -146,14 +159,41 @@ func (ke *Explorer) AcceptOrRevertChange(acceptChange func(), revertChange func(
 
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
+		ke.notifyDesirableAcceptance()
 		acceptChange()
 	} else {
 		if ke.DecideIfAcceptable(ke.objectiveValueChange) {
+			ke.notifyUndesirableAcceptance()
 			acceptChange()
 		} else {
+			ke.notifyUndesirableReversion()
 			revertChange()
 		}
 	}
+}
+
+func (ke *Explorer) notifyDesirableAcceptance() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Desirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.AcceptanceProbability)
+
+	ke.NotifyObserversOfEvent(*event)
+}
+
+func (ke *Explorer) notifyUndesirableAcceptance() {
+	acceptEvent := observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.AcceptanceProbability)
+
+	ke.NotifyObserversOfEvent(*acceptEvent)
+}
+
+func (ke *Explorer) notifyUndesirableReversion() {
+	revertEvent := observer.NewEvent(observer.Explorer).
+		WithNote("Reverting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.AcceptanceProbability)
+
+	ke.NotifyObserversOfEvent(*revertEvent)
 }
 
 func (ke *Explorer) reportInvalidChange(invalidationErrors *errors2.CompositeError) {
@@ -161,7 +201,16 @@ func (ke *Explorer) reportInvalidChange(invalidationErrors *errors2.CompositeErr
 	ke.changeInvalid = true
 	ke.reasonChangeInvalid = invalidationErrors.Error()
 
-	ke.newEvent(observer.InvalidChange)
+	ke.notifyInvalidity()
+}
+
+func (ke *Explorer) notifyInvalidity() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Invalid Change").
+		WithAttribute(ChangeInObjectiveValue, ke.objectiveValueChange).
+		WithAttribute(explorer.ReasonChangeInvalid, ke.reasonChangeInvalid)
+
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
@@ -173,7 +222,18 @@ func (ke *Explorer) changeTriedIsDesirable() bool {
 		changeIsDesirable = ke.calculateChangeInObjectiveValue() > 0
 	}
 	ke.changeIsDesirable = changeIsDesirable
+
+	ke.notifyDesirability()
+
 	return ke.changeIsDesirable
+}
+
+func (ke *Explorer) notifyDesirability() {
+	event := observer.NewEvent(observer.Explorer).
+		WithAttribute(ChangeInObjectiveValue, ke.objectiveValueChange).
+		WithAttribute(explorer.ChangeIsDesirable, ke.changeIsDesirable)
+
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) calculateChangeInObjectiveValue() float64 {
@@ -223,32 +283,35 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return new(attributes.Attributes).
 			Add(explorer.Temperature, ke.Temperature).
 			Add(ObjectiveValue, ke.ObjectiveValue())
-	case observer.DuringIteration:
+	case observer.Explorer:
 		return baseAttributes
-	case observer.InvalidChange:
-		return baseAttributes.
-			Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-			Add(explorer.ReasonChangeInvalid, ke.reasonChangeInvalid)
 	case observer.FinishedIteration:
-		return baseAttributes.
-			Add(ChangeInObjectiveValue, ke.objectiveValueChange).
-			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-			Add(explorer.AcceptanceProbability, ke.AcceptanceProbability).
-			Add(explorer.ChangeAccepted, ke.changeAccepted)
+		return new(attributes.Attributes).Add(ObjectiveValue, ke.ObjectiveValue())
 	}
 	return nil
 }
 
 func (ke *Explorer) newEvent(eventType observer.EventType) {
 	event := observer.NewEvent(eventType).
-		WithId(ke.Id()).
 		JoiningAttributes(ke.EventAttributes(eventType))
 	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) note(note string) {
-	noteEvent := observer.NewEvent(observer.DuringIteration).
-		WithId(ke.Id()).
+	noteEvent := observer.NewEvent(observer.Explorer).
 		WithAttribute(observer.Note.String(), note)
 	ke.NotifyObserversOfEvent(*noteEvent)
+}
+
+func (ke *Explorer) CoolDown() {
+	ke.Coolant.CoolDown()
+	ke.notifyCoolDown()
+}
+
+func (ke *Explorer) notifyCoolDown() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Cooling").
+		WithAttribute(explorer.Temperature, ke.Temperature)
+
+	ke.NotifyObserversOfEvent(*event)
 }

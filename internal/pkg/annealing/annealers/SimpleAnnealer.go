@@ -120,9 +120,9 @@ func (sa *SimpleAnnealer) Anneal() {
 		sa.iterationStarted()
 
 		sa.SolutionExplorer().TryRandomChange()
+		sa.SolutionExplorer().CoolDown()
 
 		sa.iterationFinished()
-		sa.SolutionExplorer().CoolDown()
 		done = sa.checkIfDone()
 	}
 
@@ -161,7 +161,8 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) newEvent(eventType observer.EventType) *observer.Event {
-	return observer.NewEvent(eventType).JoiningAttributes(sa.EventAttributes(eventType))
+	eventAttributes := sa.EventAttributes(eventType)
+	return observer.NewEvent(eventType).JoiningAttributes(eventAttributes)
 }
 
 func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attributes.Attributes {
@@ -171,16 +172,19 @@ func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attribut
 		Join(sa.SolutionExplorer().EventAttributes(eventType))
 	switch eventType {
 	case observer.StartedAnnealing:
+		return baseAttributes
+	case observer.StartedIteration:
 		return new(attributes.Attributes).
 			Add(Id, sa.Id()).
+			Add(CurrentIteration, sa.currentIteration).
 			Add(MaximumIterations, sa.maximumIterations).
 			Join(sa.SolutionExplorer().EventAttributes(eventType))
-	case observer.StartedIteration:
-		return baseAttributes.
-			Add(CurrentIteration, sa.currentIteration)
 	case observer.FinishedIteration:
-		return baseAttributes.
-			Add(CurrentIteration, sa.currentIteration)
+		return new(attributes.Attributes).
+			Add(Id, sa.Id()).
+			Add(CurrentIteration, sa.currentIteration).
+			Add(MaximumIterations, sa.maximumIterations).
+			Join(sa.SolutionExplorer().EventAttributes(eventType))
 	case observer.FinishedAnnealing:
 		return new(attributes.Attributes).
 			Add(Id, sa.Id()).
@@ -216,11 +220,16 @@ func (sa *SimpleAnnealer) Observers() []observer.Observer {
 }
 
 func (sa *SimpleAnnealer) ObserveEvent(event observer.Event) {
+	wrappingEvent := observer.NewEvent(event.EventType).WithId(sa.Id())
+
 	if event.EventType.IsAnnealingIterationState() {
-		event.AddAttribute(CurrentIteration, sa.currentIteration)
-		event.AddAttribute(MaximumIterations, sa.maximumIterations)
+		wrappingEvent.
+			WithAttribute(CurrentIteration, sa.currentIteration).
+			WithAttribute(MaximumIterations, sa.maximumIterations)
 	}
-	sa.EventNotifier().NotifyObserversOfEvent(event)
+
+	wrappingEvent.JoiningAttributes(event.AllAttributes())
+	sa.EventNotifier().NotifyObserversOfEvent(*wrappingEvent)
 }
 
 func (sa *SimpleAnnealer) SetSolutionExplorer(explorer explorer.Explorer) error {
