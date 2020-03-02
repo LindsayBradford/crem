@@ -54,6 +54,8 @@ type Explorer struct {
 	changeIsDesirable    bool
 	changeAccepted       bool
 	objectiveValueChange float64
+
+	observer.SynchronousAnnealingEventNotifier
 }
 
 func New() *Explorer {
@@ -147,41 +149,99 @@ func (ke *Explorer) ObjectiveValue() float64 {
 }
 
 func (ke *Explorer) TryRandomChange() {
+	ke.note("Trying Random Model Change")
+
 	compressedInitialModelState := ke.modelArchive.Compress(ke.Model())
 	ke.Model().DoRandomChange()
 	compressedChangedModelState := ke.modelArchive.Compress(ke.Model())
+
 	variableDifferences := compressedChangedModelState.VariableDifferences(compressedInitialModelState)
+
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Attempting to Archive Changed Model").
+		WithAttribute("Model SHA256", compressedChangedModelState.Sha256())
+
+	ke.NotifyObserversOfEvent(*event)
+
 	ke.archiveStorageResult = ke.modelArchive.AttemptToArchiveState(compressedChangedModelState)
+
 	ke.AcceptOrRevertChange(variableDifferences)
 	ke.ReturnToBaseIfRequired()
+}
+
+func (ke *Explorer) note(note string) {
+	noteEvent := observer.NewEvent(observer.Explorer).
+		WithAttribute(observer.Note.String(), note)
+	ke.NotifyObserversOfEvent(*noteEvent)
 }
 
 func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
 	if ke.changeTriedIsDesirable() {
 		ke.setAcceptanceProbability(explorer.Guaranteed)
 		ke.changeAccepted = true
+		ke.notifyDesirableAcceptance()
 	} else {
 		if ke.coolant.DecideIfAcceptable(variableDifferences) {
+			ke.notifyUndesirableAcceptance()
 			ke.AcceptLastChange()
 		} else {
+			ke.notifyUndesirableReversion()
 			ke.RevertLastChange()
 		}
 	}
 }
 
+func (ke *Explorer) notifyDesirableAcceptance() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Desirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.NotifyObserversOfEvent(*event)
+}
+
+func (ke *Explorer) notifyUndesirableAcceptance() {
+	acceptEvent := observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.NotifyObserversOfEvent(*acceptEvent)
+}
+
+func (ke *Explorer) notifyUndesirableReversion() {
+	revertEvent := observer.NewEvent(observer.Explorer).
+		WithNote("Reverting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.NotifyObserversOfEvent(*revertEvent)
+}
+
 func (ke *Explorer) changeTriedIsDesirable() bool {
 	switch ke.archiveStorageResult {
-	case archive.StoredWithNoDominanceDetected, archive.StoredReplacingDominatedEntries:
+	case archive.StoredWithNoDominanceDetected, archive.StoredReplacingDominatedEntries,
+		archive.RejectedWithDuplicateEntryDetected:
 		ke.changeIsDesirable = true
-	case archive.RejectedWithStoredEntryDominanceDetected, archive.RejectedWithDuplicateEntryDetected:
+	case archive.RejectedWithStoredEntryDominanceDetected:
 		ke.changeIsDesirable = false
 	}
+
+	revertEvent := observer.NewEvent(observer.Explorer).
+		WithAttribute("ArchiveStorageResult", ke.archiveStorageResult.String()).
+		WithAttribute("ChangeDesirable", ke.changeIsDesirable)
+
+	ke.NotifyObserversOfEvent(*revertEvent)
+
 	return ke.changeIsDesirable
 }
 
 func (ke *Explorer) AcceptLastChange() {
 	ke.archiveStorageResult = ke.modelArchive.ForceIntoArchive(ke.Model())
 	ke.changeAccepted = true
+
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Forcing Model into Archive").
+		WithAttribute("ArchiveStorageResult", ke.archiveStorageResult.String())
+
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) RevertLastChange() {
@@ -205,14 +265,26 @@ func (ke *Explorer) shouldReturnToBase() bool {
 func (ke *Explorer) returnToBase() {
 	const minFraction = 1e-63
 	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
+
+	// TODO: current model can't be return from SelectRandomIsolatedModel()
+
 	compressedModel := ke.modelArchive.SelectRandomIsolatedModel(selectionRangeLimit)
 	ke.modelArchive.Decompress(compressedModel, ke.Model())
+
 	if ke.returnToBaseIsolationFraction == 1 {
 		ke.returnToBaseIsolationFraction = ke.parameters.GetFloat64(ReturnToBaseIsolationFraction)
 	} else {
 		ke.returnToBaseIsolationFraction *= ke.returnToBaseIsolationFraction
 		ke.returnToBaseIsolationFraction = math.Max(ke.returnToBaseIsolationFraction, minFraction)
 	}
+
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Returning to Base").
+		WithAttribute("SelectionRangeLimit", selectionRangeLimit).
+		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
+		WithAttribute("New Base Model SHA256", compressedModel.Sha256())
+
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) adjustReturnToBaseRate() {
@@ -225,6 +297,10 @@ func (ke *Explorer) adjustReturnToBaseRate() {
 
 func (ke *Explorer) deriveIterationsUntilReturnToBase() {
 	ke.iterationsUntilReturnToBase = uint64(ke.returnToBaseStep)
+
+	event := observer.NewEvent(observer.Explorer).
+		WithAttribute("IterationsUntilReturnToBase", ke.iterationsUntilReturnToBase)
+	ke.NotifyObserversOfEvent(*event)
 }
 
 func (ke *Explorer) DeepClone() explorer.Explorer {
@@ -254,16 +330,20 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len())
 	case observer.FinishedIteration:
 		return baseAttributes.
-			Add(ArchiveSize, ke.modelArchive.Len()).
-			Add(ArchiveResult, ke.archiveStorageResult).
-			Add(IterationsUntilNextReturnToBase, ke.iterationsUntilReturnToBase).
-			Add(explorer.ChangeIsDesirable, ke.changeIsDesirable).
-			Add(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability()).
-			Add(explorer.ChangeAccepted, ke.changeAccepted)
+			Add(ArchiveSize, ke.modelArchive.Len())
 	}
 	return nil
 }
 
 func (ke *Explorer) CoolDown() {
 	ke.coolant.CoolDown()
+	ke.notifyCoolDown()
+}
+
+func (ke *Explorer) notifyCoolDown() {
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Cooling").
+		WithAttribute(explorer.Temperature, ke.coolant.Temperature())
+
+	ke.NotifyObserversOfEvent(*event)
 }

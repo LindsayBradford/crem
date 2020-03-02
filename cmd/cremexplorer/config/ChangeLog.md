@@ -4,6 +4,9 @@
 ### Bug Fixes
 * Fixed bug in how "SedimentProduction" reports changes to the annealer.
 * Changed Kirkpatrick explorer to consider "no objective change" updates to be undesirable.
+* Fixed bug in Suppapitnarm Explorer that allowed duplicate solutions to be archived into the solution _set_.
+### New Features
+* Reworking Kirkpatrick explorer and catchment CoreModel events for better logging.
 
 ## Version 0.7 (21 January 2020):
 ### New Features
