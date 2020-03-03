@@ -191,21 +191,6 @@ func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int)
 	return a.selectRandomModel(selectionRange)
 }
 
-func (a *NonDominanceModelArchive) sortByIsolation() {
-	// TODO: implemnent
-}
-
-func (a *NonDominanceModelArchive) selectRandomModel(selectionRange int) *CompressedModelState {
-	selectedIndex := a.selectRandomIndex(selectionRange)
-	return a.archive[selectedIndex]
-}
-
-func (a *NonDominanceModelArchive) selectRandomIndex(selectionRange int) int {
-	assert.That(selectionRange < len(a.archive))
-	randomIndex := a.RandomNumberGenerator().Intn(selectionRange)
-	return randomIndex
-}
-
 func (a *NonDominanceModelArchive) calculateArchiveIsolation() {
 	summary := a.ArchiveSummary()
 	a.isolation = make([]float64, len(a.archive))
@@ -243,6 +228,17 @@ func (a *NonDominanceModelArchive) deriveIsolation(summary Summary, state *Compr
 		}
 	}
 	return isolation
+}
+
+func (a *NonDominanceModelArchive) selectRandomModel(selectionRange int) *CompressedModelState {
+	selectedIndex := a.selectRandomIndex(selectionRange)
+	return a.archive[selectedIndex]
+}
+
+func (a *NonDominanceModelArchive) selectRandomIndex(selectionRange int) int {
+	assert.That(selectionRange < len(a.archive))
+	randomIndex := a.RandomNumberGenerator().Intn(selectionRange)
+	return randomIndex
 }
 
 func (a *NonDominanceModelArchive) buildSummary() Summary {

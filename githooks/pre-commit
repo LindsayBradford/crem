@@ -29,7 +29,7 @@ sub checkStagedGoFileFormatting {
 
 	my $unformattedFileNumber = 0;
 	foreach my $file (@stagedGoFiles) {
-		my $unformattedFile = `gofmt -s -l $file`;
+		my $unformattedFile = `gofmt -l $file`;
 		if ($unformattedFile ne "") {
 			print checkPrefix, " file needs gofmt: $unformattedFile\n";
 			$unformattedFileNumber += 1;
