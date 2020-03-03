@@ -3,6 +3,7 @@
 package suppapitnarm
 
 import (
+	"fmt"
 	"math"
 	"strings"
 
@@ -166,7 +167,7 @@ func (ke *Explorer) TryRandomChange() {
 	ke.archiveStorageResult = ke.modelArchive.AttemptToArchiveState(compressedChangedModelState)
 
 	ke.AcceptOrRevertChange(variableDifferences)
-	ke.ReturnToBaseIfRequired()
+	ke.ReturnToBaseIfRequired(compressedChangedModelState)
 }
 
 func (ke *Explorer) note(note string) {
@@ -249,11 +250,11 @@ func (ke *Explorer) RevertLastChange() {
 	ke.changeAccepted = false
 }
 
-func (ke *Explorer) ReturnToBaseIfRequired() {
+func (ke *Explorer) ReturnToBaseIfRequired(state *archive.CompressedModelState) {
 	if !ke.shouldReturnToBase() {
 		return
 	}
-	ke.returnToBase()
+	ke.returnToBase(state)
 	ke.adjustReturnToBaseRate()
 }
 
@@ -262,13 +263,20 @@ func (ke *Explorer) shouldReturnToBase() bool {
 	return ke.iterationsUntilReturnToBase <= 0
 }
 
-func (ke *Explorer) returnToBase() {
+func (ke *Explorer) returnToBase(currentModelState *archive.CompressedModelState) {
 	const minFraction = 1e-63
 	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
 
-	// TODO: current model can't be return from SelectRandomIsolatedModel()
-
 	compressedModel := ke.modelArchive.SelectRandomIsolatedModel(selectionRangeLimit)
+
+	// Is this actually a problem?  Suppapitnarm paper doesn't mention it.  Original CRP doesn't cater for it.
+	// It just seems odd to trawl through the isolated entries only to return to the current if its isolated.
+	if currentModelState.Sha256() == compressedModel.Sha256() {
+		warningMessage := fmt.Sprintf("Randomly selected return-to-base isolated model is same as current [%s]",
+			currentModelState.Sha256())
+		ke.LogHandler().Warn(warningMessage)
+	}
+
 	ke.modelArchive.Decompress(compressedModel, ke.Model())
 
 	if ke.returnToBaseIsolationFraction == 1 {
