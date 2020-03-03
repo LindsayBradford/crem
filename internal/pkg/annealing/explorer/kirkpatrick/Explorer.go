@@ -7,6 +7,7 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
@@ -19,6 +20,7 @@ import (
 )
 
 const (
+	Solution               = "Solution"
 	ObjectiveValue         = "ObjectiveValue"
 	ChangeInObjectiveValue = "ChangeInObjectiveValue"
 )
@@ -279,16 +281,28 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 			Add(explorer.Temperature, ke.Temperature).
 			Add(explorer.CoolingFactor, ke.CoolingFactor).
 			Add(ObjectiveValue, ke.ObjectiveValue())
-	case observer.StartedIteration, observer.FinishedAnnealing:
+	case observer.StartedIteration:
 		return new(attributes.Attributes).
 			Add(explorer.Temperature, ke.Temperature).
 			Add(ObjectiveValue, ke.ObjectiveValue())
+	case observer.FinishedAnnealing:
+		return new(attributes.Attributes).
+			Add(explorer.Temperature, ke.Temperature).
+			Add(ObjectiveValue, ke.ObjectiveValue()).
+			Add(Solution, *ke.fetchFinalModelSolution())
 	case observer.Explorer:
 		return baseAttributes
 	case observer.FinishedIteration:
 		return new(attributes.Attributes).Add(ObjectiveValue, ke.ObjectiveValue())
 	}
 	return nil
+}
+
+func (ke *Explorer) fetchFinalModelSolution() *solution.Solution {
+	return new(solution.SolutionBuilder).
+		WithId(ke.Id()).
+		ForModel(ke.Model()).
+		Build()
 }
 
 func (ke *Explorer) newEvent(eventType observer.EventType) {

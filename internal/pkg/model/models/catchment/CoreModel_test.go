@@ -5,7 +5,6 @@ package catchment
 import (
 	"testing"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/annealers"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
@@ -115,7 +114,7 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 
 	modelUnderTest := buildTestingModel(g)
 
-	solution := new(annealers.SolutionBuilder).
+	solution := new(solution.SolutionBuilder).
 		WithId("testingBuilder").
 		ForModel(modelUnderTest).
 		Build()
@@ -226,7 +225,7 @@ func TestCoreModel_Bounded_ValidityAsExpected(t *testing.T) {
 
 	modelUnderTest.AcceptChange()
 
-	modelSnapshot := new(annealers.SolutionBuilder).
+	modelSnapshot := new(solution.SolutionBuilder).
 		WithId("modelUnderTest").
 		ForModel(modelUnderTest).
 		Build()
@@ -259,7 +258,7 @@ func TestCoreModel_Bounded_ValidityAsExpected(t *testing.T) {
 	g.Expect(state).To(BeTrue())
 	g.Expect(stateErrors).To(BeNil())
 
-	currentSnapshot := new(annealers.SolutionBuilder).
+	currentSnapshot := new(solution.SolutionBuilder).
 		WithId("modelUnderTest").
 		ForModel(modelUnderTest).
 		Build()
@@ -345,7 +344,7 @@ func buildTestingModelDataSet(g *GomegaWithT) *csv.DataSet {
 }
 
 func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit planningunit.Id, actionType action.ManagementActionType, g *GomegaWithT) {
-	firstSolution := new(annealers.SolutionBuilder).
+	firstSolution := new(solution.SolutionBuilder).
 		WithId("testingBuilder").
 		ForModel(modelUnderTest).
 		Build()
@@ -353,7 +352,7 @@ func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit pl
 	modelUnderTest.ToggleAction(planningUnit, actionType)
 	modelUnderTest.ToggleAction(planningUnit, actionType)
 
-	secondSolution := new(annealers.SolutionBuilder).
+	secondSolution := new(solution.SolutionBuilder).
 		WithId("testingBuilder").
 		ForModel(modelUnderTest).
 		Build()

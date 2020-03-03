@@ -1,9 +1,10 @@
-package annealers
+// Copyright (c) 2020 Australian Rivers Institute.
+
+package solution
 
 import (
 	"sort"
 
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 )
@@ -12,7 +13,7 @@ type SolutionBuilder struct {
 	id    string
 	model model.Model
 
-	solution *solution.Solution
+	solution *Solution
 }
 
 func (sb *SolutionBuilder) WithId(id string) *SolutionBuilder {
@@ -25,8 +26,8 @@ func (sb *SolutionBuilder) ForModel(model model.Model) *SolutionBuilder {
 	return sb
 }
 
-func (sb *SolutionBuilder) Build() *solution.Solution {
-	sb.solution = solution.NewSolution(sb.id)
+func (sb *SolutionBuilder) Build() *Solution {
+	sb.solution = NewSolution(sb.id)
 
 	sb.addDecisionVariables()
 	sb.addPlanningUnits()
@@ -61,7 +62,7 @@ func (sb *SolutionBuilder) addPlanningUnits() {
 func (sb *SolutionBuilder) addPlanningUnitManagementActionMaps() {
 	for _, action := range sb.model.ManagementActions() {
 		planningUnit := action.PlanningUnit()
-		actionType := solution.ManagementActionType(action.Type())
+		actionType := ManagementActionType(action.Type())
 		sb.solution.ManagementActions[actionType] = true
 		switch action.IsActive() {
 		case true:
