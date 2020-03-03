@@ -25,15 +25,15 @@ const (
 func (sr StorageResult) String() string {
 	switch sr {
 	case StoredWithNoDominanceDetected:
-		return "Stored with no dominance detected"
+		return "Stored, no dominance of archive entries detected"
 	case StoredReplacingDominatedEntries:
-		return "Stored replacing dominated archive entries"
+		return "Stored, replacing dominated solutions in archive"
 	case RejectedWithStoredEntryDominanceDetected:
-		return "Rejected with archive reporting dominance of stored entries"
+		return "Rejected, solution(s) in archive would dominate"
 	case RejectedWithDuplicateEntryDetected:
-		return "Rejected with archive reporting solution already archived"
+		return "Rejected, solution is already archived"
 	case StoredForcingDominatingStateRemoval:
-		return "Stored, forcing dominance entries out of archive"
+		return "Stored, forcing dominating solutions out of archive"
 	}
 	return "Can be stored -- but why are you seeing this?!?"
 }
