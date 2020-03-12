@@ -28,6 +28,7 @@ const (
 	ArchiveSize                     = "ArchiveSize"
 	ArchiveResult                   = "ArchiveResult"
 	IterationsUntilNextReturnToBase = "IterationsUntilNextReturnToBase"
+	SolutionSet                     = "SolutionSet"
 )
 
 type Explorer struct {
@@ -93,6 +94,11 @@ func (ke *Explorer) WithCoolant(coolant cooling.TemperatureCoolant) *Explorer {
 
 func (ke *Explorer) SetCoolant(coolant cooling.TemperatureCoolant) {
 	ke.coolant = coolant
+}
+
+func (ke *Explorer) SetId(id string) {
+	ke.IdentifiableContainer.SetId(id)
+	ke.modelArchive.SetId(id)
 }
 
 func (ke *Explorer) WithParameters(params parameters.Map) *Explorer {
@@ -334,8 +340,11 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 	switch eventType {
 	case observer.StartedAnnealing:
 		return baseAttributes.Add(explorer.CoolingFactor, ke.coolant.CoolingFactor())
-	case observer.StartedIteration, observer.FinishedAnnealing:
+	case observer.StartedIteration:
 		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len())
+	case observer.FinishedAnnealing:
+		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len()).
+			Add(SolutionSet, ke.modelArchive)
 	case observer.FinishedIteration:
 		return baseAttributes.
 			Add(ArchiveSize, ke.modelArchive.Len())

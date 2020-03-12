@@ -9,6 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
+	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type StorageResult uint
@@ -45,6 +46,7 @@ func New() *NonDominanceModelArchive {
 const notIsolated = math.MaxFloat64
 
 type NonDominanceModelArchive struct {
+	name.IdentifiableContainer
 	archive   []*CompressedModelState
 	isolation []float64
 
@@ -63,11 +65,18 @@ func (a *NonDominanceModelArchive) AttemptToArchive(model model.Model) StorageRe
 	return a.AttemptToArchiveState(compressedModelState)
 }
 
+func (a *NonDominanceModelArchive) Archive() []*CompressedModelState {
+	return a.archive
+}
+
 func (a *NonDominanceModelArchive) Compress(model model.Model) *CompressedModelState {
 	return a.compressor.Compress(model)
 }
 
 func (a *NonDominanceModelArchive) Decompress(condensedModelState *CompressedModelState, model model.Model) {
+	assert.That(condensedModelState != nil && model != nil).
+		WithFailureMessage("Model state, or model is nil").
+		Holds()
 	a.compressor.Decompress(condensedModelState, model)
 }
 

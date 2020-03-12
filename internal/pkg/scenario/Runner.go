@@ -92,6 +92,7 @@ func (runner *Runner) WithMaximumConcurrentRuns(maxConcurrentRuns uint64) *Runne
 func (runner *Runner) SetAnnealer(annealer annealing.Annealer) {
 	runner.annealer = annealer
 	annealer.SetLogHandler(runner.logHandler)
+	runner.saver.SetDecompressionModel(annealer.Model())
 	annealer.AddObserver(runner.saver)
 }
 

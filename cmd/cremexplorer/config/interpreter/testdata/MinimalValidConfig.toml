@@ -5,4 +5,4 @@ Name = "testScenario"
 Type="Kirkpatrick"
 
 [Model]
-Type="CatchmentModel"
+Type="DumbModel"

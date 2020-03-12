@@ -3,11 +3,14 @@
 package scenario
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
+	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
@@ -23,12 +26,14 @@ const (
 type CallableSaver interface {
 	observer.Observer
 	logging.Container
+	SetDecompressionModel(model model.Model)
 }
 
 type Saver struct {
 	loggers.ContainedLogger
-	outputType encoding.OutputType
-	outputPath string
+	decompressionModel model.Model
+	outputType         encoding.OutputType
+	outputPath         string
 }
 
 func NewSaver() *Saver {
@@ -48,6 +53,12 @@ func (s *Saver) WithOutputPath(outputPath string) *Saver {
 
 	s.outputPath = outputPath
 	return s
+}
+
+func (s *Saver) SetDecompressionModel(model model.Model) {
+	clone := model.DeepClone()
+	clone.Initialise()
+	s.decompressionModel = clone
 }
 
 func (s *Saver) ensureOutputPathIsUsable() {
@@ -81,8 +92,8 @@ func (s *Saver) ObserveEvent(event observer.Event) {
 		s.saveSolution(solution)
 	}
 	if event.HasAttribute(SolutionSet) {
-		s.LogHandler().Info("Implement solution set saving.")
-		// TODO: Implement.
+		solutionSet := event.Attribute(SolutionSet).(archive.NonDominanceModelArchive)
+		s.saveSolutionSet(solutionSet)
 	}
 }
 
@@ -119,4 +130,40 @@ func (s *Saver) toJson(structure *solution.Solution) string {
 	}
 
 	return string(solutionAsJson)
+}
+
+func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
+	// s.debugLogSolutionInJson(solution)
+	s.ensureOutputPathIsUsable()
+	s.encodeSolutionSet(solutionSet)
+}
+
+func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) {
+	for solutionIndex, compressedModel := range solutionSet.Archive() {
+		tempModel := s.decompressionModel.DeepClone()
+
+		solutionSet.Decompress(compressedModel, tempModel)
+
+		solutionId := s.deriveSolutionId(solutionSet, solutionIndex+1)
+
+		decompressedModelSolution := new(solution.SolutionBuilder).
+			WithId(solutionId).
+			ForModel(tempModel).
+			Build()
+
+		encoder := new(encoding.Builder).
+			ForOutputType(s.outputType).
+			WithOutputPath(s.outputPath).
+			Build()
+
+		if encodingError := encoder.Encode(decompressedModelSolution); encodingError != nil {
+			s.LogHandler().Error(encodingError)
+		}
+	}
+}
+
+func (s *Saver) deriveSolutionId(solutionSet archive.NonDominanceModelArchive, currentSolution int) string {
+	solutionSetSize := solutionSet.Len()
+	solutionId := fmt.Sprintf("%s Solution (%d/%d)", solutionSet.Id(), currentSolution, solutionSetSize)
+	return solutionId
 }
