@@ -134,6 +134,7 @@ func (m *CoreModel) buildDecisionVariables() {
 		implementationCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumImplementationCost))
 	}
 
+	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
 		sedimentProduction, implementationCost,
 	)
@@ -197,6 +198,7 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 }
 
 func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []action.ManagementAction) {
+	m.managementActions.Initialise()
 	for _, action := range actions {
 		m.managementActions.Add(action)
 		action.Subscribe(actionObservers...)

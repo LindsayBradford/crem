@@ -76,6 +76,47 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 	g.Expect(actualVariables).To(HaveKey(sedimentproduction.VariableName))
 }
 
+func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	localExpectedName := "InitialiseTest"
+
+	sourceDataSet := csv.NewDataSet("CatchmentModel")
+	loadError := sourceDataSet.Load("testdata/ValidModel.csv")
+
+	g.Expect(loadError).To(BeNil())
+
+	model := NewCoreModel().
+		WithSourceDataSet(sourceDataSet).
+		WithName(localExpectedName)
+
+	g.Expect(model.Name()).To(Equal(localExpectedName))
+
+	model.Initialise()
+	model.SetManagementAction(0, true)
+	model.AcceptAll()
+
+	originalActions := *model.DecisionVariables()
+
+	g.Expect(originalActions).To(HaveKey(implementationcost.VariableName))
+	g.Expect(originalActions[implementationcost.VariableName].Value()).To(BeNumerically(">", 0))
+
+	copiedModel := model.DeepClone()
+	copiedModel.Initialise()
+
+	actualActions := copiedModel.ManagementActions()
+	expectedActionNumber := 16
+
+	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
+
+	actualVariables := *copiedModel.DecisionVariables()
+
+	g.Expect(actualVariables).To(HaveKey(implementationcost.VariableName))
+	g.Expect(actualVariables[implementationcost.VariableName].Value()).To(BeNumerically(equalTo, 0))
+
+	g.Expect(actualVariables).To(HaveKey(sedimentproduction.VariableName))
+}
+
 func TestCoreModel_Initialise_InvalidDataSet_Errors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
