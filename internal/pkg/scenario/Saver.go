@@ -14,7 +14,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-const defaultOutputPath = "solutions"
+const (
+	Solution          = "Solution"
+	SolutionSet       = "SolutionSet"
+	defaultOutputPath = "solutions"
+)
 
 type CallableSaver interface {
 	observer.Observer
@@ -72,18 +76,23 @@ func (s *Saver) ObserveEvent(event observer.Event) {
 	if event.EventType != observer.FinishedAnnealing {
 		return
 	}
-
-	solution := event.Attribute("Solution").(solution.Solution)
-	s.save(solution)
+	if event.HasAttribute(Solution) {
+		solution := event.Attribute(Solution).(solution.Solution)
+		s.saveSolution(solution)
+	}
+	if event.HasAttribute(SolutionSet) {
+		s.LogHandler().Info("Implement solution set saving.")
+		// TODO: Implement.
+	}
 }
 
-func (s *Saver) save(solution solution.Solution) {
+func (s *Saver) saveSolution(solution solution.Solution) {
 	s.debugLogSolutionInJson(solution)
 	s.ensureOutputPathIsUsable()
-	s.encode(solution)
+	s.encodeSolution(solution)
 }
 
-func (s *Saver) encode(modelSolution solution.Solution) {
+func (s *Saver) encodeSolution(modelSolution solution.Solution) {
 	encoder := new(encoding.Builder).
 		ForOutputType(s.outputType).
 		WithOutputPath(s.outputPath).

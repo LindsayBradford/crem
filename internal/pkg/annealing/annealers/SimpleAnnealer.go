@@ -5,7 +5,6 @@ package annealers
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer/null"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
@@ -21,7 +20,6 @@ import (
 
 const (
 	Id               = "Id"
-	Solution         = "Solution"
 	CurrentIteration = "CurrentIteration"
 )
 
@@ -190,17 +188,9 @@ func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attribut
 			Add(Id, sa.Id()).
 			Add(CurrentIteration, sa.currentIteration).
 			Add(MaximumIterations, sa.maximumIterations).
-			Join(sa.SolutionExplorer().EventAttributes(eventType)).
-			Add(Solution, *sa.fetchFinalModelSolution())
+			Join(sa.SolutionExplorer().EventAttributes(eventType))
 	}
 	return nil
-}
-
-func (sa *SimpleAnnealer) fetchFinalModelSolution() *solution.Solution {
-	return new(SolutionBuilder).
-		WithId(sa.Id()).
-		ForModel(sa.SolutionExplorer().Model()).
-		Build()
 }
 
 func (sa *SimpleAnnealer) initialDoneValue() bool {

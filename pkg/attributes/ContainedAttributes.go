@@ -27,6 +27,9 @@ func (ca *ContainedAttributes) ReplaceAttribute(name string, value interface{}) 
 }
 
 func (ca *ContainedAttributes) RemoveAttribute(name string) {
+	if !ca.HasAttribute(name) {
+		return
+	}
 	ca.attributes = ca.attributes.Remove(name)
 }
 
