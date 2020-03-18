@@ -1,6 +1,11 @@
 # Change Log
 
-## Version 0.8 (TBD):
+## Version 0.9 (TBD):
+### New Features
+* Averaged Suppapitnarm Annealer is now a usable option.
+* Deploy environment now has example configuration for both Annealer types.
+
+## Version 0.8 (10 March 2020):
 ### Bug Fixes
 * Fixed bug in how "SedimentProduction" reports changes to the annealer.
 * Changed Kirkpatrick explorer to consider "no objective change" updates to be undesirable.

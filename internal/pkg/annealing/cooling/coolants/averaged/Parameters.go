@@ -20,7 +20,7 @@ func (p *Parameters) Initialise() *Parameters {
 
 const (
 	_                          = iota
-	CoolingFactor       string = "coolingFactor"
+	CoolingFactor       string = "CoolingFactor"
 	StartingTemperature string = "StartingTemperature"
 )
 
