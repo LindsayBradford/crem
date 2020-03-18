@@ -1,0 +1,42 @@
+[Scenario]
+Name = "Example MOSA Scenario"
+OutputPath = "output"
+OutputType = "CSV"  # "CSV" (default) | "JSON" | "EXCEL"
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 1
+[Scenario.Reporting.LogLevelDestinations]
+Annealer = "StandardOutput"
+Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+#Debug = "StandardOutput"
+#Model = "StandardOutput"
+
+[Annealer]
+Type="AveragedSuppapitnarm"
+[Annealer.Parameters]
+ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
+StartingTemperature = 10_000.0 #10
+CoolingFactor =  0.999  # 0.99
+MaximumIterations = 1_000
+#InitialReturnToBaseStep = 50 # 20_000
+#MinimumReturnToBaseRate = 10 # 10
+
+[Model]
+Type = "CatchmentModel"
+[Model.Parameters]
+MaximumImplementationCost = 1_000_000.0
+DataSourcePath = "input/Laidley_data_v1_6.xlsx"
+
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+YearsOfErosion = 100                # 100.0 (default)
+
+RiparianRevegetationCostPerKilometer = 24000.0          # 24,000 (default)
+RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
+GullyRestorationCostPerKilometer = 44000.0              # 44,000 (default)
+GullySedimentReductionTarget = 0.8                      # 0.8 (default)
+HillSlopeRestorationCostPerKilometerSquared = 200_000.0 # 200_000.0 (default)
+HillSlopeBevegetationProportionTarget = 0.75            # 0.75 (default)

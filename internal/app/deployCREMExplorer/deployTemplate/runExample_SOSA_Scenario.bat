@@ -1,0 +1,13 @@
+@ECHO OFF
+SET CONFIG_FILE_PREFIX="Example_SOSA_Scenario"
+SET CONFIG_FILE=%CONFIG_FILE_PREFIX%.toml
+TITLE Running %CONFIG_FILE_PREFIX% of CREMExplorer
+
+SET OUTPUT_PATH="output\LOG_%CONFIG_FILE_PREFIX%.txt"
+CREMExplorer.exe --ScenarioFile %CONFIG_FILE% > %OUTPUT_PATH%
+
+TYPE %OUTPUT_PATH%
+
+ECHO.
+ECHO Above log has been written to %OUTPUT_PATH%.     
+PAUSE
