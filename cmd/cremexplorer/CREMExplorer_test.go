@@ -13,13 +13,26 @@ import (
 
 const defaultCatchmentModelAnnealerTimeout = 10
 
-func TestCREMExplorer_BlackBox_ExitWithSuccess(t *testing.T) {
+func TestCREMExplorer_BlackBoxKirkpatrick_ExitWithSuccess(t *testing.T) {
 	context := configTesting.BlackboxTestingContext{
 		T:                 t,
 		Name:              "Black Box Kirkpatrick",
 		ExecutablePath:    exceutablePath,
 		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
 		ConfigFilePath:    "testdata/TestCREMExplorer-BlackBox.toml",
+		ExpectedErrorCode: configTesting.WithSuccess,
+	}
+
+	configTesting.TestExecutableAgainstConfigFile(context)
+}
+
+func TestCREMExplorer_BlackBoxAveragedSuppapitnarm_ExitWithSuccess(t *testing.T) {
+	context := configTesting.BlackboxTestingContext{
+		T:                 t,
+		Name:              "Black Box Averaged Suppapitnarm",
+		ExecutablePath:    exceutablePath,
+		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
+		ConfigFilePath:    "testdata/TestCREMExplorer-AveragedSuppapitnarm-BlackBox.toml",
 		ExpectedErrorCode: configTesting.WithSuccess,
 	}
 

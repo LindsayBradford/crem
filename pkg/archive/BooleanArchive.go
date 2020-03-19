@@ -23,6 +23,7 @@ type BooleanArchive struct {
 	detailCache entryDetail
 
 	archiveArray []uint64
+	sha256       string
 }
 
 type entryDetail struct {
@@ -119,12 +120,22 @@ func (a *BooleanArchive) IsEquivalentTo(b *BooleanArchive) bool {
 }
 
 func (a *BooleanArchive) Sha256() string {
-	archiveAsByteArray := make([]byte, 0)
-	for index := range a.archiveArray {
-		bytes := []byte(strconv.FormatUint(a.archiveArray[index], 10))
-		archiveAsByteArray = append(archiveAsByteArray, bytes...)
+	if a.sha256 != "" {
+		return a.sha256
 	}
 
-	sha256OfArchive := sha256.Sum256(archiveAsByteArray)
-	return fmt.Sprintf("%x", sha256OfArchive)
+	archiveByteArray := archiveArrayAsByteArray(a.archiveArray)
+	sha256OfArchive := sha256.Sum256(archiveByteArray)
+	a.sha256 = fmt.Sprintf("%x", sha256OfArchive)
+
+	return a.sha256
+}
+
+func archiveArrayAsByteArray(arrayInt []uint64) []byte {
+	archiveAsByteArray := make([]byte, 0)
+	for index := range arrayInt {
+		bytes := []byte(strconv.FormatUint(arrayInt[index], 10))
+		archiveAsByteArray = append(archiveAsByteArray, bytes...)
+	}
+	return archiveAsByteArray
 }
