@@ -31,7 +31,7 @@ func TestCREMExplorer_BlackBoxAveragedSuppapitnarm_ExitWithSuccess(t *testing.T)
 		T:                 t,
 		Name:              "Black Box Averaged Suppapitnarm",
 		ExecutablePath:    exceutablePath,
-		TimeoutSeconds:    defaultCatchmentModelAnnealerTimeout,
+		TimeoutSeconds:    20,
 		ConfigFilePath:    "testdata/TestCREMExplorer-AveragedSuppapitnarm-BlackBox.toml",
 		ExpectedErrorCode: configTesting.WithSuccess,
 	}
