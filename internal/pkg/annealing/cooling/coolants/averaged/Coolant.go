@@ -66,7 +66,7 @@ func (c *Coolant) calculateAcceptanceProbability(variableChanges []float64) {
 		probabilities[index] = math.Exp(-absoluteChangeInObjectiveValue / c.temperature)
 	}
 
-	finalProbability := float64(1)
+	finalProbability := float64(0)
 	for _, probability := range probabilities {
 		finalProbability = finalProbability + probability
 	}
