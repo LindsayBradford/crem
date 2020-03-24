@@ -17,7 +17,7 @@ ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 10_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 1_000
-#InitialReturnToBaseStep = 50 # 20_000
+InitialReturnToBaseStep = 50_000 # 20_000
 #MinimumReturnToBaseRate = 10 # 10
 
 [Model]
