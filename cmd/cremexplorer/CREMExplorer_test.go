@@ -31,7 +31,7 @@ func TestCREMExplorer_BlackBoxAveragedSuppapitnarm_ExitWithSuccess(t *testing.T)
 		T:                 t,
 		Name:              "Black Box Averaged Suppapitnarm",
 		ExecutablePath:    exceutablePath,
-		TimeoutSeconds:    20,
+		TimeoutSeconds:    30,
 		ConfigFilePath:    "testdata/TestCREMExplorer-AveragedSuppapitnarm-BlackBox.toml",
 		ExpectedErrorCode: configTesting.WithSuccess,
 	}
