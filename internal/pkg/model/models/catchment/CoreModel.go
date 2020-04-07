@@ -210,10 +210,13 @@ func (m *CoreModel) randomlyInitialiseActions() {
 
 	m.initialising = true
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		m.note("Randomly initialising for Maximum implementation cost limit.")
 		m.randomlyInitialiseActionForMaximumImplementationCost()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		m.note("Randomly initialising for Maximum sediment production limit.")
 		m.randomlyInitialiseActionForMaximumSedimentProduction()
 	} else {
+		m.note("Randomly initialising for unbounded (no limits).")
 		m.randomlyInitialiseActionsUnbounded()
 	}
 	m.initialising = false
@@ -222,6 +225,7 @@ func (m *CoreModel) randomlyInitialiseActions() {
 }
 
 func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
+	m.note("Initialising all actions as inactive")
 	for _, action := range m.managementActions.Actions() {
 		m.managementActions.RandomlyInitialiseAction(action)
 
@@ -229,14 +233,19 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
 			continue // Nothing to if it wasn't activated.
 		}
 
+		m.noteManagementAction("Randomly activating action", action)
+
 		isValid, _ := m.ChangeIsValid()
 		if !isValid {
+			m.note("Change was invalid.  Reverting action to inactive")
 			m.RevertChange()
+			m.noteManagementAction("Action reverted", action)
 		}
 	}
 }
 
 func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
+	m.note("Initialising all actions as active")
 	for _, action := range m.managementActions.Actions() {
 		action.InitialisingActivation()
 	}
@@ -248,9 +257,13 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
 			continue // Nothing to if it wasn't deactivated.
 		}
 
+		m.noteManagementAction("Randomly deactivating action", action)
+
 		isValid, _ := m.ChangeIsValid()
 		if !isValid {
+			m.note("Change was invalid.  Reverting to action being active")
 			m.RevertChange()
+			m.noteManagementAction("Action reverted", action)
 		}
 	}
 }
@@ -258,6 +271,9 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
 func (m *CoreModel) randomlyInitialiseActionsUnbounded() {
 	for _, action := range m.managementActions.Actions() {
 		m.managementActions.RandomlyInitialiseAction(action)
+		if action.IsActive() {
+			m.noteManagementAction("Randomly activating action", action)
+		}
 	}
 }
 
