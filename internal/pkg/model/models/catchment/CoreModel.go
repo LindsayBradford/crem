@@ -15,6 +15,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/implementationcost"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
@@ -127,6 +128,14 @@ func (m *CoreModel) buildDecisionVariables() {
 		sedimentProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
 	}
 
+	sedimentProduction2 := new(sedimentproduction2.SedimentProduction2).
+		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
+		WithObservers(m)
+
+	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		sedimentProduction2.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
+	}
+
 	nitrogenProduction := new(nitrogenproduction.NitrogenProduction).
 		Initialise().
 		WithObservers(m)
@@ -141,7 +150,7 @@ func (m *CoreModel) buildDecisionVariables() {
 
 	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, nitrogenProduction, implementationCost,
+		sedimentProduction, sedimentProduction2, nitrogenProduction, implementationCost,
 	)
 }
 
@@ -192,6 +201,11 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
 	if sedimentProductionAsObserver, isObserver := sedimentProduction.(action.Observer); isObserver {
 		observers = append(observers, sedimentProductionAsObserver)
+	}
+
+	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction2.VariableName)
+	if sedimentProduction2AsObserver, isObserver := sedimentProduction2.(action.Observer); isObserver {
+		observers = append(observers, sedimentProduction2AsObserver)
 	}
 
 	nitrogenProduction := m.ContainedDecisionVariables.Variable(nitrogenproduction.VariableName)
