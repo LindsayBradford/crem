@@ -5,6 +5,7 @@ package nitrogenproduction
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	actions2 "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -16,6 +17,8 @@ var _ variable.UndoableDecisionVariable = new(NitrogenProduction)
 
 type NitrogenProduction struct {
 	variable.PerPlanningUnitDecisionVariable
+
+	sedimentProductionVariable *sedimentproduction2.SedimentProduction2
 
 	command variable.ChangeCommand
 
@@ -41,6 +44,11 @@ func (np *NitrogenProduction) WithName(variableName string) *NitrogenProduction 
 
 func (np *NitrogenProduction) WithStartingValue(value float64) *NitrogenProduction {
 	np.SetPlanningUnitValue(0, value)
+	return np
+}
+
+func (np *NitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction2.SedimentProduction2) *NitrogenProduction {
+	np.sedimentProductionVariable = variable
 	return np
 }
 
