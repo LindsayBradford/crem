@@ -26,7 +26,8 @@ func (c *RiverBankRestorationCommand) InPlanningUnit(planningUnit planningunit.I
 }
 
 func (c *RiverBankRestorationCommand) WithVegetationBuffer(vegetationBuffer float64) *RiverBankRestorationCommand {
-	c.undoneRiparianVegetationProportion = c.variable().riparianVegetationProportionPerPlanningUnit[c.PlanningUnit()]
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(RiverbankVegetationProportion).(float64)
 	c.doneRiparianVegetationProportion = vegetationBuffer
 	return c
 }
@@ -59,5 +60,5 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 }
 
 func (c *RiverBankRestorationCommand) setRiparianVegetation(proportion float64) {
-	c.variable().riparianVegetationProportionPerPlanningUnit[c.PlanningUnit()] = proportion
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
 }

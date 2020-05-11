@@ -4,7 +4,7 @@ package nitrogenproduction
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
-	actions2 "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	catchmentActions "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
@@ -23,6 +23,10 @@ type NitrogenProduction struct {
 	command variable.ChangeCommand
 
 	actionObserved action.ManagementAction
+
+	hillSlopeNitrogenContribution float64
+	bankNitrogenContribution      float64
+	gullyNitrogenContribution     float64
 }
 
 func (np *NitrogenProduction) Initialise() *NitrogenProduction {
@@ -58,8 +62,26 @@ func (np *NitrogenProduction) WithObservers(observers ...variable.Observer) *Nit
 }
 
 func (np *NitrogenProduction) deriveInitialValue() float64 {
-	np.SetValue(notImplementedValue)
-	return notImplementedValue
+	np.hillSlopeNitrogenContribution = np.deriveInitialHillSlopeContribution()
+	np.bankNitrogenContribution = np.deriveInitialBankContribution()
+	np.gullyNitrogenContribution = np.deriveInitialGullyContribution()
+
+	totalNitrogenContribution :=
+		np.hillSlopeNitrogenContribution + np.bankNitrogenContribution + np.gullyNitrogenContribution
+
+	return totalNitrogenContribution
+}
+
+func (np *NitrogenProduction) deriveInitialHillSlopeContribution() float64 {
+	return 0
+}
+
+func (np *NitrogenProduction) deriveInitialBankContribution() float64 {
+	return 0
+}
+
+func (np *NitrogenProduction) deriveInitialGullyContribution() float64 {
+	return 0
 }
 
 func (np *NitrogenProduction) ObserveAction(action action.ManagementAction) {
@@ -74,11 +96,11 @@ func (np *NitrogenProduction) ObserveActionInitialising(action action.Management
 func (np *NitrogenProduction) observeAction(action action.ManagementAction) {
 	np.actionObserved = action
 	switch np.actionObserved.Type() {
-	case actions2.RiverBankRestorationType:
+	case catchmentActions.RiverBankRestorationType:
 		np.handleRiverBankRestorationAction()
-	case actions2.GullyRestorationType:
+	case catchmentActions.GullyRestorationType:
 		np.handleGullyRestorationAction()
-	case actions2.HillSlopeRestorationType:
+	case catchmentActions.HillSlopeRestorationType:
 		np.handleHillSlopeRestorationAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))

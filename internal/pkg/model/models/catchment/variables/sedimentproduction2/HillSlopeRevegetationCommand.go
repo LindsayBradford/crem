@@ -26,7 +26,8 @@ func (c *HillSlopeRevegetationCommand) InPlanningUnit(planningUnit planningunit.
 }
 
 func (c *HillSlopeRevegetationCommand) WithVegetationBuffer(vegetationBuffer float64) *HillSlopeRevegetationCommand {
-	c.undoneHillSlopeVegetationProportion = c.variable().hillSlopeVegetationProportionPerPlanningUnit[c.PlanningUnit()]
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	c.undoneHillSlopeVegetationProportion = planningUnitAttributes.Value(HillSlopeVegetationProportion).(float64)
 	c.doneHillSlopeVegetationProportion = vegetationBuffer
 	return c
 }
@@ -59,5 +60,5 @@ func (c *HillSlopeRevegetationCommand) Undo() command.CommandStatus {
 }
 
 func (c *HillSlopeRevegetationCommand) setHillSlopeVegetation(proportion float64) {
-	c.variable().hillSlopeVegetationProportionPerPlanningUnit[c.PlanningUnit()] = proportion
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(HillSlopeVegetationProportion, proportion)
 }
