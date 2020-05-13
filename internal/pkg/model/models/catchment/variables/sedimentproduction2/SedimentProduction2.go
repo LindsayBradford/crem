@@ -41,8 +41,6 @@ type SedimentProduction2 struct {
 	numberOfPlanningUnits      uint
 	cachedPlanningUnitSediment float64
 
-	// hillSlopeVegetationProportionPerPlanningUnit map[planningunit.Id]float64
-
 	planningUnitAttributes map[planningunit.Id]attributes.Attributes
 }
 
@@ -95,28 +93,23 @@ func (sl *SedimentProduction2) deriveInitialSedimentProduction(planningUnitTable
 		planningUnitFloat64 := planningUnitTable.CellFloat64(planningUnitIndex, row)
 		planningUnit := Float64ToPlanningUnitId(planningUnitFloat64)
 
-		riverBankVegetationProportion := sl.originalRiverbankVegetationProportion(planningUnit)
 		hillSlopeVegetationProportion := sl.originalHillSlopeVegetationProportion(planningUnit)
 		riverbankSedimentContribution := sl.bankSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit)
 		gullySedimentContribution := sl.gullySedimentContribution.SedimentContribution(planningUnit)
 
+		riverBankVegetationProportion := sl.originalRiverbankVegetationProportion(planningUnit)
 		riparianFilter := riparianBufferFilter(riverBankVegetationProportion)
 		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter
 
-		sedimentProduced :=
-			riverbankSedimentContribution +
-				gullySedimentContribution +
-				hillSlopeSedimentContribution
-
-		roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(sl.Precision()))
-
-		sl.planningUnitAttributes[planningUnit] = sl.planningUnitAttributes[planningUnit].
+		sl.planningUnitAttributes[planningUnit] = new(attributes.Attributes).
 			Add(RiverbankVegetationProportion, riverBankVegetationProportion).
 			Add(HillSlopeVegetationProportion, hillSlopeVegetationProportion).
 			Add(RiverbankSedimentContribution, riverbankSedimentContribution).
 			Add(GullySedimentContribution, gullySedimentContribution).
-			Add(HillSlopeSedimentContribution, hillSlopeSedimentContribution).
-			Add(SedimentProduced, roundedSedimentProduced)
+			Add(HillSlopeSedimentContribution, hillSlopeSedimentContribution)
+
+		sedimentProduced := riverbankSedimentContribution + gullySedimentContribution + hillSlopeSedimentContribution
+		roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(sl.Precision()))
 
 		sl.SetPlanningUnitValue(planningUnit, roundedSedimentProduced)
 	}
@@ -221,7 +214,7 @@ func (sl *SedimentProduction2) handleGullyRestorationAction() {
 		asIsSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 	}
 
-	sl.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
+	sl.command = new(GullyRestorationCommand).
 		ForVariable(sl).
 		InPlanningUnit(sl.actionObserved.PlanningUnit()).
 		WithChange(toBeSediment - asIsSediment)
