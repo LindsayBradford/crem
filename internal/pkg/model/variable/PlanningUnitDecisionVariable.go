@@ -2,7 +2,6 @@
 
 package variable
 
-import "C"
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/pkg/math"
