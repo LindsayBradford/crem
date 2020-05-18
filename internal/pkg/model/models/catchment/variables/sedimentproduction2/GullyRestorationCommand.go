@@ -10,6 +10,9 @@ import (
 
 type GullyRestorationCommand struct {
 	variable.ChangePerPlanningUnitDecisionVariableCommand
+
+	undoneGullyContribution float64
+	doneGullyContribution   float64
 }
 
 func (c *GullyRestorationCommand) ForVariable(variable variable.PlanningUnitDecisionVariable) *GullyRestorationCommand {
@@ -24,6 +27,10 @@ func (c *GullyRestorationCommand) InPlanningUnit(planningUnit planningunit.Id) *
 
 func (c *GullyRestorationCommand) WithChange(changeValue float64) *GullyRestorationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
+
+	c.undoneGullyContribution = c.gullySedimentContribution()
+	c.doneGullyContribution = c.undoneGullyContribution + changeValue
+
 	return c
 }
 
@@ -36,7 +43,7 @@ func (c *GullyRestorationCommand) Do() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
-	// TODO: add gully specific state change
+	c.setGullySedimentContribution(c.doneGullyContribution)
 	return command.Done
 }
 
@@ -45,6 +52,15 @@ func (c *GullyRestorationCommand) Undo() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
-	// TODO: add gully specific state change
+	c.setGullySedimentContribution(c.undoneGullyContribution)
 	return command.UnDone
+}
+
+func (c *GullyRestorationCommand) setGullySedimentContribution(sedimentContribution float64) {
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(GullySedimentContribution, sedimentContribution)
+}
+
+func (c *GullyRestorationCommand) gullySedimentContribution() float64 {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	return planningUnitAttributes.Value(GullySedimentContribution).(float64)
 }

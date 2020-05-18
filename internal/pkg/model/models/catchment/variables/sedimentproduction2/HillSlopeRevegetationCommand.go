@@ -11,8 +11,11 @@ import (
 type HillSlopeRevegetationCommand struct {
 	variable.ChangePerPlanningUnitDecisionVariableCommand
 
-	doneHillSlopeVegetationProportion   float64
 	undoneHillSlopeVegetationProportion float64
+	doneHillSlopeVegetationProportion   float64
+
+	undoneHillSlopeContribution float64
+	doneHillSlopeContribution   float64
 }
 
 func (c *HillSlopeRevegetationCommand) ForVariable(variable variable.PlanningUnitDecisionVariable) *HillSlopeRevegetationCommand {
@@ -34,6 +37,10 @@ func (c *HillSlopeRevegetationCommand) WithVegetationBuffer(vegetationBuffer flo
 
 func (c *HillSlopeRevegetationCommand) WithChange(changeValue float64) *HillSlopeRevegetationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
+
+	c.undoneHillSlopeContribution = c.hillSlopeSedimentContribution()
+	c.doneHillSlopeContribution = c.undoneHillSlopeContribution + changeValue
+
 	return c
 }
 
@@ -47,6 +54,7 @@ func (c *HillSlopeRevegetationCommand) Do() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
 	c.setHillSlopeVegetation(c.doneHillSlopeVegetationProportion)
+	c.setHillSlopeSedimentContribution(c.doneHillSlopeContribution)
 	return command.Done
 }
 
@@ -56,9 +64,19 @@ func (c *HillSlopeRevegetationCommand) Undo() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
 	c.setHillSlopeVegetation(c.undoneHillSlopeVegetationProportion)
+	c.setHillSlopeSedimentContribution(c.undoneHillSlopeContribution)
 	return command.UnDone
 }
 
 func (c *HillSlopeRevegetationCommand) setHillSlopeVegetation(proportion float64) {
 	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(HillSlopeVegetationProportion, proportion)
+}
+
+func (c *HillSlopeRevegetationCommand) setHillSlopeSedimentContribution(sedimentContribution float64) {
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(HillSlopeSedimentContribution, sedimentContribution)
+}
+
+func (c *HillSlopeRevegetationCommand) hillSlopeSedimentContribution() float64 {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	return planningUnitAttributes.Value(HillSlopeSedimentContribution).(float64)
 }

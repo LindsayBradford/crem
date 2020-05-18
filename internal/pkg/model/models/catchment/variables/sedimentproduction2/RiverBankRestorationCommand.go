@@ -13,6 +13,9 @@ type RiverBankRestorationCommand struct {
 
 	doneRiparianVegetationProportion   float64
 	undoneRiparianVegetationProportion float64
+
+	undoneRiverbankContribution float64
+	doneRiverbankContribution   float64
 }
 
 func (c *RiverBankRestorationCommand) ForVariable(variable variable.PlanningUnitDecisionVariable) *RiverBankRestorationCommand {
@@ -34,6 +37,10 @@ func (c *RiverBankRestorationCommand) WithVegetationBuffer(vegetationBuffer floa
 
 func (c *RiverBankRestorationCommand) WithChange(changeValue float64) *RiverBankRestorationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
+
+	c.undoneRiverbankContribution = c.riverbankSedimentContribution()
+	c.doneRiverbankContribution = c.undoneRiverbankContribution + changeValue
+
 	return c
 }
 
@@ -47,6 +54,7 @@ func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
 	c.setRiparianVegetation(c.doneRiparianVegetationProportion)
+	c.setRiverbankSedimentContribution(c.doneRiverbankContribution)
 	return command.Done
 }
 
@@ -56,9 +64,19 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
 	c.setRiparianVegetation(c.undoneRiparianVegetationProportion)
+	c.setRiverbankSedimentContribution(c.undoneRiverbankContribution)
 	return command.UnDone
 }
 
 func (c *RiverBankRestorationCommand) setRiparianVegetation(proportion float64) {
 	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
+}
+
+func (c *RiverBankRestorationCommand) setRiverbankSedimentContribution(sedimentContribution float64) {
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankSedimentContribution, sedimentContribution)
+}
+
+func (c *RiverBankRestorationCommand) riverbankSedimentContribution() float64 {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	return planningUnitAttributes.Value(RiverbankSedimentContribution).(float64)
 }

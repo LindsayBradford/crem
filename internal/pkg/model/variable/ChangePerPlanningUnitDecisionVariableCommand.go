@@ -92,3 +92,7 @@ func (c *ChangePerPlanningUnitDecisionVariableCommand) Value() float64 {
 func (c *ChangePerPlanningUnitDecisionVariableCommand) Change() float64 {
 	return c.doneValue - c.undoneValue
 }
+
+func (c *ChangePerPlanningUnitDecisionVariableCommand) UndoneValue() float64 {
+	return c.undoneValue
+}
