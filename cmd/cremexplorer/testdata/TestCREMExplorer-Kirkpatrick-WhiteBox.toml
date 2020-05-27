@@ -2,9 +2,9 @@
 Name = "Kirkpatrick"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
-OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
-ReportEveryNumberOfIterations = 5
+ReportEveryNumberOfIterations = 1
 CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
@@ -18,7 +18,7 @@ DecisionVariable = "SedimentProduction"
 OptimisationDirection = "Minimising"
 StartingTemperature = 1_000.0 #10
 CoolingFactor =  0.999  # 0.99
-MaximumIterations = 5
+MaximumIterations = 20
 
 [Model]
 Type = "CatchmentModel"

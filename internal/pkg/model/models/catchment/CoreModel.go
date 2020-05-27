@@ -137,8 +137,8 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	nitrogenProduction := new(nitrogenproduction.NitrogenProduction).
-		Initialise().
 		WithSedimentProductionVariable(sedimentProduction2).
+		Initialise().
 		WithObservers(m)
 
 	implementationCost := new(implementationcost.ImplementationCost).

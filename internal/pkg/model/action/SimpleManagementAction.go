@@ -97,13 +97,14 @@ func (sma *SimpleManagementAction) ModelVariableKeys() (keys []ModelVariableName
 }
 
 func (sma *SimpleManagementAction) Subscribe(observers ...Observer) {
-	if sma.observers == nil {
-		sma.observers = make([]Observer, 0)
-	}
-
-	for _, newObserver := range observers {
-		sma.observers = append(sma.observers, newObserver)
-	}
+	sma.observers = observers
+	//if sma.observers == nil {
+	//	sma.observers = make([]Observer, 0)
+	//}
+	//
+	//for _, newObserver := range observers {
+	//	sma.observers = append(sma.observers, newObserver)
+	//}
 }
 
 func (sma *SimpleManagementAction) notifyObservers() {

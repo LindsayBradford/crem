@@ -7,6 +7,7 @@ import (
 	catchmentActions "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
+	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 )
 
@@ -38,6 +39,8 @@ func (np *NitrogenProduction) Initialise() *NitrogenProduction {
 
 	np.command = new(variable.NullChangeCommand)
 
+	np.deriveInitialState()
+
 	return np
 }
 
@@ -61,27 +64,52 @@ func (np *NitrogenProduction) WithObservers(observers ...variable.Observer) *Nit
 	return np
 }
 
-func (np *NitrogenProduction) deriveInitialValue() float64 {
-	np.hillSlopeNitrogenContribution = np.deriveInitialHillSlopeContribution()
-	np.bankNitrogenContribution = np.deriveInitialBankContribution()
-	np.gullyNitrogenContribution = np.deriveInitialGullyContribution()
+func (np *NitrogenProduction) deriveInitialState() {
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
-	totalNitrogenContribution :=
-		np.hillSlopeNitrogenContribution + np.bankNitrogenContribution + np.gullyNitrogenContribution
+	for planningUnit, attributes := range sedimentPlanningUnitValues {
+		initialHillSlopeContribution := attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
+		riverbankContribution := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
+		initialGullyContribution := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
 
-	return totalNitrogenContribution
+		sedimentProduced := initialHillSlopeContribution + riverbankContribution + initialGullyContribution
+		roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(np.Precision()))
+
+		np.SetPlanningUnitValue(planningUnit, roundedSedimentProduced)
+	}
 }
 
 func (np *NitrogenProduction) deriveInitialHillSlopeContribution() float64 {
-	return 0
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+
+	initialHillSlopeContribution := float64(0)
+	for _, attributes := range sedimentPlanningUnitValues {
+		initialHillSlopeContribution += attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
+	}
+
+	return initialHillSlopeContribution
 }
 
 func (np *NitrogenProduction) deriveInitialBankContribution() float64 {
-	return 0
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+
+	riverbankContribution := float64(0)
+	for _, attributes := range sedimentPlanningUnitValues {
+		riverbankContribution += attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
+	}
+
+	return riverbankContribution
 }
 
 func (np *NitrogenProduction) deriveInitialGullyContribution() float64 {
-	return 0
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+
+	initialGullyContribution := float64(0)
+	for _, attributes := range sedimentPlanningUnitValues {
+		initialGullyContribution += attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
+	}
+
+	return initialGullyContribution
 }
 
 func (np *NitrogenProduction) ObserveAction(action action.ManagementAction) {
@@ -108,15 +136,33 @@ func (np *NitrogenProduction) observeAction(action action.ManagementAction) {
 }
 
 func (np *NitrogenProduction) handleRiverBankRestorationAction() {
-	// TODO: Implement
+	actionPlanningUnit := np.actionObserved.PlanningUnit()
+	change := np.sedimentProductionVariable.DifferenceInValues()
+
+	np.command = new(RiverBankRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(actionPlanningUnit).
+		WithChange(change)
 }
 
 func (np *NitrogenProduction) handleGullyRestorationAction() {
-	// TODO: Implement
+	actionPlanningUnit := np.actionObserved.PlanningUnit()
+	change := np.sedimentProductionVariable.DifferenceInValues()
+
+	np.command = new(GullyRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(actionPlanningUnit).
+		WithChange(change)
 }
 
 func (np *NitrogenProduction) handleHillSlopeRestorationAction() {
-	// TODO: Implement
+	actionPlanningUnit := np.actionObserved.PlanningUnit()
+	change := np.sedimentProductionVariable.DifferenceInValues()
+
+	np.command = new(HillSlopeRevegetationCommand).
+		ForVariable(np).
+		InPlanningUnit(actionPlanningUnit).
+		WithChange(change)
 }
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change

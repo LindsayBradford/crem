@@ -31,7 +31,7 @@ func TestDumbAnnealerIntegrationThreeRunsSequentially(t *testing.T) {
 		T:                 t,
 		Name:              "Three sequential runs of Dumb Annealer",
 		ExecutablePath:    dumbAnnealerExecutablePath,
-		TimeoutSeconds:    defaultDumbAnnealerTimeout,
+		TimeoutSeconds:    15,
 		ConfigFilePath:    "testdata/DumbAnnealerTestConfig-ThreeRunsSequentially.toml",
 		ExpectedErrorCode: configTesting.WithSuccess,
 	}

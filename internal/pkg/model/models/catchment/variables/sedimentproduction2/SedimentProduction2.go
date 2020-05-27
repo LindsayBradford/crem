@@ -20,7 +20,6 @@ const HillSlopeVegetationProportion = "HillSlopeVegetationProportion"
 const RiverbankSedimentContribution = "RiverbankSedimentContribution"
 const GullySedimentContribution = "GullySedimentContribution"
 const HillSlopeSedimentContribution = "HillSlopeSedimentContribution"
-const SedimentProduced = "SedimentProduced"
 
 var _ variable.DecisionVariable = new(SedimentProduction2)
 
@@ -274,4 +273,8 @@ func (sl *SedimentProduction2) ApplyDoneValue() {
 
 func (sl *SedimentProduction2) ApplyUndoneValue() {
 	sl.command.Undo()
+}
+
+func (sl *SedimentProduction2) PlanningUnitAttributes() map[planningunit.Id]attributes.Attributes {
+	return sl.planningUnitAttributes
 }
