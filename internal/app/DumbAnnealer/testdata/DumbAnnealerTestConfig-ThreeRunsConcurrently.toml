@@ -13,7 +13,7 @@ Type="Kirkpatrick"
 [Annealer.Parameters]
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.95  # 0.99
-MaximumIterations = 2_000
+MaximumIterations = 1_000
 
 [Model]
 Type = "DumbModel"

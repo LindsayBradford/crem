@@ -29,6 +29,7 @@ import (
 const (
 	PlanningUnitsTableName = "PlanningUnits"
 	GulliesTableName       = "Gullies"
+	parentSoilsTableName   = "ParentSoils"
 )
 
 func NewCoreModel() *CoreModel {
@@ -53,6 +54,7 @@ type CoreModel struct {
 
 	planningUnitTable tables.CsvTable
 	gulliesTable      tables.CsvTable
+	parentSoilsTable  tables.CsvTable
 
 	variable.ContainedDecisionVariables
 
@@ -101,6 +103,7 @@ func (m *CoreModel) ParameterErrors() error {
 func (m *CoreModel) Initialise() {
 	m.planningUnitTable = m.fetchCsvTable(PlanningUnitsTableName)
 	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
+	m.parentSoilsTable = m.fetchCsvTable(parentSoilsTableName)
 
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
