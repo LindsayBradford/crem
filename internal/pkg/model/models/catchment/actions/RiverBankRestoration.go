@@ -45,6 +45,14 @@ func (r *RiverBankRestoration) WithOriginalBufferVegetation(proportionOfVegetati
 	return r.WithVariable(OriginalBufferVegetation, proportionOfVegetation)
 }
 
+func (r *RiverBankRestoration) WithTotalNitrogen(totalNitrogen float64) *RiverBankRestoration {
+	return r.WithVariable(TotalNitrogen, totalNitrogen)
+}
+
+func (r *RiverBankRestoration) WithTotalCarbon(totalCarbon float64) *RiverBankRestoration {
+	return r.WithVariable(TotalCarbon, totalCarbon)
+}
+
 func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(variableName, value)
 	return r

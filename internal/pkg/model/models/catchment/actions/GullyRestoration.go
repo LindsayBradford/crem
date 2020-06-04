@@ -45,6 +45,14 @@ func (g *GullyRestoration) WithActionedGullySediment(gullyVolume float64) *Gully
 	return g.WithVariable(ActionedGullySediment, gullyVolume)
 }
 
+func (g *GullyRestoration) WithTotalNitrogen(totalNitrogen float64) *GullyRestoration {
+	return g.WithVariable(TotalNitrogen, totalNitrogen)
+}
+
+func (g *GullyRestoration) WithTotalCarbon(totalCarbon float64) *GullyRestoration {
+	return g.WithVariable(TotalCarbon, totalCarbon)
+}
+
 func (g *GullyRestoration) WithVariable(variableName action.ModelVariableName, value float64) *GullyRestoration {
 	g.SimpleManagementAction.WithVariable(variableName, value)
 	return g

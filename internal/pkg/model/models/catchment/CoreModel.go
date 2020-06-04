@@ -167,32 +167,35 @@ func (m *CoreModel) buildAndObserveManagementActions() {
 func (m *CoreModel) buildModelActions() []action.ManagementAction {
 	modelActions := make([]action.ManagementAction, 0)
 
-	modelActions = append(modelActions, m.buildRiverBankRestorations()...)
 	modelActions = append(modelActions, m.buildGullyRestorations()...)
+	modelActions = append(modelActions, m.buildRiverBankRestorations()...)
 	modelActions = append(modelActions, m.buildHillSlopeRestorations()...)
 
 	return modelActions
-}
-
-func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
-	riverBankRestorations := new(actions.RiverBankRestorationGroup).
-		WithPlanningUnitTable(m.planningUnitTable).
-		WithParameters(m.parameters).
-		ManagementActions()
-	return riverBankRestorations
 }
 
 func (m *CoreModel) buildGullyRestorations() []action.ManagementAction {
 	gullyRestorations := new(actions.GullyRestorationGroup).
 		WithParameters(m.parameters).
 		WithGullyTable(m.gulliesTable).
+		WithParentSoilsTable(m.parentSoilsTable).
 		ManagementActions()
 	return gullyRestorations
+}
+
+func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
+	riverBankRestorations := new(actions.RiverBankRestorationGroup).
+		WithPlanningUnitTable(m.planningUnitTable).
+		WithParentSoilsTable(m.parentSoilsTable).
+		WithParameters(m.parameters).
+		ManagementActions()
+	return riverBankRestorations
 }
 
 func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
+		WithParentSoilsTable(m.parentSoilsTable).
 		WithParameters(m.parameters).
 		ManagementActions()
 	return hillSlopeRestorations

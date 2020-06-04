@@ -10,6 +10,8 @@ import (
 )
 
 type GullyRestorationGroup struct {
+	parentSoilsTable tables.CsvTable
+
 	sedimentContribution *GullySedimentContribution
 	parameters           parameters.Parameters
 
@@ -24,6 +26,11 @@ func (g *GullyRestorationGroup) WithParameters(parameters parameters.Parameters)
 func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *GullyRestorationGroup {
 	g.sedimentContribution = new(GullySedimentContribution)
 	g.sedimentContribution.Initialise(gullyTable, g.parameters)
+	return g
+}
+
+func (g *GullyRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *GullyRestorationGroup {
+	g.parentSoilsTable = parentSoilsTable
 	return g
 }
 
@@ -54,6 +61,8 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
+			WithTotalNitrogen(1). // TODO: calculate
+			WithTotalCarbon(1).   // TODO: calculate
 			WithImplementationCost(costInDollars)
 }
 

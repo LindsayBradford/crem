@@ -11,7 +11,9 @@ import (
 
 type RiverBankRestorationGroup struct {
 	planningUnitTable tables.CsvTable
-	parameters        parameters.Parameters
+	parentSoilsTable  tables.CsvTable
+
+	parameters parameters.Parameters
 
 	actionMap map[planningunit.Id]*RiverBankRestoration
 }
@@ -19,6 +21,11 @@ type RiverBankRestorationGroup struct {
 func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *RiverBankRestorationGroup {
 	r.planningUnitTable = planningUnitTable
 	return r
+}
+
+func (g *RiverBankRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
+	g.parentSoilsTable = parentSoilsTable
+	return g
 }
 
 func (r *RiverBankRestorationGroup) WithParameters(parameters parameters.Parameters) *RiverBankRestorationGroup {
@@ -63,6 +70,8 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
+			WithTotalNitrogen(1). // TODO: calculate
+			WithTotalCarbon(1).   // TODO: calculate
 			WithImplementationCost(costInDollars)
 }
 

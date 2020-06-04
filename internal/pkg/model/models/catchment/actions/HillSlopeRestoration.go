@@ -45,6 +45,14 @@ func (h *HillSlopeRestoration) WithActionedHillSlopeVegetation(proportionOfVeget
 	return h.WithVariable(ActionedHillSlopeVegetation, proportionOfVegetation)
 }
 
+func (h *HillSlopeRestoration) WithTotalNitrogen(totalNitrogen float64) *HillSlopeRestoration {
+	return h.WithVariable(TotalNitrogen, totalNitrogen)
+}
+
+func (h *HillSlopeRestoration) WithTotalCarbon(totalCarbon float64) *HillSlopeRestoration {
+	return h.WithVariable(TotalCarbon, totalCarbon)
+}
+
 func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {
 	h.SimpleManagementAction.WithVariable(variableName, value)
 	return h

@@ -11,6 +11,7 @@ import (
 
 type HillSlopeRestorationGroup struct {
 	planningUnitTable tables.CsvTable
+	parentSoilsTable  tables.CsvTable
 	parameters        parameters.Parameters
 
 	actionMap map[planningunit.Id]*HillSlopeRestoration
@@ -23,6 +24,11 @@ func (h *HillSlopeRestorationGroup) WithParameters(parameters parameters.Paramet
 
 func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *HillSlopeRestorationGroup {
 	h.planningUnitTable = planningUnitTable
+	return h
+}
+
+func (h *HillSlopeRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *HillSlopeRestorationGroup {
+	h.parentSoilsTable = parentSoilsTable
 	return h
 }
 
@@ -63,6 +69,8 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalHillSlopeVegetation(originalHillSlopeVegetation).
 			WithActionedHillSlopeVegetation(vegetationTarget).
+			WithTotalNitrogen(1). // TODO: calculate
+			WithTotalCarbon(1).   // TODO: calculate
 			WithImplementationCost(costInDollars)
 }
 
