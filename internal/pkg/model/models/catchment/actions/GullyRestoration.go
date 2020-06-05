@@ -53,6 +53,10 @@ func (g *GullyRestoration) WithTotalCarbon(totalCarbon float64) *GullyRestoratio
 	return g.WithVariable(TotalCarbon, totalCarbon)
 }
 
+func (g *GullyRestoration) WithDeltaCarbon(deltaCarbon float64) *GullyRestoration {
+	return g.WithVariable(DeltaCarbon, deltaCarbon)
+}
+
 func (g *GullyRestoration) WithVariable(variableName action.ModelVariableName, value float64) *GullyRestoration {
 	g.SimpleManagementAction.WithVariable(variableName, value)
 	return g

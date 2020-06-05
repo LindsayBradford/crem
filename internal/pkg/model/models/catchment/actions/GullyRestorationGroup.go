@@ -10,12 +10,11 @@ import (
 )
 
 type GullyRestorationGroup struct {
-	parentSoilsTable tables.CsvTable
-
 	sedimentContribution *GullySedimentContribution
 	parameters           parameters.Parameters
 
 	actionMap map[planningunit.Id]*GullyRestoration
+	parentSoilsContainer
 }
 
 func (g *GullyRestorationGroup) WithParameters(parameters parameters.Parameters) *GullyRestorationGroup {
@@ -30,7 +29,7 @@ func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *Gull
 }
 
 func (g *GullyRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *GullyRestorationGroup {
-	g.parentSoilsTable = parentSoilsTable
+	g.parentSoilsContainer.WithParentSoilsTable(parentSoilsTable, "Gully")
 	return g
 }
 
@@ -56,13 +55,18 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 
 	actionedGullySedimentReduction := 1 - g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
 
+	nitrogenValue := g.nitrogenAttributeValue(planningUnit)
+	carbonValue := g.carbonAttributeValue(planningUnit)
+	deltaCarbonValue := g.deltaCarbonAttributeValue(planningUnit)
+
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
-			WithTotalNitrogen(1). // TODO: calculate
-			WithTotalCarbon(1).   // TODO: calculate
+			WithTotalNitrogen(nitrogenValue).
+			WithTotalCarbon(carbonValue).
+			WithDeltaCarbon(deltaCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 

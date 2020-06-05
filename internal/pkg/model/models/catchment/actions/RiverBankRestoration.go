@@ -53,6 +53,10 @@ func (r *RiverBankRestoration) WithTotalCarbon(totalCarbon float64) *RiverBankRe
 	return r.WithVariable(TotalCarbon, totalCarbon)
 }
 
+func (g *RiverBankRestoration) WithDeltaCarbon(deltaCarbon float64) *RiverBankRestoration {
+	return g.WithVariable(DeltaCarbon, deltaCarbon)
+}
+
 func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(variableName, value)
 	return r

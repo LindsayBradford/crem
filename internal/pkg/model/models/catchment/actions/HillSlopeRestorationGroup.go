@@ -11,10 +11,10 @@ import (
 
 type HillSlopeRestorationGroup struct {
 	planningUnitTable tables.CsvTable
-	parentSoilsTable  tables.CsvTable
 	parameters        parameters.Parameters
 
 	actionMap map[planningunit.Id]*HillSlopeRestoration
+	parentSoilsContainer
 }
 
 func (h *HillSlopeRestorationGroup) WithParameters(parameters parameters.Parameters) *HillSlopeRestorationGroup {
@@ -28,7 +28,7 @@ func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (h *HillSlopeRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *HillSlopeRestorationGroup {
-	h.parentSoilsTable = parentSoilsTable
+	h.parentSoilsContainer.WithParentSoilsTable(parentSoilsTable, "Hillslope")
 	return h
 }
 
@@ -62,6 +62,10 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 		return
 	}
 
+	nitrogenValue := h.nitrogenAttributeValue(planningUnitAsId)
+	carbonValue := h.carbonAttributeValue(planningUnitAsId)
+	deltaCarbonValue := h.deltaCarbonAttributeValue(planningUnitAsId)
+
 	costInDollars := h.calculateImplementationCost(rowNumber)
 
 	h.actionMap[planningUnitAsId] =
@@ -69,8 +73,9 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalHillSlopeVegetation(originalHillSlopeVegetation).
 			WithActionedHillSlopeVegetation(vegetationTarget).
-			WithTotalNitrogen(1). // TODO: calculate
-			WithTotalCarbon(1).   // TODO: calculate
+			WithTotalNitrogen(nitrogenValue).
+			WithTotalCarbon(carbonValue).
+			WithDeltaCarbon(deltaCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 

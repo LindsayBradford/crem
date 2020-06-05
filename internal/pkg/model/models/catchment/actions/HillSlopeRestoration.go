@@ -53,6 +53,10 @@ func (h *HillSlopeRestoration) WithTotalCarbon(totalCarbon float64) *HillSlopeRe
 	return h.WithVariable(TotalCarbon, totalCarbon)
 }
 
+func (h *HillSlopeRestoration) WithDeltaCarbon(deltaCarbon float64) *HillSlopeRestoration {
+	return h.WithVariable(DeltaCarbon, deltaCarbon)
+}
+
 func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {
 	h.SimpleManagementAction.WithVariable(variableName, value)
 	return h

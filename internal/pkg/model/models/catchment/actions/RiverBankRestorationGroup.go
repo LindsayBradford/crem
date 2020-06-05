@@ -11,11 +11,11 @@ import (
 
 type RiverBankRestorationGroup struct {
 	planningUnitTable tables.CsvTable
-	parentSoilsTable  tables.CsvTable
 
 	parameters parameters.Parameters
 
 	actionMap map[planningunit.Id]*RiverBankRestoration
+	parentSoilsContainer
 }
 
 func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *RiverBankRestorationGroup {
@@ -24,7 +24,7 @@ func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (g *RiverBankRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
-	g.parentSoilsTable = parentSoilsTable
+	g.parentSoilsContainer.WithParentSoilsTable(parentSoilsTable, "Riparian")
 	return g
 }
 
@@ -65,13 +65,18 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
 
+	nitrogenValue := r.nitrogenAttributeValue(planningUnitAsId)
+	carbonValue := r.carbonAttributeValue(planningUnitAsId)
+	deltaCarbonValue := r.deltaCarbonAttributeValue(planningUnitAsId)
+
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
-			WithTotalNitrogen(1). // TODO: calculate
-			WithTotalCarbon(1).   // TODO: calculate
+			WithTotalNitrogen(nitrogenValue).
+			WithTotalCarbon(carbonValue).
+			WithDeltaCarbon(deltaCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 
