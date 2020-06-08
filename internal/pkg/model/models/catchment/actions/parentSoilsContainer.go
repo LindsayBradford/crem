@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	DeltaCarbon   action.ModelVariableName = "DeltaCarbon"
-	TotalCarbon   action.ModelVariableName = "TotalCarbon"
-	TotalNitrogen action.ModelVariableName = "TotalNitrogen"
+	ActionedTotalCarbon action.ModelVariableName = "ActionedTotalCarbon"
+	OriginalTotalCarbon action.ModelVariableName = "OriginalTotalCarbon"
+	TotalNitrogen       action.ModelVariableName = "TotalNitrogen"
 
 	parentSoilsPlanningUnitIndex = 0
 	sourceFilterIndex            = 1

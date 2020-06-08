@@ -68,6 +68,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	nitrogenValue := r.nitrogenAttributeValue(planningUnitAsId)
 	carbonValue := r.carbonAttributeValue(planningUnitAsId)
 	deltaCarbonValue := r.deltaCarbonAttributeValue(planningUnitAsId)
+	actionedCarbonValue := carbonValue + deltaCarbonValue
 
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
@@ -75,8 +76,8 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
 			WithTotalNitrogen(nitrogenValue).
-			WithTotalCarbon(carbonValue).
-			WithDeltaCarbon(deltaCarbonValue).
+			WithOriginalTotalCarbon(carbonValue).
+			WithActionedTotalCarbon(actionedCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 

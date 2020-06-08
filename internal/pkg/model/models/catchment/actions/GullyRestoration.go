@@ -49,12 +49,12 @@ func (g *GullyRestoration) WithTotalNitrogen(totalNitrogen float64) *GullyRestor
 	return g.WithVariable(TotalNitrogen, totalNitrogen)
 }
 
-func (g *GullyRestoration) WithTotalCarbon(totalCarbon float64) *GullyRestoration {
-	return g.WithVariable(TotalCarbon, totalCarbon)
+func (g *GullyRestoration) WithOriginalTotalCarbon(totalCarbon float64) *GullyRestoration {
+	return g.WithVariable(OriginalTotalCarbon, totalCarbon)
 }
 
-func (g *GullyRestoration) WithDeltaCarbon(deltaCarbon float64) *GullyRestoration {
-	return g.WithVariable(DeltaCarbon, deltaCarbon)
+func (g *GullyRestoration) WithActionedTotalCarbon(deltaCarbon float64) *GullyRestoration {
+	return g.WithVariable(ActionedTotalCarbon, deltaCarbon)
 }
 
 func (g *GullyRestoration) WithVariable(variableName action.ModelVariableName, value float64) *GullyRestoration {

@@ -58,6 +58,7 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 	nitrogenValue := g.nitrogenAttributeValue(planningUnit)
 	carbonValue := g.carbonAttributeValue(planningUnit)
 	deltaCarbonValue := g.deltaCarbonAttributeValue(planningUnit)
+	actionedCarbonValue := carbonValue + deltaCarbonValue
 
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
@@ -65,8 +66,8 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
 			WithTotalNitrogen(nitrogenValue).
-			WithTotalCarbon(carbonValue).
-			WithDeltaCarbon(deltaCarbonValue).
+			WithOriginalTotalCarbon(carbonValue).
+			WithActionedTotalCarbon(actionedCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 

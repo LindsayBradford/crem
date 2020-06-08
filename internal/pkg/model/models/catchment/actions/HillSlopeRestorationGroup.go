@@ -65,6 +65,7 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	nitrogenValue := h.nitrogenAttributeValue(planningUnitAsId)
 	carbonValue := h.carbonAttributeValue(planningUnitAsId)
 	deltaCarbonValue := h.deltaCarbonAttributeValue(planningUnitAsId)
+	actionedCarbonValue := carbonValue + deltaCarbonValue
 
 	costInDollars := h.calculateImplementationCost(rowNumber)
 
@@ -74,8 +75,8 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithOriginalHillSlopeVegetation(originalHillSlopeVegetation).
 			WithActionedHillSlopeVegetation(vegetationTarget).
 			WithTotalNitrogen(nitrogenValue).
-			WithTotalCarbon(carbonValue).
-			WithDeltaCarbon(deltaCarbonValue).
+			WithOriginalTotalCarbon(carbonValue).
+			WithActionedTotalCarbon(actionedCarbonValue).
 			WithImplementationCost(costInDollars)
 }
 

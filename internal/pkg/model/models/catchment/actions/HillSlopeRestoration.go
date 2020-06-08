@@ -49,12 +49,12 @@ func (h *HillSlopeRestoration) WithTotalNitrogen(totalNitrogen float64) *HillSlo
 	return h.WithVariable(TotalNitrogen, totalNitrogen)
 }
 
-func (h *HillSlopeRestoration) WithTotalCarbon(totalCarbon float64) *HillSlopeRestoration {
-	return h.WithVariable(TotalCarbon, totalCarbon)
+func (h *HillSlopeRestoration) WithOriginalTotalCarbon(totalCarbon float64) *HillSlopeRestoration {
+	return h.WithVariable(OriginalTotalCarbon, totalCarbon)
 }
 
-func (h *HillSlopeRestoration) WithDeltaCarbon(deltaCarbon float64) *HillSlopeRestoration {
-	return h.WithVariable(DeltaCarbon, deltaCarbon)
+func (h *HillSlopeRestoration) WithActionedTotalCarbon(deltaCarbon float64) *HillSlopeRestoration {
+	return h.WithVariable(ActionedTotalCarbon, deltaCarbon)
 }
 
 func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {

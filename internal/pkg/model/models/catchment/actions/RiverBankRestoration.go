@@ -49,12 +49,12 @@ func (r *RiverBankRestoration) WithTotalNitrogen(totalNitrogen float64) *RiverBa
 	return r.WithVariable(TotalNitrogen, totalNitrogen)
 }
 
-func (r *RiverBankRestoration) WithTotalCarbon(totalCarbon float64) *RiverBankRestoration {
-	return r.WithVariable(TotalCarbon, totalCarbon)
+func (r *RiverBankRestoration) WithOriginalTotalCarbon(totalCarbon float64) *RiverBankRestoration {
+	return r.WithVariable(OriginalTotalCarbon, totalCarbon)
 }
 
-func (g *RiverBankRestoration) WithDeltaCarbon(deltaCarbon float64) *RiverBankRestoration {
-	return g.WithVariable(DeltaCarbon, deltaCarbon)
+func (g *RiverBankRestoration) WithActionedTotalCarbon(deltaCarbon float64) *RiverBankRestoration {
+	return g.WithVariable(ActionedTotalCarbon, deltaCarbon)
 }
 
 func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
