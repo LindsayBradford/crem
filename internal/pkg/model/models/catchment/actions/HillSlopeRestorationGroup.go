@@ -14,7 +14,7 @@ type HillSlopeRestorationGroup struct {
 	parameters        parameters.Parameters
 
 	actionMap map[planningunit.Id]*HillSlopeRestoration
-	parentSoilsContainer
+	ParentSoilsContainer
 }
 
 func (h *HillSlopeRestorationGroup) WithParameters(parameters parameters.Parameters) *HillSlopeRestorationGroup {
@@ -28,7 +28,7 @@ func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (h *HillSlopeRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *HillSlopeRestorationGroup {
-	h.parentSoilsContainer.WithParentSoilsTable(parentSoilsTable, "Hillslope")
+	h.ParentSoilsContainer.WithSourceFilter("Hillslope").WithParentSoilsTable(parentSoilsTable)
 	return h
 }
 

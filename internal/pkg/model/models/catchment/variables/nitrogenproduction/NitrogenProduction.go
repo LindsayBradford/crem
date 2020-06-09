@@ -3,6 +3,7 @@
 package nitrogenproduction
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	catchmentActions "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
@@ -20,6 +21,7 @@ type NitrogenProduction struct {
 	variable.PerPlanningUnitDecisionVariable
 
 	sedimentProductionVariable *sedimentproduction2.SedimentProduction2
+	catchmentActions.ParentSoilsContainer
 
 	command variable.ChangeCommand
 
@@ -30,8 +32,9 @@ type NitrogenProduction struct {
 	gullyNitrogenContribution     float64
 }
 
-func (np *NitrogenProduction) Initialise() *NitrogenProduction {
+func (np *NitrogenProduction) Initialise(parentSoilsTable tables.CsvTable) *NitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
+	np.ParentSoilsContainer.WithParentSoilsTable(parentSoilsTable)
 
 	np.SetName(VariableName)
 	np.SetUnitOfMeasure(variable.TonnesPerYear)
@@ -68,15 +71,30 @@ func (np *NitrogenProduction) deriveInitialState() {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
 	for planningUnit, attributes := range sedimentPlanningUnitValues {
-		initialHillSlopeContribution := attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
-		riverbankContribution := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
-		initialGullyContribution := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
+		initialHillSlopeSediment := attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
+		riverbankSediment := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
+		initialGullySediment := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
 
-		sedimentProduced := initialHillSlopeContribution + riverbankContribution + initialGullyContribution
-		roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(np.Precision()))
+		initialNitrogen := np.initialHillSlopeSediment(initialHillSlopeSediment) +
+			np.initialRiverbankNitrogen(riverbankSediment) +
+			np.initialGullyNitrogen(initialGullySediment)
 
-		np.SetPlanningUnitValue(planningUnit, roundedSedimentProduced)
+		roundedNitrogen := math.RoundFloat(initialNitrogen, int(np.Precision()))
+
+		np.SetPlanningUnitValue(planningUnit, roundedNitrogen)
 	}
+}
+
+func (np *NitrogenProduction) initialHillSlopeSediment(initialHillSlopeSediment float64) float64 {
+	return initialHillSlopeSediment
+}
+
+func (np *NitrogenProduction) initialRiverbankNitrogen(initialRiverbankSediment float64) float64 {
+	return initialRiverbankSediment
+}
+
+func (np *NitrogenProduction) initialGullyNitrogen(initialGullySediment float64) float64 {
+	return initialGullySediment
 }
 
 func (np *NitrogenProduction) deriveInitialHillSlopeContribution() float64 {
