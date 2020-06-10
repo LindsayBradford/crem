@@ -28,7 +28,7 @@ func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (h *HillSlopeRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *HillSlopeRestorationGroup {
-	h.ParentSoilsContainer.WithSourceFilter("Hillslope").WithParentSoilsTable(parentSoilsTable)
+	h.ParentSoilsContainer.WithSourceFilter(HillSlopeSource).WithParentSoilsTable(parentSoilsTable)
 	return h
 }
 

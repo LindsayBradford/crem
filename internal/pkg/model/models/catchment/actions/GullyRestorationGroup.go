@@ -29,7 +29,7 @@ func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *Gull
 }
 
 func (g *GullyRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *GullyRestorationGroup {
-	g.ParentSoilsContainer.WithSourceFilter("Gully").WithParentSoilsTable(parentSoilsTable)
+	g.ParentSoilsContainer.WithSourceFilter(GullySource).WithParentSoilsTable(parentSoilsTable)
 	return g
 }
 

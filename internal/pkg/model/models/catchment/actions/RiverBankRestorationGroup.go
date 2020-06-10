@@ -24,7 +24,7 @@ func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (r *RiverBankRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
-	r.ParentSoilsContainer.WithSourceFilter("Riparian").WithParentSoilsTable(parentSoilsTable)
+	r.ParentSoilsContainer.WithSourceFilter(RiparianSource).WithParentSoilsTable(parentSoilsTable)
 	return r
 }
 
