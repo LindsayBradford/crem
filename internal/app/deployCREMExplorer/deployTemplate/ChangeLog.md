@@ -1,9 +1,15 @@
 # Change Log
 
-## Version 0.9 (TBD):
+## Version 0.10 (TBD):
+### New Features
+* Introduction of ParticulateNitrogen variable
+* Now deploys with Laidley_data_v1_6_1.xlsx (including nitrogen data)
+
+## Version 0.9 (07 April 2020):
 ### New Features
 * Averaged Suppapitnarm Annealer is now a usable option.
 * Deploy environment now has example configuration for both Annealer types.
+* Logging now captures and reports which management actions are randomly activated at model initialisation.
 
 ## Version 0.8 (10 March 2020):
 ### Bug Fixes

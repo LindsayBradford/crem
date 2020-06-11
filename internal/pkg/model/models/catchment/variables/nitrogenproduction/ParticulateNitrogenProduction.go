@@ -15,7 +15,7 @@ import (
 	math2 "math"
 )
 
-const VariableName = "NitrogenProduction"
+const VariableName = "ParticulateNitrogen"
 const notImplementedValue float64 = 0
 
 type particulateNitrogenVariables struct {
@@ -24,10 +24,11 @@ type particulateNitrogenVariables struct {
 	totalNitrogen float64
 }
 
-var _ variable.UndoableDecisionVariable = new(NitrogenProduction)
+var _ variable.UndoableDecisionVariable = new(ParticulateNitrogenProduction)
 
-type NitrogenProduction struct {
+type ParticulateNitrogenProduction struct {
 	variable.PerPlanningUnitDecisionVariable
+	variable.Bounds
 
 	sedimentProductionVariable *sedimentproduction2.SedimentProduction2
 	catchmentActions.ParentSoilsContainer
@@ -41,7 +42,7 @@ type NitrogenProduction struct {
 	gullyNitrogenContribution     float64
 }
 
-func (np *NitrogenProduction) Initialise(parentSoilsTable tables.CsvTable) *NitrogenProduction {
+func (np *ParticulateNitrogenProduction) Initialise(parentSoilsTable tables.CsvTable) *ParticulateNitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
 	np.ParentSoilsContainer.WithParentSoilsTable(parentSoilsTable)
 
@@ -56,27 +57,27 @@ func (np *NitrogenProduction) Initialise(parentSoilsTable tables.CsvTable) *Nitr
 	return np
 }
 
-func (np *NitrogenProduction) WithName(variableName string) *NitrogenProduction {
+func (np *ParticulateNitrogenProduction) WithName(variableName string) *ParticulateNitrogenProduction {
 	np.SetName(variableName)
 	return np
 }
 
-func (np *NitrogenProduction) WithStartingValue(value float64) *NitrogenProduction {
+func (np *ParticulateNitrogenProduction) WithStartingValue(value float64) *ParticulateNitrogenProduction {
 	np.SetPlanningUnitValue(0, value)
 	return np
 }
 
-func (np *NitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction2.SedimentProduction2) *NitrogenProduction {
+func (np *ParticulateNitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction2.SedimentProduction2) *ParticulateNitrogenProduction {
 	np.sedimentProductionVariable = variable
 	return np
 }
 
-func (np *NitrogenProduction) WithObservers(observers ...variable.Observer) *NitrogenProduction {
+func (np *ParticulateNitrogenProduction) WithObservers(observers ...variable.Observer) *ParticulateNitrogenProduction {
 	np.Subscribe(observers...)
 	return np
 }
 
-func (np *NitrogenProduction) deriveInitialState() {
+func (np *ParticulateNitrogenProduction) deriveInitialState() {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
 	for planningUnit, attributes := range sedimentPlanningUnitValues {
@@ -84,7 +85,7 @@ func (np *NitrogenProduction) deriveInitialState() {
 		riverbankSediment := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
 		initialGullySediment := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
 
-		initialNitrogen := np.initialHillSlopeSediment(planningUnit, initialHillSlopeSediment) +
+		initialNitrogen := np.initialHillSlopeNitrogen(planningUnit, initialHillSlopeSediment) +
 			np.initialRiverbankNitrogen(planningUnit, riverbankSediment) +
 			np.initialGullyNitrogen(planningUnit, initialGullySediment)
 
@@ -94,7 +95,7 @@ func (np *NitrogenProduction) deriveInitialState() {
 	}
 }
 
-func (np *NitrogenProduction) initialHillSlopeSediment(planningUnit planningunit.Id, initialHillSlopeSediment float64) float64 {
+func (np *ParticulateNitrogenProduction) initialHillSlopeNitrogen(planningUnit planningunit.Id, initialHillSlopeSediment float64) float64 {
 	if initialHillSlopeSediment == 0 {
 		return 0
 	}
@@ -112,7 +113,7 @@ func (np *NitrogenProduction) initialHillSlopeSediment(planningUnit planningunit
 	return calculatedParticulateNitrogen
 }
 
-func (np *NitrogenProduction) initialRiverbankNitrogen(planningUnit planningunit.Id, initialRiverbankSediment float64) float64 {
+func (np *ParticulateNitrogenProduction) initialRiverbankNitrogen(planningUnit planningunit.Id, initialRiverbankSediment float64) float64 {
 	if initialRiverbankSediment == 0 {
 		return 0
 	}
@@ -130,7 +131,7 @@ func (np *NitrogenProduction) initialRiverbankNitrogen(planningUnit planningunit
 	return calculatedParticulateNitrogen
 }
 
-func (np *NitrogenProduction) initialGullyNitrogen(planningUnit planningunit.Id, initialGullySediment float64) float64 {
+func (np *ParticulateNitrogenProduction) initialGullyNitrogen(planningUnit planningunit.Id, initialGullySediment float64) float64 {
 	if initialGullySediment == 0 {
 		return 0
 	}
@@ -149,17 +150,19 @@ func (np *NitrogenProduction) initialGullyNitrogen(planningUnit planningunit.Id,
 }
 
 func calculateParticulateNitrogen(variables particulateNitrogenVariables) float64 {
-	const logEnrichmentRatio = 0.8
 	totalNitrogenParentSoil := 0.08*variables.totalCarbon - 0.007*(variables.totalCarbon/variables.totalNitrogen) + 0.09
-	scaleAdjustedTotalNitrogen := 0.01 * totalNitrogenParentSoil
 
-	assert.That(scaleAdjustedTotalNitrogen > 0).WithFailureMessage("totalNitrogen not positive").Holds()
+	assert.That(totalNitrogenParentSoil > 0).WithFailureMessage("totalNitrogen not positive").Holds()
 
-	particulateNitrogen := math2.Pow(scaleAdjustedTotalNitrogen, logEnrichmentRatio)
+	const logEnrichmentRatio = 0.8
+	unscaledParticulateNitrogen := math2.Pow(totalNitrogenParentSoil, logEnrichmentRatio)
+
+	particulateNitrogen := 0.01 * variables.sediment * unscaledParticulateNitrogen
+
 	return particulateNitrogen
 }
 
-func (np *NitrogenProduction) deriveInitialHillSlopeContribution() float64 {
+func (np *ParticulateNitrogenProduction) deriveInitialHillSlopeContribution() float64 {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
 	initialHillSlopeContribution := float64(0)
@@ -170,7 +173,7 @@ func (np *NitrogenProduction) deriveInitialHillSlopeContribution() float64 {
 	return initialHillSlopeContribution
 }
 
-func (np *NitrogenProduction) deriveInitialBankContribution() float64 {
+func (np *ParticulateNitrogenProduction) deriveInitialBankContribution() float64 {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
 	riverbankContribution := float64(0)
@@ -181,7 +184,7 @@ func (np *NitrogenProduction) deriveInitialBankContribution() float64 {
 	return riverbankContribution
 }
 
-func (np *NitrogenProduction) deriveInitialGullyContribution() float64 {
+func (np *ParticulateNitrogenProduction) deriveInitialGullyContribution() float64 {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 
 	initialGullyContribution := float64(0)
@@ -192,16 +195,16 @@ func (np *NitrogenProduction) deriveInitialGullyContribution() float64 {
 	return initialGullyContribution
 }
 
-func (np *NitrogenProduction) ObserveAction(action action.ManagementAction) {
+func (np *ParticulateNitrogenProduction) ObserveAction(action action.ManagementAction) {
 	np.observeAction(action)
 }
 
-func (np *NitrogenProduction) ObserveActionInitialising(action action.ManagementAction) {
+func (np *ParticulateNitrogenProduction) ObserveActionInitialising(action action.ManagementAction) {
 	np.observeAction(action)
 	np.command.Do()
 }
 
-func (np *NitrogenProduction) observeAction(action action.ManagementAction) {
+func (np *ParticulateNitrogenProduction) observeAction(action action.ManagementAction) {
 	np.actionObserved = action
 	switch np.actionObserved.Type() {
 	case catchmentActions.RiverBankRestorationType:
@@ -215,7 +218,7 @@ func (np *NitrogenProduction) observeAction(action action.ManagementAction) {
 	}
 }
 
-func (np *NitrogenProduction) handleRiverBankRestorationAction() {
+func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
 
@@ -260,7 +263,7 @@ func (np *NitrogenProduction) handleRiverBankRestorationAction() {
 		WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
 }
 
-func (np *NitrogenProduction) handleGullyRestorationAction() {
+func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
 
@@ -305,7 +308,7 @@ func (np *NitrogenProduction) handleGullyRestorationAction() {
 		WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
 }
 
-func (np *NitrogenProduction) handleHillSlopeRestorationAction() {
+func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
 
@@ -352,28 +355,28 @@ func (np *NitrogenProduction) handleHillSlopeRestorationAction() {
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change
 // to any observers watching for state changes to the variableOld.
-func (np *NitrogenProduction) NotifyObservers() {
+func (np *ParticulateNitrogenProduction) NotifyObservers() {
 	for _, observer := range np.Observers() {
 		observer.ObserveDecisionVariable(np)
 	}
 }
 
-func (np *NitrogenProduction) UndoableValue() float64 {
+func (np *ParticulateNitrogenProduction) UndoableValue() float64 {
 	return np.command.Value()
 }
 
-func (np *NitrogenProduction) SetUndoableValue(value float64) {
+func (np *ParticulateNitrogenProduction) SetUndoableValue(value float64) {
 	np.command.SetChange(value)
 }
 
-func (np *NitrogenProduction) DifferenceInValues() float64 {
+func (np *ParticulateNitrogenProduction) DifferenceInValues() float64 {
 	return np.command.Change()
 }
 
-func (np *NitrogenProduction) ApplyDoneValue() {
+func (np *ParticulateNitrogenProduction) ApplyDoneValue() {
 	np.command.Do()
 }
 
-func (np *NitrogenProduction) ApplyUndoneValue() {
+func (np *ParticulateNitrogenProduction) ApplyUndoneValue() {
 	np.command.Undo()
 }

@@ -86,11 +86,22 @@ func (m *CoreModel) SetParameters(params baseParameters.Map) error {
 }
 
 func (m *CoreModel) validateModelParameters() {
-	if m.parameters.HasEntry(parameters.MaximumImplementationCost) &&
-		m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+	boundVariableNumber := 0
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		boundVariableNumber++
+	}
+	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		boundVariableNumber++
+	}
+	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
+		boundVariableNumber++
+	}
 
-		errorText := fmt.Sprintf("Only one of [%s], [%s] allowed as variable limit.",
-			parameters.MaximumImplementationCost, parameters.MaximumSedimentProduction)
+	if boundVariableNumber > 1 {
+		errorText := fmt.Sprintf("Only one of [%s], [%s] or [%s] allowed as variable limit.",
+			parameters.MaximumImplementationCost,
+			parameters.MaximumSedimentProduction,
+			parameters.MaximumParticulateNitrogenProduction)
 
 		m.parameters.AddValidationErrorMessage(errorText)
 	}
@@ -139,10 +150,14 @@ func (m *CoreModel) buildDecisionVariables() {
 		sedimentProduction2.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
 	}
 
-	nitrogenProduction := new(nitrogenproduction.NitrogenProduction).
+	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
 		WithSedimentProductionVariable(sedimentProduction2).
 		Initialise(m.parentSoilsTable).
 		WithObservers(m)
+
+	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
+		nitrogenProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumParticulateNitrogenProduction))
+	}
 
 	implementationCost := new(implementationcost.ImplementationCost).
 		Initialise(m.planningUnitTable, m.parameters).
@@ -242,10 +257,13 @@ func (m *CoreModel) randomlyInitialiseActions() {
 	m.initialising = true
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		m.note("Randomly initialising for Maximum implementation cost limit.")
-		m.randomlyInitialiseActionForMaximumImplementationCost()
+		m.randomlyActivateActionsFromAllInactiveStart()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
 		m.note("Randomly initialising for Maximum sediment production limit.")
-		m.randomlyInitialiseActionForMaximumSedimentProduction()
+		m.randomlyDeactivateActionsFromAllActiveStart()
+	} else if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
+		m.note("Randomly initialising for Maximum particulate nitrogen production limit.")
+		m.randomlyDeactivateActionsFromAllActiveStart()
 	} else {
 		m.note("Randomly initialising for unbounded (no limits).")
 		m.randomlyInitialiseActionsUnbounded()
@@ -255,7 +273,7 @@ func (m *CoreModel) randomlyInitialiseActions() {
 	m.note("Finished randomly initialising model actions")
 }
 
-func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
+func (m *CoreModel) randomlyActivateActionsFromAllInactiveStart() {
 	m.note("Initialising all actions as inactive")
 	for _, action := range m.managementActions.Actions() {
 		m.managementActions.RandomlyInitialiseAction(action)
@@ -275,7 +293,7 @@ func (m *CoreModel) randomlyInitialiseActionForMaximumImplementationCost() {
 	}
 }
 
-func (m *CoreModel) randomlyInitialiseActionForMaximumSedimentProduction() {
+func (m *CoreModel) randomlyDeactivateActionsFromAllActiveStart() {
 	m.note("Initialising all actions as active")
 	for _, action := range m.managementActions.Actions() {
 		action.InitialisingActivation()
