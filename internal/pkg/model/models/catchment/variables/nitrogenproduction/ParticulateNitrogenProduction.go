@@ -10,7 +10,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
-	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/pkg/errors"
 	math2 "math"
 )
@@ -82,16 +81,19 @@ func (np *ParticulateNitrogenProduction) deriveInitialState() {
 
 	for planningUnit, attributes := range sedimentPlanningUnitValues {
 		initialHillSlopeSediment := attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
+		initialHillSlopeNitrogen := np.initialHillSlopeNitrogen(planningUnit, initialHillSlopeSediment)
+
 		riverbankSediment := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
+		initialRiverbankNitrogen := np.initialRiverbankNitrogen(planningUnit, riverbankSediment)
+
 		initialGullySediment := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
+		initialGullyNitrogen := np.initialGullyNitrogen(planningUnit, initialGullySediment)
 
-		initialNitrogen := np.initialHillSlopeNitrogen(planningUnit, initialHillSlopeSediment) +
-			np.initialRiverbankNitrogen(planningUnit, riverbankSediment) +
-			np.initialGullyNitrogen(planningUnit, initialGullySediment)
+		initialNitrogen := initialHillSlopeNitrogen + initialRiverbankNitrogen + initialGullyNitrogen
 
-		roundedNitrogen := math.RoundFloat(initialNitrogen, int(np.Precision()))
+		//roundedNitrogen := math.RoundFloat(initialNitrogen, int(np.Precision()))
 
-		np.SetPlanningUnitValue(planningUnit, roundedNitrogen)
+		np.SetPlanningUnitValue(planningUnit, initialNitrogen)
 	}
 }
 
@@ -219,11 +221,19 @@ func (np *ParticulateNitrogenProduction) observeAction(action action.ManagementA
 }
 
 func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
+	planningUnit := np.actionObserved.PlanningUnit()
+
+	sedimentVariableCommand := np.sedimentProductionVariable.Command()
+
+	var asIsSediment, toBeSediment float64
+	if riverCommand, isRiverCommand := sedimentVariableCommand.(*sedimentproduction2.RiverBankRestorationCommand); isRiverCommand {
+		asIsSediment = riverCommand.UndoneRiverbankContribution()
+		toBeSediment = riverCommand.DoneRiverbankContribution()
+	}
 
 	var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	switch np.actionObserved.IsActive() {
+	isActive := np.actionObserved.IsActive()
+	switch isActive {
 	case true:
 		asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
 		toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
@@ -237,9 +247,6 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
 		toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
 	}
-
-	asIsSediment := attributes.Value(sedimentproduction2.RiverbankSedimentContribution).(float64)
-	toBeSediment := asIsSediment + np.sedimentProductionVariable.DifferenceInValues()
 
 	asIsVariables := particulateNitrogenVariables{
 		sediment:      asIsSediment,
@@ -259,16 +266,34 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 
 	np.command = new(RiverBankRestorationCommand).
 		ForVariable(np).
-		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		InPlanningUnit(planningUnit).
 		WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
 }
 
+func (np *ParticulateNitrogenProduction) handleGullyRestorationActionMirroredSediment() {
+	actionPlanningUnit := np.actionObserved.PlanningUnit()
+	change := np.sedimentProductionVariable.DifferenceInValues()
+
+	np.command = new(GullyRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(actionPlanningUnit).
+		WithChange(change)
+}
+
 func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
+	planningUnit := np.actionObserved.PlanningUnit()
+
+	sedimentVariableCommand := np.sedimentProductionVariable.Command()
+
+	var asIsSediment, toBeSediment float64
+	if gullyCommand, isGullyCommand := sedimentVariableCommand.(*sedimentproduction2.GullyRestorationCommand); isGullyCommand {
+		asIsSediment = gullyCommand.UndoneGullyContribution()
+		toBeSediment = gullyCommand.DoneGullyContribution()
+	}
 
 	var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	switch np.actionObserved.IsActive() {
+	isActive := np.actionObserved.IsActive()
+	switch isActive {
 	case true:
 		asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
 		toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
@@ -282,9 +307,6 @@ func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
 		toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
 	}
-
-	asIsSediment := attributes.Value(sedimentproduction2.GullySedimentContribution).(float64)
-	toBeSediment := asIsSediment + np.sedimentProductionVariable.DifferenceInValues()
 
 	asIsVariables := particulateNitrogenVariables{
 		sediment:      asIsSediment,
@@ -304,16 +326,24 @@ func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 
 	np.command = new(GullyRestorationCommand).
 		ForVariable(np).
-		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		InPlanningUnit(planningUnit).
 		WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
 }
 
 func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-	attributes := sedimentPlanningUnitValues[np.actionObserved.PlanningUnit()]
+	planningUnit := np.actionObserved.PlanningUnit()
+
+	sedimentVariableCommand := np.sedimentProductionVariable.Command()
+
+	var asIsSediment, toBeSediment float64
+	if hillSlopeCommand, isHillSlopeCommand := sedimentVariableCommand.(*sedimentproduction2.HillSlopeRevegetationCommand); isHillSlopeCommand {
+		asIsSediment = hillSlopeCommand.UndoneHillSlopeContribution()
+		toBeSediment = hillSlopeCommand.DoneHillSlopeContribution()
+	}
 
 	var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	switch np.actionObserved.IsActive() {
+	isActive := np.actionObserved.IsActive()
+	switch isActive {
 	case true:
 		asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
 		toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
@@ -327,9 +357,6 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
 		toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
 	}
-
-	asIsSediment := attributes.Value(sedimentproduction2.HillSlopeSedimentContribution).(float64)
-	toBeSediment := asIsSediment + np.sedimentProductionVariable.DifferenceInValues()
 
 	asIsVariables := particulateNitrogenVariables{
 		sediment:      asIsSediment,
@@ -349,7 +376,7 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 
 	np.command = new(HillSlopeRevegetationCommand).
 		ForVariable(np).
-		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		InPlanningUnit(planningUnit).
 		WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
 }
 

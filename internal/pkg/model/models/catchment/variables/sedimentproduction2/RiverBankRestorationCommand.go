@@ -80,3 +80,11 @@ func (c *RiverBankRestorationCommand) riverbankSedimentContribution() float64 {
 	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
 	return planningUnitAttributes.Value(RiverbankSedimentContribution).(float64)
 }
+
+func (c *RiverBankRestorationCommand) DoneRiverbankContribution() float64 {
+	return c.doneRiverbankContribution
+}
+
+func (c *RiverBankRestorationCommand) UndoneRiverbankContribution() float64 {
+	return c.undoneRiverbankContribution
+}

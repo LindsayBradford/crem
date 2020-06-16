@@ -278,3 +278,7 @@ func (sl *SedimentProduction2) ApplyUndoneValue() {
 func (sl *SedimentProduction2) PlanningUnitAttributes() map[planningunit.Id]attributes.Attributes {
 	return sl.planningUnitAttributes
 }
+
+func (sl *SedimentProduction2) Command() variable.ChangeCommand {
+	return sl.command
+}

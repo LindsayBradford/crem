@@ -80,3 +80,11 @@ func (c *HillSlopeRevegetationCommand) hillSlopeSedimentContribution() float64 {
 	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
 	return planningUnitAttributes.Value(HillSlopeSedimentContribution).(float64)
 }
+
+func (c *HillSlopeRevegetationCommand) DoneHillSlopeContribution() float64 {
+	return c.doneHillSlopeContribution
+}
+
+func (c *HillSlopeRevegetationCommand) UndoneHillSlopeContribution() float64 {
+	return c.undoneHillSlopeContribution
+}

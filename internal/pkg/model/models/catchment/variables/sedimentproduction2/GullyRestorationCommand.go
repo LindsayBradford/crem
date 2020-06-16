@@ -8,6 +8,8 @@ import (
 	"github.com/LindsayBradford/crem/pkg/command"
 )
 
+var _ variable.ChangeCommand = new(GullyRestorationCommand)
+
 type GullyRestorationCommand struct {
 	variable.ChangePerPlanningUnitDecisionVariableCommand
 
@@ -63,4 +65,12 @@ func (c *GullyRestorationCommand) setGullySedimentContribution(sedimentContribut
 func (c *GullyRestorationCommand) gullySedimentContribution() float64 {
 	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
 	return planningUnitAttributes.Value(GullySedimentContribution).(float64)
+}
+
+func (c *GullyRestorationCommand) DoneGullyContribution() float64 {
+	return c.doneGullyContribution
+}
+
+func (c *GullyRestorationCommand) UndoneGullyContribution() float64 {
+	return c.undoneGullyContribution
 }
