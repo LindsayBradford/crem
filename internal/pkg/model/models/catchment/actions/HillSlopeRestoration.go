@@ -33,6 +33,12 @@ func (h *HillSlopeRestoration) WithImplementationCost(costInDollars float64) *Hi
 	return h.WithVariable(HillSlopeRestorationCost, costInDollars)
 }
 
+const HillSlopeRestorationOpportunityCost action.ModelVariableName = "HillSlopeRestorationOpportunityCost"
+
+func (g *HillSlopeRestoration) WithOpportunityCost(costInDollars float64) *HillSlopeRestoration {
+	return g.WithVariable(HillSlopeRestorationOpportunityCost, costInDollars)
+}
+
 const OriginalHillSlopeVegetation action.ModelVariableName = "OriginalHillSlopeVegetation"
 
 func (h *HillSlopeRestoration) WithOriginalHillSlopeVegetation(proportionOfVegetation float64) *HillSlopeRestoration {

@@ -33,6 +33,12 @@ func (r *RiverBankRestoration) WithImplementationCost(costInDollars float64) *Ri
 	return r.WithVariable(RiverBankRestorationCost, costInDollars)
 }
 
+const RiverBankRestorationOpportunityCost action.ModelVariableName = "RiverBankRestorationOpportunityCost"
+
+func (g *RiverBankRestoration) WithOpportunityCost(costInDollars float64) *RiverBankRestoration {
+	return g.WithVariable(RiverBankRestorationOpportunityCost, costInDollars)
+}
+
 const ActionedBufferVegetation action.ModelVariableName = "ActionedBufferVegetation"
 
 func (r *RiverBankRestoration) WithActionedBufferVegetation(proportionOfVegetation float64) *RiverBankRestoration {

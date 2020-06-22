@@ -64,6 +64,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	}
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
+	opportunityCostInDollars := r.calculateImplementationCost(rowNumber)
 
 	nitrogenValue := r.nitrogenAttributeValue(planningUnitAsId)
 	carbonValue := r.carbonAttributeValue(planningUnitAsId)
@@ -78,7 +79,8 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 			WithTotalNitrogen(nitrogenValue).
 			WithOriginalTotalCarbon(carbonValue).
 			WithActionedTotalCarbon(actionedCarbonValue).
-			WithImplementationCost(costInDollars)
+			WithImplementationCost(costInDollars).
+			WithOpportunityCost(opportunityCostInDollars)
 }
 
 func (r *RiverBankRestorationGroup) originalBufferVegetation(rowNumber uint) float64 {

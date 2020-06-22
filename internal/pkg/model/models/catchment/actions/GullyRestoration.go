@@ -33,6 +33,12 @@ func (g *GullyRestoration) WithImplementationCost(costInDollars float64) *GullyR
 	return g.WithVariable(GullyRestorationCost, costInDollars)
 }
 
+const GullyRestorationOpportunityCost action.ModelVariableName = "GullyRestorationOpportunityCost"
+
+func (g *GullyRestoration) WithOpportunityCost(costInDollars float64) *GullyRestoration {
+	return g.WithVariable(GullyRestorationOpportunityCost, costInDollars)
+}
+
 const OriginalGullySediment action.ModelVariableName = "OriginalGullySediment"
 
 func (g *GullyRestoration) WithOriginalGullySediment(gullyVolume float64) *GullyRestoration {

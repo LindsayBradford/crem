@@ -61,11 +61,11 @@ func (ic *OpportunityCost) observeAction(action action.ManagementAction) {
 	ic.actionObserved = action
 	switch ic.actionObserved.Type() {
 	case actions.RiverBankRestorationType:
-		ic.handleActionForModelVariable(actions.RiverBankRestorationCost)
+		ic.handleActionForModelVariable(actions.RiverBankRestorationOpportunityCost)
 	case actions.GullyRestorationType:
-		ic.handleActionForModelVariable(actions.GullyRestorationCost)
+		ic.handleActionForModelVariable(actions.GullyRestorationOpportunityCost)
 	case actions.HillSlopeRestorationType:
-		ic.handleActionForModelVariable(actions.HillSlopeRestorationCost)
+		ic.handleActionForModelVariable(actions.HillSlopeRestorationOpportunityCost)
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}

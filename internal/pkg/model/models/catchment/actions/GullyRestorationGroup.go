@@ -51,7 +51,9 @@ func (g *GullyRestorationGroup) createManagementActions() {
 
 func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit.Id) {
 	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
+
 	costInDollars := g.calculateImplementationCost(planningUnit)
+	opportunityCostInDollars := g.calculateImplementationCost(planningUnit)
 
 	actionedGullySedimentReduction := 1 - g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
 
@@ -68,7 +70,8 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 			WithTotalNitrogen(nitrogenValue).
 			WithOriginalTotalCarbon(carbonValue).
 			WithActionedTotalCarbon(actionedCarbonValue).
-			WithImplementationCost(costInDollars)
+			WithImplementationCost(costInDollars).
+			WithOpportunityCost(opportunityCostInDollars)
 }
 
 func (g *GullyRestorationGroup) calculateImplementationCost(planningUnit planningunit.Id) float64 {
