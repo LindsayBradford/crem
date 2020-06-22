@@ -14,7 +14,7 @@ type GullyRestorationGroup struct {
 	parameters           parameters.Parameters
 
 	actionMap map[planningunit.Id]*GullyRestoration
-	ParentSoilsContainer
+	Container
 }
 
 func (g *GullyRestorationGroup) WithParameters(parameters parameters.Parameters) *GullyRestorationGroup {
@@ -28,8 +28,8 @@ func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *Gull
 	return g
 }
 
-func (g *GullyRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *GullyRestorationGroup {
-	g.ParentSoilsContainer.WithSourceFilter(GullySource).WithParentSoilsTable(parentSoilsTable)
+func (g *GullyRestorationGroup) WithActionsTable(actionsTable tables.CsvTable) *GullyRestorationGroup {
+	g.Container.WithSourceFilter(GullySource).WithActionsTable(actionsTable)
 	return g
 }
 

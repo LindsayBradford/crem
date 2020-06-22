@@ -15,7 +15,7 @@ type RiverBankRestorationGroup struct {
 	parameters parameters.Parameters
 
 	actionMap map[planningunit.Id]*RiverBankRestoration
-	ParentSoilsContainer
+	Container
 }
 
 func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tables.CsvTable) *RiverBankRestorationGroup {
@@ -24,7 +24,7 @@ func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (r *RiverBankRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
-	r.ParentSoilsContainer.WithSourceFilter(RiparianSource).WithParentSoilsTable(parentSoilsTable)
+	r.Container.WithSourceFilter(RiparianSource).WithActionsTable(parentSoilsTable)
 	return r
 }
 

@@ -30,7 +30,7 @@ type ParticulateNitrogenProduction struct {
 	variable.Bounds
 
 	sedimentProductionVariable *sedimentproduction2.SedimentProduction2
-	catchmentActions.ParentSoilsContainer
+	catchmentActions.Container
 
 	command variable.ChangeCommand
 
@@ -43,7 +43,7 @@ type ParticulateNitrogenProduction struct {
 
 func (np *ParticulateNitrogenProduction) Initialise(parentSoilsTable tables.CsvTable) *ParticulateNitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
-	np.ParentSoilsContainer.WithParentSoilsTable(parentSoilsTable)
+	np.Container.WithActionsTable(parentSoilsTable)
 
 	np.SetName(VariableName)
 	np.SetUnitOfMeasure(variable.TonnesPerYear)
@@ -125,8 +125,8 @@ func (np *ParticulateNitrogenProduction) initialRiverbankNitrogen(planningUnit p
 
 	variables := particulateNitrogenVariables{
 		sediment:      initialRiverbankSediment,
-		totalCarbon:   np.ParentSoilsContainer.MapValue(carbonKey),
-		totalNitrogen: np.ParentSoilsContainer.MapValue(nitrogenKey),
+		totalCarbon:   np.Container.MapValue(carbonKey),
+		totalNitrogen: np.Container.MapValue(nitrogenKey),
 	}
 
 	calculatedParticulateNitrogen := calculateParticulateNitrogen(variables)
@@ -143,8 +143,8 @@ func (np *ParticulateNitrogenProduction) initialGullyNitrogen(planningUnit plann
 
 	variables := particulateNitrogenVariables{
 		sediment:      initialGullySediment,
-		totalCarbon:   np.ParentSoilsContainer.MapValue(carbonKey),
-		totalNitrogen: np.ParentSoilsContainer.MapValue(nitrogenKey),
+		totalCarbon:   np.Container.MapValue(carbonKey),
+		totalNitrogen: np.Container.MapValue(nitrogenKey),
 	}
 
 	calculatedParticulateNitrogen := calculateParticulateNitrogen(variables)

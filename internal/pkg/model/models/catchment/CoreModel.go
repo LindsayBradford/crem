@@ -30,7 +30,7 @@ import (
 const (
 	PlanningUnitsTableName = "PlanningUnits"
 	GulliesTableName       = "Gullies"
-	parentSoilsTableName   = "ParentSoils"
+	actionsTableName       = "Actions"
 )
 
 func NewCoreModel() *CoreModel {
@@ -55,7 +55,7 @@ type CoreModel struct {
 
 	planningUnitTable tables.CsvTable
 	gulliesTable      tables.CsvTable
-	parentSoilsTable  tables.CsvTable
+	actionsTable      tables.CsvTable
 
 	variable.ContainedDecisionVariables
 
@@ -115,7 +115,7 @@ func (m *CoreModel) ParameterErrors() error {
 func (m *CoreModel) Initialise() {
 	m.planningUnitTable = m.fetchCsvTable(PlanningUnitsTableName)
 	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
-	m.parentSoilsTable = m.fetchCsvTable(parentSoilsTableName)
+	m.actionsTable = m.fetchCsvTable(actionsTableName)
 
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
@@ -153,7 +153,7 @@ func (m *CoreModel) buildDecisionVariables() {
 
 	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
 		WithSedimentProductionVariable(sedimentProduction2).
-		Initialise(m.parentSoilsTable).
+		Initialise(m.actionsTable).
 		WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
@@ -202,7 +202,7 @@ func (m *CoreModel) buildGullyRestorations() []action.ManagementAction {
 	gullyRestorations := new(actions.GullyRestorationGroup).
 		WithParameters(m.parameters).
 		WithGullyTable(m.gulliesTable).
-		WithParentSoilsTable(m.parentSoilsTable).
+		WithActionsTable(m.actionsTable).
 		ManagementActions()
 	return gullyRestorations
 }
@@ -210,7 +210,7 @@ func (m *CoreModel) buildGullyRestorations() []action.ManagementAction {
 func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
-		WithParentSoilsTable(m.parentSoilsTable).
+		WithParentSoilsTable(m.actionsTable).
 		WithParameters(m.parameters).
 		ManagementActions()
 	return riverBankRestorations
@@ -219,7 +219,7 @@ func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
 func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
-		WithParentSoilsTable(m.parentSoilsTable).
+		WithParentSoilsTable(m.actionsTable).
 		WithParameters(m.parameters).
 		ManagementActions()
 	return hillSlopeRestorations
