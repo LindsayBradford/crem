@@ -4,6 +4,7 @@ package catchment
 
 import (
 	"fmt"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
@@ -167,9 +168,17 @@ func (m *CoreModel) buildDecisionVariables() {
 		implementationCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumImplementationCost))
 	}
 
+	opportunityCost := new(opportunitycost.OpportunityCost).
+		Initialise(m.planningUnitTable, m.parameters).
+		WithObservers(m)
+
+	if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
+		opportunityCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumOpportunityCost))
+	}
+
 	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, sedimentProduction2, nitrogenProduction, implementationCost,
+		sedimentProduction, sedimentProduction2, nitrogenProduction, implementationCost, opportunityCost,
 	)
 }
 
@@ -238,6 +247,11 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
 	if implementationCostAsObserver, isObserver := implementationCost.(action.Observer); isObserver {
 		observers = append(observers, implementationCostAsObserver)
+	}
+
+	opportunityCost := m.ContainedDecisionVariables.Variable(opportunitycost.VariableName)
+	if opportunityCostAsObserver, isObserver := opportunityCost.(action.Observer); isObserver {
+		observers = append(observers, opportunityCostAsObserver)
 	}
 
 	return observers

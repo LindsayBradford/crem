@@ -43,6 +43,7 @@ const (
 
 	MaximumSedimentProduction            = "MaximumSedimentProduction"
 	MaximumImplementationCost            = "MaximumImplementationCost"
+	MaximumOpportunityCost               = "MaximumOpportunityCost"
 	MaximumParticulateNitrogenProduction = "MaximumSedimentProduction"
 )
 
@@ -162,7 +163,14 @@ func ParameterSpecifications() *Specifications {
 			Validator:  IsNonNegativeDecimal,
 			IsOptional: true,
 		},
+	).Add(
+		Specification{
+			Key:        MaximumOpportunityCost,
+			Validator:  IsNonNegativeDecimal,
+			IsOptional: true,
+		},
 	)
+
 	return specs
 }
 
