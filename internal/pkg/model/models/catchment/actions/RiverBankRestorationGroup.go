@@ -64,7 +64,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	}
 
 	costInDollars := r.calculateImplementationCost(rowNumber)
-	opportunityCostInDollars := r.calculateImplementationCost(rowNumber)
+	opportunityCostInDollars := r.opportunityCostAttributeValue(planningUnitAsId)
 
 	nitrogenValue := r.nitrogenAttributeValue(planningUnitAsId)
 	carbonValue := r.carbonAttributeValue(planningUnitAsId)

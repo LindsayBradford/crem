@@ -1,4 +1,4 @@
 TableName, FilePath
 PlanningUnits, ValidPlanningUnits.csv
 Gullies, ValidGullies.csv
-ParentSoils, ValidParentSoils.csv
+Actions, ValidActions.csv

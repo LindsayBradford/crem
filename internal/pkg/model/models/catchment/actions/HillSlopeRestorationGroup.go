@@ -68,7 +68,7 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	actionedCarbonValue := carbonValue + deltaCarbonValue
 
 	costInDollars := h.calculateImplementationCost(rowNumber)
-	opportunityCostInDollars := h.calculateImplementationCost(rowNumber)
+	opportunityCostInDollars := h.opportunityCostAttributeValue(planningUnitAsId)
 
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
