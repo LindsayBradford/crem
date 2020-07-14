@@ -72,10 +72,10 @@ func (bsc *BankSedimentContribution) partialBankSedimentContribution(rowNumber u
 
 	waterDensity := bsc.parameters.GetFloat64(parameters.WaterDensity)
 	localAcceleration := bsc.parameters.GetFloat64(parameters.LocalAcceleration)
-	bankFullDischarge := bsc.planningUnitTable.CellFloat64(bankFullFlowIndex, rowNumber)
+	bankFullFlow := bsc.planningUnitTable.CellFloat64(bankFullFlowIndex, rowNumber)
 	channelSlope := bsc.planningUnitTable.CellFloat64(channelSlopeIndex, rowNumber)
 
-	channelDischarge := waterDensity * localAcceleration * bankFullDischarge * channelSlope
+	channelDischarge := waterDensity * localAcceleration * bankFullFlow * channelSlope
 
 	riparianVegetationImpact := float64(1) // This is the value that changes as we anneal, leaving in formula for now for traceability.
 

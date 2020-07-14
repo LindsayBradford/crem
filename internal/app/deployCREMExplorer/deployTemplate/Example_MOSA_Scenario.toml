@@ -24,7 +24,7 @@ InitialReturnToBaseStep = 50_000 # 20_000
 Type = "CatchmentModel"
 [Model.Parameters]
 MaximumImplementationCost = 1_000_000.0
-DataSourcePath = "input/Laidley_data_v1_6_1.xlsx"
+DataSourcePath = "input/Laidley_data_v1_6_2.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
