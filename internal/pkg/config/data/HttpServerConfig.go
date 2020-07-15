@@ -12,9 +12,12 @@ import (
 
 const defaultServerConfigPath = "config/server.toml"
 
-type HttpServerConfig struct {
-	MetaDataConfig
+const (
+	DefaultApiPort   = uint64(8080)
+	DefaultAdminPort = uint64(8081)
+)
 
+type HttpServerConfig struct {
 	AdminPort                uint64
 	ApiPort                  uint64
 	CacheMaximumAgeInSeconds uint64
@@ -40,8 +43,7 @@ func defaultServerConfigFileNotSupplied() bool {
 }
 
 func embeddedDefaultHttpServerConfig() (*HttpServerConfig, error) {
-	config := HttpServerConfig{ApiPort: 2020, AdminPort: 2021}
-	config.FilePath = "<default server configuration>"
+	config := HttpServerConfig{ApiPort: DefaultApiPort, AdminPort: DefaultAdminPort}
 	return &config, nil
 }
 
@@ -56,6 +58,5 @@ func retrieveHttpServerFromFile(configFilePath string) (*HttpServerConfig, error
 		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
 		return nil, errors.New(errorMsg)
 	}
-	conf.FilePath = configFilePath
 	return &conf, nil
 }
