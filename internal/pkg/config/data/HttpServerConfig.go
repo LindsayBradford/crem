@@ -23,7 +23,7 @@ type HttpServerConfig struct {
 	CacheMaximumAgeInSeconds uint64
 	JobQueueLength           uint64
 
-	Loggers []LoggingConfig
+	Logger LoggingConfig
 }
 
 func RetrieveHttpServer(configFilePath string) (*HttpServerConfig, error) {

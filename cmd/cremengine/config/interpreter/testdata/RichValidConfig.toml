@@ -1,0 +1,10 @@
+[Engine]
+ApiPort = 3030
+AdminPort = 3031
+CacheMaximumAgeInSeconds = 5
+JobQueueLength = 10
+
+[Engine.Logger]
+Name = "TestLogger"
+[Engine.Logger.LogLevelDestinations]
+Debug = "StandardOutput"

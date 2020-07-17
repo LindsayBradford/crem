@@ -7,7 +7,6 @@ package server
 import (
 	"fmt"
 
-	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -17,13 +16,11 @@ type RestServer struct {
 	adminMux *admin.Mux
 	apiMux   rest.Mux
 
-	configuration *data.HttpServerConfig
-	Logger        logging.Logger
-}
+	cacheMaximumAgeInSeconds uint64
+	apiPort                  uint64
+	adminPort                uint64
 
-func (s *RestServer) WithConfig(configuration *data.HttpServerConfig) *RestServer {
-	s.configuration = configuration
-	return s
+	Logger logging.Logger
 }
 
 func (s *RestServer) Initialise() *RestServer {
@@ -35,6 +32,21 @@ func (s *RestServer) WithApiMux(apiMux rest.Mux) *RestServer {
 	s.adminMux = new(admin.Mux).Initialise()
 	s.apiMux = apiMux
 	s.apiMux.AddHandler("/", s.adminMux.StatusHandler)
+	return s
+}
+
+func (s *RestServer) WithApiPort(apiPort uint64) *RestServer {
+	s.apiPort = apiPort
+	return s
+}
+
+func (s *RestServer) WithAdminPort(adminPort uint64) *RestServer {
+	s.adminPort = adminPort
+	return s
+}
+
+func (s *RestServer) WithCacheMaximumAge(cacheMaximumAge uint64) *RestServer {
+	s.cacheMaximumAgeInSeconds = cacheMaximumAge
 	return s
 }
 
@@ -52,13 +64,13 @@ func (s *RestServer) WithStatus(status admin.ServiceStatus) *RestServer {
 
 func (s *RestServer) Start() {
 	go func() {
-		s.adminMux.WithCacheMaxAge(s.configuration.CacheMaximumAgeInSeconds)
-		startMuxOnPort(s.adminMux, s.configuration.AdminPort)
+		s.adminMux.WithCacheMaxAge(s.cacheMaximumAgeInSeconds)
+		startMuxOnPort(s.adminMux, s.adminPort)
 	}()
 
 	go func() {
-		s.adminMux.WithCacheMaxAge(s.configuration.CacheMaximumAgeInSeconds)
-		startMuxOnPort(s.apiMux, s.configuration.ApiPort)
+		s.adminMux.WithCacheMaxAge(s.cacheMaximumAgeInSeconds)
+		startMuxOnPort(s.apiMux, s.apiPort)
 	}()
 
 	s.adminMux.WaitForShutdownSignal()

@@ -4,7 +4,6 @@ package data
 
 import (
 	"fmt"
-
 	"github.com/BurntSushi/toml"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
@@ -83,6 +82,10 @@ func defaultConfig() EngineConfig {
 		data.HttpServerConfig{
 			ApiPort:   8080,
 			AdminPort: 8081,
+			Logger: data.LoggingConfig{
+				Type:      data.NativeLibrary,
+				Formatter: data.RawMessage,
+			},
 		},
 	}
 	return config

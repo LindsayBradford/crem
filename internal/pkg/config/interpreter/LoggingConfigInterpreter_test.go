@@ -37,8 +37,8 @@ func TestConfigInterpreter_ValidNativeDefaultingLoggingConfig_NoErrors(t *testin
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.NativeLibrary,
-		LoggingFormatter: data.Json,
+		Type:      data.NativeLibrary,
+		Formatter: data.Json,
 	}
 
 	// when
@@ -62,8 +62,8 @@ func TestConfigInterpreter_ValidBareBonesDefaultingLoggingConfig_NoErrors(t *tes
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.BareBones,
-		LoggingFormatter: data.NameValuePair,
+		Type:      data.BareBones,
+		Formatter: data.NameValuePair,
 	}
 
 	// when
@@ -87,8 +87,8 @@ func TestConfigInterpreter_InvalidLoggingTypeConfig_Panics(t *testing.T) {
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.LoggerType{Value: "NotRecognised"},
-		LoggingFormatter: data.NameValuePair,
+		Type:      data.LoggerType{Value: "NotRecognised"},
+		Formatter: data.NameValuePair,
 	}
 
 	// when
@@ -107,8 +107,8 @@ func TestConfigInterpreter_InvalidLoggingFormatterConfig_Panics(t *testing.T) {
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.BareBones,
-		LoggingFormatter: data.FormatterType{"Unrecognised"},
+		Type:      data.BareBones,
+		Formatter: data.FormatterType{"Unrecognised"},
 	}
 
 	interpreterUnderTest := NewLoggingConfigInterpreter()
@@ -127,8 +127,8 @@ func TestConfigInterpreter_ValidLoggingConfigWithLogLevelDestinations_NoErrors(t
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.BareBones,
-		LoggingFormatter: data.RawMessage,
+		Type:      data.BareBones,
+		Formatter: data.RawMessage,
 		LogLevelDestinations: map[string]string{
 			"Debugging":   "StandardError",
 			"Information": "StandardOutput",
@@ -154,8 +154,8 @@ func TestConfigInterpreter_InvalidLogLevelDestinations_Errors(t *testing.T) {
 
 	// given
 	configUnderTest := data.LoggingConfig{
-		LoggingType:      data.BareBones,
-		LoggingFormatter: data.RawMessage,
+		Type:      data.BareBones,
+		Formatter: data.RawMessage,
 		LogLevelDestinations: map[string]string{
 			"Debugging": "NotAValidDestination",
 		},

@@ -47,6 +47,10 @@ func (i *LoggingConfigInterpreter) initialise() *LoggingConfigInterpreter {
 }
 
 func (i *LoggingConfigInterpreter) Interpret(config *data.LoggingConfig) *LoggingConfigInterpreter {
+	if config == nil {
+		return i
+	}
+
 	i.deriveLogHandler(config)
 	i.deriveLogLevelDestinations(config)
 	i.logger, _ = i.loggerBuilder.Build()
@@ -55,8 +59,8 @@ func (i *LoggingConfigInterpreter) Interpret(config *data.LoggingConfig) *Loggin
 }
 
 func (i *LoggingConfigInterpreter) deriveLogHandler(config *data.LoggingConfig) {
-	formatter := deriveLogFormatter(config.LoggingFormatter)
-	switch config.LoggingType {
+	formatter := deriveLogFormatter(config.Formatter)
+	switch config.Type {
 	case data.NativeLibrary, data.UnspecifiedLoggerType:
 		i.loggerBuilder.
 			ForNativeLibraryLogHandler().

@@ -3,3 +3,12 @@ ApiPort = 3030
 AdminPort = 3031
 CacheMaximumAgeInSeconds = 5
 JobQueueLength = 10
+
+[Engine.Logger]
+Type = "NativeLibrary"  # "NativeLibrary" (default) | "BareBones"
+Formatter = "RawMessage"  # "JSON" | "NameValuePair" | "RawMessage" (default)
+[Engine.Logger.LogLevelDestinations]
+Debugging = "StandardError"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput" # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"    # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"      # "Discarded"  | "StandardOutput" | "StandardError" (Default)

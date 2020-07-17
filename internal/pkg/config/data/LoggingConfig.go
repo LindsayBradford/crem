@@ -3,8 +3,8 @@
 package data
 
 type LoggingConfig struct {
-	LoggingType          LoggerType
-	LoggingFormatter     FormatterType
+	Type                 LoggerType
+	Formatter            FormatterType
 	LogLevelDestinations map[string]string
 }
 
@@ -20,7 +20,7 @@ var (
 
 func (lt *LoggerType) UnmarshalText(text []byte) error {
 	context := UnmarshalContext{
-		ConfigKey: "[[Loggers]].Type",
+		ConfigKey: "Type",
 		ValidValues: []string{
 			NativeLibrary.Value, BareBones.Value,
 		},
@@ -46,7 +46,7 @@ var (
 
 func (ft *FormatterType) UnmarshalText(text []byte) error {
 	context := UnmarshalContext{
-		ConfigKey: "[[Loggers]].Formatter",
+		ConfigKey: "Formatter",
 		ValidValues: []string{
 			RawMessage.Value, Json.Value, NameValuePair.Value,
 		},
