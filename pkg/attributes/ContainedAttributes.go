@@ -23,7 +23,11 @@ func (ca *ContainedAttributes) RenameAttribute(currentName string, newName strin
 }
 
 func (ca *ContainedAttributes) ReplaceAttribute(name string, value interface{}) {
-	ca.attributes = ca.attributes.Replace(name, value)
+	if ca.HasAttribute(name) {
+		ca.attributes = ca.attributes.Replace(name, value)
+	} else {
+		ca.AddAttribute(name, value)
+	}
 }
 
 func (ca *ContainedAttributes) RemoveAttribute(name string) {

@@ -5,10 +5,10 @@ package interpreter
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/config"
 	"github.com/LindsayBradford/crem/cmd/cremengine/engine"
+	"github.com/LindsayBradford/crem/cmd/cremengine/engine/api"
 	data2 "github.com/LindsayBradford/crem/internal/pkg/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
-	"github.com/LindsayBradford/crem/internal/pkg/server/api"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
@@ -58,9 +58,9 @@ func (i *EngineConfigInterpreter) buildEngine(engineConfig data2.HttpServerConfi
 	apiMux := buildApiMux(engineConfig)
 
 	i.engine = engine.NewBaseEngine().
+		WithApiPort(engineConfig.ApiPort).
 		WithAdminPort(engineConfig.AdminPort).
 		WithApiMux(apiMux).
-		WithApiPort(engineConfig.ApiPort).
 		WithCacheMaximumAge(engineConfig.CacheMaximumAgeInSeconds).
 		WithLogHandler(ServerLogger).
 		WithStatus(engineStatus)
@@ -69,12 +69,7 @@ func (i *EngineConfigInterpreter) buildEngine(engineConfig data2.HttpServerConfi
 }
 
 func buildApiMux(serverConfig data2.HttpServerConfig) *api.Mux {
-	// TODO: Build engine-specific apiMux.
 	return new(api.Mux).Initialise()
-	//	return new(api.Mux).
-	//		Initialise().
-	//		WithJobQueueLength(serverConfig.JobQueueLength).
-	//		WithMainThreadChannel(&mainThreadChannel)
 }
 
 func (i *EngineConfigInterpreter) Engine() engine.Engine {

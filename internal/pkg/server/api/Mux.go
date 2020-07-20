@@ -8,8 +8,7 @@ import (
 
 const muxType = "API"
 
-const BasePath = "/api"
-const V1Path = "/v1"
+const BasePath = "api"
 
 type Mux struct {
 	rest.MuxImpl

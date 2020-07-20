@@ -57,6 +57,12 @@ func (r *Response) WithContentType(contentType string) *Response {
 	return r
 }
 
+func (r *Response) WithTextContent(content string) *Response {
+	r.WithContentType(TextMimeType)
+	r.Content = content
+	return r
+}
+
 func (r *Response) WithJsonContent(content interface{}) *Response {
 	r.WithContentType(JsonMimeType)
 
