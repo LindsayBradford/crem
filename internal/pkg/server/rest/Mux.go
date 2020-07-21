@@ -131,7 +131,7 @@ func (mi *MuxImpl) RespondWithError(responseCode int, responseMsg string, w http
 		WithWriter(w).
 		WithResponseCode(responseCode).
 		WithJsonContent(
-			ErrorResponse{ErrorMessage: responseMsg, Time: FormattedTimestamp()},
+			MessageResponse{Message: responseMsg, Time: FormattedTimestamp()},
 		)
 
 	writeError := restResponse.Write()

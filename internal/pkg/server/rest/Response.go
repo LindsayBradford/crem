@@ -11,9 +11,9 @@ import (
 	errors2 "github.com/pkg/errors"
 )
 
-type ErrorResponse struct {
-	ErrorMessage string
-	Time         string
+type MessageResponse struct {
+	Message string
+	Time    string
 }
 
 type Response struct {

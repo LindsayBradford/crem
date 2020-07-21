@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/LindsayBradford/crem/cmd/cremengine/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
 	"io/ioutil"
@@ -48,6 +49,16 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestContent := requestBodyToString(r)
+	config, retrieveError := data.RetrieveScenarioConfigFromString(requestContent)
+
+	if retrieveError != nil {
+		wrappingError := errors.Wrap(retrieveError, "v1 POST scenario handler")
+		m.Logger().Error(wrappingError)
+		m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
+		return
+	}
+
+	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] retrieved")
 
 	m.ReplaceAttribute(scenarioTextKey, requestContent)
 
@@ -56,7 +67,12 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent("scenario configuration updated")
+		WithJsonContent(
+			rest.MessageResponse{
+				Message: "Scenario configuration successfully posted",
+				Time:    rest.FormattedTimestamp(),
+			},
+		)
 
 	m.Logger().Debug("Responding with scenario configuration receipt acknowledgement ")
 	writeError := restResponse.Write()

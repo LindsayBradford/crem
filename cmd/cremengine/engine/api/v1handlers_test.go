@@ -64,7 +64,7 @@ func TestPostScenarioResource_NotAllowedResponse(t *testing.T) {
 	verifyResponseStatusCode(muxUnderTest, postContext)
 }
 
-func TestPostScenarioResource_OkResponse(t *testing.T) {
+func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
@@ -77,9 +77,30 @@ func TestPostScenarioResource_OkResponse(t *testing.T) {
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
 			RequestBody: scenarioTomlText,
-			ContentType: rest.TextMimeType,
+			ContentType: rest.TomlMimeType,
 		},
-		ExpectedResponseStatus: http.StatusMethodNotAllowed,
+		ExpectedResponseStatus: http.StatusOK,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+}
+
+func TestPostScenarioTextResource_BadRequestResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+
+	// when
+	postContext := TestContext{
+		Name: "POST /scenario text request returns 200 (ok) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: "This isn't TOML",
+			ContentType: rest.TomlMimeType,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
 	}
 
 	// then
@@ -89,23 +110,25 @@ func TestPostScenarioResource_OkResponse(t *testing.T) {
 func TestScenarioResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
+	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
 
+	// when
 	postContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: "here is some text",
+			RequestBody: scenarioTomlText,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
 	}
 
 	// then
-
 	verifyResponseStatusCode(muxUnderTest, postContext)
 
+	// when
 	getContext := TestContext{
 		Name: "GET /scenario request returns 200 (ok) response",
 		T:    t,
