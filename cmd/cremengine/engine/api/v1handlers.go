@@ -31,7 +31,7 @@ func (m *Mux) v1GetScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithTextContent(responseText)
+		WithTomlContent(responseText)
 
 	m.Logger().Debug("Responding with current scenario configuration")
 	writeError := restResponse.Write()
@@ -43,7 +43,12 @@ func (m *Mux) v1GetScenarioHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
+	if m.requestContentTypeWasNotToml(r, w) {
+		return
+	}
+
 	requestContent := requestBodyToString(r)
+
 	m.ReplaceAttribute(scenarioTextKey, requestContent)
 
 	restResponse := new(rest.Response).
@@ -60,6 +65,14 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
 		m.Logger().Error(wrappingError)
 	}
+}
+
+func (m *Mux) requestContentTypeWasNotToml(r *http.Request, w http.ResponseWriter) bool {
+	if r.Header.Get(rest.ContentTypeHeaderKey) != rest.TomlMimeType {
+		m.MethodNotAllowedError(w, r)
+		return true
+	}
+	return false
 }
 
 func requestBodyToString(r *http.Request) string {

@@ -3,11 +3,11 @@
 package testing
 
 import (
+	"github.com/LindsayBradford/crem/pkg/threading"
 	"os"
 	"os/exec"
 	"testing"
 
-	"github.com/LindsayBradford/crem/pkg/threading"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
 )
