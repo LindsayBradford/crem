@@ -34,7 +34,8 @@ func (m *Mux) v1GetScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		WithCacheControlMaxAge(m.CacheMaxAge()).
 		WithTomlContent(responseText)
 
-	m.Logger().Debug("Responding with current scenario configuration")
+	scenarioName := m.Attribute(scenarioNameKey).(string)
+	m.Logger().Info("Responding with scenario [" + scenarioName + "] configuration")
 	writeError := restResponse.Write()
 
 	if writeError != nil {
@@ -58,7 +59,8 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] retrieved")
+	m.ReplaceAttribute(scenarioNameKey, config.Scenario.Name)
+	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] successfully retrieved")
 
 	m.ReplaceAttribute(scenarioTextKey, requestContent)
 
@@ -74,7 +76,7 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		)
 
-	m.Logger().Debug("Responding with scenario configuration receipt acknowledgement ")
+	m.Logger().Info("Responding with acknowledgement of scenario configuration receipt")
 	writeError := restResponse.Write()
 
 	if writeError != nil {

@@ -90,8 +90,8 @@ func (mi *MuxImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (mi *MuxImpl) logRequestReceipt(r *http.Request) {
 	mi.logger.Info(
-		"[" + mi.muxType + "] Received request Method [" + r.Method +
-			"] for request [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
+		"[" + mi.muxType + "] multiplexer processing request: method [" + r.Method +
+			"] on resource [" + r.URL.Path + "] from [" + r.RemoteAddr + "].")
 }
 
 func (mi *MuxImpl) handlerFor(r *http.Request) (handlerFunction HandlerFunc, found bool) {
@@ -149,7 +149,7 @@ func (mi *MuxImpl) logResponseError(r *http.Request, responseMsg string) {
 }
 
 func (mi *MuxImpl) Start(address string) {
-	mi.logger.Debug("Starting [" + mi.muxType + "] server on address [" + address + "]")
+	mi.logger.Debug("Starting [" + mi.muxType + "] multiplexer on port [" + address + "]")
 
 	mi.server = http.Server{Addr: address, Handler: mi}
 

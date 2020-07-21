@@ -43,14 +43,13 @@ func (m *Mux) WithType(muxType string) *Mux {
 	return m
 }
 
-func (m *Mux) setStatus(statusMessage string) {
-	m.Logger().Info("Changed server Status to [" + statusMessage + "]")
+func (m *Mux) SetStatus(statusMessage string) {
+	m.Logger().Info("Changing server status to [" + statusMessage + "]")
 	m.Status.Status = statusMessage
 	m.UpdateStatusTime()
 }
 
 func (m *Mux) Start(address string) {
-	m.setStatus("RUNNING")
 	m.MuxImpl.Start(address)
 }
 
@@ -82,7 +81,7 @@ func (m *Mux) StatusHandler(w http.ResponseWriter, r *http.Request) {
 		WithCacheControlMaxAge(m.CacheMaxAge()).
 		WithJsonContent(m.Status)
 
-	m.Logger().Debug("Responding with status [" + m.Status.Status + "]")
+	m.Logger().Info("Responding with status [" + m.Status.Status + "]")
 	writeError := restResponse.Write()
 
 	if writeError != nil {
@@ -124,5 +123,5 @@ func (m *Mux) UpdateStatusTime() {
 
 func (m *Mux) Shutdown() {
 	m.Server().Shutdown(context.Background())
-	m.setStatus("DEAD")
+	m.SetStatus("DEAD")
 }

@@ -64,14 +64,16 @@ func (s *RestServer) WithStatus(status admin.ServiceStatus) *RestServer {
 
 func (s *RestServer) Start() {
 	go func() {
-		s.adminMux.WithCacheMaxAge(s.cacheMaximumAgeInSeconds)
-		startMuxOnPort(s.adminMux, s.adminPort)
+		s.apiMux.SetCacheMaxAge(s.cacheMaximumAgeInSeconds)
+		startMuxOnPort(s.apiMux, s.apiPort)
 	}()
 
 	go func() {
-		s.adminMux.WithCacheMaxAge(s.cacheMaximumAgeInSeconds)
-		startMuxOnPort(s.apiMux, s.apiPort)
+		s.adminMux.SetCacheMaxAge(s.cacheMaximumAgeInSeconds)
+		startMuxOnPort(s.adminMux, s.adminPort)
 	}()
+
+	s.adminMux.SetStatus("RUNNING")
 
 	s.adminMux.WaitForShutdownSignal()
 	s.shutdown()

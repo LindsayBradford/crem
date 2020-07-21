@@ -3,6 +3,7 @@
 package engine
 
 import (
+	"github.com/LindsayBradford/crem/cmd/cremengine/config"
 	"github.com/LindsayBradford/crem/internal/pkg/server"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
@@ -62,7 +63,7 @@ func (s *BaseEngine) LogHandler() logging.Logger {
 }
 
 func (s *BaseEngine) Run() error {
-	s.LogHandler().Info(rest.NameAndVersionString() + " -- Starting")
+	s.LogHandler().Info(config.NameAndVersionString() + " -- Starting")
 	s.Start()
 	return nil
 }

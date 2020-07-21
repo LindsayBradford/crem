@@ -13,6 +13,7 @@ import (
 const v1Path = "v1"
 
 const scenarioTextKey = "ScenarioText"
+const scenarioNameKey = "ScenarioName"
 
 type JobArray []*job.Job
 
@@ -33,6 +34,11 @@ func (m *Mux) Initialise() *Mux {
 
 func (m *Mux) WithMainThreadChannel(channel *threading.MainThreadChannel) *Mux {
 	m.mainThreadChannel = channel
+	return m
+}
+
+func (m *Mux) WithCacheMaxAge(maxAgeInSeconds uint64) *Mux {
+	m.MuxImpl.WithCacheMaxAge(maxAgeInSeconds)
 	return m
 }
 
