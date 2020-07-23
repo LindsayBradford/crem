@@ -3,6 +3,7 @@
 package api
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
@@ -11,6 +12,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/threading"
+	"io/ioutil"
+	"net/http"
 )
 
 const v1Path = "v1"
@@ -26,7 +29,9 @@ type Mux struct {
 
 	modelConfigInterpreter *interpreter.ModelConfigInterpreter
 	model                  *catchment.Model
-	jsonMarshaler          json.Marshaler
+	modelSolution          *solution.Solution
+
+	jsonMarshaler json.Marshaler
 
 	attributes.ContainedAttributes
 }
@@ -60,4 +65,9 @@ func buildV1ApiPath(pathElements ...string) string {
 	}
 
 	return builtPath
+}
+
+func requestBodyToString(r *http.Request) string {
+	responseBodyBytes, _ := ioutil.ReadAll(r.Body)
+	return string(responseBodyBytes)
 }
