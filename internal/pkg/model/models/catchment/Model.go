@@ -3,8 +3,13 @@
 package catchment
 
 import (
+	errors2 "errors"
+	"github.com/LindsayBradford/crem/internal/pkg/dataset"
+	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/excel"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -27,7 +32,7 @@ func NewModel() *Model {
 }
 
 type Model struct {
-	sourceDataSet      excel.DataSet
+	sourceDataSet      dataset.DataSet
 	oleFunctionWrapper threading.MainThreadFunctionWrapper
 	CoreModel
 }
@@ -45,9 +50,24 @@ func (m *Model) WithParameters(params baseParameters.Map) *Model {
 func (m *Model) Initialise() {
 	m.note("Initialising")
 
-	m.loadSourceDataSet()
+	loadError := m.loadSourceDataSet()
+	if loadError != nil {
+		m.parameters.AddValidationErrorMessage(loadError.Error())
+		return
+	}
 	m.CoreModel.Initialise()
 	m.RandomlyInitialiseActions()
+}
+
+func (m *Model) InitialiseToAsIsState() {
+	m.note("Initialising")
+
+	loadError := m.loadSourceDataSet()
+	if loadError != nil {
+		m.parameters.AddValidationErrorMessage(loadError.Error())
+		return
+	}
+	m.CoreModel.Initialise()
 }
 
 func (m *Model) RandomlyInitialiseActions() {
@@ -56,11 +76,45 @@ func (m *Model) RandomlyInitialiseActions() {
 	m.initialising = false
 }
 
-func (m *Model) loadSourceDataSet() {
-	m.sourceDataSet = *excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
+func (m *Model) loadSourceDataSet() error {
 	dataSourcePath := m.deriveDataSourcePath()
-	m.sourceDataSet.Load(dataSourcePath)
-	m.WithSourceDataSet(&m.sourceDataSet)
+	pathExtension := strings.ToLower(path.Ext(dataSourcePath))
+	switch pathExtension {
+	case ".csv":
+		return m.loadCsvSourceDataSet(dataSourcePath)
+	case ".xlsx":
+		return m.loadExcelSourceDataSet(dataSourcePath)
+	default:
+		return errors2.New("Source data file not supported: Initialisation failed")
+	}
+}
+
+func (m *Model) loadCsvSourceDataSet(dataSourcePath string) error {
+	dataSet := csv.NewDataSet("CatchmentDataSet")
+
+	loadError := dataSet.Load(dataSourcePath)
+	if loadError != nil {
+		return loadError
+	}
+
+	m.sourceDataSet = dataSet
+	m.WithSourceDataSet(m.sourceDataSet)
+
+	return nil
+}
+
+func (m *Model) loadExcelSourceDataSet(dataSourcePath string) error {
+	dataSet := excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
+
+	loadError := dataSet.Load(dataSourcePath)
+	if loadError != nil {
+		return loadError
+	}
+
+	m.sourceDataSet = dataSet
+	m.WithSourceDataSet(m.sourceDataSet)
+
+	return nil
 }
 
 func (m *Model) deriveDataSourcePath() string {

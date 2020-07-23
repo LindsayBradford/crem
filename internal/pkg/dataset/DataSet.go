@@ -12,6 +12,7 @@ type DataSet interface {
 	Tables() map[string]Table
 	Table(name string) (Table, error)
 	AddTable(name string, table Table) error
+	Teardown()
 }
 
 func NewDataSet(name string) DataSet {
@@ -52,4 +53,8 @@ func (dsi *DataSetImpl) AddTable(name string, table Table) error {
 
 	dsi.tables[name] = table
 	return nil
+}
+
+func (dsi *DataSetImpl) Teardown() {
+	// deliberately does nothing
 }

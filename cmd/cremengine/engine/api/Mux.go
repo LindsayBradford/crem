@@ -3,6 +3,9 @@
 package api
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
+	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	serverApi "github.com/LindsayBradford/crem/internal/pkg/server/api"
 	"github.com/LindsayBradford/crem/internal/pkg/server/job"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
@@ -21,13 +24,20 @@ type Mux struct {
 	serverApi.Mux
 	mainThreadChannel *threading.MainThreadChannel
 
+	modelConfigInterpreter *interpreter.ModelConfigInterpreter
+	model                  *catchment.Model
+	jsonMarshaler          json.Marshaler
+
 	attributes.ContainedAttributes
 }
 
 func (m *Mux) Initialise() *Mux {
 	m.Mux.Initialise()
 
+	m.modelConfigInterpreter = interpreter.NewModelConfigInterpreter()
+
 	m.AddHandler(buildV1ApiPath("scenario"), m.v1scenarioHandler)
+	m.AddHandler(buildV1ApiPath("model"), m.v1modelHandler)
 
 	return m
 }

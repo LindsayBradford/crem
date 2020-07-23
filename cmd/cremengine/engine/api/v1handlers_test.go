@@ -4,11 +4,13 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
-	"github.com/onsi/gomega"
+	"github.com/LindsayBradford/crem/pkg/threading"
+	. "github.com/onsi/gomega"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 )
 
 const (
@@ -67,6 +69,7 @@ func TestPostScenarioResource_NotAllowedResponse(t *testing.T) {
 func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
+
 	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
@@ -107,9 +110,10 @@ func TestPostScenarioTextResource_BadRequestResponse(t *testing.T) {
 	verifyResponseStatusCode(muxUnderTest, postContext)
 }
 
-func TestScenarioResource_OkResponse(t *testing.T) {
+func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
+
 	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
@@ -145,16 +149,19 @@ func TestScenarioResource_OkResponse(t *testing.T) {
 }
 
 func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) {
-	g := gomega.NewGomegaWithT(context.T)
+	g := NewGomegaWithT(context.T)
 
-	responseContainer := sendRequest(muxUnderTest, context.Request)
+	var responseContainer httptest.JsonResponseContainer
 
-	g.Expect(responseContainer.StatusCode).To(gomega.BeNumerically("==", context.ExpectedResponseStatus),
+	responseContainer = sendRequest(muxUnderTest, context.Request)
+
+	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", context.ExpectedResponseStatus),
 		context.Name+" should return status "+strconv.Itoa(context.ExpectedResponseStatus))
 }
 
 func buildMuxUnderTest() *Mux {
-	muxUnderTest := new(Mux).Initialise()
+	mainThreadChannel := threading.GetMainThreadChannel()
+	muxUnderTest := new(Mux).Initialise().WithMainThreadChannel(&mainThreadChannel)
 	muxUnderTest.SetLogger(loggers.DefaultTestingLogger)
 	return muxUnderTest
 }
@@ -169,4 +176,14 @@ func readTestFileAsText(filePath string) string {
 		return string(b)
 	}
 	return "error reading file"
+}
+
+func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer httptest.JsonResponseContainer) {
+	responseTimeString, ok := responseContainer.JsonMap["Time"].(string)
+	g.Expect(ok).To(Equal(true), " should return a string encoding of time")
+
+	responseTime, parseErr := time.Parse(time.RFC3339Nano, responseTimeString)
+	g.Expect(parseErr).To(BeNil(), " should return a RFC3339Nano encoded string of time")
+
+	g.Expect(responseTime).To(BeTemporally("~", time.Now(), time.Millisecond*5), " should return status time of about now")
 }
