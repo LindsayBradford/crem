@@ -31,7 +31,7 @@ func (s *RestServer) Initialise() *RestServer {
 func (s *RestServer) WithApiMux(apiMux rest.Mux) *RestServer {
 	s.adminMux = new(admin.Mux).Initialise()
 	s.apiMux = apiMux
-	s.apiMux.AddHandler("/", s.adminMux.StatusHandler)
+	s.apiMux.AddHandler("^/$", s.adminMux.StatusHandler)
 	return s
 }
 

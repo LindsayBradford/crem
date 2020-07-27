@@ -5,6 +5,7 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -35,7 +36,12 @@ type MuxImpl struct {
 	logger     logging.Logger
 }
 
-type HandlerFunctionMap map[string]HandlerFunc
+type HandlerFunctionMap map[*regexp.Regexp]HandlerFunc
+
+func (m HandlerFunctionMap) AddHandler(addressPattern string, handler HandlerFunc) {
+	compiledPattern := regexp.MustCompile("^" + addressPattern + "$")
+	m[compiledPattern] = handler
+}
 
 func (mi *MuxImpl) Initialise() *MuxImpl {
 	mi.HandlerMap = make(HandlerFunctionMap)
@@ -75,10 +81,6 @@ func (mi *MuxImpl) Server() *http.Server {
 	return &mi.server
 }
 
-func (mi *MuxImpl) AddHandler(address string, handler HandlerFunc) {
-	mi.HandlerMap[address] = handler
-}
-
 func (mi *MuxImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	mi.logRequestReceipt(r)
 	if handlerFunction, handlerFound := mi.handlerFor(r); handlerFound {
@@ -95,8 +97,13 @@ func (mi *MuxImpl) logRequestReceipt(r *http.Request) {
 }
 
 func (mi *MuxImpl) handlerFor(r *http.Request) (handlerFunction HandlerFunc, found bool) {
-	handlerFunction, found = mi.HandlerMap[r.URL.Path]
-	return
+	for key := range mi.HandlerMap {
+		matchFound := key.MatchString(r.URL.Path)
+		if matchFound {
+			return mi.HandlerMap[key], true
+		}
+	}
+	return nil, false
 }
 
 func (mi *MuxImpl) NotFoundError(w http.ResponseWriter, r *http.Request) {

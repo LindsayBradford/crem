@@ -3,13 +3,12 @@
 package admin
 
 import (
-	"net/http"
-	"os"
-	"os/signal"
-
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"net/http"
+	"os"
+	"os/signal"
 )
 
 type ServiceStatus struct {
@@ -32,10 +31,14 @@ func (m *Mux) Initialise() *Mux {
 	m.MuxImpl.Initialise().WithType(muxType)
 
 	m.doneChannel = make(chan bool)
-	m.HandlerMap["/status"] = m.StatusHandler
-	m.HandlerMap["/shutdown"] = m.shutdownHandler
+	m.AddHandler("/status", m.StatusHandler)
+	m.AddHandler("/shutdown", m.shutdownHandler)
 
 	return m
+}
+
+func (m *Mux) AddHandler(addressPattern string, handler rest.HandlerFunc) {
+	m.HandlerMap.AddHandler(addressPattern, handler)
 }
 
 func (m *Mux) WithType(muxType string) *Mux {

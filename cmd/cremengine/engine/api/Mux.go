@@ -41,8 +41,9 @@ func (m *Mux) Initialise() *Mux {
 
 	m.modelConfigInterpreter = interpreter.NewModelConfigInterpreter()
 
-	m.AddHandler(buildV1ApiPath("scenario"), m.v1scenarioHandler)
 	m.AddHandler(buildV1ApiPath("model"), m.v1modelHandler)
+	m.AddHandler(buildV1ApiPath("scenario"), m.v1scenarioHandler)
+	m.AddHandler(buildV1ApiPath("model/subcatchment/\\d+"), m.v1subcatchmentHandler)
 
 	return m
 }
@@ -64,7 +65,11 @@ func buildV1ApiPath(pathElements ...string) string {
 		builtPath = builtPath + rest.UrlPathSeparator + element
 	}
 
-	return builtPath
+	return "^" + builtPath + "$"
+}
+
+func (m *Mux) AddHandler(address string, handler rest.HandlerFunc) {
+	m.HandlerMap.AddHandler(address, handler)
 }
 
 func requestBodyToString(r *http.Request) string {
