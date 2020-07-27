@@ -72,7 +72,11 @@ func (m *Mux) AddHandler(address string, handler rest.HandlerFunc) {
 	m.HandlerMap.AddHandler(address, handler)
 }
 
-func requestBodyToString(r *http.Request) string {
+func requestBodyToBytes(r *http.Request) []byte {
 	responseBodyBytes, _ := ioutil.ReadAll(r.Body)
-	return string(responseBodyBytes)
+	return responseBodyBytes
+}
+
+func requestBodyToString(r *http.Request) string {
+	return string(requestBodyToBytes(r))
 }
