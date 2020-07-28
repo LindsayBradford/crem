@@ -24,20 +24,29 @@ func (m *Mux) v1subcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) v1GetSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
-	if m.modelSolution == nil {
-		m.NotFoundError(w, r)
-		return
-	}
-
 	pathElements := strings.Split(r.URL.Path, rest.UrlPathSeparator)
 	lastElementIndex := len(pathElements) - 1
 	subCatchment := pathElements[lastElementIndex]
 
-	scenarioName := m.Attribute(scenarioNameKey).(string)
-	m.Logger().Info("Responding with model [" + scenarioName + "] subcatchment [" + subCatchment + "] state")
+	if m.modelSolution == nil {
+		m.Logger().Warn("Attempted to request subcatchment [" + subCatchment + "] state with no model present")
+		m.NotFoundError(w, r)
+		return
+	}
 
 	subCatchmentAsInteger, convertError := strconv.Atoi(subCatchment)
 	if convertError != nil {
+		panic("Should not reach here -- regular expression map should stop non-integers from being passed to handler")
+	}
+
+	var subCatchmentFound bool
+	for _, action := range m.model.ManagementActions() {
+		if action.PlanningUnit() == planningunit.Id(subCatchmentAsInteger) {
+			subCatchmentFound = true
+		}
+	}
+	if !subCatchmentFound {
+		m.Logger().Warn("Attempted to request subcatchment [" + subCatchment + "] state not offered by the model")
 		m.NotFoundError(w, r)
 		return
 	}
@@ -63,8 +72,11 @@ func (m *Mux) v1GetSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 
 	writeError := restResponse.Write()
 
+	scenarioName := m.Attribute(scenarioNameKey).(string)
+	m.Logger().Info("Responding with model [" + scenarioName + "] subcatchment [" + subCatchment + "] state")
+
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model handler")
+		wrappingError := errors.Wrap(writeError, "v1 subcatchment handler")
 		m.Logger().Error(wrappingError)
 	}
 }
