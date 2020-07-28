@@ -12,12 +12,17 @@ import (
 	"strings"
 )
 
+const (
+	ActiveAction   = "Active"
+	InactiveAction = "Inactive"
+)
+
 func (m *Mux) v1subcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		m.v1PostSubcatchmentHandler(w, r)
 	case http.MethodGet:
 		m.v1GetSubcatchmentHandler(w, r)
+	case http.MethodPost:
+		m.v1PostSubcatchmentHandler(w, r)
 	default:
 		m.MethodNotAllowedError(w, r)
 	}
@@ -26,41 +31,43 @@ func (m *Mux) v1subcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Mux) v1GetSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	pathElements := strings.Split(r.URL.Path, rest.UrlPathSeparator)
 	lastElementIndex := len(pathElements) - 1
-	subCatchment := pathElements[lastElementIndex]
+	subCatchmentAsString := pathElements[lastElementIndex]
 
 	if m.modelSolution == nil {
-		m.Logger().Warn("Attempted to request subcatchment [" + subCatchment + "] state with no model present")
+		m.Logger().Warn("Attempted to request subcatchment [" + subCatchmentAsString + "] state with no model present")
 		m.NotFoundError(w, r)
 		return
 	}
 
-	subCatchmentAsInteger, convertError := strconv.Atoi(subCatchment)
+	subCatchmentAsInteger, convertError := strconv.Atoi(subCatchmentAsString)
 	if convertError != nil {
 		panic("Should not reach here -- regular expression map should stop non-integers from being passed to handler")
 	}
 
+	subCatchment := planningunit.Id(subCatchmentAsInteger)
+
 	var subCatchmentFound bool
 	for _, action := range m.model.ManagementActions() {
-		if action.PlanningUnit() == planningunit.Id(subCatchmentAsInteger) {
+		if action.PlanningUnit() == subCatchment {
 			subCatchmentFound = true
 		}
 	}
 	if !subCatchmentFound {
-		m.Logger().Warn("Attempted to request subcatchment [" + subCatchment + "] state not offered by the model")
+		m.Logger().Warn("Attempted to request subcatchment [" + subCatchmentAsString + "] state not offered by the model")
 		m.NotFoundError(w, r)
 		return
 	}
 
-	activeActions := m.modelSolution.ActiveManagementActions[planningunit.Id(subCatchmentAsInteger)]
-	inactiveActions := m.modelSolution.InactiveManagementActions[planningunit.Id(subCatchmentAsInteger)]
+	activeActions := m.modelSolution.ActiveManagementActions[subCatchment]
+	inactiveActions := m.modelSolution.InactiveManagementActions[subCatchment]
 
 	returnAttributes := attributes.Attributes{}
 
 	for _, action := range activeActions {
-		returnAttributes = returnAttributes.Add(string(action), "Active")
+		returnAttributes = returnAttributes.Add(string(action), ActiveAction)
 	}
 	for _, action := range inactiveActions {
-		returnAttributes = returnAttributes.Add(string(action), "Inactive")
+		returnAttributes = returnAttributes.Add(string(action), InactiveAction)
 	}
 
 	restResponse := new(rest.Response).
@@ -73,7 +80,7 @@ func (m *Mux) v1GetSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	scenarioName := m.Attribute(scenarioNameKey).(string)
-	m.Logger().Info("Responding with model [" + scenarioName + "] subcatchment [" + subCatchment + "] state")
+	m.Logger().Info("Responding with model [" + scenarioName + "] subcatchment [" + subCatchmentAsString + "] state")
 
 	if writeError != nil {
 		wrappingError := errors.Wrap(writeError, "v1 subcatchment handler")
@@ -89,17 +96,17 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 
 	pathElements := strings.Split(r.URL.Path, rest.UrlPathSeparator)
 	lastElementIndex := len(pathElements) - 1
-	subCatchment := pathElements[lastElementIndex]
+	subCatchmentAsString := pathElements[lastElementIndex]
 
-	subCatchmentAsInteger, convertError := strconv.Atoi(subCatchment)
+	subCatchmentAsInteger, convertError := strconv.Atoi(subCatchmentAsString)
 	if convertError != nil {
-		m.NotFoundError(w, r)
-		return
+		panic("Should not reach here -- regular expression map should stop non-integers from being passed to handler")
 	}
 
+	subCatchment := planningunit.Id(subCatchmentAsInteger)
 	var planningUnitFound bool
 	for _, value := range m.modelSolution.PlanningUnits {
-		if value == planningunit.Id(subCatchmentAsInteger) {
+		if value == subCatchment {
 			planningUnitFound = true
 		}
 	}
@@ -110,7 +117,7 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	scenarioName := m.Attribute(scenarioNameKey).(string)
-	m.Logger().Info("Processing POST of model [" + scenarioName + "] subcatchment [" + subCatchment + "] state")
+	m.Logger().Info("Processing POST of model [" + scenarioName + "] subcatchment [" + subCatchmentAsString + "] state")
 
 	requestContent := requestBodyToBytes(r)
 	postedAttributes := attributes.Attributes{}
@@ -131,7 +138,7 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		if entry.Value != "Inactive" && entry.Value != "Active" {
+		if entry.Value != InactiveAction && entry.Value != ActiveAction {
 			baseError := errors.New("For named action [" + entry.Name + "], value [" + entry.Value.(string) + "] not one of [Active,Inactive]")
 			wrappingError := errors.Wrap(baseError, "v1 POST subcatchment handler")
 			m.Logger().Error(wrappingError)
@@ -141,21 +148,21 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	for actionIndex, action := range m.model.ManagementActions() {
-		if planningunit.Id(subCatchmentAsInteger) != action.PlanningUnit() {
+		if subCatchment != action.PlanningUnit() {
 			continue
 		}
 
 		for _, entry := range postedAttributes {
 			if entry.Name == string(action.Type()) {
-				if entry.Value == "Inactive" {
+				if entry.Value == InactiveAction {
 					m.model.SetManagementAction(actionIndex, false)
 					m.model.AcceptAll()
-					m.Logger().Info("Model subcatchment [" + subCatchment + "], Action [" + entry.Name + "], set to [" + entry.Value.(string) + "]")
+					m.Logger().Info("Model subcatchment [" + subCatchmentAsString + "], Action [" + entry.Name + "], set to [" + entry.Value.(string) + "]")
 				}
-				if entry.Value == "Active" {
+				if entry.Value == ActiveAction {
 					m.model.SetManagementAction(actionIndex, true)
 					m.model.AcceptAll()
-					m.Logger().Info("Model subcatchment [" + subCatchment + "], Action [" + entry.Name + "], set to [" + entry.Value.(string) + "]")
+					m.Logger().Info("Model subcatchment [" + subCatchmentAsString + "], Action [" + entry.Name + "], set to [" + entry.Value.(string) + "]")
 				}
 			}
 		}
