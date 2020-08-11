@@ -4,14 +4,14 @@ OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
 OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
-ReportEveryNumberOfIterations = 1
+ReportEveryNumberOfIterations = 100
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
 #Model = "StandardOutput"
 
 [Annealer]
-Type="Suppapitnarm"
+Type="AveragedSuppapitnarm"
 [Annealer.Parameters]
 ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 10.0 #10
