@@ -44,7 +44,7 @@ const (
 	MaximumSedimentProduction            = "MaximumSedimentProduction"
 	MaximumImplementationCost            = "MaximumImplementationCost"
 	MaximumOpportunityCost               = "MaximumOpportunityCost"
-	MaximumParticulateNitrogenProduction = "MaximumSedimentProduction"
+	MaximumParticulateNitrogenProduction = "MaximumParticulateNitrogenProduction"
 )
 
 func ParameterSpecifications() *Specifications {
@@ -111,9 +111,15 @@ func ParameterSpecifications() *Specifications {
 		},
 	).Add(
 		Specification{
-			Key:          HillSlopeBevegetationProportionTarget,
+			Key:          HillSlopeRevegetationProportionTarget,
 			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(0.75),
+		},
+	).Add(
+		Specification{
+			Key:          HillSlopeDeliveryRatio,
+			Validator:    IsDecimalBetweenZeroAndOne,
+			DefaultValue: float64(0.05),
 		},
 	).Add(
 		Specification{
