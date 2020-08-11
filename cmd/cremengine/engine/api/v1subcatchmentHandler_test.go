@@ -37,6 +37,7 @@ func TestFirstSubcatchmentGetRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, context)
+	muxUnderTest.Shutdown()
 }
 
 func TestMissingSubcatchmentGetRequest_NotFoundResponse(t *testing.T) {
@@ -58,6 +59,7 @@ func TestMissingSubcatchmentGetRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestInvalidSubcatchmentGetRequest_NotFoundResponse(t *testing.T) {
@@ -79,6 +81,7 @@ func TestInvalidSubcatchmentGetRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestDeleteValidSubcathmentResource_BadMethodResponse(t *testing.T) {
@@ -99,6 +102,7 @@ func TestDeleteValidSubcathmentResource_BadMethodResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestGetValidSubcathmentResource_OkResponse(t *testing.T) {
@@ -119,6 +123,7 @@ func TestGetValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 
 	// TODO: Limitation of current test framework is that I can't easily get to response content.
 	// TODO: Consider retrieval of response body and interrogating its Json payload for expected action state.
@@ -142,6 +147,7 @@ func TestFirstSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, context)
+	muxUnderTest.Shutdown()
 }
 
 func TestMissingSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
@@ -163,6 +169,7 @@ func TestMissingSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
@@ -184,6 +191,7 @@ func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
@@ -213,6 +221,7 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestPostInvalidSubcatchmentJson_OkResponse(t *testing.T) {
@@ -237,6 +246,7 @@ func TestPostInvalidSubcatchmentJson_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestPostInvalidSubcatchmentActionResource_OkResponse(t *testing.T) {
@@ -264,6 +274,7 @@ func TestPostInvalidSubcatchmentActionResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func TestPostInvalidSubcatchmentActionStateResource_OkResponse(t *testing.T) {
@@ -291,6 +302,7 @@ func TestPostInvalidSubcatchmentActionStateResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
 
 func buildValidScenario(t *testing.T, muxUnderTest *Mux) {

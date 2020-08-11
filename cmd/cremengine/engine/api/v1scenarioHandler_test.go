@@ -42,6 +42,7 @@ func TestFirstScenarioGetRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, context)
+	muxUnderTest.Shutdown()
 }
 
 func TestPostScenarioResource_NotAllowedResponse(t *testing.T) {
@@ -64,6 +65,8 @@ func TestPostScenarioResource_NotAllowedResponse(t *testing.T) {
 	// then
 
 	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
 }
 
 func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
@@ -87,6 +90,8 @@ func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
 }
 
 func TestPostScenarioTextResource_BadRequestResponse(t *testing.T) {
@@ -108,6 +113,8 @@ func TestPostScenarioTextResource_BadRequestResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
 }
 
 func TestPostValidScenarioResource_OkResponse(t *testing.T) {
@@ -146,6 +153,8 @@ func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+
+	muxUnderTest.Shutdown()
 }
 
 func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) {
@@ -160,6 +169,7 @@ func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) {
 }
 
 func buildMuxUnderTest() *Mux {
+	threading.ResetMainThreadChannel()
 	mainThreadChannel := threading.GetMainThreadChannel()
 	muxUnderTest := new(Mux).Initialise().WithMainThreadChannel(&mainThreadChannel)
 	muxUnderTest.SetLogger(loggers.DefaultTestingLogger)

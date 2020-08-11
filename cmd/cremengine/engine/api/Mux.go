@@ -72,6 +72,13 @@ func (m *Mux) AddHandler(address string, handler rest.HandlerFunc) {
 	m.HandlerMap.AddHandler(address, handler)
 }
 
+func (m *Mux) Shutdown() {
+	if m.model != nil {
+		m.model.TearDown()
+	}
+	m.MuxImpl.Shutdown()
+}
+
 func requestBodyToBytes(r *http.Request) []byte {
 	responseBodyBytes, _ := ioutil.ReadAll(r.Body)
 	return responseBodyBytes

@@ -25,6 +25,7 @@ func TestFirstModelGetRequest_NotFoundResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, context)
+	muxUnderTest.Shutdown()
 }
 
 func TestGetValidModelResource_OkResponse(t *testing.T) {
@@ -64,4 +65,5 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
 }
