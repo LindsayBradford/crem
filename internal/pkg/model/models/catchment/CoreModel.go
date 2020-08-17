@@ -16,7 +16,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/implementationcost"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction2"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
@@ -28,7 +27,7 @@ import (
 )
 
 const (
-	PlanningUnitsTableName = "PlanningUnits"
+	SubcatchmentsTableName = "Subcatchments"
 	GulliesTableName       = "Gullies"
 	actionsTableName       = "Actions"
 )
@@ -113,7 +112,7 @@ func (m *CoreModel) ParameterErrors() error {
 }
 
 func (m *CoreModel) Initialise() {
-	m.planningUnitTable = m.fetchCsvTable(PlanningUnitsTableName)
+	m.planningUnitTable = m.fetchCsvTable(SubcatchmentsTableName)
 	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
 	m.actionsTable = m.fetchCsvTable(actionsTableName)
 
@@ -143,16 +142,8 @@ func (m *CoreModel) buildDecisionVariables() {
 		sedimentProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
 	}
 
-	sedimentProduction2 := new(sedimentproduction2.SedimentProduction2).
-		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
-		WithObservers(m)
-
-	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
-		sedimentProduction2.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
-	}
-
 	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
-		WithSedimentProductionVariable(sedimentProduction2).
+		WithSedimentProductionVariable(sedimentProduction).
 		Initialise(m.actionsTable).
 		WithObservers(m)
 
@@ -178,7 +169,7 @@ func (m *CoreModel) buildDecisionVariables() {
 
 	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, sedimentProduction2, nitrogenProduction, implementationCost, opportunityCost,
+		sedimentProduction, nitrogenProduction, implementationCost, opportunityCost,
 	)
 }
 
@@ -219,7 +210,7 @@ func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
 func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 	hillSlopeRestorations := new(actions.HillSlopeRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
-		WithParentSoilsTable(m.actionsTable).
+		WithActionsTable(m.actionsTable).
 		WithParameters(m.parameters).
 		ManagementActions()
 	return hillSlopeRestorations
@@ -229,12 +220,7 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	observers := make([]action.Observer, 0)
 	observers = append(observers, m)
 
-	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
-	if sedimentProductionAsObserver, isObserver := sedimentProduction.(action.Observer); isObserver {
-		observers = append(observers, sedimentProductionAsObserver)
-	}
-
-	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction2.VariableName)
+	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
 	if sedimentProduction2AsObserver, isObserver := sedimentProduction2.(action.Observer); isObserver {
 		observers = append(observers, sedimentProduction2AsObserver)
 	}

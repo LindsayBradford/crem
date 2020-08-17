@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package sedimentproduction2
+package sedimentproduction
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
@@ -36,8 +36,8 @@ func (c *GullyRestorationCommand) WithChange(changeValue float64) *GullyRestorat
 	return c
 }
 
-func (c *GullyRestorationCommand) variable() *SedimentProduction2 {
-	return c.Target().(*SedimentProduction2)
+func (c *GullyRestorationCommand) variable() *SedimentProduction {
+	return c.Target().(*SedimentProduction)
 }
 
 func (c *GullyRestorationCommand) Do() command.CommandStatus {

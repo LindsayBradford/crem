@@ -1,4 +1,4 @@
 TableName, FilePath
-PlanningUnits, TestingPlanningUnits.csv
+Subcatchments, TestingSubcatchments.csv
 Gullies, TestingGullies.csv
-Actions, TestActions.csv
+Actions, TestingActions.csv

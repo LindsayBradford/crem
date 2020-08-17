@@ -63,23 +63,15 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 		return
 	}
 
-	costInDollars := r.calculateImplementationCost(rowNumber)
-	opportunityCostInDollars := r.opportunityCostAttributeValue(planningUnitAsId)
-
-	nitrogenValue := r.nitrogenAttributeValue(planningUnitAsId)
-	carbonValue := r.carbonAttributeValue(planningUnitAsId)
-	deltaCarbonValue := r.deltaCarbonAttributeValue(planningUnitAsId)
-	actionedCarbonValue := carbonValue + deltaCarbonValue
+	opportunityCostInDollars := r.opportunityCost(planningUnitAsId)
+	implementationCostInDollars := r.implementationCost(planningUnitAsId)
 
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
-			WithTotalNitrogen(nitrogenValue).
-			WithOriginalTotalCarbon(carbonValue).
-			WithActionedTotalCarbon(actionedCarbonValue).
-			WithImplementationCost(costInDollars).
+			WithImplementationCost(implementationCostInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }
 
@@ -93,18 +85,4 @@ func (r *RiverBankRestorationGroup) calculateChangeInBufferVegetation(rowNumber 
 	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
 	changeInRiparianVegetation := vegetationTarget - proportionOfRiparianVegetation
 	return changeInRiparianVegetation
-}
-
-func (r *RiverBankRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
-	riparianRevegetationCostPerKlmSquared := r.parameters.GetFloat64(parameters.RiparianRevegetationCostPerKilometer)
-	riverLengthInMetres := r.planningUnitTable.CellFloat64(riverLengthIndex, rowNumber)
-	riverLengthInKilometres := riverLengthInMetres / 1000
-
-	vegetationChange := r.calculateChangeInBufferVegetation(rowNumber)
-
-	vegetationChangeLengthInKilometresSquared := vegetationChange * riverLengthInKilometres
-
-	implementationCost := vegetationChangeLengthInKilometresSquared * riparianRevegetationCostPerKlmSquared
-
-	return implementationCost
 }

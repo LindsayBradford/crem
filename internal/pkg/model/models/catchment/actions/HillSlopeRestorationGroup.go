@@ -27,8 +27,8 @@ func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 	return h
 }
 
-func (h *HillSlopeRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *HillSlopeRestorationGroup {
-	h.Container.WithSourceFilter(HillSlopeSource).WithActionsTable(parentSoilsTable)
+func (h *HillSlopeRestorationGroup) WithActionsTable(actionsTable tables.CsvTable) *HillSlopeRestorationGroup {
+	h.Container.WithSourceFilter(HillSlopeSource).WithActionsTable(actionsTable)
 	return h
 }
 
@@ -54,56 +54,36 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
-	hillSlopeArea := h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
-	vegetationTarget := h.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
-	originalHillSlopeVegetation := h.originalHillSlopeVegetation(rowNumber)
+	opportunityCostInDollars := h.opportunityCost(planningUnitAsId)
+	implementationCostInDollars := h.implementationCost(planningUnitAsId)
 
-	if hillSlopeArea == 0 || originalHillSlopeVegetation >= vegetationTarget {
-		return
-	}
+	originalHillSlopeErosion := h.originalHillSlopeErosion(planningUnitAsId)
+	adjustedOriginalHillSlopeErosion := h.adjustByDeliveryRatio(originalHillSlopeErosion)
+	actionedHillSlopeErosion := h.actionedHillSlopeErosion(planningUnitAsId)
+	adjustedActionedHillSlopeErosion := h.adjustByDeliveryRatio(actionedHillSlopeErosion)
 
-	nitrogenValue := h.nitrogenAttributeValue(planningUnitAsId)
-	carbonValue := h.carbonAttributeValue(planningUnitAsId)
-	deltaCarbonValue := h.deltaCarbonAttributeValue(planningUnitAsId)
-	actionedCarbonValue := carbonValue + deltaCarbonValue
+	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId)
+	adjustedOriginalParticulateNitrogen := h.adjustByDeliveryRatio(originalParticulateNitrogen)
+	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId)
+	adjustedActionedParticulateNitrogen := h.adjustByDeliveryRatio(actionedParticulateNitrogen)
 
-	costInDollars := h.calculateImplementationCost(rowNumber)
-	opportunityCostInDollars := h.opportunityCostAttributeValue(planningUnitAsId)
+	originalFineSediment := h.originalFineSediment(planningUnitAsId)
+	actionedFineSediment := h.originalFineSediment(planningUnitAsId)
 
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithOriginalHillSlopeVegetation(originalHillSlopeVegetation).
-			WithActionedHillSlopeVegetation(vegetationTarget).
-			WithTotalNitrogen(nitrogenValue).
-			WithOriginalTotalCarbon(carbonValue).
-			WithActionedTotalCarbon(actionedCarbonValue).
-			WithImplementationCost(costInDollars).
-			WithOpportunityCost(opportunityCostInDollars)
+			WithOpportunityCost(opportunityCostInDollars).
+			WithImplementationCost(implementationCostInDollars).
+			WithOriginalSedimentErosion(adjustedOriginalHillSlopeErosion).
+			WithActionedSedimentErosion(adjustedActionedHillSlopeErosion).
+			WithOriginalParticulateNitrogen(adjustedOriginalParticulateNitrogen).
+			WithActionedParticulateNitrogen(adjustedActionedParticulateNitrogen).
+			WithOriginalFineSediment(originalFineSediment).
+			WithActionedFineSediment(actionedFineSediment)
 }
 
-func (h *HillSlopeRestorationGroup) originalHillSlopeVegetation(rowNumber uint) float64 {
-	proportionOfRiparianVegetation := h.planningUnitTable.CellFloat64(proportionOfHillSlopeVegetationIndex, rowNumber)
-	return proportionOfRiparianVegetation
-}
-
-func (h *HillSlopeRestorationGroup) calculateChangeInHillSlopeVegetation(rowNumber uint) float64 {
-	proportionOfRiparianVegetation := h.originalHillSlopeVegetation(rowNumber)
-	vegetationTarget := h.parameters.GetFloat64(parameters.HillSlopeBevegetationProportionTarget)
-	changeInRiparianVegetation := vegetationTarget - proportionOfRiparianVegetation
-	return changeInRiparianVegetation
-}
-
-func (h *HillSlopeRestorationGroup) calculateImplementationCost(rowNumber uint) float64 {
-	implementationCostPerKmSquared := h.parameters.GetFloat64(parameters.HillSlopeRestorationCostPerKilometerSquared)
-	hillSlopeAreaInMetresSquared := h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
-	hillSlopeAreaInKilometresSquared := hillSlopeAreaInMetresSquared / 1000
-
-	vegetationChange := h.calculateChangeInHillSlopeVegetation(rowNumber)
-
-	vegetationChangeInKilometresSquared := vegetationChange * hillSlopeAreaInKilometresSquared
-
-	implementationCost := vegetationChangeInKilometresSquared * implementationCostPerKmSquared
-
-	return implementationCost
+func (h *HillSlopeRestorationGroup) adjustByDeliveryRatio(value float64) float64 {
+	sedimentDeliveryRatio := h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio)
+	return value * sedimentDeliveryRatio
 }

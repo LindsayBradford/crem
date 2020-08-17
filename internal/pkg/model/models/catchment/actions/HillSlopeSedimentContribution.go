@@ -5,28 +5,24 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
-	"math"
 )
 
 const (
-	hillSlopeAreaIndex                   = 11
-	proportionOfHillSlopeVegetationIndex = 12
-	hillSlopeRKLSIndex                   = 13
-	hillSlopeDistanceIndex               = 14
+	hillSlopeAreaIndex = 11
 )
 
 type hillSlopeSedimentTracker struct {
-	rkls                         float64
-	originalProportionVegetation float64
-	distanceToCatchment          float64
-	area                         float64
+	area                     float64
+	originalSedimentProduced float64
+	actionedSedimentProduced float64
 }
 
 type HillSlopeSedimentContribution struct {
 	planningUnitTable tables.CsvTable
 	parameters        parameters.Parameters
 
-	contributionMap map[planningunit.Id]hillSlopeSedimentTracker
+	contributionMap       map[planningunit.Id]hillSlopeSedimentTracker
+	sedimentDeliveryRatio float64
 }
 
 func (h *HillSlopeSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
@@ -36,6 +32,7 @@ func (h *HillSlopeSedimentContribution) Initialise(planningUnitTable tables.CsvT
 }
 
 func (h *HillSlopeSedimentContribution) populateContributionMap() {
+	h.sedimentDeliveryRatio = h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio)
 	_, rowCount := h.planningUnitTable.ColumnAndRowSize()
 	h.contributionMap = make(map[planningunit.Id]hillSlopeSedimentTracker, rowCount)
 
@@ -49,68 +46,32 @@ func (h *HillSlopeSedimentContribution) populateContributionMapEntry(rowNumber u
 	mapKey := planningunit.Float64ToId(planningUnit)
 
 	h.contributionMap[mapKey] = hillSlopeSedimentTracker{
-		rkls:                         h.hillSlopeRkls(rowNumber),
-		originalProportionVegetation: h.originalHillSlopeVegetation(rowNumber),
-		distanceToCatchment:          h.distanceToCatchment(rowNumber),
-		area:                         h.hillSlopeArea(rowNumber),
+		area:                     h.hillSlopeArea(rowNumber),
+		originalSedimentProduced: 1,
+		actionedSedimentProduced: 0,
 	}
-}
-
-func (h *HillSlopeSedimentContribution) hillSlopeRkls(rowNumber uint) float64 {
-	// rkls: Rainfall erosivity factor  (R) * Soil Erodibility Factor (K) * Slope length (L) * Slope Steepness (S)
-	// See Catchment Rehabilitation Planner final report, section 3.2.3
-	rkls := h.planningUnitTable.CellFloat64(hillSlopeRKLSIndex, rowNumber)
-	return rkls
 }
 
 func (h *HillSlopeSedimentContribution) hillSlopeArea(rowNumber uint) float64 {
 	return h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
 }
 
-func (h *HillSlopeSedimentContribution) originalHillSlopeVegetation(rowNumber uint) float64 {
-	return h.planningUnitTable.CellFloat64(proportionOfHillSlopeVegetationIndex, rowNumber)
-}
-
-func (h *HillSlopeSedimentContribution) distanceToCatchment(rowNumber uint) float64 {
-	return h.planningUnitTable.CellFloat64(hillSlopeDistanceIndex, rowNumber)
-}
-
-func (h *HillSlopeSedimentContribution) OriginalPlanningUnitVegetationProportion(id planningunit.Id) float64 {
-	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[id]
-	assert.That(planningUnitIsPresent).Holds()
-
-	return planningUnitSedimentTracker.originalProportionVegetation
-}
-
 func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
-	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[id]
+	sedimentTracker, planningUnitIsPresent := h.contributionMap[id]
 	assert.That(planningUnitIsPresent).Holds()
 
-	originalVegetationCover := h.calculateVegetationCover(id, planningUnitSedimentTracker.originalProportionVegetation)
-	sedimentContribution := planningUnitSedimentTracker.rkls * originalVegetationCover
-	return sedimentContribution
+	originalSediment := h.calculateDeliveryAdjustedSediment(sedimentTracker.originalSedimentProduced)
+	return originalSediment
 }
 
-func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
-	planningUnitSedimentTracker, planningUnitIsPresent := h.contributionMap[planningUnit]
+func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(id planningunit.Id, rawSedimentProduced float64) float64 {
+	_, planningUnitIsPresent := h.contributionMap[id]
 	assert.That(planningUnitIsPresent).Holds()
 
-	sedimentContribution := planningUnitSedimentTracker.rkls * h.calculateVegetationCover(planningUnit, proportionOfHillSlopeVegetation)
-
-	return sedimentContribution
+	originalSediment := h.calculateDeliveryAdjustedSediment(rawSedimentProduced)
+	return originalSediment
 }
 
-func (h *HillSlopeSedimentContribution) calculateVegetationCover(planningUnit planningunit.Id, proportionOfHillSlopeVegetation float64) float64 {
-	// See: CRP final report, section 3.2.3, pg 24.
-	distanceToRiparianBuffer := h.contributionMap[planningUnit].distanceToCatchment
-	groundCover := proportionOfHillSlopeVegetation
-
-	unmodifiedVegetationCoverFactor := 0.5665 * math.Exp(-0.0487*groundCover)
-
-	b := 0.001 * math.Exp(0.053*groundCover)
-	hillSlopeSedimentDeliveryRatio := 0.1336 * math.Exp((-1*b)*distanceToRiparianBuffer)
-
-	vegetationCoverFactor := unmodifiedVegetationCoverFactor * hillSlopeSedimentDeliveryRatio
-
-	return vegetationCoverFactor
+func (h *HillSlopeSedimentContribution) calculateDeliveryAdjustedSediment(sedimentProduced float64) float64 {
+	return sedimentProduced * h.sedimentDeliveryRatio
 }

@@ -52,35 +52,16 @@ func (g *GullyRestorationGroup) createManagementActions() {
 func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit.Id) {
 	originalGullySediment := g.sedimentContribution.SedimentContribution(planningUnit)
 
-	costInDollars := g.calculateImplementationCost(planningUnit)
-	opportunityCostInDollars := g.opportunityCostAttributeValue(planningUnit)
+	costInDollars := g.implementationCost(planningUnit)
+	opportunityCostInDollars := g.opportunityCost(planningUnit)
 
 	actionedGullySedimentReduction := 1 - g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
-
-	nitrogenValue := g.nitrogenAttributeValue(planningUnit)
-	carbonValue := g.carbonAttributeValue(planningUnit)
-	deltaCarbonValue := g.deltaCarbonAttributeValue(planningUnit)
-	actionedCarbonValue := carbonValue + deltaCarbonValue
 
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
-			WithTotalNitrogen(nitrogenValue).
-			WithOriginalTotalCarbon(carbonValue).
-			WithActionedTotalCarbon(actionedCarbonValue).
 			WithImplementationCost(costInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
-}
-
-func (g *GullyRestorationGroup) calculateImplementationCost(planningUnit planningunit.Id) float64 {
-	channelRestorationCostPerKilometer := g.parameters.GetFloat64(parameters.GullyRestorationCostPerKilometer)
-
-	channelLengthInMetres := g.sedimentContribution.ChannelLength(planningUnit)
-	channelLengthInKilometres := channelLengthInMetres / 1000
-
-	implementationCost := channelLengthInKilometres * channelRestorationCostPerKilometer
-
-	return implementationCost
 }

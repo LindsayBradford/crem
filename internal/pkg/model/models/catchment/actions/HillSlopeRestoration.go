@@ -35,32 +35,44 @@ func (h *HillSlopeRestoration) WithImplementationCost(costInDollars float64) *Hi
 
 const HillSlopeRestorationOpportunityCost action.ModelVariableName = "HillSlopeRestorationOpportunityCost"
 
-func (g *HillSlopeRestoration) WithOpportunityCost(costInDollars float64) *HillSlopeRestoration {
-	return g.WithVariable(HillSlopeRestorationOpportunityCost, costInDollars)
+func (h *HillSlopeRestoration) WithOpportunityCost(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationOpportunityCost, costInDollars)
 }
 
-const OriginalHillSlopeVegetation action.ModelVariableName = "OriginalHillSlopeVegetation"
+const HillSlopeRestorationOriginalSedimentErosion action.ModelVariableName = "HillSlopeRestorationOriginalSedimentErosion"
 
-func (h *HillSlopeRestoration) WithOriginalHillSlopeVegetation(proportionOfVegetation float64) *HillSlopeRestoration {
-	return h.WithVariable(OriginalHillSlopeVegetation, proportionOfVegetation)
+func (h *HillSlopeRestoration) WithOriginalSedimentErosion(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationOriginalSedimentErosion, costInDollars)
 }
 
-const ActionedHillSlopeVegetation action.ModelVariableName = "ActionedHillSlopeVegetation"
+const HillSlopeRestorationActionedSedimentErosion action.ModelVariableName = "HillSlopeRestorationActionedSedimentErosion"
 
-func (h *HillSlopeRestoration) WithActionedHillSlopeVegetation(proportionOfVegetation float64) *HillSlopeRestoration {
-	return h.WithVariable(ActionedHillSlopeVegetation, proportionOfVegetation)
+func (h *HillSlopeRestoration) WithActionedSedimentErosion(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationActionedSedimentErosion, costInDollars)
 }
 
-func (h *HillSlopeRestoration) WithTotalNitrogen(totalNitrogen float64) *HillSlopeRestoration {
-	return h.WithVariable(TotalNitrogen, totalNitrogen)
+const HillSlopeRestorationOriginalParticulateNitrogen action.ModelVariableName = "HillSlopeRestorationOriginalParticulateNitrogen"
+
+func (h *HillSlopeRestoration) WithOriginalParticulateNitrogen(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationOriginalParticulateNitrogen, costInDollars)
 }
 
-func (h *HillSlopeRestoration) WithOriginalTotalCarbon(totalCarbon float64) *HillSlopeRestoration {
-	return h.WithVariable(OriginalTotalCarbon, totalCarbon)
+const HillSlopeRestorationActionedParticulateNitrogen action.ModelVariableName = "HillSlopeRestorationActionedParticulateNitrogen"
+
+func (h *HillSlopeRestoration) WithActionedParticulateNitrogen(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationActionedParticulateNitrogen, costInDollars)
 }
 
-func (h *HillSlopeRestoration) WithActionedTotalCarbon(deltaCarbon float64) *HillSlopeRestoration {
-	return h.WithVariable(ActionedTotalCarbon, deltaCarbon)
+const HillSlopeRestorationOriginalFineSediment action.ModelVariableName = "HillSlopeRestorationOriginalFineSediment"
+
+func (h *HillSlopeRestoration) WithOriginalFineSediment(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationOriginalFineSediment, costInDollars)
+}
+
+const HillSlopeRestorationActionedFineSediment action.ModelVariableName = "HillSlopeRestorationActionedFineSediment"
+
+func (h *HillSlopeRestoration) WithActionedFineSediment(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(HillSlopeRestorationActionedFineSediment, costInDollars)
 }
 
 func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {

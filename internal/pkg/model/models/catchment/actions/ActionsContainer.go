@@ -5,7 +5,6 @@ package actions
 import (
 	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
-	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 )
@@ -13,27 +12,30 @@ import (
 type ActionSource string
 
 const (
-	ActionedTotalCarbon action.ModelVariableName = "ActionedTotalCarbon"
-	OriginalTotalCarbon action.ModelVariableName = "OriginalTotalCarbon"
-	TotalNitrogen       action.ModelVariableName = "TotalNitrogen"
-	OpportunityCost     action.ModelVariableName = "OpportunityCost"
-
-	parentSoilsPlanningUnitIndex = 0
-	sourceFilterIndex            = 1
-	nitrogenValueIndex           = 2
-	carbonValueIndex             = 3
-	deltaCarbonValueIndex        = 4
-	opportunityCostIndex         = 5
+	subCatchmentIndex                = 0
+	filterIndex                      = 1
+	opportunityCostIndex             = 2
+	implementationCostIndex          = 3
+	particulateNitrogenOriginalIndex = 4
+	particulateNitrogenActionedIndex = 5
+	hillSlopeErosionOriginalIndex    = 6
+	hillSlopeErosionActionedIndex    = 7
+	fineSedimentOriginalIndex        = 8
+	fineSedimentActionedIndex        = 9
 
 	RiparianSource  ActionSource = "Riparian"
 	HillSlopeSource ActionSource = "Hillslope"
 	GullySource     ActionSource = "Gully"
 	UndefinedSource ActionSource = ""
 
-	NitrogenAttribute        = "Nitrogen"
-	CarbonAttribute          = "Carbon"
-	CarbonDeltaAttribute     = "CarbonDelta"
-	OpportunityCostAttribute = "OpportunityCot"
+	OpportunityCostAttribute             = "OpportunityCot"
+	ImplementationCostAttribute          = "ImplementationCost"
+	ParticulateNitrogenOriginalAttribute = "ParticulateNitrogenOriginal"
+	ParticulateNitrogenActionedAttribute = "ParticulateNitrogenActioned"
+	HillSlopeErosionOriginalAttribute    = "HillSlopeErosionOriginal"
+	HillSlopeErosionActionedAttribute    = "HillSlopeErosionActioned"
+	FineSedimentOriginalAttribute        = "FineSedimentOriginal"
+	FineSedimentActionedAttribute        = "FineSedimentActioned"
 )
 
 type Container struct {
@@ -52,29 +54,30 @@ func (c *Container) WithActionsTable(actionsTable tables.CsvTable) *Container {
 
 	for rowNumber := uint(0); rowNumber < rowCount; rowNumber++ {
 
-		sourceType := ActionSource(actionsTable.CellString(sourceFilterIndex, rowNumber))
+		sourceType := ActionSource(actionsTable.CellString(filterIndex, rowNumber))
 		if c.sourceFilter != UndefinedSource && sourceType != c.sourceFilter {
 			continue
 		}
 
-		var mapKey string
-		planningUnit := planningunit.Id(actionsTable.CellFloat64(parentSoilsPlanningUnitIndex, rowNumber))
+		subCatchment := planningunit.Id(actionsTable.CellFloat64(subCatchmentIndex, rowNumber))
 
-		nitrogenValue := actionsTable.CellFloat64(nitrogenValueIndex, rowNumber)
-		mapKey = c.DeriveMapKey(planningUnit, sourceType, NitrogenAttribute)
-		c.actionsMap[mapKey] = nitrogenValue
+		var mapAttribute = func(index uint, attribute string) {
+			value := actionsTable.CellFloat64(index, rowNumber)
+			mapKey := c.DeriveMapKey(subCatchment, sourceType, attribute)
+			c.actionsMap[mapKey] = value
+		}
 
-		carbonValue := actionsTable.CellFloat64(carbonValueIndex, rowNumber)
-		mapKey = c.DeriveMapKey(planningUnit, sourceType, CarbonAttribute)
-		c.actionsMap[mapKey] = carbonValue
+		mapAttribute(opportunityCostIndex, OpportunityCostAttribute)
+		mapAttribute(implementationCostIndex, ImplementationCostAttribute)
 
-		carbonDeltaValue := actionsTable.CellFloat64(deltaCarbonValueIndex, rowNumber)
-		mapKey = c.DeriveMapKey(planningUnit, sourceType, CarbonDeltaAttribute)
-		c.actionsMap[mapKey] = carbonDeltaValue
+		mapAttribute(particulateNitrogenOriginalIndex, ParticulateNitrogenOriginalAttribute)
+		mapAttribute(particulateNitrogenActionedIndex, ParticulateNitrogenActionedAttribute)
 
-		opportunityCostValue := actionsTable.CellFloat64(opportunityCostIndex, rowNumber)
-		mapKey = c.DeriveMapKey(planningUnit, sourceType, OpportunityCostAttribute)
-		c.actionsMap[mapKey] = opportunityCostValue
+		mapAttribute(hillSlopeErosionOriginalIndex, HillSlopeErosionOriginalAttribute)
+		mapAttribute(hillSlopeErosionActionedIndex, HillSlopeErosionActionedAttribute)
+
+		mapAttribute(fineSedimentOriginalIndex, FineSedimentOriginalAttribute)
+		mapAttribute(fineSedimentActionedIndex, FineSedimentActionedAttribute)
 	}
 	return c
 }
@@ -86,29 +89,49 @@ func (c *Container) MapValue(key string) float64 {
 	return mappedValue
 }
 
-func (c *Container) DeriveMapKey(planningUnit planningunit.Id, sourceType ActionSource, elementType string) string {
+func (c *Container) DeriveMapKey(subCatchment planningunit.Id, sourceType ActionSource, elementType string) string {
 	if c.sourceFilter == UndefinedSource {
-		return fmt.Sprintf("%d,%s,%s", planningUnit, sourceType, elementType)
+		return fmt.Sprintf("%d,%s,%s", subCatchment, sourceType, elementType)
 	}
-	return fmt.Sprintf("%d,%s", planningUnit, elementType)
+	return fmt.Sprintf("%d,%s", subCatchment, elementType)
 }
 
-func (c *Container) nitrogenAttributeValue(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, NitrogenAttribute)
-	return c.actionsMap[key]
-}
-
-func (c *Container) carbonAttributeValue(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, CarbonAttribute)
-	return c.actionsMap[key]
-}
-
-func (c *Container) deltaCarbonAttributeValue(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, CarbonDeltaAttribute)
-	return c.actionsMap[key]
-}
-
-func (c *Container) opportunityCostAttributeValue(planningUnit planningunit.Id) float64 {
+func (c *Container) opportunityCost(planningUnit planningunit.Id) float64 {
 	key := c.DeriveMapKey(planningUnit, c.sourceFilter, OpportunityCostAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) implementationCost(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ImplementationCostAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) originalParticulateNitrogen(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ParticulateNitrogenOriginalAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) actionedParticulateNitrogen(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ParticulateNitrogenActionedAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) originalHillSlopeErosion(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionOriginalAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) actionedHillSlopeErosion(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionOriginalAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) originalFineSediment(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, FineSedimentOriginalAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) actionedFineSediment(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, FineSedimentActionedAttribute)
 	return c.actionsMap[key]
 }
