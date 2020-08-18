@@ -2,8 +2,9 @@
 
 ## Version 0.10 (TBD):
 ### New Features
+* Altered approach to Hillslope calculation in Catchment Model. 
 * Introduction of ParticulateNitrogen variable
-* Now deploys with Laidley_data_v1_6_1.xlsx (including nitrogen data)
+* Now deploys with Laidley_data_v1_7.xlsx (including nitrogen data)
 
 ## Version 0.9 (07 April 2020):
 ### New Features

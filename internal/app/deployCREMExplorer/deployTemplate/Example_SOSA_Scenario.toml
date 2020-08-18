@@ -22,7 +22,7 @@ MaximumIterations = 1_000_000
 Type = "CatchmentModel"
 [Model.Parameters]
 MaximumImplementationCost = 1_000_000.0
-DataSourcePath = "input/Laidley_data_v1_6_2.xlsx"
+DataSourcePath = "input/Laidley_data_v1_7.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
@@ -37,4 +37,4 @@ RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
 GullyRestorationCostPerKilometer = 44000.0              # 44,000 (default)
 GullySedimentReductionTarget = 0.8                      # 0.8 (default)
 HillSlopeRestorationCostPerKilometerSquared = 200_000.0 # 200_000.0 (default)
-HillSlopeBevegetationProportionTarget = 0.75            # 0.75 (default)
+HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
