@@ -7,6 +7,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
+	"strconv"
+	"strings"
 )
 
 type ActionSource string
@@ -89,11 +91,42 @@ func (c *Container) MapValue(key string) float64 {
 	return mappedValue
 }
 
+type KeyComponents struct {
+	SubCatchment planningunit.Id
+	SourceType   ActionSource
+	ElementType  string
+}
+
 func (c *Container) DeriveMapKey(subCatchment planningunit.Id, sourceType ActionSource, elementType string) string {
 	if c.sourceFilter == UndefinedSource {
 		return fmt.Sprintf("%d,%s,%s", subCatchment, sourceType, elementType)
 	}
 	return fmt.Sprintf("%d,%s", subCatchment, elementType)
+}
+
+func (c *Container) DeriveMapKeyComponents(mapKey string) *KeyComponents {
+	rawComponents := strings.Split(mapKey, ",")
+
+	rawPlanningUnitId, rawPlanningUnitIdError := strconv.ParseInt(rawComponents[0], 10, 64)
+	if rawPlanningUnitIdError != nil {
+		return nil
+	}
+
+	if c.sourceFilter == UndefinedSource {
+		rawSourceType := ActionSource(rawComponents[1])
+		rawElementType := rawComponents[2]
+		return &KeyComponents{
+			SubCatchment: planningunit.Id(rawPlanningUnitId),
+			SourceType:   rawSourceType,
+			ElementType:  rawElementType,
+		}
+	} else {
+		rawElementType := rawComponents[1]
+		return &KeyComponents{
+			SubCatchment: planningunit.Id(rawPlanningUnitId),
+			ElementType:  rawElementType,
+		}
+	}
 }
 
 func (c *Container) opportunityCost(planningUnit planningunit.Id) float64 {
@@ -134,4 +167,8 @@ func (c *Container) originalFineSediment(planningUnit planningunit.Id) float64 {
 func (c *Container) actionedFineSediment(planningUnit planningunit.Id) float64 {
 	key := c.DeriveMapKey(planningUnit, c.sourceFilter, FineSedimentActionedAttribute)
 	return c.actionsMap[key]
+}
+
+func (c *Container) Map() map[string]float64 {
+	return c.actionsMap
 }

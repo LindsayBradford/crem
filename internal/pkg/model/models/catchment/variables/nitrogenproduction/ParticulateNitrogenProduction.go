@@ -6,7 +6,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	catchmentActions "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -20,7 +19,6 @@ type ParticulateNitrogenProduction struct {
 	variable.PerPlanningUnitDecisionVariable
 	variable.Bounds
 
-	sedimentProductionVariable *sedimentproduction.SedimentProduction
 	catchmentActions.Container
 
 	command variable.ChangeCommand
@@ -57,19 +55,22 @@ func (np *ParticulateNitrogenProduction) WithStartingValue(value float64) *Parti
 	return np
 }
 
-// TODO: Deprecated?
-func (np *ParticulateNitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction.SedimentProduction) *ParticulateNitrogenProduction {
-	np.sedimentProductionVariable = variable
-	return np
-}
-
 func (np *ParticulateNitrogenProduction) WithObservers(observers ...variable.Observer) *ParticulateNitrogenProduction {
 	np.Subscribe(observers...)
 	return np
 }
 
 func (np *ParticulateNitrogenProduction) deriveInitialState() {
-	// TODO:   drive off particulate nitrogen values in actions table instead.
+	for key, value := range np.Map() {
+		components := np.DeriveMapKeyComponents(key)
+		if components == nil || components.ElementType != catchmentActions.ParticulateNitrogenOriginalAttribute {
+			continue
+		}
+
+		currentValue := np.PlanningUnitValue(components.SubCatchment)
+		newValue := currentValue + value
+		np.SetPlanningUnitValue(components.SubCatchment, newValue)
+	}
 }
 
 func (np *ParticulateNitrogenProduction) ObserveAction(action action.ManagementAction) {
@@ -96,175 +97,59 @@ func (np *ParticulateNitrogenProduction) observeAction(action action.ManagementA
 }
 
 func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
-	// TODO: Implement
-}
+	//TODO: This doesn't handle riparian buffer filtering dependency.
+	var toBeNitrogen, asIsNitrogen float64
 
-func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction_deprecated() {
-	//planningUnit := np.actionObserved.PlanningUnit()
-	//
-	//sedimentVariableCommand := np.sedimentProductionVariable.Command()
-	//
-	//var asIsSediment, toBeSediment float64
-	//if riverCommand, isRiverCommand := sedimentVariableCommand.(*sedimentproduction.RiverBankRestorationCommand); isRiverCommand {
-	//	asIsSediment = riverCommand.UndoneRiverbankContribution()
-	//	toBeSediment = riverCommand.DoneRiverbankContribution()
-	//}
-	//
-	//var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	//isActive := np.actionObserved.IsActive()
-	//switch isActive {
-	//case true:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//case false:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//}
-	//
-	//asIsVariables := particulateNitrogenVariables{
-	//	sediment:      asIsSediment,
-	//	totalCarbon:   asIsCarbon,
-	//	totalNitrogen: asIsNitrogen,
-	//}
-	//
-	//asIsParticulateNitrogen := calculateParticulateNitrogen(asIsVariables)
-	//
-	//toBeVariables := particulateNitrogenVariables{
-	//	sediment:      toBeSediment,
-	//	totalCarbon:   toBeCarbon,
-	//	totalNitrogen: toBeNitrogen,
-	//}
-	//
-	//toBeParticulateNitrogen := calculateParticulateNitrogen(toBeVariables)
-	//
-	//np.command = new(RiverBankRestorationCommand).
-	//	ForVariable(np).
-	//	InPlanningUnit(planningUnit).
-	//	WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
-}
+	switch np.actionObserved.IsActive() {
+	case true:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+	case false:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+	}
 
-func (np *ParticulateNitrogenProduction) handleGullyRestorationActionMirroredSediment() {
-	//actionPlanningUnit := np.actionObserved.PlanningUnit()
-	//change := np.sedimentProductionVariable.DifferenceInValues()
-	//
-	//np.command = new(GullyRestorationCommand).
-	//	ForVariable(np).
-	//	InPlanningUnit(actionPlanningUnit).
-	//	WithChange(change)
+	np.command = new(GullyRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
 func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
-	// TODO: Implement
-}
+	var toBeNitrogen, asIsNitrogen float64
 
-func (np *ParticulateNitrogenProduction) handleGullyRestorationAction_deprecated() {
-	//planningUnit := np.actionObserved.PlanningUnit()
-	//
-	//sedimentVariableCommand := np.sedimentProductionVariable.Command()
-	//
-	//var asIsSediment, toBeSediment float64
-	//if gullyCommand, isGullyCommand := sedimentVariableCommand.(*sedimentproduction.GullyRestorationCommand); isGullyCommand {
-	//	asIsSediment = gullyCommand.UndoneGullyContribution()
-	//	toBeSediment = gullyCommand.DoneGullyContribution()
-	//}
-	//
-	//var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	//isActive := np.actionObserved.IsActive()
-	//switch isActive {
-	//case true:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//case false:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//}
-	//
-	//asIsVariables := particulateNitrogenVariables{
-	//	sediment:      asIsSediment,
-	//	totalCarbon:   asIsCarbon,
-	//	totalNitrogen: asIsNitrogen,
-	//}
-	//
-	//asIsParticulateNitrogen := calculateParticulateNitrogen(asIsVariables)
-	//
-	//toBeVariables := particulateNitrogenVariables{
-	//	sediment:      toBeSediment,
-	//	totalCarbon:   toBeCarbon,
-	//	totalNitrogen: toBeNitrogen,
-	//}
-	//
-	//toBeParticulateNitrogen := calculateParticulateNitrogen(toBeVariables)
-	//
-	//np.command = new(GullyRestorationCommand).
-	//	ForVariable(np).
-	//	InPlanningUnit(planningUnit).
-	//	WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
+	switch np.actionObserved.IsActive() {
+	case true:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+	case false:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+	}
+
+	np.command = new(GullyRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
 func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
-	// TODO: Implement
-}
+	//TODO: This doesn't handle riparian buffer filtering dependency.
+	var toBeNitrogen, asIsNitrogen float64
 
-func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction_deprecated() {
-	//planningUnit := np.actionObserved.PlanningUnit()
-	//
-	//sedimentVariableCommand := np.sedimentProductionVariable.Command()
-	//
-	//var asIsSediment, toBeSediment float64
-	//if hillSlopeCommand, isHillSlopeCommand := sedimentVariableCommand.(*sedimentproduction.HillSlopeRevegetationCommand); isHillSlopeCommand {
-	//	asIsSediment = hillSlopeCommand.UndoneHillSlopeContribution()
-	//	toBeSediment = hillSlopeCommand.DoneHillSlopeContribution()
-	//}
-	//
-	//var asIsCarbon, toBeCarbon, asIsNitrogen, toBeNitrogen float64
-	//isActive := np.actionObserved.IsActive()
-	//switch isActive {
-	//case true:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//case false:
-	//	asIsCarbon = np.actionObserved.ModelVariableValue(catchmentActions.ActionedTotalCarbon)
-	//	toBeCarbon = np.actionObserved.ModelVariableValue(catchmentActions.OriginalTotalCarbon)
-	//
-	//	asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.TotalNitrogen)
-	//	toBeNitrogen = asIsNitrogen // TODO:  Check in with Jing's revisiting this being constant across actions
-	//}
-	//
-	//asIsVariables := particulateNitrogenVariables{
-	//	sediment:      asIsSediment,
-	//	totalCarbon:   asIsCarbon,
-	//	totalNitrogen: asIsNitrogen,
-	//}
-	//
-	//asIsParticulateNitrogen := calculateParticulateNitrogen(asIsVariables)
-	//
-	//toBeVariables := particulateNitrogenVariables{
-	//	sediment:      toBeSediment,
-	//	totalCarbon:   toBeCarbon,
-	//	totalNitrogen: toBeNitrogen,
-	//}
-	//
-	//toBeParticulateNitrogen := calculateParticulateNitrogen(toBeVariables)
-	//
-	//np.command = new(HillSlopeRevegetationCommand).
-	//	ForVariable(np).
-	//	InPlanningUnit(planningUnit).
-	//	WithChange(toBeParticulateNitrogen - asIsParticulateNitrogen)
+	switch np.actionObserved.IsActive() {
+	case true:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+	case false:
+		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+	}
+
+	np.command = new(GullyRestorationCommand).
+		ForVariable(np).
+		InPlanningUnit(np.actionObserved.PlanningUnit()).
+		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change

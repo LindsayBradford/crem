@@ -214,6 +214,7 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
+	//TODO: This doesn't handle riparian buffer filtering dependency.
 	var asIsSediment, toBeSediment float64
 	switch sl.actionObserved.IsActive() {
 	case true:

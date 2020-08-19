@@ -143,7 +143,6 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
-		WithSedimentProductionVariable(sedimentProduction).
 		Initialise(m.actionsTable).
 		WithObservers(m)
 
