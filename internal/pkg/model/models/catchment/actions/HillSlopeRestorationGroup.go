@@ -54,13 +54,17 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
-	opportunityCostInDollars := h.opportunityCost(planningUnitAsId)
-	implementationCostInDollars := h.implementationCost(planningUnitAsId)
+	if !h.actionNeededFor(planningUnitAsId) {
+		return
+	}
 
 	originalHillSlopeErosion := h.originalHillSlopeErosion(planningUnitAsId)
 	adjustedOriginalHillSlopeErosion := h.adjustByDeliveryRatio(originalHillSlopeErosion)
 	actionedHillSlopeErosion := h.actionedHillSlopeErosion(planningUnitAsId)
 	adjustedActionedHillSlopeErosion := h.adjustByDeliveryRatio(actionedHillSlopeErosion)
+
+	opportunityCostInDollars := h.opportunityCost(planningUnitAsId)
+	implementationCostInDollars := h.implementationCost(planningUnitAsId)
 
 	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId)
 	adjustedOriginalParticulateNitrogen := h.adjustByDeliveryRatio(originalParticulateNitrogen)
@@ -73,14 +77,18 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithOpportunityCost(opportunityCostInDollars).
-			WithImplementationCost(implementationCostInDollars).
 			WithOriginalSedimentErosion(adjustedOriginalHillSlopeErosion).
 			WithActionedSedimentErosion(adjustedActionedHillSlopeErosion).
 			WithOriginalParticulateNitrogen(adjustedOriginalParticulateNitrogen).
 			WithActionedParticulateNitrogen(adjustedActionedParticulateNitrogen).
 			WithOriginalFineSediment(originalFineSediment).
-			WithActionedFineSediment(actionedFineSediment)
+			WithActionedFineSediment(actionedFineSediment).
+			WithOpportunityCost(opportunityCostInDollars).
+			WithImplementationCost(implementationCostInDollars)
+}
+
+func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id) bool {
+	return h.originalHillSlopeErosion(planningUnit) > 0
 }
 
 func (h *HillSlopeRestorationGroup) adjustByDeliveryRatio(value float64) float64 {

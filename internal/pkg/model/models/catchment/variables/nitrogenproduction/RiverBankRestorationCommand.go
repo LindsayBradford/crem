@@ -3,7 +3,6 @@
 package nitrogenproduction
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/command"
@@ -29,24 +28,13 @@ func (c *RiverBankRestorationCommand) InPlanningUnit(planningUnit planningunit.I
 	return c
 }
 
-//func (c *RiverBankRestorationCommand) WithVegetationBuffer(vegetationBuffer float64) *RiverBankRestorationCommand {
-//	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
-//	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(RiverbankVegetationProportion).(float64)
-//	c.doneRiparianVegetationProportion = vegetationBuffer
-//	return c
-//}
-
 func (c *RiverBankRestorationCommand) WithChange(changeValue float64) *RiverBankRestorationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
-	//
-	//c.undoneRiverbankContribution = c.riverbankSedimentContribution()
-	//c.doneRiverbankContribution = c.undoneRiverbankContribution + changeValue
-	//
 	return c
 }
 
-func (c *RiverBankRestorationCommand) variable() *sedimentproduction.SedimentProduction {
-	return c.Target().(*sedimentproduction.SedimentProduction)
+func (c *RiverBankRestorationCommand) variable() *ParticulateNitrogenProduction {
+	return c.Target().(*ParticulateNitrogenProduction)
 }
 
 func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
@@ -54,8 +42,6 @@ func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
-	//c.setRiparianVegetation(c.doneRiparianVegetationProportion)
-	//c.setRiverbankSedimentContribution(c.doneRiverbankContribution)
 	return command.Done
 }
 
@@ -64,20 +50,5 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
-	//c.setRiparianVegetation(c.undoneRiparianVegetationProportion)
-	//c.setRiverbankSedimentContribution(c.undoneRiverbankContribution)
 	return command.UnDone
 }
-
-//func (c *RiverBankRestorationCommand) setRiparianVegetation(proportion float64) {
-//	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
-//}
-//
-//func (c *RiverBankRestorationCommand) setRiverbankSedimentContribution(sedimentContribution float64) {
-//	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankSedimentContribution, sedimentContribution)
-//}
-//
-//func (c *RiverBankRestorationCommand) riverbankSedimentContribution() float64 {
-//	planningUnitAttributes := c.variable().PlanningUnitAttributes()[c.PlanningUnit()]
-//	return planningUnitAttributes.Value(RiverbankSedimentContribution).(float64)
-//}

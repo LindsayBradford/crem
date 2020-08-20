@@ -3,7 +3,6 @@
 package nitrogenproduction
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/command"
@@ -28,8 +27,8 @@ func (c *GullyRestorationCommand) WithChange(changeValue float64) *GullyRestorat
 	return c
 }
 
-func (c *GullyRestorationCommand) variable() *sedimentproduction.SedimentProduction {
-	return c.Target().(*sedimentproduction.SedimentProduction)
+func (c *GullyRestorationCommand) variable() *ParticulateNitrogenProduction {
+	return c.Target().(*ParticulateNitrogenProduction)
 }
 
 func (c *GullyRestorationCommand) Do() command.CommandStatus {
