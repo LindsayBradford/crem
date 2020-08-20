@@ -155,7 +155,7 @@ func (c *Container) originalHillSlopeErosion(planningUnit planningunit.Id) float
 }
 
 func (c *Container) actionedHillSlopeErosion(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionOriginalAttribute)
+	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionActionedAttribute)
 	return c.actionsMap[key]
 }
 
