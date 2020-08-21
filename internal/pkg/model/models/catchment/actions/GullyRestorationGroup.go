@@ -57,11 +57,16 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 
 	actionedGullySedimentReduction := 1 - g.parameters.GetFloat64(parameters.GullySedimentReductionTarget)
 
+	originalParticulateNitrogen := g.originalParticulateNitrogen(planningUnit)
+	actionedParticulateNitrogen := g.actionedParticulateNitrogen(planningUnit)
+
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
 			WithOriginalGullySediment(originalGullySediment).
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
+			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
+			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
 			WithImplementationCost(costInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

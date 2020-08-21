@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	catchmentActions "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	catchmentParameters "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/pkg/errors"
 )
@@ -30,7 +31,7 @@ type ParticulateNitrogenProduction struct {
 	gullyNitrogenContribution     float64
 }
 
-func (np *ParticulateNitrogenProduction) Initialise(actionsTable tables.CsvTable) *ParticulateNitrogenProduction {
+func (np *ParticulateNitrogenProduction) Initialise(actionsTable tables.CsvTable, parameters catchmentParameters.Parameters) *ParticulateNitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
 	np.Container.WithActionsTable(actionsTable)
 
@@ -40,7 +41,7 @@ func (np *ParticulateNitrogenProduction) Initialise(actionsTable tables.CsvTable
 
 	np.command = new(variable.NullChangeCommand)
 
-	np.deriveInitialState()
+	np.deriveInitialState(parameters)
 
 	return np
 }
@@ -60,13 +61,19 @@ func (np *ParticulateNitrogenProduction) WithObservers(observers ...variable.Obs
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) deriveInitialState() {
+func (np *ParticulateNitrogenProduction) deriveInitialState(parameters catchmentParameters.Parameters) {
+	hillSlopeDeliveryRatio := parameters.GetFloat64(catchmentParameters.HillSlopeDeliveryRatio)
 	for key, value := range np.Map() {
 		components := np.DeriveMapKeyComponents(key)
 		if components == nil || components.ElementType != catchmentActions.ParticulateNitrogenOriginalAttribute {
 			continue
 		}
 
+		if components.SourceType == catchmentActions.HillSlopeSource {
+			value = value * hillSlopeDeliveryRatio
+		}
+
+		// TODO: this approach doesn't cater to riparian filtering
 		currentValue := np.PlanningUnitValue(components.SubCatchment)
 		newValue := currentValue + value
 		np.SetPlanningUnitValue(components.SubCatchment, newValue)

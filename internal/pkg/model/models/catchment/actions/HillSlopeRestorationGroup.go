@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	"github.com/LindsayBradford/crem/pkg/math"
 )
 
 type HillSlopeRestorationGroup struct {
@@ -88,7 +89,11 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 }
 
 func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id) bool {
-	return h.originalHillSlopeErosion(planningUnit) > 0
+	const minimumPrecision = 3
+	originalSediment := h.originalHillSlopeErosion(planningUnit)
+	roundedSediment := math.RoundFloat(originalSediment, minimumPrecision)
+
+	return h.originalHillSlopeErosion(planningUnit) > 0 && roundedSediment > 0
 }
 
 func (h *HillSlopeRestorationGroup) adjustByDeliveryRatio(value float64) float64 {

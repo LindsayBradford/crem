@@ -143,7 +143,7 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
-		Initialise(m.actionsTable).
+		Initialise(m.actionsTable, m.parameters).
 		WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
