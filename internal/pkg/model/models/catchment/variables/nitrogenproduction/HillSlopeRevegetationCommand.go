@@ -11,9 +11,6 @@ import (
 type HillSlopeRevegetationCommand struct {
 	variable.ChangePerPlanningUnitDecisionVariableCommand
 
-	undoneHillSlopeVegetationProportion float64
-	doneHillSlopeVegetationProportion   float64
-
 	undoneHillSlopeContribution float64
 	doneHillSlopeContribution   float64
 }
@@ -25,6 +22,12 @@ func (c *HillSlopeRevegetationCommand) ForVariable(variable variable.PlanningUni
 
 func (c *HillSlopeRevegetationCommand) InPlanningUnit(planningUnit planningunit.Id) *HillSlopeRevegetationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.InPlanningUnit(planningUnit)
+	return c
+}
+
+func (c *HillSlopeRevegetationCommand) WithNitrogenContribution(contribution float64) *HillSlopeRevegetationCommand {
+	c.undoneHillSlopeContribution = c.hillSlopeNitrogenContribution()
+	c.doneHillSlopeContribution = contribution
 	return c
 }
 
@@ -42,6 +45,7 @@ func (c *HillSlopeRevegetationCommand) Do() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
+	c.setHillSlopeNitrogenContribution(c.doneHillSlopeContribution)
 	return command.Done
 }
 
@@ -50,5 +54,23 @@ func (c *HillSlopeRevegetationCommand) Undo() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
+	c.setHillSlopeNitrogenContribution(c.undoneHillSlopeContribution)
 	return command.UnDone
+}
+
+func (c *HillSlopeRevegetationCommand) setHillSlopeNitrogenContribution(nitrogenContribution float64) {
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(HillSlopeNitrogenContribution, nitrogenContribution)
+}
+
+func (c *HillSlopeRevegetationCommand) hillSlopeNitrogenContribution() float64 {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	return planningUnitAttributes.Value(HillSlopeNitrogenContribution).(float64)
+}
+
+func (c *HillSlopeRevegetationCommand) DoneHillSlopeContribution() float64 {
+	return c.doneHillSlopeContribution
+}
+
+func (c *HillSlopeRevegetationCommand) UndoneHillSlopeContribution() float64 {
+	return c.undoneHillSlopeContribution
 }

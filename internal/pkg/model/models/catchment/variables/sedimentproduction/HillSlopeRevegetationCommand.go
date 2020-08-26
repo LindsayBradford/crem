@@ -28,12 +28,14 @@ func (c *HillSlopeRevegetationCommand) InPlanningUnit(planningUnit planningunit.
 	return c
 }
 
+func (c *HillSlopeRevegetationCommand) WithSedimentContribution(contribution float64) *HillSlopeRevegetationCommand {
+	c.undoneHillSlopeContribution = c.hillSlopeSedimentContribution()
+	c.doneHillSlopeContribution = contribution
+	return c
+}
+
 func (c *HillSlopeRevegetationCommand) WithChange(changeValue float64) *HillSlopeRevegetationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
-
-	c.undoneHillSlopeContribution = c.hillSlopeSedimentContribution()
-	c.doneHillSlopeContribution = c.undoneHillSlopeContribution + changeValue
-
 	return c
 }
 

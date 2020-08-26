@@ -28,19 +28,22 @@ func (c *RiverBankRestorationCommand) InPlanningUnit(planningUnit planningunit.I
 	return c
 }
 
-func (c *RiverBankRestorationCommand) WithVegetationBuffer(vegetationBuffer float64) *RiverBankRestorationCommand {
+func (c *RiverBankRestorationCommand) WithVegetationProportion(proportion float64) *RiverBankRestorationCommand {
 	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
 	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(RiverbankVegetationProportion).(float64)
-	c.doneRiparianVegetationProportion = vegetationBuffer
+	c.doneRiparianVegetationProportion = proportion
+	return c
+}
+
+func (c *RiverBankRestorationCommand) WithRiverBankContribution(contribution float64) *RiverBankRestorationCommand {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	c.undoneRiverbankContribution = planningUnitAttributes.Value(RiverbankSedimentContribution).(float64)
+	c.doneRiverbankContribution = contribution
 	return c
 }
 
 func (c *RiverBankRestorationCommand) WithChange(changeValue float64) *RiverBankRestorationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
-
-	c.undoneRiverbankContribution = c.riverbankSedimentContribution()
-	c.doneRiverbankContribution = c.undoneRiverbankContribution + changeValue
-
 	return c
 }
 
