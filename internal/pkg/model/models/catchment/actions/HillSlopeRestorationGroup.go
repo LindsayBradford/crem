@@ -60,17 +60,13 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	}
 
 	originalHillSlopeErosion := h.originalHillSlopeErosion(planningUnitAsId)
-	adjustedOriginalHillSlopeErosion := h.adjustByDeliveryRatio(originalHillSlopeErosion)
 	actionedHillSlopeErosion := h.actionedHillSlopeErosion(planningUnitAsId)
-	adjustedActionedHillSlopeErosion := h.adjustByDeliveryRatio(actionedHillSlopeErosion)
 
 	opportunityCostInDollars := h.opportunityCost(planningUnitAsId)
 	implementationCostInDollars := h.implementationCost(planningUnitAsId)
 
 	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId)
-	adjustedOriginalParticulateNitrogen := h.adjustByDeliveryRatio(originalParticulateNitrogen)
 	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId)
-	adjustedActionedParticulateNitrogen := h.adjustByDeliveryRatio(actionedParticulateNitrogen)
 
 	originalFineSediment := h.originalFineSediment(planningUnitAsId)
 	actionedFineSediment := h.originalFineSediment(planningUnitAsId)
@@ -78,10 +74,10 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
-			WithOriginalSedimentErosion(adjustedOriginalHillSlopeErosion).
-			WithActionedSedimentErosion(adjustedActionedHillSlopeErosion).
-			WithOriginalParticulateNitrogen(adjustedOriginalParticulateNitrogen).
-			WithActionedParticulateNitrogen(adjustedActionedParticulateNitrogen).
+			WithOriginalSedimentErosion(originalHillSlopeErosion).
+			WithActionedSedimentErosion(actionedHillSlopeErosion).
+			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
+			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
 			WithOriginalFineSediment(originalFineSediment).
 			WithActionedFineSediment(actionedFineSediment).
 			WithOpportunityCost(opportunityCostInDollars).
@@ -94,9 +90,4 @@ func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id
 	roundedSediment := math.RoundFloat(originalSediment, minimumPrecision)
 
 	return h.originalHillSlopeErosion(planningUnit) > 0 && roundedSediment > 0
-}
-
-func (h *HillSlopeRestorationGroup) adjustByDeliveryRatio(value float64) float64 {
-	sedimentDeliveryRatio := h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio)
-	return value * sedimentDeliveryRatio
 }

@@ -246,15 +246,15 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
-	var toBeHillSlopeNitrogen, asIsHillSlopeNitrogen float64
+	var toBeHillSlopeSediment, asIsHillSlopeSediment float64
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		toBeHillSlopeNitrogen = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
-		asIsHillSlopeNitrogen = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
+		toBeHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
+		asIsHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
 	case false:
-		asIsHillSlopeNitrogen = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
-		toBeHillSlopeNitrogen = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
+		asIsHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
+		toBeHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
 	}
 
 	attributes := sl.planningUnitAttributes[sl.actionObserved.PlanningUnit()]
@@ -263,25 +263,25 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 		riparianVVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
 		riparianContribution:          attributes.Value(RiverbankSedimentContribution).(float64),
 		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         asIsHillSlopeNitrogen,
+		hillSlopeContribution:         asIsHillSlopeSediment,
 	}
 
-	asIsNitrogen := sl.calculateSedimentProduction(asIsContext)
+	asIsSediment := sl.calculateSedimentProduction(asIsContext)
 
 	toBeContext := sedimentContext{
 		riparianVVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
 		riparianContribution:          attributes.Value(RiverbankSedimentContribution).(float64),
 		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         toBeHillSlopeNitrogen,
+		hillSlopeContribution:         toBeHillSlopeSediment,
 	}
 
-	toBeNitrogen := sl.calculateSedimentProduction(toBeContext)
+	toBeSediment := sl.calculateSedimentProduction(toBeContext)
 
 	sl.command = new(HillSlopeRevegetationCommand).
 		ForVariable(sl).
 		InPlanningUnit(sl.actionObserved.PlanningUnit()).
-		WithSedimentContribution(toBeHillSlopeNitrogen).
-		WithChange(toBeNitrogen - asIsNitrogen)
+		WithSedimentContribution(toBeHillSlopeSediment).
+		WithChange(toBeSediment - asIsSediment)
 }
 
 func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planningunit.Id, hillSlopeVegetation float64) float64 {

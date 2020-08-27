@@ -132,11 +132,14 @@ func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithAction
 
 		switch components.SourceType {
 		case catchmentActions.HillSlopeSource:
-			np.planningUnitAttributes[components.SubCatchment] = np.planningUnitAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, value)
+			np.planningUnitAttributes[components.SubCatchment] =
+				np.planningUnitAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, value)
 		case catchmentActions.GullySource:
-			np.planningUnitAttributes[components.SubCatchment] = np.planningUnitAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
+			np.planningUnitAttributes[components.SubCatchment] =
+				np.planningUnitAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
 		case catchmentActions.RiparianSource:
-			np.planningUnitAttributes[components.SubCatchment] = np.planningUnitAttributes[components.SubCatchment].Replace(RiverbankNitrogenContribution, value)
+			np.planningUnitAttributes[components.SubCatchment] =
+				np.planningUnitAttributes[components.SubCatchment].Replace(RiverbankNitrogenContribution, value)
 		}
 	}
 }
