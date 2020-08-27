@@ -55,7 +55,10 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
-	if !h.actionNeededFor(planningUnitAsId) {
+	originalBufferVegetation := h.originalBufferVegetation(rowNumber)
+	riparianFilter := riparianBufferFilter(originalBufferVegetation)
+
+	if !h.actionNeededFor(planningUnitAsId, riparianFilter) {
 		return
 	}
 
@@ -68,9 +71,6 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId)
 	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId)
 
-	originalFineSediment := h.originalFineSediment(planningUnitAsId)
-	actionedFineSediment := h.originalFineSediment(planningUnitAsId)
-
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
@@ -78,16 +78,37 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithActionedSedimentErosion(actionedHillSlopeErosion).
 			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
 			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
-			WithOriginalFineSediment(originalFineSediment).
-			WithActionedFineSediment(actionedFineSediment).
 			WithOpportunityCost(opportunityCostInDollars).
 			WithImplementationCost(implementationCostInDollars)
 }
 
-func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id) bool {
-	const minimumPrecision = 3
-	originalSediment := h.originalHillSlopeErosion(planningUnit)
-	roundedSediment := math.RoundFloat(originalSediment, minimumPrecision)
+func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id, worstCaseRiparianFilter float64) bool {
+	originalHillSlopeSedimeht := h.originalHillSlopeErosion(planningUnit)
+	if originalHillSlopeSedimeht == 0 {
+		return false
+	}
 
-	return h.originalHillSlopeErosion(planningUnit) > 0 && roundedSediment > 0
+	const minimumPrecision = 3
+
+	worstCaseHillSlopeSediment := originalHillSlopeSedimeht *
+		h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio) * worstCaseRiparianFilter
+
+	roundedWorstCaseSediment := math.RoundFloat(worstCaseHillSlopeSediment, minimumPrecision)
+
+	return roundedWorstCaseSediment > 0
+}
+
+func (h *HillSlopeRestorationGroup) originalBufferVegetation(rowNumber uint) float64 {
+	proportionOfRiparianVegetation := h.planningUnitTable.CellFloat64(riparianVegetationIndex, rowNumber)
+	return proportionOfRiparianVegetation
+}
+
+func riparianBufferFilter(proportionOfRiparianBufferVegetation float64) float64 {
+	if proportionOfRiparianBufferVegetation < 0.25 {
+		return 1
+	}
+	if proportionOfRiparianBufferVegetation > 0.75 {
+		return 0.25
+	}
+	return 1 - proportionOfRiparianBufferVegetation
 }

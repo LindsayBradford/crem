@@ -66,11 +66,16 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	opportunityCostInDollars := r.opportunityCost(planningUnitAsId)
 	implementationCostInDollars := r.implementationCost(planningUnitAsId)
 
+	originalParticulateNitrogen := r.originalParticulateNitrogen(planningUnitAsId)
+	actionedParticulateNitrogen := r.actionedParticulateNitrogen(planningUnitAsId)
+
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalBufferVegetation(originalBufferVegetation).
 			WithActionedBufferVegetation(vegetationTarget).
+			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
+			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
 			WithImplementationCost(implementationCostInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

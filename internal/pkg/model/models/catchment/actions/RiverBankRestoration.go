@@ -35,8 +35,8 @@ func (r *RiverBankRestoration) WithImplementationCost(costInDollars float64) *Ri
 
 const RiverBankRestorationOpportunityCost action.ModelVariableName = "RiverBankRestorationOpportunityCost"
 
-func (g *RiverBankRestoration) WithOpportunityCost(costInDollars float64) *RiverBankRestoration {
-	return g.WithVariable(RiverBankRestorationOpportunityCost, costInDollars)
+func (r *RiverBankRestoration) WithOpportunityCost(costInDollars float64) *RiverBankRestoration {
+	return r.WithVariable(RiverBankRestorationOpportunityCost, costInDollars)
 }
 
 const ActionedBufferVegetation action.ModelVariableName = "ActionedBufferVegetation"
@@ -54,4 +54,12 @@ func (r *RiverBankRestoration) WithOriginalBufferVegetation(proportionOfVegetati
 func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(variableName, value)
 	return r
+}
+
+func (r *RiverBankRestoration) WithOriginalParticulateNitrogen(particulateNitrogen float64) *RiverBankRestoration {
+	return r.WithVariable(ParticulateNitrogenOriginalAttribute, particulateNitrogen)
+}
+
+func (r *RiverBankRestoration) WithActionedParticulateNitrogen(particulateNitrogen float64) *RiverBankRestoration {
+	return r.WithVariable(ParticulateNitrogenActionedAttribute, particulateNitrogen)
 }
