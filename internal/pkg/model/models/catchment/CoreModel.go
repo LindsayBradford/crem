@@ -143,6 +143,7 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
+		WithSedimentProductionVariable(sedimentProduction).
 		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
 		WithObservers(m)
 
@@ -200,7 +201,7 @@ func (m *CoreModel) buildGullyRestorations() []action.ManagementAction {
 func (m *CoreModel) buildRiverBankRestorations() []action.ManagementAction {
 	riverBankRestorations := new(actions.RiverBankRestorationGroup).
 		WithPlanningUnitTable(m.planningUnitTable).
-		WithParentSoilsTable(m.actionsTable).
+		WithActionsTable(m.actionsTable).
 		WithParameters(m.parameters).
 		ManagementActions()
 	return riverBankRestorations
@@ -219,8 +220,8 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	observers := make([]action.Observer, 0)
 	observers = append(observers, m)
 
-	sedimentProduction2 := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
-	if sedimentProduction2AsObserver, isObserver := sedimentProduction2.(action.Observer); isObserver {
+	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
+	if sedimentProduction2AsObserver, isObserver := sedimentProduction.(action.Observer); isObserver {
 		observers = append(observers, sedimentProduction2AsObserver)
 	}
 

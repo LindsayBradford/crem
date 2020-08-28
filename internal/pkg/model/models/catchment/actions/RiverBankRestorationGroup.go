@@ -10,9 +10,9 @@ import (
 )
 
 type RiverBankRestorationGroup struct {
-	planningUnitTable tables.CsvTable
-
-	parameters parameters.Parameters
+	planningUnitTable        tables.CsvTable
+	parameters               parameters.Parameters
+	bankSedimentContribution BankSedimentContribution
 
 	actionMap map[planningunit.Id]*RiverBankRestoration
 	Container
@@ -23,7 +23,7 @@ func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 	return r
 }
 
-func (r *RiverBankRestorationGroup) WithParentSoilsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
+func (r *RiverBankRestorationGroup) WithActionsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
 	r.Container.WithSourceFilter(RiparianSource).WithActionsTable(parentSoilsTable)
 	return r
 }
@@ -43,6 +43,8 @@ func (r *RiverBankRestorationGroup) ManagementActions() []action.ManagementActio
 }
 
 func (r *RiverBankRestorationGroup) createManagementActions() {
+	r.bankSedimentContribution.Initialise(r.planningUnitTable, r.parameters)
+
 	_, rowCount := r.planningUnitTable.ColumnAndRowSize()
 	r.actionMap = make(map[planningunit.Id]*RiverBankRestoration, rowCount)
 
@@ -55,27 +57,36 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnit := r.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
-	vegetationTarget := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
-
 	originalBufferVegetation := r.originalBufferVegetation(rowNumber)
+	actionedBufferVegetation := r.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
 
-	if originalBufferVegetation >= vegetationTarget {
+	if originalBufferVegetation >= actionedBufferVegetation {
 		return
 	}
 
 	opportunityCostInDollars := r.opportunityCost(planningUnitAsId)
 	implementationCostInDollars := r.implementationCost(planningUnitAsId)
 
+	originalSediment := r.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnitAsId, originalBufferVegetation)
+	actionedSediment := r.bankSedimentContribution.PlanningUnitSedimentContribution(planningUnitAsId, actionedBufferVegetation)
+
 	originalParticulateNitrogen := r.originalParticulateNitrogen(planningUnitAsId)
 	actionedParticulateNitrogen := r.actionedParticulateNitrogen(planningUnitAsId)
+
+	originalFineSediment := r.originalFineSediment(planningUnitAsId)
+	actionedFineSediment := r.actionedFineSediment(planningUnitAsId)
 
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
 			WithOriginalBufferVegetation(originalBufferVegetation).
-			WithActionedBufferVegetation(vegetationTarget).
+			WithActionedBufferVegetation(actionedBufferVegetation).
+			WithOriginalRiparianSedimentProduction(originalSediment).
+			WithActionedRiparianSedimentProduction(actionedSediment).
 			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
 			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
+			WithOriginalFineSediment(originalFineSediment).
+			WithActionedFineSediment(actionedFineSediment).
 			WithImplementationCost(implementationCostInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

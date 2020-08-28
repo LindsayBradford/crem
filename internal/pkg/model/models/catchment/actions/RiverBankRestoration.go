@@ -51,9 +51,16 @@ func (r *RiverBankRestoration) WithOriginalBufferVegetation(proportionOfVegetati
 	return r.WithVariable(OriginalBufferVegetation, proportionOfVegetation)
 }
 
-func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
-	r.SimpleManagementAction.WithVariable(variableName, value)
-	return r
+const OriginalRiparianSedimentProduction action.ModelVariableName = "OriginalRiparianSedimentProduction"
+
+func (r *RiverBankRestoration) WithOriginalRiparianSedimentProduction(sediment float64) *RiverBankRestoration {
+	return r.WithVariable(OriginalRiparianSedimentProduction, sediment)
+}
+
+const ActionedRiparianSedimentProduction action.ModelVariableName = "ActionedRiparianSedimentProduction"
+
+func (r *RiverBankRestoration) WithActionedRiparianSedimentProduction(sediment float64) *RiverBankRestoration {
+	return r.WithVariable(ActionedRiparianSedimentProduction, sediment)
 }
 
 func (r *RiverBankRestoration) WithOriginalParticulateNitrogen(particulateNitrogen float64) *RiverBankRestoration {
@@ -62,4 +69,17 @@ func (r *RiverBankRestoration) WithOriginalParticulateNitrogen(particulateNitrog
 
 func (r *RiverBankRestoration) WithActionedParticulateNitrogen(particulateNitrogen float64) *RiverBankRestoration {
 	return r.WithVariable(ParticulateNitrogenActionedAttribute, particulateNitrogen)
+}
+
+func (r *RiverBankRestoration) WithOriginalFineSediment(fineSediment float64) *RiverBankRestoration {
+	return r.WithVariable(FineSedimentOriginalAttribute, fineSediment)
+}
+
+func (r *RiverBankRestoration) WithActionedFineSediment(fineSediment float64) *RiverBankRestoration {
+	return r.WithVariable(FineSedimentActionedAttribute, fineSediment)
+}
+
+func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
+	r.SimpleManagementAction.WithVariable(variableName, value)
+	return r
 }

@@ -13,6 +13,9 @@ type RiverBankRestorationCommand struct {
 
 	doneRiparianVegetationProportion   float64
 	undoneRiparianVegetationProportion float64
+
+	undoneRiparianContribution float64
+	doneRiparianContribution   float64
 }
 
 func (c *RiverBankRestorationCommand) ForVariable(variable variable.PlanningUnitDecisionVariable) *RiverBankRestorationCommand {
@@ -32,6 +35,12 @@ func (c *RiverBankRestorationCommand) WithVegetationProportion(proportion float6
 	return c
 }
 
+func (c *RiverBankRestorationCommand) WithNitrogenContribution(contribution float64) *RiverBankRestorationCommand {
+	c.undoneRiparianContribution = c.riparianNitrogenContribution()
+	c.doneRiparianContribution = contribution
+	return c
+}
+
 func (c *RiverBankRestorationCommand) variable() *ParticulateNitrogenProduction {
 	return c.Target().(*ParticulateNitrogenProduction)
 }
@@ -41,6 +50,7 @@ func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
 		return command.NoChange
 	}
 	c.setRiparianVegetationProportion(c.doneRiparianVegetationProportion)
+	c.setRiparianContribution(c.doneRiparianContribution)
 	return command.Done
 }
 
@@ -49,9 +59,19 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 		return command.NoChange
 	}
 	c.setRiparianVegetationProportion(c.undoneRiparianVegetationProportion)
+	c.setRiparianContribution(c.undoneRiparianContribution)
 	return command.UnDone
 }
 
 func (c *RiverBankRestorationCommand) setRiparianVegetationProportion(proportion float64) {
 	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
+}
+
+func (c *RiverBankRestorationCommand) riparianNitrogenContribution() float64 {
+	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	return planningUnitAttributes.Value(RiparianNitrogenContribution).(float64)
+}
+
+func (c *RiverBankRestorationCommand) setRiparianContribution(contribution float64) {
+	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiparianNitrogenContribution, contribution)
 }
