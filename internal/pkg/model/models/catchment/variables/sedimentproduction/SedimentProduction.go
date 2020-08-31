@@ -169,7 +169,7 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 	switch sl.actionObserved.IsActive() {
 	case true:
 		asIsVegetation = sl.actionObserved.ModelVariableValue(actions.OriginalBufferVegetation)
-		asIsRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.ActionedRiparianSedimentProduction)
+		asIsRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.OriginalRiparianSedimentProduction)
 
 		toBeVegetation = sl.actionObserved.ModelVariableValue(actions.ActionedBufferVegetation)
 		toBeRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.ActionedRiparianSedimentProduction)
@@ -178,25 +178,25 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 		asIsRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.ActionedRiparianSedimentProduction)
 
 		toBeVegetation = sl.actionObserved.ModelVariableValue(actions.OriginalBufferVegetation)
-		toBeRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.ActionedRiparianSedimentProduction)
+		toBeRiverBankSediment = sl.actionObserved.ModelVariableValue(actions.OriginalRiparianSedimentProduction)
 	}
 
 	attributes := sl.planningUnitAttributes[sl.actionObserved.PlanningUnit()]
 
 	asIsContext := sedimentContext{
-		riparianVVegetationProportion: asIsVegetation,
-		riparianContribution:          asIsRiverBankSediment,
-		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         attributes.Value(HillSlopeSedimentContribution).(float64),
+		riparianVegetationProportion: asIsVegetation,
+		riparianContribution:         asIsRiverBankSediment,
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
 	}
 
 	asIsSediment := sl.calculateSedimentProduction(asIsContext)
 
 	toBeContext := sedimentContext{
-		riparianVVegetationProportion: toBeVegetation,
-		riparianContribution:          toBeRiverBankSediment,
-		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         attributes.Value(HillSlopeSedimentContribution).(float64),
+		riparianVegetationProportion: toBeVegetation,
+		riparianContribution:         toBeRiverBankSediment,
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
 	}
 
 	toBeSediment := sl.calculateSedimentProduction(toBeContext)
@@ -254,8 +254,8 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		toBeHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
 		asIsHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
+		toBeHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
 	case false:
 		asIsHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionActionedAttribute)
 		toBeHillSlopeSediment = sl.actionObserved.ModelVariableValue(actions.HillSlopeErosionOriginalAttribute)
@@ -264,19 +264,19 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 	attributes := sl.planningUnitAttributes[sl.actionObserved.PlanningUnit()]
 
 	asIsContext := sedimentContext{
-		riparianVVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
-		riparianContribution:          attributes.Value(RiverbankSedimentContribution).(float64),
-		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         asIsHillSlopeSediment,
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        asIsHillSlopeSediment,
 	}
 
 	asIsSediment := sl.calculateSedimentProduction(asIsContext)
 
 	toBeContext := sedimentContext{
-		riparianVVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
-		riparianContribution:          attributes.Value(RiverbankSedimentContribution).(float64),
-		gullyContribution:             attributes.Value(GullySedimentContribution).(float64),
-		hillSlopeContribution:         toBeHillSlopeSediment,
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        toBeHillSlopeSediment,
 	}
 
 	toBeSediment := sl.calculateSedimentProduction(toBeContext)
@@ -327,8 +327,8 @@ func (sl *SedimentProduction) Command() variable.ChangeCommand {
 }
 
 type sedimentContext struct {
-	riparianContribution          float64
-	riparianVVegetationProportion float64
+	riparianContribution         float64
+	riparianVegetationProportion float64
 
 	hillSlopeContribution float64
 	gullyContribution     float64
@@ -337,11 +337,11 @@ type sedimentContext struct {
 func (sl *SedimentProduction) calculateSedimentProduction(context sedimentContext) float64 {
 	deliveryAdjustedHillSlopeContribution := context.hillSlopeContribution * sl.hillSlopeDeliveryRatio
 
-	riparianFilter := riparianBufferFilter(context.riparianVVegetationProportion)
+	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
 	filteredHillSlopeContribution := deliveryAdjustedHillSlopeContribution * riparianFilter
 
-	nitrogenProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
+	sedimentProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
 
-	roundedSedimentProduced := math.RoundFloat(nitrogenProduced, int(sl.Precision()))
+	roundedSedimentProduced := math.RoundFloat(sedimentProduced, int(sl.Precision()))
 	return roundedSedimentProduced
 }
