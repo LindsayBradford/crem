@@ -336,7 +336,7 @@ func deriveExcelNumberFormat(value interface{}) string {
 	case int, int64, uint64:
 		return "#,##0"
 	case float64:
-		return "#,##0.00"
+		return "#,##0.00#"
 	default:
 		return "@"
 	}
