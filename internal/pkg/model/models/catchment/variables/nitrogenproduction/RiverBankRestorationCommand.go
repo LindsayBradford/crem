@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/command"
+	"github.com/LindsayBradford/crem/pkg/math"
 )
 
 type RiverBankRestorationCommand struct {
@@ -31,13 +32,17 @@ func (c *RiverBankRestorationCommand) InPlanningUnit(planningUnit planningunit.I
 func (c *RiverBankRestorationCommand) WithVegetationProportion(proportion float64) *RiverBankRestorationCommand {
 	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
 	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(RiverbankVegetationProportion).(float64)
-	c.doneRiparianVegetationProportion = proportion
+	change := proportion - c.undoneRiparianVegetationProportion
+	roundedChange := math.RoundFloat(change, int(c.variable().Precision()))
+	c.doneRiparianVegetationProportion = c.undoneRiparianVegetationProportion + roundedChange
 	return c
 }
 
 func (c *RiverBankRestorationCommand) WithNitrogenContribution(contribution float64) *RiverBankRestorationCommand {
 	c.undoneRiparianContribution = c.riparianNitrogenContribution()
-	c.doneRiparianContribution = contribution
+	change := contribution - c.undoneRiparianContribution
+	roundedChange := math.RoundFloat(change, int(c.variable().Precision()))
+	c.doneRiparianContribution = c.undoneRiparianContribution + roundedChange
 	return c
 }
 
