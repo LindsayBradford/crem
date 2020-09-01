@@ -25,12 +25,14 @@ func (c *GullyRestorationCommand) InPlanningUnit(planningUnit planningunit.Id) *
 	return c
 }
 
+func (c *GullyRestorationCommand) WithNitrogenContribution(contribution float64) *GullyRestorationCommand {
+	c.undoneGullyContribution = c.gullyNitrogenContribution()
+	c.doneGullyContribution = contribution
+	return c
+}
+
 func (c *GullyRestorationCommand) WithChange(changeValue float64) *GullyRestorationCommand {
 	c.ChangePerPlanningUnitDecisionVariableCommand.WithChange(changeValue)
-
-	c.undoneGullyContribution = c.gullyNitrogenContribution()
-	c.doneGullyContribution = c.undoneGullyContribution + changeValue
-
 	return c
 }
 
