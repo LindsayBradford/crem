@@ -62,14 +62,16 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 		return
 	}
 
-	originalHillSlopeErosion := h.originalHillSlopeErosion(planningUnitAsId)
-	actionedHillSlopeErosion := h.actionedHillSlopeErosion(planningUnitAsId)
+	hillSlopeDeliveryRatio := h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio)
+
+	originalHillSlopeErosion := h.originalHillSlopeErosion(planningUnitAsId) * hillSlopeDeliveryRatio
+	actionedHillSlopeErosion := h.actionedHillSlopeErosion(planningUnitAsId) * hillSlopeDeliveryRatio
 
 	opportunityCostInDollars := h.opportunityCost(planningUnitAsId)
 	implementationCostInDollars := h.implementationCost(planningUnitAsId)
 
-	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId)
-	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId)
+	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
+	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
 
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().

@@ -2,6 +2,7 @@ package actions
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
@@ -23,10 +24,13 @@ type HillSlopeSedimentContribution struct {
 
 	contributionMap       map[planningunit.Id]hillSlopeSedimentTracker
 	sedimentDeliveryRatio float64
+
+	Container
 }
 
-func (h *HillSlopeSedimentContribution) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) {
-	h.planningUnitTable = planningUnitTable
+func (h *HillSlopeSedimentContribution) Initialise(dataSet *dataset.DataSetImpl, parameters parameters.Parameters) {
+	h.planningUnitTable = dataSet.SubCatchmentsTable
+	h.Container.WithSourceFilter(HillSlopeSource).WithActionsTable(dataSet.ActionsTable)
 	h.parameters = parameters
 	h.populateContributionMap()
 }
@@ -47,8 +51,8 @@ func (h *HillSlopeSedimentContribution) populateContributionMapEntry(rowNumber u
 
 	h.contributionMap[mapKey] = hillSlopeSedimentTracker{
 		area:                     h.hillSlopeArea(rowNumber),
-		originalSedimentProduced: 1,
-		actionedSedimentProduced: 0,
+		originalSedimentProduced: h.originalHillSlopeErosion(mapKey),
+		actionedSedimentProduced: h.actionedHillSlopeErosion(mapKey),
 	}
 }
 

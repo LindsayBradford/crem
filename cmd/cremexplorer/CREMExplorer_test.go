@@ -64,6 +64,18 @@ func TestCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
 
+func TestCREMExplorer_KirkpatrickParticulateNitrogen_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "Kirkpatrick",
+		T:              t,
+		ConfigFilePath: "testdata/TestCREMExplorer-KirkpatrickParticulateNitrogen-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
+
 func TestCREMExplorer_Suppapitnarm_WhiteBox_ExitWithSuccess(t *testing.T) {
 	context := configTesting.WhiteboxTestingContext{
 		Name:           "Suppapitnarm",

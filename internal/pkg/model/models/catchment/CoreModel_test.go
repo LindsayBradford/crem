@@ -3,6 +3,8 @@
 package catchment
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -163,9 +165,48 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 	g.Expect(solution).To(Not(BeNil()))
 
 	verifyPlanningUnitValues(g, solution, implementationcost.VariableName, 0)
+	verifyPlanningUnitValues(g, solution, opportunitycost.VariableName, 0)
 
-	// TODO: Revisit with updated value
-	//verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 38310.166)
+	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1123.303)
+	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.35)
+}
+
+func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+
+	modelUnderTest := buildTestingModel(g)
+	builder := new(solution.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest)
+
+	solution := builder.Build()
+
+	g.Expect(solution).To(Not(BeNil()))
+
+	// when
+
+	planningUnit := planningunit.Id(18)
+
+	modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	modelUnderTest.AcceptChange()
+	modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+	modelUnderTest.AcceptChange()
+	modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	modelUnderTest.AcceptChange()
+	modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+	modelUnderTest.AcceptChange()
+
+	// then
+	newSolution := builder.Build()
+
+	g.Expect(newSolution).To(Not(BeNil()))
+
+	verifyPlanningUnitValues(g, newSolution, implementationcost.VariableName, 0)
+	verifyPlanningUnitValues(g, newSolution, opportunitycost.VariableName, 0)
+
+	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1123.303)
+	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.35)
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {
@@ -393,7 +434,9 @@ func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit pl
 		Build()
 
 	modelUnderTest.ToggleAction(planningUnit, actionType)
+	modelUnderTest.AcceptChange()
 	modelUnderTest.ToggleAction(planningUnit, actionType)
+	modelUnderTest.AcceptChange()
 
 	secondSolution := new(solution.SolutionBuilder).
 		WithId("testingBuilder").

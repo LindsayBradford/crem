@@ -59,7 +59,8 @@ func (c *GullyRestorationCommand) Undo() command.CommandStatus {
 }
 
 func (c *GullyRestorationCommand) setGullySedimentContribution(sedimentContribution float64) {
-	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(GullySedimentContribution, sedimentContribution)
+	c.variable().planningUnitAttributes[c.PlanningUnit()] =
+		c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(GullySedimentContribution, sedimentContribution)
 }
 
 func (c *GullyRestorationCommand) gullySedimentContribution() float64 {

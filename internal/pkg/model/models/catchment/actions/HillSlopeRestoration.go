@@ -39,16 +39,12 @@ func (h *HillSlopeRestoration) WithOpportunityCost(costInDollars float64) *HillS
 	return h.WithVariable(HillSlopeRestorationOpportunityCost, costInDollars)
 }
 
-const HillSlopeRestorationOriginalSedimentErosion action.ModelVariableName = "HillSlopeRestorationOriginalSedimentErosion"
-
 func (h *HillSlopeRestoration) WithOriginalSedimentErosion(costInDollars float64) *HillSlopeRestoration {
-	return h.WithVariable(HillSlopeRestorationOriginalSedimentErosion, costInDollars)
+	return h.WithVariable(HillSlopeErosionOriginalAttribute, costInDollars)
 }
 
-const HillSlopeRestorationActionedSedimentErosion action.ModelVariableName = "HillSlopeRestorationActionedSedimentErosion"
-
 func (h *HillSlopeRestoration) WithActionedSedimentErosion(costInDollars float64) *HillSlopeRestoration {
-	return h.WithVariable(HillSlopeRestorationActionedSedimentErosion, costInDollars)
+	return h.WithVariable(HillSlopeErosionActionedAttribute, costInDollars)
 }
 
 func (h *HillSlopeRestoration) WithOriginalParticulateNitrogen(costInDollars float64) *HillSlopeRestoration {

@@ -139,6 +139,19 @@ func (np *ParticulateNitrogenProduction) buildDefaultPlanningUnitAttributes(plan
 }
 
 func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithActionValues() {
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+
+	for planningUnit, sedimentVariableAttributes := range sedimentPlanningUnitValues {
+		riverbankSediment := sedimentVariableAttributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
+
+		localAttributes := np.planningUnitAttributes[planningUnit]
+		fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
+
+		riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
+		np.planningUnitAttributes[planningUnit] =
+			np.planningUnitAttributes[planningUnit].Replace(RiparianNitrogenContribution, riparianNitrogen)
+	}
+
 	for key, value := range np.Map() {
 		components := np.DeriveMapKeyComponents(key)
 		if components == nil {
@@ -148,8 +161,9 @@ func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithAction
 		if components.ElementType == catchmentActions.ParticulateNitrogenOriginalAttribute {
 			switch components.SourceType {
 			case catchmentActions.HillSlopeSource:
+				deliveryAdjustedValue := value * np.hillSlopeDeliveryRatio
 				np.planningUnitAttributes[components.SubCatchment] =
-					np.planningUnitAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, value)
+					np.planningUnitAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, deliveryAdjustedValue)
 			case catchmentActions.GullySource:
 				np.planningUnitAttributes[components.SubCatchment] =
 					np.planningUnitAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
@@ -165,19 +179,6 @@ func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithAction
 			default: // Deliberately does nothing
 			}
 		}
-	}
-
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-
-	for planningUnit, sedimentVariableAttributes := range sedimentPlanningUnitValues {
-		riverbankSediment := sedimentVariableAttributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
-
-		localAttributes := np.planningUnitAttributes[planningUnit]
-		fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
-
-		riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
-		np.planningUnitAttributes[planningUnit] =
-			np.planningUnitAttributes[planningUnit].Replace(RiparianNitrogenContribution, riparianNitrogen)
 	}
 }
 
@@ -199,7 +200,7 @@ func (np *ParticulateNitrogenProduction) updateParticulateNitrogenFor(subCatchme
 
 	context := nitrogenContext{
 		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
-		riparianContribution:         attributes.Value(GullyNitrogenContribution).(float64),
+		riparianContribution:         attributes.Value(RiparianNitrogenContribution).(float64),
 		gullyContribution:            attributes.Value(GullyNitrogenContribution).(float64),
 		hillSlopeContribution:        attributes.Value(HillSlopeNitrogenContribution).(float64),
 	}
@@ -209,17 +210,19 @@ func (np *ParticulateNitrogenProduction) updateParticulateNitrogenFor(subCatchme
 }
 
 func (np *ParticulateNitrogenProduction) calculateNitrogenProduction(context nitrogenContext) float64 {
-
-	deliveryAdjustedHillSlopeContribution := context.hillSlopeContribution * np.hillSlopeDeliveryRatio
-
-	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
-	filteredHillSlopeContribution := deliveryAdjustedHillSlopeContribution * riparianFilter
-
-	filteredHillSlopeContribution = math.RoundFloat(filteredHillSlopeContribution, int(np.Precision()))
+	filteredHillSlopeContribution := np.deriveHillSlopeNitrogenProduction(context)
 	nitrogenProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
 
 	roundedNitrogenProduced := math.RoundFloat(nitrogenProduced, int(np.Precision()))
 	return roundedNitrogenProduced
+}
+
+func (np *ParticulateNitrogenProduction) deriveHillSlopeNitrogenProduction(context nitrogenContext) float64 {
+	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
+	filteredHillSlopeContribution := context.hillSlopeContribution * riparianFilter
+
+	filteredHillSlopeContribution = math.RoundFloat(filteredHillSlopeContribution, int(np.Precision()))
+	return filteredHillSlopeContribution
 }
 
 func Float64ToPlanningUnitId(value float64) planningunit.Id {
@@ -284,26 +287,26 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 
 	attributes := np.planningUnitAttributes[np.actionObserved.PlanningUnit()]
 
-	asIsRiparianContribution := asIsRiparianSediment * asIsFineSediment * conversionFactor
-	asIsRiparianContribution = math.RoundFloat(asIsRiparianContribution, int(np.Precision()))
+	asIsRiparianNitrogen := asIsRiparianSediment * asIsFineSediment * conversionFactor
+	asIsRiparianNitrogen = math.RoundFloat(asIsRiparianNitrogen, int(np.Precision()))
 
 	asIsContext := nitrogenContext{
 		riparianVegetationProportion: asIsVegetation,
 
-		riparianContribution:  asIsRiparianContribution,
+		riparianContribution:  asIsRiparianNitrogen,
 		gullyContribution:     attributes.Value(GullyNitrogenContribution).(float64),
 		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
 	}
 
 	asIsNitrogen := np.calculateNitrogenProduction(asIsContext)
 
-	toBeRiparianContribution := toBeRiparianSediment * toBeFineSediment * conversionFactor
-	toBeRiparianContribution = math.RoundFloat(toBeRiparianContribution, int(np.Precision()))
+	toBeRiparianNitrogen := toBeRiparianSediment * toBeFineSediment * conversionFactor
+	toBeRiparianNitrogen = math.RoundFloat(toBeRiparianNitrogen, int(np.Precision()))
 
 	toBeContext := nitrogenContext{
 		riparianVegetationProportion: toBeVegetation,
 
-		riparianContribution:  toBeRiparianContribution,
+		riparianContribution:  toBeRiparianNitrogen,
 		gullyContribution:     attributes.Value(GullyNitrogenContribution).(float64),
 		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
 	}
@@ -314,7 +317,7 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 		ForVariable(np).
 		InPlanningUnit(np.actionObserved.PlanningUnit()).
 		WithVegetationProportion(toBeVegetation).
-		WithNitrogenContribution(toBeRiparianContribution).
+		WithRiverBankNitrogenContribution(toBeRiparianNitrogen).
 		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
@@ -374,7 +377,7 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 	np.command = new(HillSlopeRevegetationCommand).
 		ForVariable(np).
 		InPlanningUnit(np.actionObserved.PlanningUnit()).
-		WithNitrogenContribution(toBeHillSlopeNitrogen).
+		WithFilteredNitrogenContribution(toBeHillSlopeNitrogen).
 		WithChange(toBeNitrogen - asIsNitrogen)
 }
 

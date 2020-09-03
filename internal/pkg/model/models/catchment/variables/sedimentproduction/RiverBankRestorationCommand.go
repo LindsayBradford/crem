@@ -72,11 +72,13 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 }
 
 func (c *RiverBankRestorationCommand) setRiparianVegetation(proportion float64) {
-	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
+	c.variable().planningUnitAttributes[c.PlanningUnit()] =
+		c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
 }
 
 func (c *RiverBankRestorationCommand) setRiverbankSedimentContribution(sedimentContribution float64) {
-	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankSedimentContribution, sedimentContribution)
+	c.variable().planningUnitAttributes[c.PlanningUnit()] =
+		c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(RiverbankSedimentContribution, sedimentContribution)
 }
 
 func (c *RiverBankRestorationCommand) riverbankSedimentContribution() float64 {

@@ -90,7 +90,7 @@ func (m *Model) loadSourceDataSet() error {
 }
 
 func (m *Model) loadCsvSourceDataSet(dataSourcePath string) error {
-	dataSet := csv.NewDataSet("CatchmentDataSet")
+	dataSet := csv.NewDataSet("DataSetImpl")
 
 	loadError := dataSet.Load(dataSourcePath)
 	if loadError != nil {
@@ -104,7 +104,7 @@ func (m *Model) loadCsvSourceDataSet(dataSourcePath string) error {
 }
 
 func (m *Model) loadExcelSourceDataSet(dataSourcePath string) error {
-	dataSet := excel.NewDataSet("CatchmentDataSet", m.oleFunctionWrapper)
+	dataSet := excel.NewDataSet("DataSetImpl", m.oleFunctionWrapper)
 
 	loadError := dataSet.Load(dataSourcePath)
 	if loadError != nil {

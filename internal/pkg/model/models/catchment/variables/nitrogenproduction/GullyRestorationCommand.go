@@ -60,7 +60,8 @@ func (c *GullyRestorationCommand) Undo() command.CommandStatus {
 }
 
 func (c *GullyRestorationCommand) setGullyNitrogenContribution(contribution float64) {
-	c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(GullyNitrogenContribution, contribution)
+	c.variable().planningUnitAttributes[c.PlanningUnit()] =
+		c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(GullyNitrogenContribution, contribution)
 }
 
 func (c *GullyRestorationCommand) gullyNitrogenContribution() float64 {

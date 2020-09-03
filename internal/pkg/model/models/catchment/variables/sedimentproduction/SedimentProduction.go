@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	catchmentParameters "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
@@ -47,7 +48,7 @@ type SedimentProduction struct {
 	planningUnitAttributes map[planningunit.Id]attributes.Attributes
 }
 
-func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters catchmentParameters.Parameters) *SedimentProduction {
+func (sl *SedimentProduction) Initialise(dataSet *dataset.DataSetImpl, parameters catchmentParameters.Parameters) *SedimentProduction {
 	sl.PerPlanningUnitDecisionVariable.Initialise()
 
 	sl.SetName(VariableName)
@@ -58,21 +59,21 @@ func (sl *SedimentProduction) Initialise(planningUnitTable tables.CsvTable, gull
 
 	sl.command = new(variable.NullChangeCommand)
 
-	sl.deriveInitialState(planningUnitTable, gulliesTable, parameters)
+	sl.deriveInitialState(dataSet, parameters)
 
 	return sl
 }
 
-func (sl *SedimentProduction) deriveInitialState(planningUnitTable tables.CsvTable, gulliesTable tables.CsvTable, parameters catchmentParameters.Parameters) {
-	sl.deriveNumberOfPlanningUnits(planningUnitTable)
+func (sl *SedimentProduction) deriveInitialState(dataSet *dataset.DataSetImpl, parameters catchmentParameters.Parameters) {
+	sl.deriveNumberOfPlanningUnits(dataSet.SubCatchmentsTable)
 
 	sl.initialisePlanningUnitAttributes()
 
-	sl.bankSedimentContribution.Initialise(planningUnitTable, parameters)
-	sl.gullySedimentContribution.Initialise(gulliesTable, parameters)
-	sl.hillSlopeSedimentContribution.Initialise(planningUnitTable, parameters)
+	sl.bankSedimentContribution.Initialise(dataSet.SubCatchmentsTable, parameters)
+	sl.gullySedimentContribution.Initialise(dataSet.GulliesTable, parameters)
+	sl.hillSlopeSedimentContribution.Initialise(dataSet, parameters)
 
-	sl.deriveInitialSedimentProduction(planningUnitTable)
+	sl.deriveInitialSedimentProduction(dataSet.SubCatchmentsTable)
 }
 
 func (sl *SedimentProduction) initialisePlanningUnitAttributes() {
@@ -236,11 +237,11 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		toBeSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 		asIsSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
+		toBeSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 	case false:
-		toBeSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
 		asIsSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
+		toBeSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
 	}
 
 	sl.command = new(GullyRestorationCommand).
@@ -335,10 +336,8 @@ type sedimentContext struct {
 }
 
 func (sl *SedimentProduction) calculateSedimentProduction(context sedimentContext) float64 {
-	deliveryAdjustedHillSlopeContribution := context.hillSlopeContribution * sl.hillSlopeDeliveryRatio
-
 	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
-	filteredHillSlopeContribution := deliveryAdjustedHillSlopeContribution * riparianFilter
+	filteredHillSlopeContribution := context.hillSlopeContribution * riparianFilter
 
 	sedimentProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
 

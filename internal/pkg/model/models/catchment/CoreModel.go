@@ -4,6 +4,7 @@ package catchment
 
 import (
 	"fmt"
+	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"math"
 
@@ -24,12 +25,6 @@ import (
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
-)
-
-const (
-	SubcatchmentsTableName = "Subcatchments"
-	GulliesTableName       = "Gullies"
-	actionsTableName       = "Actions"
 )
 
 func NewCoreModel() *CoreModel {
@@ -58,7 +53,7 @@ type CoreModel struct {
 
 	variable.ContainedDecisionVariables
 
-	inputDataSet dataset.DataSet
+	inputDataSet *catchmentDataSet.DataSetImpl
 	initialising bool
 
 	observer.SynchronousAnnealingEventNotifier
@@ -75,7 +70,7 @@ func (m *CoreModel) WithParameters(params baseParameters.Map) *CoreModel {
 }
 
 func (m *CoreModel) WithSourceDataSet(sourceDataSet dataset.DataSet) *CoreModel {
-	m.inputDataSet = sourceDataSet
+	m.inputDataSet = new(catchmentDataSet.DataSetImpl).Initialise(sourceDataSet)
 	return m
 }
 
@@ -112,9 +107,9 @@ func (m *CoreModel) ParameterErrors() error {
 }
 
 func (m *CoreModel) Initialise() {
-	m.planningUnitTable = m.fetchCsvTable(SubcatchmentsTableName)
-	m.gulliesTable = m.fetchCsvTable(GulliesTableName)
-	m.actionsTable = m.fetchCsvTable(actionsTableName)
+	m.planningUnitTable = m.fetchCsvTable(catchmentDataSet.SubcatchmentsTableName)
+	m.gulliesTable = m.fetchCsvTable(catchmentDataSet.GulliesTableName)
+	m.actionsTable = m.fetchCsvTable(catchmentDataSet.ActionsTableName)
 
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
@@ -135,7 +130,7 @@ func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
 
 func (m *CoreModel) buildDecisionVariables() {
 	sedimentProduction := new(sedimentproduction.SedimentProduction).
-		Initialise(m.planningUnitTable, m.gulliesTable, m.parameters).
+		Initialise(m.inputDataSet, m.parameters).
 		WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
