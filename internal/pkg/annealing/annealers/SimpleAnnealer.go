@@ -130,7 +130,8 @@ func (sa *SimpleAnnealer) Anneal() {
 func (sa *SimpleAnnealer) handlePanicRecovery() {
 	if r := recover(); r != nil {
 		if rAsError, isError := r.(error); isError {
-			wrappingError := errors.Wrap(rAsError, "annealing function failed")
+			wrappingError := errors.Wrap(rAsError, "Unrecoverable annealing failure. Exiting with error: ")
+			sa.LogHandler().Error(wrappingError)
 			panic(wrappingError)
 		}
 		panic(r)

@@ -44,7 +44,7 @@ func (vs *UndoableDecisionVariables) SetValue(name string, value float64) {
 }
 
 func variableMissing(name string) error {
-	return errors.New("decision variableOld [" + name + "] does not exist.")
+	return errors.New("decision variable [" + name + "] does not exist.")
 }
 
 // Variable returns a pointer to the variableOld in its collection with the supplied name.
