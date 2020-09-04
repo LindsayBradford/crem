@@ -139,19 +139,6 @@ func (np *ParticulateNitrogenProduction) buildDefaultPlanningUnitAttributes(plan
 }
 
 func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithActionValues() {
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-
-	for planningUnit, sedimentVariableAttributes := range sedimentPlanningUnitValues {
-		riverbankSediment := sedimentVariableAttributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
-
-		localAttributes := np.planningUnitAttributes[planningUnit]
-		fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
-
-		riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
-		np.planningUnitAttributes[planningUnit] =
-			np.planningUnitAttributes[planningUnit].Replace(RiparianNitrogenContribution, riparianNitrogen)
-	}
-
 	for key, value := range np.Map() {
 		components := np.DeriveMapKeyComponents(key)
 		if components == nil {
@@ -180,6 +167,20 @@ func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithAction
 			}
 		}
 	}
+
+	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+
+	for planningUnit, sedimentVariableAttributes := range sedimentPlanningUnitValues {
+		riverbankSediment := sedimentVariableAttributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
+
+		localAttributes := np.planningUnitAttributes[planningUnit]
+		fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
+
+		riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
+		np.planningUnitAttributes[planningUnit] =
+			np.planningUnitAttributes[planningUnit].Replace(RiparianNitrogenContribution, riparianNitrogen)
+	}
+
 }
 
 func (np *ParticulateNitrogenProduction) calculateInitialParticulateNitrogenPerPlanningUnit() {

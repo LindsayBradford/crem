@@ -167,8 +167,8 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 	verifyPlanningUnitValues(g, solution, implementationcost.VariableName, 0)
 	verifyPlanningUnitValues(g, solution, opportunitycost.VariableName, 0)
 
-	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1123.303)
-	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.35)
+	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1322.548)
+	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.753)
 }
 
 func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.T) {
@@ -205,8 +205,98 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, implementationcost.VariableName, 0)
 	verifyPlanningUnitValues(g, newSolution, opportunitycost.VariableName, 0)
 
-	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1123.303)
-	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.35)
+	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1322.548)
+	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.753)
+}
+
+func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 18
+
+	modelUnderTest := buildTestingModel(g)
+	builder := new(solution.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest)
+
+	solution := builder.Build()
+
+	g.Expect(solution).To(Not(BeNil()))
+
+	// when
+
+	planningUnit := planningunit.Id(planningUnitUnderTest)
+
+	for index := 0; index < 1_000; index++ {
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+	}
+	// then
+	newSolution := builder.Build()
+
+	g.Expect(newSolution).To(Not(BeNil()))
+
+	variableUnderTest := solutionVariable(solution, nitrogenproduction.VariableName)
+	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[1]
+
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.753))
+	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
+	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 2.291))
+}
+
+func TestCoreModel_ParticulateNitrogen_Exploratory(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 112
+
+	modelUnderTest := buildTestingModel(g)
+	builder := new(solution.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest)
+
+	solution := builder.Build()
+
+	g.Expect(solution).To(Not(BeNil()))
+
+	// when
+
+	planningUnit := planningunit.Id(planningUnitUnderTest)
+
+	for index := 0; index < 1_000; index++ {
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+	}
+
+	// then
+	newSolution := builder.Build()
+
+	g.Expect(newSolution).To(Not(BeNil()))
+
+	variableUnderTest := solutionVariable(solution, nitrogenproduction.VariableName)
+	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[3]
+
+	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
+	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 0.403))
+
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.753))
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {
