@@ -1,10 +1,14 @@
 # Change Log
 
-## Version 0.10 (TBD):
+## Version 0.10 (04 Sept 2020):
 ### New Features
-* Altered approach to Hillslope calculation in Catchment Model. 
-* Introduction of ParticulateNitrogen variable
-* Now deploys with Laidley_data_v1_7.xlsx (including nitrogen data) 
+* Altered approach to Hillslope calculation in Catchment Model based on pre-processed hillslope hot-spots. 
+* Introduction of ParticulateNitrogen variable for tracking particulate nitrogen sources (as per sediment)
+* Replacement of Implementation Cost as a parameter function to being defined per management action.
+* Introduction of Opportunity Cost, defined per management action.
+* Now deploys with Laidley_data_v1_7.xlsx (supporting the above changes) 
+### Bug Fixes
+* Instead of failing silently, we now report a log error and quit if an invalid objective variable has been specified.  
 
 ## Version 0.9 (07 April 2020):
 ### New Features
