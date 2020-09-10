@@ -27,8 +27,7 @@ const (
 var baseVariableHeadings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
 
 const (
-	planningUnitHeading = "PlanningUnit"
-	planningUnitColumn  = 0
+	planningUnitColumn = 0
 
 	inactiveActionValue = 0
 	activeActionValue   = 1
@@ -71,17 +70,6 @@ func (m *Marshaler) marshalDecisionVariables(solution *solution.Solution, dataSe
 				}
 			}
 		}
-
-		//if decisionVariable.ValuePerPlanningUnit != nil {
-		//	var offsetColumn uint = unitOfMeasureColumn + 1
-		//
-		//	for j := range solution.PlanningUnits {
-		//		columnIndex := uint(j) + offsetColumn
-		//
-		//		inputVariable := decisionVariable.ValuePerPlanningUnit[j].Value
-		//		table.SetCell(columnIndex, rowIndex, inputVariable)
-		//	}
-		//}
 	}
 
 	dataSet.AddTable(table.Name(), table)
@@ -113,7 +101,7 @@ func variableHeadings(solution *solution.Solution) []string {
 	baseOffset := len(baseVariableHeadings)
 
 	for index, entry := range solution.PlanningUnits {
-		finalisedHeadings[index+baseOffset] = planningUnitHeading + "-" + entry.String()
+		finalisedHeadings[index+baseOffset] = solution.PlanningUnitHeading() + "-" + entry.String()
 	}
 
 	return finalisedHeadings
@@ -129,7 +117,7 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 
 		for x, csvHeading := range actionHeadings {
 			columnIndex := uint(x)
-			if shouldSkipColumnWith(csvHeading) {
+			if shouldSkipColumnWith(solution, csvHeading) {
 				continue
 			}
 			table.SetCell(columnIndex, rowIndex, inactiveActionValue)
@@ -138,7 +126,7 @@ func (m *Marshaler) marshalActionState(solution *solution.Solution, dataSet *exc
 		if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 			for x, csvHeading := range actionHeadings {
 				columnIndex := uint(x)
-				if shouldSkipColumnWith(csvHeading) {
+				if shouldSkipColumnWith(solution, csvHeading) {
 					continue
 				}
 
@@ -173,14 +161,14 @@ func emptyActionTable(solution *solution.Solution) (table *tables.CsvTableImpl, 
 func tableHeadings(solution *solution.Solution) []string {
 	headings := make([]string, 1)
 
-	headings[planningUnitColumn] = planningUnitHeading
+	headings[planningUnitColumn] = solution.PlanningUnitHeading()
 	headings = append(headings, solution.ActionsAsStrings()...)
 
 	return headings
 }
 
-func shouldSkipColumnWith(csvHeading string) bool {
-	return csvHeading == planningUnitHeading
+func shouldSkipColumnWith(solution *solution.Solution, csvHeading string) bool {
+	return csvHeading == solution.PlanningUnitHeading()
 }
 
 func actionMatchesColumnNamed(action solution.ManagementActionType, csvHeading string) bool {

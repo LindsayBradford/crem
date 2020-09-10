@@ -25,9 +25,9 @@ const (
 var variableHeadings = []string{nameHeading, valueHeading, unitOfMeasureHeading}
 
 const (
-	planningUnitHeading = "PlanningUnit"
-	inactiveActionValue = "0"
-	activeActionValue   = "1"
+	defaultPlanningUnitHeading = "PlanningUnit"
+	inactiveActionValue        = "0"
+	activeActionValue          = "1"
 )
 
 var currencyConverter = strings.NewConverter().WithFloatingPointPrecision(2).PaddingZeros()
@@ -46,7 +46,7 @@ func (cm *DecisionVariableMarshaler) marshalDecisionVariables(solution *solution
 
 func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(solution *solution.Solution) string {
 
-	planningUnits := planningUnitsAsHeaders(solution.PlanningUnits)
+	planningUnits := planningUnitsAsHeaders(solution)
 
 	builder := new(strings.FluentBuilder)
 	builder.
@@ -65,11 +65,12 @@ func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(solution *solu
 	return builder.String()
 }
 
-func planningUnitsAsHeaders(planningUnits planningunit.Ids) []string {
-	headers := make([]string, len(planningUnits))
+func planningUnitsAsHeaders(solution *solution.Solution) []string {
 
-	for index, value := range planningUnits {
-		headers[index] = planningUnitHeading + "-" + value.String()
+	headers := make([]string, len(solution.PlanningUnits))
+
+	for index, value := range solution.PlanningUnits {
+		headers[index] = solution.PlanningUnitHeading() + "-" + value.String()
 	}
 
 	return headers
@@ -153,8 +154,8 @@ func (cm *ManagementActionMarshaler) csvEncodeManagementActions(solution *soluti
 
 func csvEncodeActionHeadings(solution *solution.Solution) []string {
 	headings := make([]string, 1)
-	headings[0] = planningUnitHeading
 
+	headings[0] = solution.PlanningUnitHeading()
 	headings = append(headings, solution.ActionsAsStrings()...)
 
 	return headings
@@ -169,7 +170,7 @@ func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
 
 	if activeActions, unitHasActiveActions := solution.ActiveManagementActions[planningUnit]; unitHasActiveActions {
 		for headingIndex, csvHeading := range actionHeadings {
-			if shouldSkipColumnWith(csvHeading) {
+			if shouldSkipColumnWith(solution, csvHeading) {
 				continue
 			}
 
@@ -184,7 +185,7 @@ func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
 		}
 	} else {
 		for headingIndex, csvHeading := range actionHeadings {
-			if shouldSkipColumnWith(csvHeading) {
+			if shouldSkipColumnWith(solution, csvHeading) {
 				continue
 			}
 			values[headingIndex] = inactiveActionValue
@@ -193,8 +194,8 @@ func (cm *ManagementActionMarshaler) buildActionCsvValuesForPlanningUnit(
 	return values
 }
 
-func shouldSkipColumnWith(csvHeading string) bool {
-	return csvHeading == planningUnitHeading
+func shouldSkipColumnWith(solution *solution.Solution, csvHeading string) bool {
+	return csvHeading == solution.PlanningUnitHeading()
 }
 
 func actionMatchesColumnNamed(action solution.ManagementActionType, csvHeading string) bool {

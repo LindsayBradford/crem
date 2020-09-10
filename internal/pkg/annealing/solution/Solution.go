@@ -4,6 +4,7 @@ package solution
 
 import (
 	"fmt"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"sort"
 	"strings"
 
@@ -12,6 +13,9 @@ import (
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
 )
+
+const DefaultPlanningUnitHeading = "PlanningUnit"
+const ModelSuppliedPlanningUnitName = "ModelSuppliedPlanningUnitName"
 
 func NewSolution(id string) *Solution {
 	newSolution := new(Solution)
@@ -49,6 +53,8 @@ type Solution struct {
 	ManagementActions         map[ManagementActionType]bool `json:"-"`
 	ActiveManagementActions   map[planningunit.Id]ManagementActions
 	InactiveManagementActions map[planningunit.Id]ManagementActions `json:"-"`
+
+	attributes.ContainedAttributes
 }
 
 func (s Solution) ActionsAsStrings() []string {
@@ -147,4 +153,12 @@ func (s *Solution) checkDecisionVariablesAreSumOfPlanningUnits(other *Solution, 
 			errors.AddMessage(variableError)
 		}
 	}
+}
+
+func (s *Solution) PlanningUnitHeading() string {
+	finalisedHeading := DefaultPlanningUnitHeading
+	if s.HasAttribute(ModelSuppliedPlanningUnitName) {
+		finalisedHeading = s.Attribute(ModelSuppliedPlanningUnitName).(string)
+	}
+	return finalisedHeading
 }

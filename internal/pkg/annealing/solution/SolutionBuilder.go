@@ -3,6 +3,7 @@
 package solution
 
 import (
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"sort"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model"
@@ -29,11 +30,19 @@ func (sb *SolutionBuilder) ForModel(model model.Model) *SolutionBuilder {
 func (sb *SolutionBuilder) Build() *Solution {
 	sb.solution = NewSolution(sb.id)
 
+	sb.transferAttributes()
 	sb.addDecisionVariables()
 	sb.addPlanningUnits()
 	sb.addPlanningUnitManagementActionMaps()
 
 	return sb.solution
+}
+
+func (sb *SolutionBuilder) transferAttributes() {
+	if attributeContainingModel, hasAttributes := sb.model.(attributes.Interface); hasAttributes {
+		modelAttributes := attributeContainingModel.AllAttributes()
+		sb.solution.JoiningAttributes(modelAttributes)
+	}
 }
 
 func (sb *SolutionBuilder) addDecisionVariables() {

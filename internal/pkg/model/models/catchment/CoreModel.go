@@ -6,6 +6,7 @@ import (
 	"fmt"
 	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
+	"github.com/LindsayBradford/crem/pkg/attributes"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
@@ -57,6 +58,8 @@ type CoreModel struct {
 	initialising bool
 
 	observer.SynchronousAnnealingEventNotifier
+
+	attributes.ContainedAttributes
 }
 
 func (m *CoreModel) WithName(name string) *CoreModel {
@@ -107,6 +110,7 @@ func (m *CoreModel) ParameterErrors() error {
 }
 
 func (m *CoreModel) Initialise() {
+	m.AddAttribute("ModelSuppliedPlanningUnitName", "SubCatchment")
 	m.planningUnitTable = m.fetchCsvTable(catchmentDataSet.SubcatchmentsTableName)
 	m.gulliesTable = m.fetchCsvTable(catchmentDataSet.GulliesTableName)
 	m.actionsTable = m.fetchCsvTable(catchmentDataSet.ActionsTableName)

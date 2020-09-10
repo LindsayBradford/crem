@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.11 (tbd):
+### New Features
+* Planning Units renamed to Subcatchemsts for CatchmentModel.  
+
 ## Version 0.10 (04 Sept 2020):
 ### New Features
 * Altered approach to Hillslope calculation in Catchment Model based on pre-processed hillslope hot-spots. 
