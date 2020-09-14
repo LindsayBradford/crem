@@ -168,7 +168,7 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 	verifyPlanningUnitValues(g, solution, opportunitycost.VariableName, 0)
 
 	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.753)
+	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.754)
 }
 
 func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.T) {
@@ -206,7 +206,7 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, opportunitycost.VariableName, 0)
 
 	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.753)
+	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.754)
 }
 
 func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
@@ -248,7 +248,7 @@ func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
 	variableUnderTest := solutionVariable(solution, nitrogenproduction.VariableName)
 	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[1]
 
-	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.753))
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
 	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
 	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 2.291))
 }
@@ -294,9 +294,9 @@ func TestCoreModel_ParticulateNitrogen_Exploratory(t *testing.T) {
 	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[3]
 
 	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
-	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 0.403))
+	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 0.404))
 
-	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.753))
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {
