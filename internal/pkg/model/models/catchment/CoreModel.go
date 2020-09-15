@@ -156,16 +156,14 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	implementationCost := new(implementationcost.ImplementationCost).
-		Initialise(m.planningUnitTable, m.parameters).
-		WithObservers(m)
+		Initialise().WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		implementationCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumImplementationCost))
 	}
 
 	opportunityCost := new(opportunitycost.OpportunityCost).
-		Initialise(m.planningUnitTable, m.parameters).
-		WithObservers(m)
+		Initialise().WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
 		opportunityCost.SetMaximum(m.parameters.GetFloat64(parameters.MaximumOpportunityCost))

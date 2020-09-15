@@ -3,10 +3,8 @@
 package implementationcost
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
@@ -24,10 +22,9 @@ type ImplementationCost struct {
 	actionObserved action.ManagementAction
 
 	command variable.ChangeCommand
-	// command *variable.ChangePerPlanningUnitDecisionVariableCommand
 }
 
-func (ic *ImplementationCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *ImplementationCost {
+func (ic *ImplementationCost) Initialise() *ImplementationCost {
 	ic.PerPlanningUnitDecisionVariable.Initialise()
 
 	ic.command = new(variable.NullChangeCommand)

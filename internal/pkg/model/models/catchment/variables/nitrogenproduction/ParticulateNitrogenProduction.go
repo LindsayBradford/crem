@@ -16,8 +16,7 @@ import (
 )
 
 const (
-	VariableName                = "ParticulateNitrogen"
-	notImplementedValue float64 = 0
+	VariableName = "ParticulateNitrogen"
 
 	planningUnitIndex           = 0
 	proportionOfVegetationIndex = 8
@@ -46,7 +45,7 @@ type ParticulateNitrogenProduction struct {
 
 	sedimentProductionVariable *sedimentproduction.SedimentProduction
 
-	numberOfPlanningUnits uint
+	numberOfSubCatchments uint
 
 	hillSlopeDeliveryRatio float64
 
@@ -54,10 +53,10 @@ type ParticulateNitrogenProduction struct {
 	bankNitrogenContribution      float64
 	gullyNitrogenContribution     float64
 
-	planningUnitAttributes map[planningunit.Id]attributes.Attributes
+	subCatchmentAttributes map[planningunit.Id]attributes.Attributes
 }
 
-func (np *ParticulateNitrogenProduction) Initialise(planningUnitTable tables.CsvTable, actionsTable tables.CsvTable, parameters catchmentParameters.Parameters) *ParticulateNitrogenProduction {
+func (np *ParticulateNitrogenProduction) Initialise(subCatchmentsTable tables.CsvTable, actionsTable tables.CsvTable, parameters catchmentParameters.Parameters) *ParticulateNitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
 	np.Container.WithActionsTable(actionsTable)
 
@@ -69,7 +68,7 @@ func (np *ParticulateNitrogenProduction) Initialise(planningUnitTable tables.Csv
 
 	np.command = new(variable.NullChangeCommand)
 
-	np.deriveInitialState(planningUnitTable, parameters)
+	np.deriveInitialState(subCatchmentsTable, parameters)
 
 	return np
 }
@@ -94,42 +93,40 @@ func (np *ParticulateNitrogenProduction) WithSedimentProductionVariable(variable
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) deriveInitialState(planningUnitTable tables.CsvTable, parameters catchmentParameters.Parameters) {
-	np.deriveNumberOfPlanningUnits(planningUnitTable)
-
-	np.initialisePlanningUnitAttributes()
-
-	np.deriveInitialNitrogen(planningUnitTable, parameters)
+func (np *ParticulateNitrogenProduction) deriveInitialState(subCatchmentsTable tables.CsvTable, parameters catchmentParameters.Parameters) {
+	np.deriveNumberOfSubCatchments(subCatchmentsTable)
+	np.initialiseSubCatchmentAttributes()
+	np.deriveInitialNitrogen(subCatchmentsTable)
 }
 
-func (np *ParticulateNitrogenProduction) deriveNumberOfPlanningUnits(planningUnitTable tables.CsvTable) {
-	_, rowCount := planningUnitTable.ColumnAndRowSize()
-	np.numberOfPlanningUnits = rowCount
+func (np *ParticulateNitrogenProduction) deriveNumberOfSubCatchments(subCatchmentsTable tables.CsvTable) {
+	_, rowCount := subCatchmentsTable.ColumnAndRowSize()
+	np.numberOfSubCatchments = rowCount
 }
 
-func (np *ParticulateNitrogenProduction) initialisePlanningUnitAttributes() {
-	np.planningUnitAttributes = make(map[planningunit.Id]attributes.Attributes, np.numberOfPlanningUnits)
-	for index, _ := range np.planningUnitAttributes {
+func (np *ParticulateNitrogenProduction) initialiseSubCatchmentAttributes() {
+	np.subCatchmentAttributes = make(map[planningunit.Id]attributes.Attributes, np.numberOfSubCatchments)
+	for index, _ := range np.subCatchmentAttributes {
 		newAttributes := make(attributes.Attributes, 0)
-		np.planningUnitAttributes[index] = newAttributes
+		np.subCatchmentAttributes[index] = newAttributes
 	}
 }
 
-func (np *ParticulateNitrogenProduction) deriveInitialNitrogen(planningUnitTable tables.CsvTable, parameters catchmentParameters.Parameters) {
-	np.buildDefaultPlanningUnitAttributes(planningUnitTable)
+func (np *ParticulateNitrogenProduction) deriveInitialNitrogen(subCatchmentsTable tables.CsvTable) {
+	np.buildDefaultSubCatchmentAttributes(subCatchmentsTable)
 	np.replaceDefaultAttributeValuesWithActionValues()
-	np.calculateInitialParticulateNitrogenPerPlanningUnit()
+	np.calculateInitialParticulateNitrogenPerSubCatchment()
 }
 
-func (np *ParticulateNitrogenProduction) buildDefaultPlanningUnitAttributes(planningUnitTable tables.CsvTable) {
-	for row := uint(0); row < np.numberOfPlanningUnits; row++ {
-		planningUnitFloat64 := planningUnitTable.CellFloat64(planningUnitIndex, row)
-		planningUnit := Float64ToPlanningUnitId(planningUnitFloat64)
+func (np *ParticulateNitrogenProduction) buildDefaultSubCatchmentAttributes(subCatchmentsTable tables.CsvTable) {
+	for row := uint(0); row < np.numberOfSubCatchments; row++ {
+		subCatchmentFloat64 := subCatchmentsTable.CellFloat64(planningUnitIndex, row)
+		subCatchment := Float64ToSubCatchmentId(subCatchmentFloat64)
 
-		riverBankVegetationProportion := planningUnitTable.CellFloat64(proportionOfVegetationIndex, row)
+		riverBankVegetationProportion := subCatchmentsTable.CellFloat64(proportionOfVegetationIndex, row)
 
-		np.planningUnitAttributes[planningUnit] =
-			np.planningUnitAttributes[planningUnit].
+		np.subCatchmentAttributes[subCatchment] =
+			np.subCatchmentAttributes[subCatchment].
 				Add(RiverbankVegetationProportion, riverBankVegetationProportion).
 				Add(RiparianFineSediment, float64(0)).
 				Add(RiparianNitrogenContribution, float64(0)).
@@ -139,52 +136,73 @@ func (np *ParticulateNitrogenProduction) buildDefaultPlanningUnitAttributes(plan
 }
 
 func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithActionValues() {
+	// Order below matters. Riparian nitrogen contribution depends on base attribute values being pre-calculated.
+	np.calculateBaseAttributes()
+	np.calculateRiparianNitrogenContributionAttribute()
+}
+
+func (np *ParticulateNitrogenProduction) calculateBaseAttributes() {
 	for key, value := range np.Map() {
 		components := np.DeriveMapKeyComponents(key)
 		if components == nil {
 			continue
 		}
 
-		if components.ElementType == catchmentActions.ParticulateNitrogenOriginalAttribute {
-			switch components.SourceType {
-			case catchmentActions.HillSlopeSource:
-				deliveryAdjustedValue := value * np.hillSlopeDeliveryRatio
-				np.planningUnitAttributes[components.SubCatchment] =
-					np.planningUnitAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, deliveryAdjustedValue)
-			case catchmentActions.GullySource:
-				np.planningUnitAttributes[components.SubCatchment] =
-					np.planningUnitAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
-			default: // Deliberately does nothing
-			}
-		}
-
-		if components.ElementType == catchmentActions.FineSedimentOriginalAttribute {
-			switch components.SourceType {
-			case catchmentActions.RiparianSource:
-				np.planningUnitAttributes[components.SubCatchment] =
-					np.planningUnitAttributes[components.SubCatchment].Replace(RiparianFineSediment, value)
-			default: // Deliberately does nothing
-			}
-		}
+		np.calculateGullyAndHillSlopeContributions(components, value)
+		np.calculateRiparianFineSediment(components, value)
 	}
-
-	sedimentPlanningUnitValues := np.sedimentProductionVariable.PlanningUnitAttributes()
-
-	for planningUnit, sedimentVariableAttributes := range sedimentPlanningUnitValues {
-		riverbankSediment := sedimentVariableAttributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
-
-		localAttributes := np.planningUnitAttributes[planningUnit]
-		fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
-
-		riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
-		np.planningUnitAttributes[planningUnit] =
-			np.planningUnitAttributes[planningUnit].Replace(RiparianNitrogenContribution, riparianNitrogen)
-	}
-
 }
 
-func (np *ParticulateNitrogenProduction) calculateInitialParticulateNitrogenPerPlanningUnit() {
-	for subCatchment, attributes := range np.planningUnitAttributes {
+func (np *ParticulateNitrogenProduction) calculateGullyAndHillSlopeContributions(components *catchmentActions.KeyComponents, value float64) {
+	if components.ElementType != catchmentActions.ParticulateNitrogenOriginalAttribute {
+		return
+	}
+
+	switch components.SourceType {
+	case catchmentActions.HillSlopeSource:
+		deliveryAdjustedValue := value * np.hillSlopeDeliveryRatio
+		np.subCatchmentAttributes[components.SubCatchment] =
+			np.subCatchmentAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, deliveryAdjustedValue)
+	case catchmentActions.GullySource:
+		np.subCatchmentAttributes[components.SubCatchment] =
+			np.subCatchmentAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
+	default: // Deliberately does nothing
+	}
+}
+
+func (np *ParticulateNitrogenProduction) calculateRiparianFineSediment(components *catchmentActions.KeyComponents, value float64) {
+	if components.ElementType != catchmentActions.FineSedimentOriginalAttribute {
+		return
+	}
+
+	switch components.SourceType {
+	case catchmentActions.RiparianSource:
+		np.subCatchmentAttributes[components.SubCatchment] =
+			np.subCatchmentAttributes[components.SubCatchment].Replace(RiparianFineSediment, value)
+	default: // Deliberately does nothing
+	}
+}
+
+func (np *ParticulateNitrogenProduction) calculateRiparianNitrogenContributionAttribute() {
+	sedimentSubCatchmentValues := np.sedimentProductionVariable.PlanningUnitAttributes()
+	for subCatchment, sedimentVariableAttributes := range sedimentSubCatchmentValues {
+		np.calculateRiparianNitrogenContributionForSubCatchment(subCatchment, sedimentVariableAttributes)
+	}
+}
+
+func (np *ParticulateNitrogenProduction) calculateRiparianNitrogenContributionForSubCatchment(subCatchment planningunit.Id, attributes attributes.Attributes) {
+	riverbankSediment := attributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
+
+	localAttributes := np.subCatchmentAttributes[subCatchment]
+	fineSediment := localAttributes.Value(RiparianFineSediment).(float64)
+
+	riparianNitrogen := riverbankSediment * fineSediment * conversionFactor
+	np.subCatchmentAttributes[subCatchment] =
+		np.subCatchmentAttributes[subCatchment].Replace(RiparianNitrogenContribution, riparianNitrogen)
+}
+
+func (np *ParticulateNitrogenProduction) calculateInitialParticulateNitrogenPerSubCatchment() {
+	for subCatchment, attributes := range np.subCatchmentAttributes {
 		np.updateParticulateNitrogenFor(subCatchment, attributes)
 	}
 }
@@ -225,7 +243,7 @@ func (np *ParticulateNitrogenProduction) deriveHillSlopeNitrogenProduction(conte
 	return filteredHillSlopeContribution
 }
 
-func Float64ToPlanningUnitId(value float64) planningunit.Id {
+func Float64ToSubCatchmentId(value float64) planningunit.Id {
 	return planningunit.Id(value)
 }
 
@@ -285,8 +303,8 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 		toBeVegetation = np.actionObserved.ModelVariableValue(catchmentActions.OriginalBufferVegetation)
 	}
 
-	actionPlanningUnit := np.actionObserved.PlanningUnit()
-	attributes := np.planningUnitAttributes[actionPlanningUnit]
+	actionSubCatchment := np.actionObserved.PlanningUnit()
+	attributes := np.subCatchmentAttributes[actionSubCatchment]
 
 	asIsRiparianNitrogen := asIsRiparianSediment * asIsFineSediment * conversionFactor
 
@@ -314,7 +332,7 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 
 	np.command = new(RiverBankRestorationCommand).
 		ForVariable(np).
-		InPlanningUnit(actionPlanningUnit).
+		InPlanningUnit(actionSubCatchment).
 		WithVegetationProportion(toBeVegetation).
 		WithRiverBankNitrogenContribution(toBeRiparianNitrogen).
 		WithChange(toBeNitrogen - asIsNitrogen)
@@ -332,11 +350,11 @@ func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
 	}
 
-	actionPlanningUnit := np.actionObserved.PlanningUnit()
+	actionSubCatchment := np.actionObserved.PlanningUnit()
 
 	np.command = new(GullyRestorationCommand).
 		ForVariable(np).
-		InPlanningUnit(actionPlanningUnit).
+		InPlanningUnit(actionSubCatchment).
 		WithNitrogenContribution(toBeNitrogen).
 		WithChange(toBeNitrogen - asIsNitrogen)
 }
@@ -353,8 +371,8 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 		toBeHillSlopeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
 	}
 
-	actionPlanningUnit := np.actionObserved.PlanningUnit()
-	attributes := np.planningUnitAttributes[actionPlanningUnit]
+	actionSubCatchment := np.actionObserved.PlanningUnit()
+	attributes := np.subCatchmentAttributes[actionSubCatchment]
 
 	asIsContext := nitrogenContext{
 		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
@@ -378,7 +396,7 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 
 	np.command = new(HillSlopeRevegetationCommand).
 		ForVariable(np).
-		InPlanningUnit(actionPlanningUnit).
+		InPlanningUnit(actionSubCatchment).
 		WithFilteredNitrogenContribution(toBeHillSlopeNitrogen).
 		WithChange(toBeNitrogen - asIsNitrogen)
 }

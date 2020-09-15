@@ -3,10 +3,8 @@
 package opportunitycost
 
 import (
-	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/internal/pkg/model/action"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/math"
@@ -26,7 +24,7 @@ type OpportunityCost struct {
 	command variable.ChangeCommand
 }
 
-func (ic *OpportunityCost) Initialise(planningUnitTable tables.CsvTable, parameters parameters.Parameters) *OpportunityCost {
+func (ic *OpportunityCost) Initialise() *OpportunityCost {
 	ic.PerPlanningUnitDecisionVariable.Initialise()
 
 	ic.command = new(variable.NullChangeCommand)

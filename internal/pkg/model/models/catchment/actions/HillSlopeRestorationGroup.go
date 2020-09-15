@@ -85,14 +85,14 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 }
 
 func (h *HillSlopeRestorationGroup) actionNeededFor(planningUnit planningunit.Id, worstCaseRiparianFilter float64) bool {
-	originalHillSlopeSedimeht := h.originalHillSlopeErosion(planningUnit)
-	if originalHillSlopeSedimeht == 0 {
+	originalHillSlopeSediment := h.originalHillSlopeErosion(planningUnit)
+	if originalHillSlopeSediment == 0 {
 		return false
 	}
 
 	const minimumPrecision = 3
 
-	worstCaseHillSlopeSediment := originalHillSlopeSedimeht *
+	worstCaseHillSlopeSediment := originalHillSlopeSediment *
 		h.parameters.GetFloat64(parameters.HillSlopeDeliveryRatio) * worstCaseRiparianFilter
 
 	roundedWorstCaseSediment := math.RoundFloat(worstCaseHillSlopeSediment, minimumPrecision)

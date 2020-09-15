@@ -46,8 +46,8 @@ func (h *HillSlopeSedimentContribution) populateContributionMap() {
 }
 
 func (h *HillSlopeSedimentContribution) populateContributionMapEntry(rowNumber uint) {
-	planningUnit := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
-	mapKey := planningunit.Float64ToId(planningUnit)
+	subCatchment := h.planningUnitTable.CellFloat64(planningUnitIndex, rowNumber)
+	mapKey := planningunit.Float64ToId(subCatchment)
 
 	h.contributionMap[mapKey] = hillSlopeSedimentTracker{
 		area:                     h.hillSlopeArea(rowNumber),
@@ -60,17 +60,17 @@ func (h *HillSlopeSedimentContribution) hillSlopeArea(rowNumber uint) float64 {
 	return h.planningUnitTable.CellFloat64(hillSlopeAreaIndex, rowNumber)
 }
 
-func (h *HillSlopeSedimentContribution) OriginalPlanningUnitSedimentContribution(id planningunit.Id) float64 {
-	sedimentTracker, planningUnitIsPresent := h.contributionMap[id]
-	assert.That(planningUnitIsPresent).Holds()
+func (h *HillSlopeSedimentContribution) OriginalSubCatchmentSedimentContribution(id planningunit.Id) float64 {
+	sedimentTracker, subCatchmentIsPresent := h.contributionMap[id]
+	assert.That(subCatchmentIsPresent).Holds()
 
 	originalSediment := h.calculateDeliveryAdjustedSediment(sedimentTracker.originalSedimentProduced)
 	return originalSediment
 }
 
-func (h *HillSlopeSedimentContribution) PlanningUnitSedimentContribution(id planningunit.Id, rawSedimentProduced float64) float64 {
-	_, planningUnitIsPresent := h.contributionMap[id]
-	assert.That(planningUnitIsPresent).Holds()
+func (h *HillSlopeSedimentContribution) SubCatchmentSedimentContribution(id planningunit.Id, rawSedimentProduced float64) float64 {
+	_, subCatchmentIsPresent := h.contributionMap[id]
+	assert.That(subCatchmentIsPresent).Holds()
 
 	originalSediment := h.calculateDeliveryAdjustedSediment(rawSedimentProduced)
 	return originalSediment

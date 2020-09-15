@@ -108,7 +108,7 @@ func (sl *SedimentProduction) deriveInitialSedimentProduction(planningUnitTable 
 
 		riverBankVegetationProportion := sl.originalRiverbankVegetationProportion(planningUnit)
 		riparianFilter := riparianBufferFilter(riverBankVegetationProportion)
-		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalPlanningUnitSedimentContribution(planningUnit) * riparianFilter
+		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalSubCatchmentSedimentContribution(planningUnit) * riparianFilter
 
 		sl.planningUnitAttributes[planningUnit] = new(attributes.Attributes).
 			Add(RiverbankVegetationProportion, riverBankVegetationProportion).
@@ -290,7 +290,7 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 }
 
 func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planningunit.Id, hillSlopeVegetation float64) float64 {
-	hillSlopeSediment := sl.hillSlopeSedimentContribution.PlanningUnitSedimentContribution(planningUnit, hillSlopeVegetation)
+	hillSlopeSediment := sl.hillSlopeSedimentContribution.SubCatchmentSedimentContribution(planningUnit, hillSlopeVegetation)
 
 	attribs := sl.planningUnitAttributes[planningUnit]
 	filter := attribs.Value(RiverbankVegetationProportion).(float64)

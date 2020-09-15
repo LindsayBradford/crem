@@ -59,12 +59,12 @@ func (c *HillSlopeRevegetationCommand) Undo() command.CommandStatus {
 }
 
 func (c *HillSlopeRevegetationCommand) setHillSlopeNitrogenContribution(nitrogenContribution float64) {
-	c.variable().planningUnitAttributes[c.PlanningUnit()] =
-		c.variable().planningUnitAttributes[c.PlanningUnit()].Replace(HillSlopeNitrogenContribution, nitrogenContribution)
+	c.variable().subCatchmentAttributes[c.PlanningUnit()] =
+		c.variable().subCatchmentAttributes[c.PlanningUnit()].Replace(HillSlopeNitrogenContribution, nitrogenContribution)
 }
 
 func (c *HillSlopeRevegetationCommand) hillSlopeNitrogenContribution() float64 {
-	planningUnitAttributes := c.variable().planningUnitAttributes[c.PlanningUnit()]
+	planningUnitAttributes := c.variable().subCatchmentAttributes[c.PlanningUnit()]
 	return planningUnitAttributes.Value(HillSlopeNitrogenContribution).(float64)
 }
 

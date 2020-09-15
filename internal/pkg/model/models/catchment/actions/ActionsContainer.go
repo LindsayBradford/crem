@@ -63,7 +63,7 @@ func (c *Container) WithActionsTable(actionsTable tables.CsvTable) *Container {
 
 		subCatchment := planningunit.Id(actionsTable.CellFloat64(subCatchmentIndex, rowNumber))
 
-		var mapAttribute = func(index uint, attribute string) {
+		mapAttribute := func(index uint, attribute string) {
 			value := actionsTable.CellFloat64(index, rowNumber)
 			mapKey := c.DeriveMapKey(subCatchment, sourceType, attribute)
 			c.actionsMap[mapKey] = value
