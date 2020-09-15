@@ -85,21 +85,26 @@ func (m *CoreModel) SetParameters(params baseParameters.Map) error {
 
 func (m *CoreModel) validateModelParameters() {
 	boundVariableNumber := 0
-	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
-		boundVariableNumber++
-	}
 	if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
 		boundVariableNumber++
 	}
 	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
 		boundVariableNumber++
 	}
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		boundVariableNumber++
+	}
+	if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
+		boundVariableNumber++
+	}
 
 	if boundVariableNumber > 1 {
-		errorText := fmt.Sprintf("Only one of [%s], [%s] or [%s] allowed as variable limit.",
-			parameters.MaximumImplementationCost,
+		errorText := fmt.Sprintf("Only one of [%s], [%s], [%s] or [%s] allowed as variable limit.",
 			parameters.MaximumSedimentProduction,
-			parameters.MaximumParticulateNitrogenProduction)
+			parameters.MaximumParticulateNitrogenProduction,
+			parameters.MaximumImplementationCost,
+			parameters.MaximumOpportunityCost,
+		)
 
 		m.parameters.AddValidationErrorMessage(errorText)
 	}
@@ -219,24 +224,10 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	observers := make([]action.Observer, 0)
 	observers = append(observers, m)
 
-	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
-	if sedimentProduction2AsObserver, isObserver := sedimentProduction.(action.Observer); isObserver {
-		observers = append(observers, sedimentProduction2AsObserver)
-	}
-
-	nitrogenProduction := m.ContainedDecisionVariables.Variable(nitrogenproduction.VariableName)
-	if nitrogenProductionAsObserver, isObserver := nitrogenProduction.(action.Observer); isObserver {
-		observers = append(observers, nitrogenProductionAsObserver)
-	}
-
-	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
-	if implementationCostAsObserver, isObserver := implementationCost.(action.Observer); isObserver {
-		observers = append(observers, implementationCostAsObserver)
-	}
-
-	opportunityCost := m.ContainedDecisionVariables.Variable(opportunitycost.VariableName)
-	if opportunityCostAsObserver, isObserver := opportunityCost.(action.Observer); isObserver {
-		observers = append(observers, opportunityCostAsObserver)
+	for _, variable := range *m.DecisionVariables() {
+		if variableAsObserver, isObserver := variable.(action.Observer); isObserver {
+			observers = append(observers, variableAsObserver)
+		}
 	}
 
 	return observers
@@ -256,6 +247,9 @@ func (m *CoreModel) randomlyInitialiseActions() {
 	m.initialising = true
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		m.note("Randomly initialising for Maximum implementation cost limit.")
+		m.randomlyActivateActionsFromAllInactiveStart()
+	} else if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
+		m.note("Randomly initialising for Maximum opportunity cost limit.")
 		m.randomlyActivateActionsFromAllInactiveStart()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
 		m.note("Randomly initialising for Maximum sediment production limit.")
@@ -454,24 +448,13 @@ func (m *CoreModel) DeepClone() model.Model {
 }
 
 func (m *CoreModel) ChangeIsValid() (bool, *compositeErrors.CompositeError) {
+	return m.checkValidityWith(m.undoableValueBoundsChecker)
+}
+
+func (m *CoreModel) checkValidityWith(validationFunction func(*compositeErrors.CompositeError)) (bool, *compositeErrors.CompositeError) {
 	validationErrors := compositeErrors.New("Validation Errors")
 
-	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
-	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
-		if !boundSedimentLoad.WithinBounds(sedimentProduction.UndoableValue()) {
-			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.UndoableValue()))
-			validationErrors.AddMessage(validationMessage)
-		}
-	}
-
-	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
-	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
-		if !boundImplementationCost.WithinBounds(implementationCost.UndoableValue()) {
-			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.UndoableValue()))
-			validationErrors.AddMessage(validationMessage)
-		}
-	}
-
+	validationFunction(validationErrors)
 	if validationErrors.Size() > 0 {
 		return false, validationErrors
 	}
@@ -479,30 +462,39 @@ func (m *CoreModel) ChangeIsValid() (bool, *compositeErrors.CompositeError) {
 	return true, nil
 }
 
+func (m *CoreModel) undoableValueBoundsChecker(validationErrors *compositeErrors.CompositeError) {
+	for _, name := range m.DecisionVariableNames() {
+		m.checkVariableUndoableValueBounds(name, validationErrors)
+	}
+}
+
+func (m *CoreModel) checkVariableUndoableValueBounds(variableName string, validationErrors *compositeErrors.CompositeError) {
+	variableToCheck := m.ContainedDecisionVariables.Variable(variableName)
+	checkBounds(variableToCheck, variableToCheck.UndoableValue(), validationErrors)
+}
+
 func (m *CoreModel) StateIsValid() (bool, *compositeErrors.CompositeError) {
-	validationErrors := compositeErrors.New("Validation Errors")
+	return m.checkValidityWith(m.actualValueBoundsChecker)
+}
 
-	sedimentProduction := m.ContainedDecisionVariables.Variable(sedimentproduction.VariableName)
-	if boundSedimentLoad, isBound := sedimentProduction.(variable.Bounded); isBound {
-		if !boundSedimentLoad.WithinBounds(sedimentProduction.Value()) {
-			validationMessage := fmt.Sprintf("SedimentProduction %s", boundSedimentLoad.BoundErrorAsText(sedimentProduction.Value()))
-			validationErrors.AddMessage(validationMessage)
+func (m *CoreModel) actualValueBoundsChecker(validationErrors *compositeErrors.CompositeError) {
+	for _, name := range m.DecisionVariableNames() {
+		m.checkVariableActualValueBounds(name, validationErrors)
+	}
+}
+
+func (m *CoreModel) checkVariableActualValueBounds(variableName string, validationErrors *compositeErrors.CompositeError) {
+	variableToCheck := m.ContainedDecisionVariables.Variable(variableName)
+	checkBounds(variableToCheck, variableToCheck.Value(), validationErrors)
+}
+
+func checkBounds(possiblyBoundVariable variable.UndoableDecisionVariable, value float64, validationErrors *compositeErrors.CompositeError) {
+	if boundVariable, isBound := possiblyBoundVariable.(variable.Bounded); isBound {
+		if !boundVariable.WithinBounds(value) {
+			message := fmt.Sprintf("%s %s", possiblyBoundVariable.Name(), boundVariable.BoundErrorAsText(value))
+			validationErrors.AddMessage(message)
 		}
 	}
-
-	implementationCost := m.ContainedDecisionVariables.Variable(implementationcost.VariableName)
-	if boundImplementationCost, isBound := implementationCost.(variable.Bounded); isBound {
-		if !boundImplementationCost.WithinBounds(implementationCost.Value()) {
-			validationMessage := fmt.Sprintf("ImplementationCost value %s", boundImplementationCost.BoundErrorAsText(implementationCost.Value()))
-			validationErrors.AddMessage(validationMessage)
-		}
-	}
-
-	if validationErrors.Size() > 0 {
-		return false, validationErrors
-	}
-
-	return true, nil
 }
 
 func (m *CoreModel) TearDown() {

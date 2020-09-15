@@ -1,7 +1,5 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// Copyright (c) 2019 Australian Rivers Institute.
-
 package variable
 
 const (
@@ -17,12 +15,19 @@ func (c *ContainedDecisionVariables) Initialise() {
 }
 
 func (c *ContainedDecisionVariables) DecisionVariables() *DecisionVariableMap {
-	inductiveVariables := c.UndoableDecisionVariables
-	vanillaVariables := make(DecisionVariableMap, 0)
-	for _, inductiveVariable := range inductiveVariables {
-		vanillaVariables[inductiveVariable.Name()] = inductiveVariable
+	variableMap := make(DecisionVariableMap, 0)
+	for _, variable := range c.UndoableDecisionVariables {
+		variableMap[variable.Name()] = variable
 	}
-	return &vanillaVariables
+	return &variableMap
+}
+
+func (c *ContainedDecisionVariables) DecisionVariableNames() []string {
+	names := make([]string, 0)
+	for _, variable := range c.UndoableDecisionVariables {
+		names = append(names, variable.Name())
+	}
+	return names
 }
 
 func (c *ContainedDecisionVariables) DecisionVariable(name string) DecisionVariable {
