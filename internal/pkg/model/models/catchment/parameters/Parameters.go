@@ -53,6 +53,12 @@ func ParameterSpecifications() *Specifications {
 	specs := NewSpecifications()
 	specs.Add(
 		Specification{
+			Key:          DataSourcePath,
+			Validator:    IsReadableFile,
+			DefaultValue: "",
+		},
+	).Add(
+		Specification{
 			Key:          BankErosionFudgeFactor,
 			Validator:    validateIsBankErosionFudgeFactor,
 			DefaultValue: 5 * math.Pow(10, -4),
@@ -95,12 +101,6 @@ func ParameterSpecifications() *Specifications {
 		},
 	).Add(
 		Specification{
-			Key:          DataSourcePath,
-			Validator:    IsReadableFile,
-			DefaultValue: "",
-		},
-	).Add(
-		Specification{
 			Key:          RiparianBufferVegetationProportionTarget,
 			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(0.75),
@@ -113,45 +113,9 @@ func ParameterSpecifications() *Specifications {
 		},
 	).Add(
 		Specification{
-			Key:          HillSlopeRevegetationProportionTarget,
-			Validator:    IsDecimalBetweenZeroAndOne,
-			DefaultValue: float64(0.75),
-		},
-	).Add(
-		Specification{
 			Key:          HillSlopeDeliveryRatio,
 			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(0.05),
-		},
-	).Add(
-		Specification{
-			Key:          RiparianRevegetationCostPerKilometer,
-			Validator:    IsDecimal,
-			DefaultValue: float64(24000),
-		},
-	).Add(
-		Specification{
-			Key:          GullyRestorationCostPerKilometer,
-			Validator:    IsDecimal,
-			DefaultValue: float64(44000),
-		},
-	).Add(
-		Specification{
-			Key:          HillSlopeRestorationCostPerKilometerSquared,
-			Validator:    IsDecimal,
-			DefaultValue: float64(200000),
-		},
-	).Add(
-		Specification{
-			Key:          SedimentProductionDecisionWeight,
-			Validator:    IsDecimalBetweenZeroAndOne,
-			DefaultValue: float64(0.5),
-		},
-	).Add(
-		Specification{
-			Key:          ImplementationCostDecisionWeight,
-			Validator:    IsDecimalBetweenZeroAndOne,
-			DefaultValue: float64(0.5),
 		},
 	).Add(
 		Specification{

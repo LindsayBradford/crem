@@ -2,7 +2,10 @@
 
 ## Version 0.11 (tbd):
 ### New Features
-* Planning Units renamed to Subcatchemsts for CatchmentModel.  
+* Planning Units renamed to Subcatchments for CatchmentModel.
+* Example config files now ship with rich configuration detail, showcasing full config potential. 
+### Bug Fixes
+* Redundant CatchmentModel parameters have now been removed.  
 
 ## Version 0.10 (04 Sept 2020):
 ### New Features

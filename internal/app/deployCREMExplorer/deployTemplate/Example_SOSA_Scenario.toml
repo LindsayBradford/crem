@@ -1,19 +1,34 @@
 [Scenario]
 Name = "Example SOSA Scenario"
-OutputPath = "output"
-OutputType = "EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+RunNumber = 1                                           # 1 (default)
+MaximumConcurrentRunNumber = 1                          # 1 (default)
+OutputPath = "output"                                   # Relative directory path to place results files
+OutputType = "EXCEL"                                    # "CSV" (default) | "JSON" | "EXCEL"
+#CpuProfilePath = "someProfiler/OutputFilePath.pprof"   # Uncomment to capture CPU profiling data.
+[Scenario.UserDetail]
+TextEntry = "Some Text"                                 # Example user-defined data for scenario. Not used by system.
+IntegerEntry = 42                                       # Example user-defined data for scenario. Not used by system.
+FloatEntry = 42.42                                      # Example user-defined data for scenario. Not used by system.
+BooleanEntry = true                                     # Example user-defined data for scenario. Not used by system.
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 10_000
+Type = "NativeLibrary"                                  # "NativeLibrary" (Default) | "BareBones"
+Formatter = "RawMessage"                                # "RawMessage" (Default) | "JSON" | "NameValuePair"
 [Scenario.Reporting.LogLevelDestinations]
-Annealer = "StandardOutput"
-Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-#Debug = "StandardOutput"
-#Model = "StandardOutput"
+Annealer = "StandardOutput"                             # "Discarded"  | "StandardOutput" (Default) | "StandardError"
+Debugging = "Discarded"                                 # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput"                          # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"                             # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"                                # "Discarded"  | "StandardOutput" | "StandardError" (Default)
+Model = "Discarded"                                     # "Discarded"  (default) | "StandardOutput" | "StandardError"
+
 
 [Annealer]
 Type = "Kirkpatrick"
+EventNotifier = "Synchronous"                           # "Synchronous" (default) | Concurrent"
 [Annealer.Parameters]
 DecisionVariable = "SedimentProduction"
+OptimisationDirection = "Minimising"                    # Minimising (default) | "Maximising"
 StartingTemperature = 10_000.0
 CoolingFactor = 0.999
 MaximumIterations = 1_000_000
@@ -21,7 +36,6 @@ MaximumIterations = 1_000_000
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
-MaximumImplementationCost = 1_000_000.0
 DataSourcePath = "input/Laidley_data_v1_7.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
@@ -35,3 +49,9 @@ YearsOfErosion = 100                # 100.0 (default)
 RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
 GullySedimentReductionTarget = 0.8                      # 0.8 (default)
 HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
+
+# Only one of the below variable bounds can be applied maximum.
+#MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
+#MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
+MaximumImplementationCost = 1_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+#MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.
