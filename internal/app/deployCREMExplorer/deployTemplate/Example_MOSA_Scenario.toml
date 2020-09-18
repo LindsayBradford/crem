@@ -24,12 +24,15 @@ Model = "Discarded"                                     # "Discarded"  (default)
 [Annealer]
 Type="AveragedSuppapitnarm"
 [Annealer.Parameters]
-ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 10_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 1_000_000
-InitialReturnToBaseStep = 50_000 # 20_000
-#MinimumReturnToBaseRate = 10 # 10
+
+ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
+ReturnToBaseAdjustmentFactor = 0.95                 # 0.95 (default)
+InitialReturnToBaseStep = 50_000                    # 20_000 (default)
+MinimumReturnToBaseRate = 10                        # 10 (default)
+ReturnToBaseIsolationFraction = 0.9                 # 0.9 (default)
 
 [Model]
 Type = "CatchmentModel"
