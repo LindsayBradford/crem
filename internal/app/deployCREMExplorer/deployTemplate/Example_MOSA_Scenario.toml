@@ -28,7 +28,6 @@ StartingTemperature = 10_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 1_000_000
 
-ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 ReturnToBaseAdjustmentFactor = 0.95                 # 0.95 (default)
 InitialReturnToBaseStep = 50_000                    # 20_000 (default)
 MinimumReturnToBaseRate = 10                        # 10 (default)

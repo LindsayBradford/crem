@@ -8,8 +8,6 @@ import (
 	. "github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 )
 
-const DefaultExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
-
 type Parameters struct {
 	parameters.Parameters
 }
@@ -22,7 +20,6 @@ func (p *Parameters) Initialise() *Parameters {
 }
 
 const (
-	ExplorableDecisionVariables   = "ExplorableDecisionVariables"
 	ReturnToBaseAdjustmentFactor  = "ReturnToBaseAdjustmentFactor"
 	InitialReturnToBaseStep       = "InitialReturnToBaseStep"
 	MinimumReturnToBaseRate       = "MinimumReturnToBaseRate"
@@ -40,12 +37,6 @@ const (
 func ParameterSpecifications() *Specifications {
 	specs := NewSpecifications()
 	specs.Add(
-		Specification{
-			Key:          ExplorableDecisionVariables,
-			Validator:    IsString,
-			DefaultValue: DefaultExplorableDecisionVariables,
-		},
-	).Add(
 		Specification{
 			Key:          ReturnToBaseAdjustmentFactor,
 			Validator:    IsDecimalBetweenZeroAndOne,

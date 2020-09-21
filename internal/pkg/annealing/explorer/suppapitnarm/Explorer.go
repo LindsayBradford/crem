@@ -4,9 +4,6 @@ package suppapitnarm
 
 import (
 	"fmt"
-	"math"
-	"strings"
-
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/suppapitnarm"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
@@ -20,6 +17,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"github.com/pkg/errors"
+	"math"
 )
 
 const (
@@ -113,8 +111,6 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 	ke.returnToBaseStep = float64(ke.parameters.GetInt64(InitialReturnToBaseStep))
 	ke.returnToBaseIsolationFraction = 1
 
-	ke.checkDecisionVariablesFromParams()
-
 	return ke.parameters.ValidationErrors()
 }
 
@@ -124,17 +120,6 @@ func (ke *Explorer) SetTemperature(temperature float64) error {
 	}
 	ke.coolant.SetTemperature(temperature)
 	return nil
-}
-
-func (ke *Explorer) checkDecisionVariablesFromParams() {
-	decisionVariableNames := ke.parameters.GetString(ExplorableDecisionVariables)
-	splitVariableNames := strings.Split(decisionVariableNames, nameSeparator)
-	for _, name := range splitVariableNames {
-		variableOffered := ke.Model().OffersDecisionVariable(name)
-		if !variableOffered {
-			ke.parameters.AddValidationErrorMessage("decision variable [" + name + "] not recognised by model")
-		}
-	}
 }
 
 func (ke *Explorer) ParameterErrors() error {
