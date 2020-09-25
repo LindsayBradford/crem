@@ -4,6 +4,8 @@ package scenario
 
 import (
 	"fmt"
+	solutionset "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
+	encoding2 "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding"
 	"os"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -138,32 +140,58 @@ func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 	s.encodeSolutionSet(solutionSet)
 }
 
+//type Summary map[string]solution.Summary
+
 func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) {
+	summary := make(solutionset.Summary, 0)
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
-		tempModel := s.decompressionModel.DeepClone()
-
-		solutionSet.Decompress(compressedModel, tempModel)
-
-		solutionId := s.deriveSolutionId(solutionSet, solutionIndex+1)
-
-		decompressedModelSolution := new(solution.SolutionBuilder).
-			WithId(solutionId).
-			ForModel(tempModel).
-			Build()
-
-		encoder := new(encoding.Builder).
-			ForOutputType(s.outputType).
-			WithOutputPath(s.outputPath).
-			Build()
-
-		if encodingError := encoder.Encode(decompressedModelSolution); encodingError != nil {
-			s.LogHandler().Error(encodingError)
-		}
+		solution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
+		s.encodeSolution(*solution)
+		s.summarise(&summary, solution)
 	}
+	s.encodeSummary(&summary)
+}
+
+func (s *Saver) deriveModelSolution(solutionSet archive.NonDominanceModelArchive, solutionIndex int, compressedModel *archive.CompressedModelState) *solution.Solution {
+	solutionId := s.deriveSolutionId(solutionSet, solutionIndex+1)
+	return s.deriveSolutionFrom(solutionSet, compressedModel, solutionId)
+}
+
+func (s *Saver) deriveSolutionFrom(solutionSet archive.NonDominanceModelArchive, compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
+	decompressedModel := s.decompress(solutionSet, compressedModel)
+
+	decompressedModelSolution := new(solution.SolutionBuilder).
+		WithId(solutionId).
+		ForModel(decompressedModel).
+		Build()
+	return decompressedModelSolution
+}
+
+func (s *Saver) decompress(solutionSet archive.NonDominanceModelArchive, compressedModel *archive.CompressedModelState) model.Model {
+	decompressedModel := s.decompressionModel.DeepClone()
+	decompressedModel.Initialise()
+	solutionSet.Decompress(compressedModel, decompressedModel)
+	return decompressedModel
 }
 
 func (s *Saver) deriveSolutionId(solutionSet archive.NonDominanceModelArchive, currentSolution int) string {
 	solutionSetSize := solutionSet.Len()
 	solutionId := fmt.Sprintf("%s Solution (%d/%d)", solutionSet.Id(), currentSolution, solutionSetSize)
 	return solutionId
+}
+
+func (s *Saver) summarise(summary *solutionset.Summary, solution *solution.Solution) {
+	baseMap := *summary
+	baseMap[solution.Id] = solution.Summarise()
+}
+
+func (s *Saver) encodeSummary(summary *solutionset.Summary) {
+	encoder := new(encoding2.Builder).
+		ForOutputType(s.outputType).
+		WithOutputPath(s.outputPath).
+		Build()
+
+	if encodingError := encoder.Encode(summary); encodingError != nil {
+		s.LogHandler().Error(encodingError)
+	}
 }

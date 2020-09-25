@@ -66,7 +66,6 @@ func (cm *DecisionVariableMarshaler) decisionVariablesToCsvString(solution *solu
 }
 
 func planningUnitsAsHeaders(solution *solution.Solution) []string {
-
 	headers := make([]string, len(solution.PlanningUnits))
 
 	for index, value := range solution.PlanningUnits {

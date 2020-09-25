@@ -48,22 +48,27 @@ func TestModelCompressor_Decompress_AlteredModel(t *testing.T) {
 	// given
 	compressorUnderTest := new(ModelCompressor)
 	originalModel := buildMultiObjectiveDumbModel()
+	modifiedModel := originalModel.DeepClone()
 
 	numberOfRandomChanges := 7
 	for change := 0; change < numberOfRandomChanges; change++ {
-		originalModel.DoRandomChange()
+		modifiedModel.DoRandomChange()
 	}
 
 	decompressedModel := originalModel.DeepClone()
 
 	// when
-	compressedModelState := compressorUnderTest.Compress(originalModel)
+	compressedModelState := compressorUnderTest.Compress(modifiedModel)
 	compressorUnderTest.Decompress(compressedModelState, decompressedModel)
 
 	// then
-	g.Expect(decompressedModel.DecisionVariables()).To(Equal(originalModel.DecisionVariables()))
-	g.Expect(decompressedModel.ManagementActions()).To(Equal(originalModel.ManagementActions()))
-	g.Expect(compressedModelState.MatchesStateOf(originalModel)).To(BeTrue())
+	//g.Expect(decompressedModel.DecisionVariables()).To(Not(Equal(originalModel.DecisionVariables())))
+	//g.Expect(decompressedModel.ManagementActions()).To(Not(Equal(originalModel.ManagementActions())))
+	//g.Expect(compressedModelState.MatchesStateOf(originalModel)).To(BeFalse())
+
+	g.Expect(decompressedModel.DecisionVariables()).To(Equal(modifiedModel.DecisionVariables()))
+	g.Expect(decompressedModel.ManagementActions()).To(Equal(modifiedModel.ManagementActions()))
+	g.Expect(compressedModelState.MatchesStateOf(modifiedModel)).To(BeTrue())
 }
 
 func buildMultiObjectiveDumbModel() *modumb.Model {

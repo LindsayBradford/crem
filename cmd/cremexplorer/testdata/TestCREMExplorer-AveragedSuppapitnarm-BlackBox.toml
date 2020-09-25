@@ -1,10 +1,10 @@
 [Scenario]
 Name = "Averaged Suppapitnarm"
 OutputPath="testdata/solutions"
-CpuProfilePath="testdata/profile.pprof"
+#CpuProfilePath="testdata/profile.pprof"
 OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
-ReportEveryNumberOfIterations = 100
+ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]
 #Debugging = "StandardOutput"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealer = "StandardOutput"
@@ -13,10 +13,9 @@ Annealer = "StandardOutput"
 [Annealer]
 Type="AveragedSuppapitnarm"
 [Annealer.Parameters]
-ExplorableDecisionVariables = "SedimentProduced,ImplementationCost"
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.999  # 0.99
-MaximumIterations = 2_000
+MaximumIterations = 500
 InitialReturnToBaseStep = 50 # 20_000
 MinimumReturnToBaseRate = 10 # 10
 

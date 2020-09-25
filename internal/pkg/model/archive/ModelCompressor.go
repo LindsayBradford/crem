@@ -40,6 +40,6 @@ func compressActions(model model.Model) archive.BooleanArchive {
 
 func (mc *ModelCompressor) Decompress(condensedModelState *CompressedModelState, model model.Model) {
 	for index := 0; index < condensedModelState.Actions.Len(); index++ {
-		model.SetManagementActionUnobserved(index, condensedModelState.Actions.Value(index))
+		model.SetManagementAction(index, condensedModelState.Actions.Value(index))
 	}
 }

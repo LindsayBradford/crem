@@ -18,11 +18,11 @@ MaximumIterations = 2_000
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
+DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
 LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
-DataSourcePath = "testdata/testInputExcelDataSet.xlsx"
 
