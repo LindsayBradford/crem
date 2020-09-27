@@ -2,10 +2,13 @@
 
 ## Version 0.11 (tbd):
 ### New Features
-* Planning Units renamed to Subcatchments for CatchmentModel.
-* Example config files now ship with rich configuration detail, showcasing full config potential. 
+* Planning Units renamed to Subcatchments for CatchmentModel output.
+* Example config files now ship with rich configuration detail, showcasing full config potential.
+* A CSV-formatted summary file of variable values is now created per MOSA run for ease of analysis.   
 ### Bug Fixes
-* Redundant CatchmentModel parameters have now been removed.  
+* Fixed a MOSA solution set decompression bug that saw multiple solutions with same variable values output. 
+* Redundant CatchmentModel parameters around coarse-grained costing have now been removed.
+* Parameter "ExplorableDecisionVariables" removed, as it does nothing.
 
 ## Version 0.10 (04 Sept 2020):
 ### New Features
