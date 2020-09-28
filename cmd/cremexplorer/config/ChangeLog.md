@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.11 (tbd):
+## Version 0.11 (28 Sept 2020):
 ### New Features
 * Planning Units renamed to Subcatchments for CatchmentModel output.
 * Example config files now ship with rich configuration detail, showcasing full config potential.

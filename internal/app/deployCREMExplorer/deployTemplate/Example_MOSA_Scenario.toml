@@ -23,6 +23,7 @@ Model = "Discarded"                                     # "Discarded"  (default)
 
 [Annealer]
 Type="AveragedSuppapitnarm"
+EventNotifier = "Sequential"                            # "Sequential" (default) | Concurrent"
 [Annealer.Parameters]
 StartingTemperature = 10_000.0 #10
 CoolingFactor =  0.999  # 0.99
