@@ -27,6 +27,7 @@ const (
 	ArchiveResult                   = "ArchiveResult"
 	IterationsUntilNextReturnToBase = "IterationsUntilNextReturnToBase"
 	SolutionSet                     = "SolutionSet"
+	LastReturnedToBase              = "LastReturnedToBase"
 )
 
 type Explorer struct {
@@ -46,6 +47,9 @@ type Explorer struct {
 
 	modelArchive         archive.NonDominanceModelArchive
 	archiveStorageResult archive.StorageResult
+
+	currentIteration   uint64
+	lastReturnedToBase uint64
 
 	iterationsUntilReturnToBase   uint64
 	returnToBaseStep              float64
@@ -73,6 +77,7 @@ func (ke *Explorer) Initialise() {
 	ke.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
 	ke.deriveIterationsUntilReturnToBase()
+	ke.currentIteration = 1
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -159,6 +164,8 @@ func (ke *Explorer) TryRandomChange() {
 
 	ke.AcceptOrRevertChange(variableDifferences)
 	ke.ReturnToBaseIfRequired(compressedChangedModelState)
+
+	ke.currentIteration++
 }
 
 func (ke *Explorer) note(note string) {
@@ -283,6 +290,8 @@ func (ke *Explorer) returnToBase(currentModelState *archive.CompressedModelState
 		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
 		WithAttribute("New Base Model SHA256", compressedModel.Sha256())
 
+	ke.lastReturnedToBase = ke.currentIteration
+
 	ke.NotifyObserversOfEvent(*event)
 }
 
@@ -332,7 +341,8 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 			Add(SolutionSet, ke.modelArchive)
 	case observer.FinishedIteration:
 		return baseAttributes.
-			Add(ArchiveSize, ke.modelArchive.Len())
+			Add(ArchiveSize, ke.modelArchive.Len()).
+			Add(LastReturnedToBase, ke.lastReturnedToBase)
 	}
 	return nil
 }

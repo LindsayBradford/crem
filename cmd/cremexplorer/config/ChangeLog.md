@@ -2,7 +2,7 @@
 
 ## Version 0.11 (TBD):
 ### New Features
-* TBD
+* Minor logging changes to allow for easier MOSA pareto front quality analysis.
 ### Bug Fixes
 * TBD
 
