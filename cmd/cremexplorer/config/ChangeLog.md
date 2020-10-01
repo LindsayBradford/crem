@@ -3,6 +3,7 @@
 ## Version 0.11 (TBD):
 ### New Features
 * Minor logging changes to allow for easier MOSA pareto front quality analysis.
+* Now deploys with a 'scripts' directory and script 'MOSA_QualityExtractor.py' that extracts MOSA quality metrics from logs.
 ### Bug Fixes
 * TBD
 
