@@ -39,7 +39,7 @@ def deriveQualityMetrics(logFile, qualityFile):
     writeEntries(logFile, qualityFile)
 
 def writeHeadings(qualityFile):
-    headings = ['Iteration', 'Temperature', 'LastReturnedToBase', 'Solutions' ]
+    headings = ['Iteration', 'Temperature', 'ObjectiveValue']
     
     stringIO = io.StringIO()
     print(*headings,  sep=', ', file=stringIO)
@@ -55,12 +55,10 @@ def writeEntries(logFile, qualityFile):
             iteration = extractValueViaPattern(line, 'Iteration \[([\d,]*?)/')
             # Any combination of digits, '.', and ',' between 'Temperature [' and the first (reluctant) ']' found.
             temperature = extractValueViaPattern(line, 'Temperature \[([\d,\.]*?)\]')
-            # Any combination of digits and ',' between 'LastReturnedToBase [' and the first (reluctant) ']' found.
-            lastReturnedToBase = extractValueViaPattern(line, 'LastReturnedToBase \[([\d,]*?)\]')
-            # Any combination of digits and ',' between 'ArchiveSize [' and the first (reluctant) ']' found.
-            archiveSize = extractValueViaPattern(line, 'ArchiveSize \[([\d,]*?)\]')
+            # Any combination of digits, '.', and ',' between 'ObjectiveValue [' and the first (reluctant) ']' found.
+            objectiveValue = extractValueViaPattern(line, 'ObjectiveValue \[([\d,.]*?)\]')
 
-            qualityLine = f'{iteration},  {temperature}, {lastReturnedToBase}, {archiveSize}\n'
+            qualityLine = f'{iteration},{temperature}, {objectiveValue}\n'
             qualityFile.write(qualityLine)
             
     for line in logFile:

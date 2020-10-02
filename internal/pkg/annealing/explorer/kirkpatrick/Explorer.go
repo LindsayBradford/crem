@@ -293,7 +293,9 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 	case observer.Explorer:
 		return baseAttributes
 	case observer.FinishedIteration:
-		return new(attributes.Attributes).Add(ObjectiveValue, ke.ObjectiveValue())
+		return new(attributes.Attributes).
+			Add(explorer.Temperature, ke.Temperature).
+			Add(ObjectiveValue, ke.ObjectiveValue())
 	}
 	return nil
 }
