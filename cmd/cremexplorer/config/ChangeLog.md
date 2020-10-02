@@ -6,6 +6,7 @@
 * Now deploys with a 'scripts' directory
     * 'MOSA_QualityExtractor.py' that extracts MOSA quality metrics from logs.
     * 'SOSA_QualityExtractor.py' that extracts SOSA quality metrics from logs.
+* ALl existing scripts have been cut across to python, with duplication across scripting languages removed.
 ### Bug Fixes
 * TBD
 
