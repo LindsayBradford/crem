@@ -4,6 +4,7 @@ package data
 
 import (
 	"fmt"
+	"github.com/LindsayBradford/crem/cmd/cremexplorer/config"
 
 	"github.com/BurntSushi/toml"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
@@ -67,6 +68,8 @@ func retrieveConfig(source decoderSummary) (*Config, error) {
 		allErrors.Add(errors.New(errorMsg))
 	}
 	conf.MetaData.FilePath = deriveFilePathFromSource(source)
+	conf.MetaData.ExecutableName = config.ExecutableName
+	conf.MetaData.ExecutableVersion = config.Version
 
 	if checkErrors := checkMandatoryFields(&conf); checkErrors != nil {
 		allErrors.Add(checkErrors)

@@ -3,6 +3,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
@@ -84,7 +85,10 @@ func deriveScenario(configFile string) {
 	myScenario = myInterpreter.Interpret(myConfig).Scenario()
 
 	LogHandler = myScenario.LogHandler()
-	LogHandler.Info("Configuring scenario with [" + myConfig.MetaData.FilePath + "]")
+	metaData := myConfig.MetaData
+	metaDataSummary := fmt.Sprintf("Running [%s] Version [%s] with scenario [%s]",
+		metaData.ExecutableName, metaData.ExecutableVersion, metaData.FilePath)
+	LogHandler.Info(metaDataSummary)
 
 	interpreterErrors := myInterpreter.Errors()
 

@@ -7,6 +7,7 @@
     * 'MOSA_QualityExtractor.py' that extracts MOSA quality metrics from logs.
     * 'SOSA_QualityExtractor.py' that extracts SOSA quality metrics from logs.
 * ALl existing scripts have been cut across to python, with duplication across scripting languages removed.
+* Logging now reports application name and version in opening log entry. 
 ### Bug Fixes
 * TBD
 

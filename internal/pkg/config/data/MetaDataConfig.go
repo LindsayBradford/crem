@@ -3,5 +3,7 @@
 package data
 
 type MetaDataConfig struct {
-	FilePath string
+	FilePath          string
+	ExecutableName    string
+	ExecutableVersion string
 }

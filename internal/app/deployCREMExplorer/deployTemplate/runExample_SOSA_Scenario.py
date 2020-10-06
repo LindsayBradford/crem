@@ -2,6 +2,8 @@
 # Author: Lindsay Bradford
 
 import subprocess
+
+
 def main():
     configFilePrefix = 'Example_SOSA_Scenario'
 
@@ -20,6 +22,7 @@ def main():
         print(output.stdout)
 
     print (f'\n\nPress <ENTER> to close window. Above log been written to "{outputPath}".\n')
+
 
 if __name__ == '__main__':
     main()
