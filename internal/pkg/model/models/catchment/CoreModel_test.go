@@ -3,6 +3,7 @@
 package catchment
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"testing"
@@ -209,7 +210,7 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.754)
 }
 
-func TestCoreModel_IsEquivalentTo_Success(t *testing.T) {
+func TestCoreModel_IsEquivalentTo_AsExpected(t *testing.T) {
 	// given
 	g := NewGomegaWithT(t)
 	const planningUnitUnderTest = 18
@@ -244,6 +245,50 @@ func TestCoreModel_IsEquivalentTo_Success(t *testing.T) {
 	// then
 
 	g.Expect(firstModelUnderTest.IsEquivalentTo(secondModelUnderTest)).To(BeFalse())
+}
+
+func TestCoreModel_Compression_AsExpected(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 18
+	modelArchive := new(archive.NonDominanceModelArchive).Initialise()
+
+	// when
+
+	modelUnderTest := buildTestingModel(g)
+	compressedModelUnderTest := modelArchive.Compress(modelUnderTest)
+
+	decompressedModel := modelUnderTest.DeepClone()
+	decompressedModel.Initialise()
+	modelArchive.Decompress(compressedModelUnderTest, decompressedModel)
+
+	// then
+
+	g.Expect(modelUnderTest.IsEquivalentTo(decompressedModel)).To(BeTrue())
+}
+
+func TestCoreModel_CompressionOfChanged_AsExpected(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 18
+	planningUnit := planningunit.Id(planningUnitUnderTest)
+	modelArchive := new(archive.NonDominanceModelArchive).Initialise()
+
+	// when
+
+	modelUnderTest := buildTestingModel(g)
+	modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	modelUnderTest.AcceptChange()
+
+	compressedModelUnderTest := modelArchive.Compress(modelUnderTest)
+
+	decompressedModel := modelUnderTest.DeepClone()
+	decompressedModel.Initialise()
+	modelArchive.Decompress(compressedModelUnderTest, decompressedModel)
+
+	// then
+
+	g.Expect(modelUnderTest.IsEquivalentTo(decompressedModel)).To(BeTrue())
 }
 
 func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {

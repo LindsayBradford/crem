@@ -328,11 +328,17 @@ func (m *CoreModel) ActiveManagementActions() []action.ManagementAction {
 }
 
 func (m *CoreModel) SetManagementAction(index int, value bool) {
-	m.managementActions.SetActivation(index, value)
+	if m.ManagementActions()[index].IsActive() != value {
+		m.managementActions.SetActivation(index, value)
+		m.AcceptChange()
+	}
 }
 
 func (m *CoreModel) SetManagementActionUnobserved(index int, value bool) {
-	m.managementActions.SetActivationUnobserved(index, value)
+	if m.ManagementActions()[index].IsActive() != value {
+		m.managementActions.SetActivationUnobserved(index, value)
+		m.AcceptChange()
+	}
 }
 
 func (m *CoreModel) PlanningUnits() planningunit.Ids {
@@ -528,7 +534,8 @@ func (m *CoreModel) checkActions(otherModel model.Model) bool {
 func (m *CoreModel) checkVariables(otherModel model.Model) bool {
 	myDecisionVariables := *m.DecisionVariables()
 	for _, variable := range myDecisionVariables {
-		if variable.Value() != otherModel.DecisionVariable(variable.Name()).Value() {
+		otherVariable := otherModel.DecisionVariable(variable.Name())
+		if variable.Value() != otherVariable.Value() {
 			return false
 		}
 	}
