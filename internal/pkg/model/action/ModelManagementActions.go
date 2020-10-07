@@ -6,14 +6,17 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	"github.com/pkg/errors"
+	"sort"
 )
 
 // ModelManagementActions is a container/manager for all management actions that can be applied to a model.
 type ModelManagementActions struct {
 	lastApplied ManagementAction
-	actions     []ManagementAction
+	actions     ManagementActions
 	rand.RandContainer
 }
+
+type ManagementActions []ManagementAction
 
 func (m *ModelManagementActions) Initialise() {
 	m.actions = make([]ManagementAction, 0)
@@ -25,6 +28,30 @@ func (m *ModelManagementActions) Add(newActions ...ManagementAction) {
 	for _, newAction := range newActions {
 		m.actions = append(m.actions, newAction)
 	}
+}
+
+func (m *ModelManagementActions) Sort() {
+	sort.Sort(m.actions)
+}
+
+func (ma ManagementActions) Len() int {
+	return len(ma)
+}
+
+func (ma ManagementActions) Swap(i, j int) {
+	ma[i], ma[j] = ma[j], ma[i]
+}
+
+func (ma ManagementActions) Less(i, j int) bool {
+	if ma[i].PlanningUnit() < ma[j].PlanningUnit() {
+		return true
+	}
+	if ma[i].PlanningUnit() == ma[j].PlanningUnit() {
+		if ma[i].Type() < ma[j].Type() {
+			return true
+		}
+	}
+	return false
 }
 
 // RandomlyToggleOneActivation randomly picks one of its stored management actions and toggles its activation
@@ -71,7 +98,7 @@ func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementActio
 	}
 }
 
-func (m *ModelManagementActions) RandomlyDeinitialiseAction(action ManagementAction) {
+func (m *ModelManagementActions) RandomlyDeInitialiseAction(action ManagementAction) {
 	randomValue := m.RandomNumberGenerator().Intn(2)
 	switch randomValue {
 	case deactivate:
@@ -122,11 +149,11 @@ func (m *ModelManagementActions) LastAppliedAction() ManagementAction {
 	return m.lastApplied
 }
 
-func (m *ModelManagementActions) Actions() []ManagementAction {
+func (m *ModelManagementActions) Actions() ManagementActions {
 	return m.actions
 }
 
-func (m *ModelManagementActions) ActiveActions() []ManagementAction {
+func (m *ModelManagementActions) ActiveActions() ManagementActions {
 	activeActions := make([]ManagementAction, 0)
 
 	for _, action := range m.actions {

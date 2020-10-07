@@ -243,3 +243,5 @@ func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction
 }
 
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
+
+func (m *Model) IsEquivalentTo(model.Model) bool { return false } // TODO: implement

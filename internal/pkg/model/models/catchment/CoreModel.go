@@ -6,6 +6,7 @@ import (
 	"fmt"
 	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"math"
 
@@ -237,6 +238,7 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 		m.managementActions.Add(action)
 		action.Subscribe(actionObservers...)
 	}
+	m.managementActions.Sort()
 }
 
 func (m *CoreModel) randomlyInitialiseActions() {
@@ -291,7 +293,7 @@ func (m *CoreModel) randomlyDeactivateActionsFromAllActiveStart() {
 	}
 
 	for _, action := range m.managementActions.Actions() {
-		m.managementActions.RandomlyDeinitialiseAction(action)
+		m.managementActions.RandomlyDeInitialiseAction(action)
 
 		if action.IsActive() {
 			continue // Nothing to if it wasn't deactivated.
@@ -497,4 +499,39 @@ func checkBounds(possiblyBoundVariable variable.UndoableDecisionVariable, value 
 
 func (m *CoreModel) TearDown() {
 	// deliberately does nothing.
+}
+
+func (m *CoreModel) IsEquivalentTo(otherModel model.Model) bool {
+	if !m.checkActions(otherModel) {
+		return false
+	}
+	if !m.checkVariables(otherModel) {
+		return false
+	}
+	return true
+}
+
+func (m *CoreModel) checkActions(otherModel model.Model) bool {
+	myActions := m.ManagementActions()
+	otherActions := otherModel.ManagementActions()
+	for index := range myActions {
+		assert.That(myActions[index].PlanningUnit() == otherActions[index].PlanningUnit()).Holds()
+		assert.That(myActions[index].Type() == otherActions[index].Type()).Holds()
+
+		if myActions[index].IsActive() != otherActions[index].IsActive() {
+			return false
+		}
+	}
+	return true
+}
+
+func (m *CoreModel) checkVariables(otherModel model.Model) bool {
+	myDecisionVariables := *m.DecisionVariables()
+	for _, variable := range myDecisionVariables {
+		if variable.Value() != otherModel.DecisionVariable(variable.Name()).Value() {
+			return false
+		}
+	}
+
+	return true
 }

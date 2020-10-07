@@ -29,6 +29,8 @@ type Model interface {
 	AcceptChange()
 	RevertChange()
 
+	IsEquivalentTo(Model) bool
+
 	DeepClone() Model
 
 	ManagementActions() []action.ManagementAction
@@ -110,5 +112,7 @@ func (nm *nullModel) SetManagementAction(index int, value bool)           {}
 func (nm *nullModel) SetManagementActionUnobserved(index int, value bool) {}
 
 func (nm *nullModel) PlanningUnits() planningunit.Ids { return nil }
+
+func (nm *nullModel) IsEquivalentTo(Model) bool { return false }
 
 func (nm *nullModel) DeepClone() Model { return nm }

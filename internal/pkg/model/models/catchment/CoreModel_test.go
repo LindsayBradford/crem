@@ -209,6 +209,43 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.754)
 }
 
+func TestCoreModel_IsEquivalentTo_Success(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 18
+	planningUnit := planningunit.Id(planningUnitUnderTest)
+
+	// when
+
+	firstModelUnderTest := buildTestingModel(g)
+	secondModelUnderTest := buildTestingModel(g)
+
+	// then
+
+	g.Expect(firstModelUnderTest.IsEquivalentTo(secondModelUnderTest)).To(BeTrue())
+
+	// when
+
+	firstModelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	firstModelUnderTest.AcceptChange()
+
+	secondModelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	secondModelUnderTest.AcceptChange()
+
+	// then
+
+	g.Expect(firstModelUnderTest.IsEquivalentTo(secondModelUnderTest)).To(BeTrue())
+
+	// when
+
+	secondModelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+	secondModelUnderTest.AcceptChange()
+
+	// then
+
+	g.Expect(firstModelUnderTest.IsEquivalentTo(secondModelUnderTest)).To(BeFalse())
+}
+
 func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
 	// given
 	g := NewGomegaWithT(t)
@@ -253,7 +290,7 @@ func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
 	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 2.291))
 }
 
-func TestCoreModel_ParticulateNitrogen_Exploratory(t *testing.T) {
+func TestCoreModel_ParticulateNitrogen_HillSlopeRiverbankDependency_NoRoundingErrors(t *testing.T) {
 	// given
 	g := NewGomegaWithT(t)
 	const planningUnitUnderTest = 112

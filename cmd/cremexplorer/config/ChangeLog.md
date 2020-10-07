@@ -9,7 +9,7 @@
 * ALl existing scripts have been cut across to python, with duplication across scripting languages removed.
 * Logging now reports application name and version in opening log entry. 
 ### Bug Fixes
-* TBD
+* Fixed issue where management actions for a model were created in differing orders, breaking compression.
 
 ## Version 0.11 (28 Sept 2020):
 ### New Features
