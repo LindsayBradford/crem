@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.11 (TBD):
+## Version 0.12 (07/10/2020):
 ### New Features
 * Minor logging changes to allow for easier annealing quality analysis.
 * Now deploys with a 'scripts' directory

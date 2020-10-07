@@ -1,14 +1,15 @@
 # Change Log
 
-## Version 0.11 (TBD):
+## Version 0.12 (07/10/2020):
 ### New Features
 * Minor logging changes to allow for easier annealing quality analysis.
 * Now deploys with a 'scripts' directory
     * 'MOSA_QualityExtractor.py' that extracts MOSA quality metrics from logs.
     * 'SOSA_QualityExtractor.py' that extracts SOSA quality metrics from logs.
 * ALl existing scripts have been cut across to python, with duplication across scripting languages removed.
+* Logging now reports application name and version in opening log entry. 
 ### Bug Fixes
-* TBD
+* Fixed issue where management actions for a model were created in differing orders, breaking compression.
 
 ## Version 0.11 (28 Sept 2020):
 ### New Features
