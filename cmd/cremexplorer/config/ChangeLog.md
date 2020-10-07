@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 0.13 (TBD):
+### New Features
+* TBD 
+### Bug Fixes
+* TBD
+
 ## Version 0.12 (07/10/2020):
 ### New Features
 * Minor logging changes to allow for easier annealing quality analysis.
