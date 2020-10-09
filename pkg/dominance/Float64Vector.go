@@ -42,14 +42,26 @@ func vectorLengthsMatch(firstVector *Float64Vector, secondVector *Float64Vector)
 }
 
 func (v *Float64Vector) Dominates(otherCandidate Candidate) bool {
-	return v.anyLessThanValuesIn(otherCandidate) && v.allEqualOrLessThanValuesIn(otherCandidate)
+	return v.allLessThanValuesIn(otherCandidate)
+}
+
+func (v *Float64Vector) allLessThanValuesIn(otherCandidate Candidate) bool {
+	otherCandidateAsVector := *asFloat64Vector(otherCandidate)
+	thisCandidateAsVector := *v
+
+	for index := range thisCandidateAsVector {
+		if thisCandidateAsVector[index] >= otherCandidateAsVector[index] {
+			return false
+		}
+	}
+	return true
 }
 
 func (v *Float64Vector) anyLessThanValuesIn(otherCandidate Candidate) bool {
 	otherCandidateAsVector := *asFloat64Vector(otherCandidate)
 	thisCandidateAsVector := *v
 
-	for index := range otherCandidateAsVector {
+	for index := range thisCandidateAsVector {
 		if thisCandidateAsVector[index] < otherCandidateAsVector[index] {
 			return true
 		}

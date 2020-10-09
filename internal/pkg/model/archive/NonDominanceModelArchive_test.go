@@ -67,11 +67,22 @@ func TestNonDominanceModelArchive_DominatorReplaceDominated(t *testing.T) {
 
 	// then
 	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
-	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 2))
 
 	// when
-	modelToChange.SetManagementAction(3, true)
+	modelToChange.SetManagementAction(1, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
+
+	// when
+	modelToChange.SetManagementAction(2, true)
 	modelToChange.AcceptChange()
 	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
 	showArchiveState(t, archiveUnderTest)
@@ -79,21 +90,19 @@ func TestNonDominanceModelArchive_DominatorReplaceDominated(t *testing.T) {
 	// then
 	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
 }
 
-func TestNonDominanceModelArchive_ArchiveAttemptOfDominatedRejected(t *testing.T) {
+func TestNonDominanceModelArchive_ArchiveAttemptOfDominatedRejectedForcedAccepted(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
 	modelToChange := buildSilentMultiObjectiveDumbModel()
 	archiveUnderTest := New()
-
-	// when
 	storageResult := archiveUnderTest.AttemptToArchive(modelToChange)
 	showArchiveState(t, archiveUnderTest)
 
-	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
 	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
 
@@ -103,59 +112,65 @@ func TestNonDominanceModelArchive_ArchiveAttemptOfDominatedRejected(t *testing.T
 	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
 	showArchiveState(t, archiveUnderTest)
 
-	// then
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 2))
+
+	modelToChange.SetManagementAction(1, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
+
+	modelToChange.SetManagementAction(2, true)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
 	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	g.Expect(storageResult).To(Equal(StoredReplacingDominatedEntries))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
 
-	// when
+	modelToChange.SetManagementAction(2, false)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(RejectedWithDuplicateEntryDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
+
+	modelToChange.SetManagementAction(1, false)
+	modelToChange.AcceptChange()
+	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
+	g.Expect(storageResult).To(Equal(RejectedWithDuplicateEntryDetected))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
+
 	modelToChange.SetManagementAction(0, false)
 	modelToChange.AcceptChange()
 	storageResult = archiveUnderTest.AttemptToArchive(modelToChange)
 	showArchiveState(t, archiveUnderTest)
 
-	// then
 	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	g.Expect(storageResult).To(Equal(RejectedWithStoredEntryDominanceDetected))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
-}
-
-func TestNonDominanceModelArchive_ForceArchiveAttemptStored(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	// given
-	modelToChange := buildSilentMultiObjectiveDumbModel()
-	archiveUnderTest := New()
-
-	// when
-	storageResult := archiveUnderTest.AttemptToArchive(modelToChange)
-
-	modelToChange.SetManagementAction(0, true)
-	modelToChange.AcceptChange()
-	archiveUnderTest.AttemptToArchive(modelToChange)
-
-	modelToChange.SetManagementAction(3, true)
-	modelToChange.AcceptChange()
-	archiveUnderTest.AttemptToArchive(modelToChange)
-
-	// then
-	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
-	g.Expect(storageResult).To(Equal(StoredWithNoDominanceDetected))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
-	showArchiveState(t, archiveUnderTest)
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
 
 	// when
 
-	modelToChange.SetManagementAction(3, false)
-	modelToChange.AcceptChange()
-
+	t.Logf("Forcing last change into archive")
 	storageResult = archiveUnderTest.ForceIntoArchive(modelToChange)
 	showArchiveState(t, archiveUnderTest)
 
 	// then
 	g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	g.Expect(storageResult).To(Equal(StoredForcingDominatingStateRemoval))
-	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 1))
+	g.Expect(archiveUnderTest.Len()).To(BeNumerically(equalTo, 3))
 }
 
 func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
@@ -219,6 +234,7 @@ func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
 	modelToChange := buildSilentMultiObjectiveDumbModel()
 	archiveUnderTest := New()
 	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
 
 	// when
 	summary := archiveUnderTest.ArchiveSummary()
@@ -233,29 +249,40 @@ func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
 	modelToChange.SetManagementAction(0, true)
 	modelToChange.AcceptChange()
 	archiveUnderTest.AttemptToArchive(modelToChange)
-
-	summary = archiveUnderTest.ArchiveSummary()
-
-	// then
-	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 1))
-
-	for _, entry := range summary {
-		g.Expect(entry.Minimum).To(BeNumerically(equalTo, entry.Maximum))
-		g.Expect(entry.Range).To(BeNumerically(equalTo, 0))
-	}
-	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
-
-	// when
-	modelToChange.SetManagementAction(0, false)
-	modelToChange.AcceptChange()
-	modelToChange.SetManagementAction(1, true)
-	modelToChange.AcceptChange()
-	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
 
 	summary = archiveUnderTest.ArchiveSummary()
 
 	// then
 	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 2))
+
+	for index, entry := range summary {
+		switch index {
+		case 0:
+			g.Expect(entry.Minimum).To(BeNumerically(equalTo, 999))
+			g.Expect(entry.Maximum).To(BeNumerically(equalTo, 1000))
+			g.Expect(entry.Range).To(BeNumerically(equalTo, 1))
+		default:
+			g.Expect(entry.Minimum).To(BeNumerically(equalTo, entry.Maximum))
+			g.Expect(entry.Range).To(BeNumerically(equalTo, 0))
+		}
+	}
+
+	// when
+	modelToChange.SetManagementAction(0, false)
+	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	modelToChange.SetManagementAction(1, true)
+	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
+	summary = archiveUnderTest.ArchiveSummary()
+
+	// then
+	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 3))
 
 	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
 	g.Expect(summary[0].Maximum).To(BeNumerically(equalTo, 1000))
@@ -268,14 +295,18 @@ func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
 	// when
 	modelToChange.SetManagementAction(1, false)
 	modelToChange.AcceptChange()
+	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
+
 	modelToChange.SetManagementAction(2, true)
 	modelToChange.AcceptChange()
 	archiveUnderTest.AttemptToArchive(modelToChange)
+	showArchiveState(t, archiveUnderTest)
 
 	summary = archiveUnderTest.ArchiveSummary()
 
 	// then
-	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 3))
+	g.Expect(len(archiveUnderTest.archive)).To(BeNumerically(equalTo, 4))
 
 	g.Expect(summary[0].Minimum).To(BeNumerically(equalTo, 999))
 	g.Expect(summary[0].Maximum).To(BeNumerically(equalTo, 1000))
