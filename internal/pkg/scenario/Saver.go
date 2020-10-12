@@ -140,8 +140,6 @@ func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 	s.encodeSolutionSet(solutionSet)
 }
 
-//type Summary map[string]solution.Summary
-
 func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 	summary := make(solutionset.Summary, 0)
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
@@ -164,6 +162,7 @@ func (s *Saver) deriveSolutionFrom(solutionSet archive.NonDominanceModelArchive,
 		WithId(solutionId).
 		ForModel(decompressedModel).
 		Build()
+
 	return decompressedModelSolution
 }
 

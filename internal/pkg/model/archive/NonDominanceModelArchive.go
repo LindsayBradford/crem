@@ -3,13 +3,11 @@
 package archive
 
 import (
-	"math"
-	"sort"
-
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/name"
+	"math"
 )
 
 type StorageResult uint
@@ -195,9 +193,14 @@ func (a *NonDominanceModelArchive) ArchiveSummary() Summary {
 }
 
 func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int) *CompressedModelState {
-	a.calculateArchiveIsolation()
-	sort.Sort(a)
-	return a.selectRandomModel(selectionRange)
+	// TODO: This is Suppapitmarm approach, and archiveSize^2 in computational complexity for good isolation model selection.
+	//a.calculateArchiveIsolation()
+	//sort.Sort(a)
+	//return a.selectRandomModel(selectionRange)
+
+	// TODO: This is the Engrand approach, and constant time in computational complexity, with unlikely isolation model selection..
+	fullArchiveRange := len(a.archive)
+	return a.selectRandomModel(fullArchiveRange)
 }
 
 func (a *NonDominanceModelArchive) calculateArchiveIsolation() {
@@ -245,7 +248,10 @@ func (a *NonDominanceModelArchive) selectRandomModel(selectionRange int) *Compre
 }
 
 func (a *NonDominanceModelArchive) selectRandomIndex(selectionRange int) int {
-	assert.That(selectionRange < len(a.archive))
+	assert.That(selectionRange > 0 && selectionRange <= len(a.archive)).
+		WithFailureMessage("Selection range invalid for size of archive").
+		Holds()
+
 	randomIndex := a.RandomNumberGenerator().Intn(selectionRange)
 	return randomIndex
 }

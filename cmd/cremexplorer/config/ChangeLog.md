@@ -2,9 +2,10 @@
 
 ## Version 0.13 (TBD):
 ### New Features
-* TBD 
+* Experimenting with the poorer quality, but much faster return-to-base behaviour of Engrand et.al.
 ### Bug Fixes
-* TBD
+* Some fixes around non-dominance and its testing.
+* Fixed a MOSA resource starvation bug where an Excel handler per solution was created as the archive was saved. 
 
 ## Version 0.12 (07/10/2020):
 ### New Features

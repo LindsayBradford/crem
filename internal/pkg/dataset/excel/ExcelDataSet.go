@@ -198,6 +198,7 @@ func (ds *DataSet) saveDataSetIntoExcelFile(excelFilePath string) {
 
 	workbook := workbooks.Add()
 	defer workbook.Close(false)
+	defer workbook.Release()
 
 	ds.storeToWorkbook(workbook)
 	ds.saveWorkbookAs(workbook, excelFilePath)

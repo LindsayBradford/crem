@@ -32,6 +32,7 @@ func NewModel() *Model {
 }
 
 type Model struct {
+	sourceDataLoaded   bool
 	sourceDataSet      dataset.DataSet
 	oleFunctionWrapper threading.MainThreadFunctionWrapper
 	CoreModel
@@ -50,10 +51,13 @@ func (m *Model) WithParameters(params baseParameters.Map) *Model {
 func (m *Model) Initialise() {
 	m.note("Initialising")
 
-	loadError := m.loadSourceDataSet()
-	if loadError != nil {
-		m.parameters.AddValidationErrorMessage(loadError.Error())
-		return
+	if !m.sourceDataLoaded {
+		loadError := m.loadSourceDataSet()
+		if loadError != nil {
+			m.parameters.AddValidationErrorMessage(loadError.Error())
+			return
+		}
+		m.sourceDataLoaded = true
 	}
 	m.CoreModel.Initialise()
 	m.RandomlyInitialiseActions()
@@ -62,10 +66,13 @@ func (m *Model) Initialise() {
 func (m *Model) InitialiseToAsIsState() {
 	m.note("Initialising")
 
-	loadError := m.loadSourceDataSet()
-	if loadError != nil {
-		m.parameters.AddValidationErrorMessage(loadError.Error())
-		return
+	if !m.sourceDataLoaded {
+		loadError := m.loadSourceDataSet()
+		if loadError != nil {
+			m.parameters.AddValidationErrorMessage(loadError.Error())
+			return
+		}
+		m.sourceDataLoaded = true
 	}
 	m.CoreModel.Initialise()
 }
