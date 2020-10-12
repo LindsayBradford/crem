@@ -1,7 +1,7 @@
 # (c) 2020, Australian Rivers Institute
 # Author: Lindsay Bradford
 
-import subprocess
+import os
 
 
 def main():
@@ -10,16 +10,12 @@ def main():
     configFile = f'{configFilePrefix}.toml'
     outputPath = f'output/LOG_{configFilePrefix}.txt'
 
-    commandArray = ['CREMExplorer.exe', '--ScenarioFile', configFile]
+    commandArray = ['CREMExplorer.exe', '--ScenarioFile', configFile, '2>&1', '>', outputPath]
     command = ' '.join(commandArray)
 
-    print (f'\nRunning "{command}", capturing output to "{outputPath}".\n\n')
+    print (f'\nRunning "{command}".\n\n')
 
-    with open(outputPath, mode="w") as outputFile:
-        output = subprocess.run(commandArray, capture_output=True, text=True)
-
-        print(output.stdout, file=outputFile)
-        print(output.stdout)
+    os.system(command)
 
     print (f'\n\nPress <ENTER> to close window. Above log been written to "{outputPath}".\n')
 

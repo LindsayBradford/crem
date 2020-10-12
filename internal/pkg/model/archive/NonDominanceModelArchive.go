@@ -8,6 +8,7 @@ import (
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/name"
 	"math"
+	"sort"
 )
 
 type StorageResult uint
@@ -192,15 +193,17 @@ func (a *NonDominanceModelArchive) ArchiveSummary() Summary {
 	return summary
 }
 
-func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int) *CompressedModelState {
-	// TODO: This is Suppapitmarm approach, and archiveSize^2 in computational complexity for good isolation model selection.
-	//a.calculateArchiveIsolation()
-	//sort.Sort(a)
-	//return a.selectRandomModel(selectionRange)
-
+func (a *NonDominanceModelArchive) SelectRandomModel() *CompressedModelState {
 	// TODO: This is the Engrand approach, and constant time in computational complexity, with unlikely isolation model selection..
 	fullArchiveRange := len(a.archive)
 	return a.selectRandomModel(fullArchiveRange)
+}
+
+func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int) *CompressedModelState {
+	// TODO: This is Suppapitmarm approach, and archiveSize^2 in computational complexity for good isolation model selection.
+	a.calculateArchiveIsolation()
+	sort.Sort(a)
+	return a.selectRandomModel(selectionRange)
 }
 
 func (a *NonDominanceModelArchive) calculateArchiveIsolation() {

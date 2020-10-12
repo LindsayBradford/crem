@@ -260,22 +260,27 @@ func (ke *Explorer) shouldReturnToBase() bool {
 	ke.iterationsUntilReturnToBase--
 	return ke.iterationsUntilReturnToBase <= 0
 }
-
 func (ke *Explorer) returnToBase(currentModelState *archive.CompressedModelState) {
+	ke.returnToBaseInsideArchive(currentModelState)
+	//ke.returnToBaseOutsideArchive(currentModelState)
+}
+
+func (ke *Explorer) returnToBaseInsideArchive(currentModelState *archive.CompressedModelState) {
 	const minFraction = 1e-63
 	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
 
-	compressedModel := ke.modelArchive.SelectRandomIsolatedModel(selectionRangeLimit)
+	//selectedModel := ke.modelArchive.SelectRandomIsolatedModel(selectionRangeLimit)
+	selectedModel := ke.modelArchive.SelectRandomModel()
 
 	// Is this actually a problem?  Suppapitnarm paper doesn't mention it.  Original CRP doesn't cater for it.
 	// It just seems odd to trawl through the isolated entries only to return to the current if its isolated.
-	if currentModelState.Sha256() == compressedModel.Sha256() {
+	if currentModelState.Sha256() == selectedModel.Sha256() {
 		warningMessage := fmt.Sprintf("Randomly selected return-to-base isolated model is same as current [%s]",
 			currentModelState.Sha256())
 		ke.LogHandler().Warn(warningMessage)
 	}
 
-	ke.modelArchive.Decompress(compressedModel, ke.Model())
+	ke.modelArchive.Decompress(selectedModel, ke.Model())
 
 	if ke.returnToBaseIsolationFraction == 1 {
 		ke.returnToBaseIsolationFraction = ke.parameters.GetFloat64(ReturnToBaseIsolationFraction)
@@ -288,7 +293,38 @@ func (ke *Explorer) returnToBase(currentModelState *archive.CompressedModelState
 		WithNote("Returning to Base").
 		WithAttribute("SelectionRangeLimit", selectionRangeLimit).
 		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
-		WithAttribute("New Base Model SHA256", compressedModel.Sha256())
+		WithAttribute("New Base Model SHA256", selectedModel.Sha256())
+
+	ke.lastReturnedToBase = ke.currentIteration
+
+	ke.NotifyObserversOfEvent(*event)
+}
+
+func (ke *Explorer) returnToBaseOutsideArchive(currentModelState *archive.CompressedModelState) {
+	const minFraction = 1e-63
+	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
+
+	selectedModel := ke.Model().DeepClone()
+	selectedModel.Initialise()
+	selectedModelArchive := ke.modelArchive.Compress(selectedModel)
+
+	for currentModelState.Sha256() == selectedModelArchive.Sha256() {
+		selectedModel.Initialise()
+		selectedModelArchive = ke.modelArchive.Compress(selectedModel)
+	}
+
+	if ke.returnToBaseIsolationFraction == 1 {
+		ke.returnToBaseIsolationFraction = ke.parameters.GetFloat64(ReturnToBaseIsolationFraction)
+	} else {
+		ke.returnToBaseIsolationFraction *= ke.returnToBaseIsolationFraction
+		ke.returnToBaseIsolationFraction = math.Max(ke.returnToBaseIsolationFraction, minFraction)
+	}
+
+	event := observer.NewEvent(observer.Explorer).
+		WithNote("Returning to Base").
+		WithAttribute("SelectionRangeLimit", selectionRangeLimit).
+		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
+		WithAttribute("New Base Model SHA256", selectedModelArchive.Sha256())
 
 	ke.lastReturnedToBase = ke.currentIteration
 

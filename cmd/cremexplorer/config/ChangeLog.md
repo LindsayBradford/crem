@@ -1,11 +1,12 @@
 # Change Log
 
-## Version 0.13 (TBD):
+## Version 0.13 (12/10/2020):
 ### New Features
 * Experimenting with the poorer quality, but much faster return-to-base behaviour of Engrand et.al.
 ### Bug Fixes
 * Some fixes around non-dominance and its testing.
-* Fixed a MOSA resource starvation bug where an Excel handler per solution was created as the archive was saved. 
+* Fixed a MOSA resource starvation bug where an Excel handler per solution was created as the archive was saved.
+* Python boot scripts now capture standard error output and allow for real-time tailing of output-files.  
 
 ## Version 0.12 (07/10/2020):
 ### New Features
