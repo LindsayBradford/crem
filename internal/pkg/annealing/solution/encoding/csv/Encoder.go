@@ -4,6 +4,8 @@ package csv
 
 import (
 	"bufio"
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"os"
 	"path"
 
@@ -15,6 +17,7 @@ const fileType = "csv"
 const fileTypeExtension = "." + fileType
 
 type Encoder struct {
+	loggers.ContainedLogger
 	decisionVariableMarshaler DecisionVariableMarshaler
 	managementActionMarshaler ManagementActionMarshaler
 	outputPath                string
@@ -25,7 +28,13 @@ func (e *Encoder) WithOutputPath(outputPath string) *Encoder {
 	return e
 }
 
+func (e *Encoder) WithLogHandler(logHandler logging.Logger) *Encoder {
+	e.SetLogHandler(logHandler)
+	return e
+}
+
 func (e Encoder) Encode(solution *solution.Solution) error {
+	e.LogHandler().Info("Saving [" + solution.Id + "] as [CSV]")
 	if decisionVariableError := e.encodeDecisionVariables(solution); decisionVariableError != nil {
 		return errors.Wrap(decisionVariableError, fileType+" encoding of solution decision variables")
 	}
@@ -42,6 +51,7 @@ func (e Encoder) encodeDecisionVariables(solution *solution.Solution) error {
 	}
 
 	outputPath := e.deriveDecisionVariableOutputPath(solution)
+	e.LogHandler().Debug("Encoding [" + solution.Id + "] variables to [" + outputPath + "]")
 	return e.encodeMarshaled(marshaledSolution, outputPath)
 }
 
@@ -52,6 +62,7 @@ func (e Encoder) encodeManagementActions(solution *solution.Solution) error {
 	}
 
 	outputPath := e.deriveManagementActionOutputPath(solution)
+	e.LogHandler().Debug("Encoding [" + solution.Id + "] management actions to [" + outputPath + "]")
 	return e.encodeMarshaled(marshaledSolution, outputPath)
 }
 

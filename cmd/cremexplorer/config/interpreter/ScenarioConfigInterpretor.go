@@ -58,8 +58,8 @@ func (i *ScenarioConfigInterpreter) interpretRunner(config *appData.ScenarioConf
 		i.errors.Add(errors.New("Missing mandatory scenario name field"))
 	}
 
-	saver := buildSaver(config)
 	logHandler := i.reportingInterpreter.LogHandler()
+	saver := buildSaver(config).WithLogHandler(logHandler)
 
 	runner = scenario.NewRunner().
 		WithName(config.Name).

@@ -57,6 +57,11 @@ func (s *Saver) WithOutputPath(outputPath string) *Saver {
 	return s
 }
 
+func (s *Saver) WithLogHandler(logHandler logging.Logger) *Saver {
+	s.SetLogHandler(logHandler)
+	return s
+}
+
 func (s *Saver) SetDecompressionModel(model model.Model) {
 	clone := model.DeepClone()
 	clone.Initialise()
@@ -90,10 +95,12 @@ func (s *Saver) ObserveEvent(event observer.Event) {
 		return
 	}
 	if event.HasAttribute(Solution) {
+		s.LogHandler().Info("Saving annealing optimised solution")
 		solution := event.Attribute(Solution).(solution.Solution)
 		s.saveSolution(solution)
 	}
 	if event.HasAttribute(SolutionSet) {
+		s.LogHandler().Info("Saving annealing solution set")
 		solutionSet := event.Attribute(SolutionSet).(archive.NonDominanceModelArchive)
 		s.saveSolutionSet(solutionSet)
 	}
@@ -109,6 +116,7 @@ func (s *Saver) encodeSolution(modelSolution solution.Solution) {
 	encoder := new(encoding.Builder).
 		ForOutputType(s.outputType).
 		WithOutputPath(s.outputPath).
+		WithLogHandler(s.LogHandler()).
 		Build()
 
 	if encodingError := encoder.Encode(&modelSolution); encodingError != nil {
@@ -188,6 +196,7 @@ func (s *Saver) encodeSummary(summary *solutionset.Summary) {
 	encoder := new(encoding2.Builder).
 		ForOutputType(s.outputType).
 		WithOutputPath(s.outputPath).
+		WithLogHandler(s.LogHandler()).
 		Build()
 
 	if encodingError := encoder.Encode(summary); encodingError != nil {

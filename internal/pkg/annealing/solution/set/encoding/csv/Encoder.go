@@ -5,6 +5,8 @@ package csv
 import (
 	"bufio"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
+	"github.com/LindsayBradford/crem/pkg/logging"
+	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"os"
 	"path"
 
@@ -15,6 +17,7 @@ const fileType = "csv"
 const fileTypeExtension = "." + fileType
 
 type Encoder struct {
+	loggers.ContainedLogger
 	summaryMarshaler SummaryMarshaler
 	outputPath       string
 }
@@ -24,7 +27,13 @@ func (e *Encoder) WithOutputPath(outputPath string) *Encoder {
 	return e
 }
 
+func (e *Encoder) WithLogHandler(logHandler logging.Logger) *Encoder {
+	e.SetLogHandler(logHandler)
+	return e
+}
+
 func (e Encoder) Encode(summary *set.Summary) error {
+	e.LogHandler().Info("Saving [" + summary.Id() + "] to [CSV]")
 	if decisionVariableError := e.encodeDecisionVariables(summary); decisionVariableError != nil {
 		return errors.Wrap(decisionVariableError, fileType+" encoding of solution decision variables")
 	}
@@ -34,10 +43,14 @@ func (e Encoder) Encode(summary *set.Summary) error {
 func (e Encoder) encodeDecisionVariables(summary *set.Summary) error {
 	marshaledSolution, marshalError := e.summaryMarshaler.Marshal(summary)
 	if marshalError != nil {
-		return errors.Wrap(marshalError, fileType+" marshaling of solution decision variables")
+		wrapperError := errors.Wrap(marshalError, fileType+" marshaling of solution decision variables")
+		e.LogHandler().Error(wrapperError)
+		return wrapperError
 	}
 
 	outputPath := e.deriveSummaryOutputPath(summary)
+	e.LogHandler().Debug("Encoding [" + summary.Id() + "] to [" + outputPath + "]")
+
 	return e.encodeMarshaled(marshaledSolution, outputPath)
 }
 
@@ -52,7 +65,9 @@ func (e Encoder) encodeMarshaled(marshaledSummary []byte, outputPath string) err
 
 	bufferedWriter := bufio.NewWriter(file)
 	if _, writeError := bufferedWriter.Write(marshaledSummary); writeError != nil {
-		return errors.Wrap(writeError, "writing marshaled "+fileType+" of solution summary")
+		wrappingError := errors.Wrap(writeError, "writing marshaled "+fileType+" of solution summary")
+		e.LogHandler().Error(wrappingError)
+		return wrappingError
 	}
 
 	bufferedWriter.Flush()
