@@ -19,6 +19,7 @@ type Model interface {
 	DecisionVariableContainer
 
 	Initialise()
+	Randomize()
 	TearDown()
 
 	DoRandomChange()
@@ -30,6 +31,7 @@ type Model interface {
 	RevertChange()
 
 	IsEquivalentTo(Model) bool
+	SynchroniseTo(Model)
 
 	DeepClone() Model
 
@@ -86,6 +88,7 @@ func (nm *nullModel) WithName(name string) *nullModel {
 }
 
 func (nm *nullModel) Initialise() {}
+func (nm *nullModel) Randomize()  {}
 func (nm *nullModel) TearDown()   {}
 
 func (nm *nullModel) DoRandomChange() {}
@@ -115,4 +118,5 @@ func (nm *nullModel) PlanningUnits() planningunit.Ids { return nil }
 
 func (nm *nullModel) IsEquivalentTo(Model) bool { return false }
 
-func (nm *nullModel) DeepClone() Model { return nm }
+func (nm *nullModel) DeepClone() Model          { return nm }
+func (nm *nullModel) SynchroniseTo(model Model) {}

@@ -29,6 +29,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var _ model.Model = new(CoreModel)
+
 func NewCoreModel() *CoreModel {
 	newModel := new(CoreModel)
 
@@ -123,6 +125,7 @@ func (m *CoreModel) Initialise() {
 
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
+	m.InitialiseActions()
 }
 
 func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
@@ -241,71 +244,110 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 	m.managementActions.Sort()
 }
 
-func (m *CoreModel) randomlyInitialiseActions() {
-	m.note("Starting randomly initialising model actions")
+func (m *CoreModel) InitialiseActions() {
+	m.note("Starting initialising model actions")
 
 	m.initialising = true
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
-		m.note("Randomly initialising for Maximum implementation cost limit.")
-		m.randomlyActivateActionsFromAllInactiveStart()
+		m.note("Initialising for Maximum implementation cost limit.")
+		m.InitialiseAllActionsToInactive()
 	} else if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
-		m.note("Randomly initialising for Maximum opportunity cost limit.")
-		m.randomlyActivateActionsFromAllInactiveStart()
+		m.note("Initialising for Maximum opportunity cost limit.")
+		m.InitialiseAllActionsToInactive()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
 		m.note("Randomly initialising for Maximum sediment production limit.")
-		m.randomlyDeactivateActionsFromAllActiveStart()
+		m.InitialieAllActionsToActive()
 	} else if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
 		m.note("Randomly initialising for Maximum particulate nitrogen production limit.")
-		m.randomlyDeactivateActionsFromAllActiveStart()
+		m.InitialieAllActionsToActive()
+	}
+	m.initialising = false
+
+	m.note("Finished initialising model actions")
+}
+
+func (m *CoreModel) Randomize() {
+	m.note("Starting randomizing model action state")
+
+	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+		m.note("Randomly initialising for Maximum implementation cost limit.")
+		m.RandomlyValidlyActivateActions()
+	} else if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {
+		m.note("Randomly initialising for Maximum opportunity cost limit.")
+		m.RandomlyValidlyActivateActions()
+	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
+		m.note("Randomly initialising for Maximum sediment production limit.")
+		m.RandomlyValidlyDeactivateActions()
+	} else if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
+		m.note("Randomly initialising for Maximum particulate nitrogen production limit.")
+		m.RandomlyValidlyDeactivateActions()
 	} else {
 		m.note("Randomly initialising for unbounded (no limits).")
 		m.randomlyInitialiseActionsUnbounded()
 	}
-	m.initialising = false
-
-	m.note("Finished randomly initialising model actions")
+	m.note("Finished randomizing model action state")
 }
 
 func (m *CoreModel) randomlyActivateActionsFromAllInactiveStart() {
+	m.InitialiseAllActionsToInactive()
+	m.RandomlyValidlyActivateActions()
+}
+
+func (m *CoreModel) InitialiseAllActionsToInactive() {
 	m.note("Initialising all actions as inactive")
 	for _, action := range m.managementActions.Actions() {
-		m.managementActions.RandomlyInitialiseAction(action)
+		action.InitialisingDeactivation()
+	}
+}
 
-		if !action.IsActive() {
-			continue // Nothing to if it wasn't activated.
+func (m *CoreModel) RandomlyValidlyActivateActions() {
+	isValid := true
+	for isValid {
+		actionChanged := m.managementActions.RandomlyInitialiseAnyAction()
+		if actionChanged == nil {
+			continue
 		}
 
-		m.noteManagementAction("Randomly activating action", action)
+		m.noteManagementAction("Activated random action", actionChanged)
+		isValid, _ = m.ChangeIsValid()
 
-		isValid, _ := m.ChangeIsValid()
-		if !isValid {
-			m.note("Change was invalid.  Reverting action to inactive")
-			m.RevertChange()
-			m.noteManagementAction("Action reverted", action)
+		if isValid {
+			m.note("Activation was valid. Keeping.")
+		} else {
+			m.note("Activation was invalid. Reverting.")
+			actionChanged.InitialisingDeactivation()
 		}
 	}
 }
 
 func (m *CoreModel) randomlyDeactivateActionsFromAllActiveStart() {
+	m.InitialieAllActionsToActive()
+	m.RandomlyValidlyDeactivateActions()
+}
+
+func (m *CoreModel) InitialieAllActionsToActive() {
 	m.note("Initialising all actions as active")
 	for _, action := range m.managementActions.Actions() {
 		action.InitialisingActivation()
 	}
+}
 
-	for _, action := range m.managementActions.Actions() {
-		m.managementActions.RandomlyDeInitialiseAction(action)
-
-		if action.IsActive() {
-			continue // Nothing to if it wasn't deactivated.
+func (m *CoreModel) RandomlyValidlyDeactivateActions() {
+	isValid := true
+	for isValid {
+		actionChanged := m.managementActions.RandomlyDeInitialiseAnyAction()
+		if actionChanged == nil {
+			continue
 		}
 
-		m.noteManagementAction("Randomly deactivating action", action)
+		m.noteManagementAction("Deactivate random action", actionChanged)
+		isValid, _ = m.ChangeIsValid()
 
-		isValid, _ := m.ChangeIsValid()
-		if !isValid {
-			m.note("Change was invalid.  Reverting to action being active")
-			m.RevertChange()
-			m.noteManagementAction("Action reverted", action)
+		if isValid {
+			m.note("Deactivation was valid. Keeping.")
+		} else {
+			m.note("Deactivation was invalid. Reverting.")
+			actionChanged.InitialisingActivation()
 		}
 	}
 }
@@ -541,4 +583,10 @@ func (m *CoreModel) checkVariables(otherModel model.Model) bool {
 	}
 
 	return true
+}
+
+func (m *CoreModel) SynchroniseTo(otherModel model.Model) {
+	for index, action := range otherModel.ManagementActions() {
+		m.SetManagementAction(index, action.IsActive())
+	}
 }

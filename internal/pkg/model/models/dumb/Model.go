@@ -70,6 +70,10 @@ func (m *Model) Initialise() {
 	m.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 
+func (m *Model) Randomize() {
+	// TODO: deliberately does nothing
+}
+
 func (m *Model) TearDown() {
 	// This model doesn't need any special tearDown.
 }
@@ -161,3 +165,5 @@ func (m *Model) DecisionVariableChange(decisionVariableName string) float64 {
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
 func (m *Model) IsEquivalentTo(model.Model) bool { return false } // TODO: implement
+
+func (m *Model) SynchroniseTo(model.Model) {} // TODO: implement

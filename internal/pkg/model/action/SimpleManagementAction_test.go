@@ -102,12 +102,7 @@ func TestSimpleManagementAction_InitialisingActivation(t *testing.T) {
 	g.Expect(testSpyOne.LastObserved()).To(BeNil())
 	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
 
-	expectedPanicCall := func() {
-		actionUnderTest.InitialisingActivation()
-	}
-
 	// then
-	g.Expect(expectedPanicCall).To(Panic())
 	g.Expect(testSpyOne.LastObserved()).To(BeNil())
 	g.Expect(testSpyTwo.LastObserved()).To(BeNil())
 }

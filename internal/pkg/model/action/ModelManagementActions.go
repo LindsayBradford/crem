@@ -98,6 +98,20 @@ func (m *ModelManagementActions) RandomlyInitialiseAction(action ManagementActio
 	}
 }
 
+func (m *ModelManagementActions) RandomlyInitialiseAnyAction() ManagementAction {
+	actionLen := len(m.actions)
+	randomActionIndex := m.RandomNumberGenerator().Intn(actionLen)
+	randomAction := m.actions[randomActionIndex]
+
+	if randomAction.IsActive() {
+		return nil
+	}
+
+	m.lastApplied = randomAction
+	randomAction.InitialisingActivation()
+	return randomAction
+}
+
 func (m *ModelManagementActions) RandomlyDeInitialiseAction(action ManagementAction) {
 	randomValue := m.RandomNumberGenerator().Intn(2)
 	switch randomValue {
@@ -109,6 +123,20 @@ func (m *ModelManagementActions) RandomlyDeInitialiseAction(action ManagementAct
 	default:
 		panic(errors.New("Random value outside range of [0,1]"))
 	}
+}
+
+func (m *ModelManagementActions) RandomlyDeInitialiseAnyAction() ManagementAction {
+	actionLen := len(m.actions)
+	randomActionIndex := m.RandomNumberGenerator().Intn(actionLen)
+	randomAction := m.actions[randomActionIndex]
+
+	if !randomAction.IsActive() {
+		return nil
+	}
+
+	m.lastApplied = randomAction
+	randomAction.InitialisingDeactivation()
+	return randomAction
 }
 
 func (m *ModelManagementActions) ToggleActionUnobserved(planningUnit planningunit.Id, actionType ManagementActionType) {

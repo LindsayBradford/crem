@@ -34,7 +34,9 @@ type Explorer struct {
 	name.NameContainer
 	name.IdentifiableContainer
 
-	model.ContainedModel
+	currentModel   model.Model
+	potentialModel model.Model
+
 	loggers.ContainedLogger
 
 	coolant cooling.TemperatureCoolant
@@ -67,7 +69,10 @@ func New() *Explorer {
 	newExplorer.parameters.Initialise()
 	newExplorer.SetCoolant(suppapitnarm.NewCoolant())
 	newExplorer.modelArchive.Initialise()
-	newExplorer.SetModel(model.NewNullModel())
+
+	newExplorer.currentModel = model.NewNullModel()
+	newExplorer.potentialModel = model.NewNullModel()
+
 	return newExplorer
 }
 
@@ -75,7 +80,12 @@ func (ke *Explorer) Initialise() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
 	ke.modelArchive.Initialise()
 	ke.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
-	ke.Model().Initialise()
+
+	ke.currentModel.Initialise()
+	ke.currentModel.Randomize()
+
+	ke.potentialModel.Initialise()
+
 	ke.deriveIterationsUntilReturnToBase()
 	ke.currentIteration = 1
 }
@@ -86,7 +96,8 @@ func (ke *Explorer) WithName(name string) *Explorer {
 }
 
 func (ke *Explorer) WithModel(model model.Model) *Explorer {
-	ke.SetModel(model)
+	ke.currentModel = model
+	ke.potentialModel = model.DeepClone()
 	return ke
 }
 
@@ -141,16 +152,16 @@ func (ke *Explorer) ParameterErrors() error {
 }
 
 func (ke *Explorer) ObjectiveValue() float64 {
-	variable := ke.Model().DecisionVariable(ke.objectiveVariableName)
+	variable := ke.currentModel.DecisionVariable(ke.objectiveVariableName)
 	return variable.Value()
 }
 
 func (ke *Explorer) TryRandomChange() {
 	ke.note("Trying Random Model Change")
 
-	compressedInitialModelState := ke.modelArchive.Compress(ke.Model())
-	ke.Model().DoRandomChange()
-	compressedChangedModelState := ke.modelArchive.Compress(ke.Model())
+	compressedInitialModelState := ke.modelArchive.Compress(ke.currentModel)
+	ke.generatePotentialModel()
+	compressedChangedModelState := ke.modelArchive.Compress(ke.potentialModel)
 
 	variableDifferences := compressedChangedModelState.VariableDifferences(compressedInitialModelState)
 
@@ -168,6 +179,14 @@ func (ke *Explorer) TryRandomChange() {
 	ke.currentIteration++
 }
 
+func (ke *Explorer) generatePotentialModel() {
+	ke.note("Creating and Randomizing potential new model off old.")
+	ke.potentialModel.SynchroniseTo(ke.currentModel)
+	//ke.potentialModel.Initialise()
+	ke.potentialModel.Randomize()
+	ke.note(" Finished creating and Randomizing potential new model.")
+}
+
 func (ke *Explorer) note(note string) {
 	noteEvent := observer.NewEvent(observer.Explorer).
 		WithAttribute(observer.Note.String(), note)
@@ -176,18 +195,23 @@ func (ke *Explorer) note(note string) {
 
 func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
 	if ke.changeTriedIsDesirable() {
-		ke.setAcceptanceProbability(explorer.Guaranteed)
-		ke.changeAccepted = true
+		ke.AcceptDesirableChange()
 		ke.notifyDesirableAcceptance()
 	} else {
 		if ke.coolant.DecideIfAcceptable(variableDifferences) {
 			ke.notifyUndesirableAcceptance()
-			ke.AcceptLastChange()
+			ke.AcceptUndesirableChange()
 		} else {
 			ke.notifyUndesirableReversion()
 			ke.RevertLastChange()
 		}
 	}
+}
+
+func (ke *Explorer) AcceptDesirableChange() {
+	ke.setAcceptanceProbability(explorer.Guaranteed)
+	ke.changeAccepted = true
+	ke.currentModel.SynchroniseTo(ke.potentialModel)
 }
 
 func (ke *Explorer) notifyDesirableAcceptance() {
@@ -232,9 +256,10 @@ func (ke *Explorer) changeTriedIsDesirable() bool {
 	return ke.changeIsDesirable
 }
 
-func (ke *Explorer) AcceptLastChange() {
-	ke.archiveStorageResult = ke.modelArchive.ForceIntoArchive(ke.Model())
+func (ke *Explorer) AcceptUndesirableChange() {
+	ke.archiveStorageResult = ke.modelArchive.ForceIntoArchive(ke.potentialModel)
 	ke.changeAccepted = true
+	ke.currentModel.SynchroniseTo(ke.potentialModel)
 
 	event := observer.NewEvent(observer.Explorer).
 		WithNote("Forcing Model into Archive").
@@ -244,7 +269,7 @@ func (ke *Explorer) AcceptLastChange() {
 }
 
 func (ke *Explorer) RevertLastChange() {
-	ke.Model().UndoChange()
+	// we just ignore potential model state.
 	ke.changeAccepted = false
 }
 
@@ -280,7 +305,7 @@ func (ke *Explorer) returnToBaseInsideArchive(currentModelState *archive.Compres
 		ke.LogHandler().Warn(warningMessage)
 	}
 
-	ke.modelArchive.Decompress(selectedModel, ke.Model())
+	ke.modelArchive.Decompress(selectedModel, ke.currentModel)
 
 	if ke.returnToBaseIsolationFraction == 1 {
 		ke.returnToBaseIsolationFraction = ke.parameters.GetFloat64(ReturnToBaseIsolationFraction)
@@ -304,7 +329,7 @@ func (ke *Explorer) returnToBaseOutsideArchive(currentModelState *archive.Compre
 	const minFraction = 1e-63
 	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
 
-	selectedModel := ke.Model().DeepClone()
+	selectedModel := ke.currentModel.DeepClone()
 	selectedModel.Initialise()
 	selectedModelArchive := ke.modelArchive.Compress(selectedModel)
 
@@ -350,14 +375,24 @@ func (ke *Explorer) deriveIterationsUntilReturnToBase() {
 func (ke *Explorer) DeepClone() explorer.Explorer {
 	clone := *ke
 	clone.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
-	modelClone := ke.Model().DeepClone()
-	clone.SetModel(modelClone)
+	clone.currentModel = ke.currentModel.DeepClone()
+	clone.potentialModel = ke.currentModel.DeepClone()
 	return &clone
+}
+
+func (ke *Explorer) Model() model.Model {
+	return ke.currentModel
+}
+
+func (ke *Explorer) SetModel(model model.Model) {
+	ke.currentModel = model
+	ke.potentialModel = model.DeepClone()
 }
 
 func (ke *Explorer) TearDown() {
 	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
-	ke.Model().TearDown()
+	ke.currentModel.TearDown()
+	ke.potentialModel.TearDown()
 }
 
 func (ke *Explorer) setAcceptanceProbability(probability float64) {

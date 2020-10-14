@@ -50,3 +50,9 @@ YearsOfErosion = 100                # 100.0 (default)
 RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
 GullySedimentReductionTarget = 0.8                      # 0.8 (default)
 HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
+
+# Only one of the below variable bounds can be applied maximum.
+#MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
+#MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
+MaximumImplementationCost = 1_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+#MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.

@@ -29,3 +29,9 @@ LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
 GullyCompensationFactor = 0.5       # 0.5 (default)
 SedimentDensity = 1.5               # (1.5 t/m^3 default)
 SuspendedSedimentProportion = 0.5   # 0.5 (default)
+
+# Only one of the below variable bounds can be applied maximum.
+#MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
+#MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
+MaximumImplementationCost = 1_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+#MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.

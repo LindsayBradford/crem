@@ -77,6 +77,10 @@ func (m *Model) Initialise() {
 	m.buildManagementActions()
 }
 
+func (m *Model) Randomize() {
+	// TODO: deliberately does nothing
+}
+
 func (m *Model) buildDecisionVariables() {
 	m.ContainedDecisionVariables.Initialise()
 	objectiveOne := new(variables.DumbObjective).
@@ -245,3 +249,5 @@ func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
 func (m *Model) IsEquivalentTo(model.Model) bool { return false } // TODO: implement
+
+func (m *Model) SynchroniseTo(model.Model) {} // TODO: implement

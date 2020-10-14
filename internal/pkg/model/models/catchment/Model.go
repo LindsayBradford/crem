@@ -60,7 +60,11 @@ func (m *Model) Initialise() {
 		m.sourceDataLoaded = true
 	}
 	m.CoreModel.Initialise()
-	m.RandomlyInitialiseActions()
+}
+
+func (m *Model) Randomize() {
+	m.note("Randomizing")
+	m.CoreModel.Randomize()
 }
 
 func (m *Model) InitialiseToAsIsState() {
@@ -79,7 +83,8 @@ func (m *Model) InitialiseToAsIsState() {
 
 func (m *Model) RandomlyInitialiseActions() {
 	m.initialising = true
-	m.CoreModel.randomlyInitialiseActions()
+	m.CoreModel.InitialiseActions()
+	m.CoreModel.Randomize()
 	m.initialising = false
 }
 

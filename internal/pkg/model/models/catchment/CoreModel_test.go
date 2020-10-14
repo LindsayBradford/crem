@@ -441,7 +441,7 @@ func TestCoreModel_Bounded_RandomisationStaysValid(t *testing.T) {
 
 	modelUnderTest := buildBoundedTestingModel(g)
 
-	modelUnderTest.randomlyInitialiseActions()
+	modelUnderTest.InitialiseActions()
 
 	changeState, changeErrors := modelUnderTest.StateIsValid()
 

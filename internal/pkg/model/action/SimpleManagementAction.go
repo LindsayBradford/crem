@@ -4,7 +4,6 @@ package action
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
-	"github.com/pkg/errors"
 )
 
 var _ ManagementAction = new(SimpleManagementAction)
@@ -49,7 +48,7 @@ func (sma *SimpleManagementAction) Type() ManagementActionType {
 
 func (sma *SimpleManagementAction) InitialisingActivation() {
 	if sma.isActive {
-		panic(errors.New("InitialisingActivation should not be called on an active action"))
+		return
 	}
 	sma.ToggleActivationUnobserved()
 	sma.notifyInitialisingObservers()
@@ -57,7 +56,7 @@ func (sma *SimpleManagementAction) InitialisingActivation() {
 
 func (sma *SimpleManagementAction) InitialisingDeactivation() {
 	if !sma.isActive {
-		panic(errors.New("InitialisingDeactivation should not be called on an inactive action"))
+		return
 	}
 	sma.ToggleActivationUnobserved()
 	sma.notifyInitialisingObservers()
