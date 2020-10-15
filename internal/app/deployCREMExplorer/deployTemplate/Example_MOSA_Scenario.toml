@@ -25,12 +25,12 @@ Model = "Discarded"                                     # "Discarded"  (default)
 Type="AveragedSuppapitnarm"
 EventNotifier = "Sequential"                            # "Sequential" (default) | Concurrent"
 [Annealer.Parameters]
-StartingTemperature = 10_000.0 #10
+StartingTemperature = 100_000.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 1_000_000
 
 ReturnToBaseAdjustmentFactor = 0.95                 # 0.95 (default)
-InitialReturnToBaseStep = 50_000                    # 20_000 (default)
+InitialReturnToBaseStep = 20_000                    # 20_000 (default)
 MinimumReturnToBaseRate = 10                        # 10 (default)
 ReturnToBaseIsolationFraction = 0.9                 # 0.9 (default)
 
@@ -54,5 +54,5 @@ HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
 # Only one of the below variable bounds can be applied maximum.
 #MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
 #MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
-MaximumImplementationCost = 1_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+MaximumImplementationCost = 10_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
 #MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.

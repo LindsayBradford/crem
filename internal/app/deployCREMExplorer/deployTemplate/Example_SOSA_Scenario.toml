@@ -52,5 +52,5 @@ HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
 # Only one of the below variable bounds can be applied maximum.
 #MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
 #MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
-MaximumImplementationCost = 1_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+MaximumImplementationCost = 10_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
 #MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.

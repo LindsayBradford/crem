@@ -150,12 +150,33 @@ func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 
 func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 	summary := make(solutionset.Summary, 0)
+
+	asIsSolution := s.deriveASsIsSolution(solutionSet)
+	s.encodeSolution(*asIsSolution)
+	s.summarise(&summary, asIsSolution)
+
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
 		solution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
 		s.encodeSolution(*solution)
 		s.summarise(&summary, solution)
 	}
 	s.encodeSummary(&summary)
+}
+
+func (s *Saver) deriveASsIsSolution(solutionSet archive.NonDominanceModelArchive) *solution.Solution {
+	s.decompressionModel.Initialise()
+	asIsSolutionId := s.deriveAsIsSolutionId(solutionSet)
+
+	decompressedModelSolution := new(solution.SolutionBuilder).
+		WithId(asIsSolutionId).
+		ForModel(s.decompressionModel).
+		Build()
+
+	return decompressedModelSolution
+}
+
+func (s *Saver) deriveAsIsSolutionId(solutionSet archive.NonDominanceModelArchive) string {
+	return solutionSet.Id() + " Solution (As-Is)"
 }
 
 func (s *Saver) deriveModelSolution(solutionSet archive.NonDominanceModelArchive, solutionIndex int, compressedModel *archive.CompressedModelState) *solution.Solution {

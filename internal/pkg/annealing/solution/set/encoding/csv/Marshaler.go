@@ -7,6 +7,8 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
 	"github.com/LindsayBradford/crem/pkg/strings"
 	"regexp"
+	"sort"
+	"strconv"
 	strings2 "strings"
 )
 
@@ -33,6 +35,41 @@ func (cm *SummaryMarshaler) marshalSummary(summary *set.Summary) ([]byte, error)
 	return csvStringAsBytes, nil
 }
 
+var numberMatcher *regexp.Regexp
+
+func init() {
+	numberMatcher = regexp.MustCompile(`(\d+) of `)
+}
+
+type sortableSummaries []string
+
+func (v sortableSummaries) Len() int {
+	return len(v)
+}
+
+func (v sortableSummaries) Swap(i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+
+func (v sortableSummaries) Less(i, j int) bool {
+	const indexOfNumberMatch = 1
+	numberMatchAtI := numberMatcher.FindStringSubmatch(v[i])
+	numberMatchAtJ := numberMatcher.FindStringSubmatch(v[j])
+
+	// As-Is entry should always be first, and will not be caught be a number matching regular expression
+
+	if numberMatchAtI == nil {
+		return true
+	} else if numberMatchAtJ == nil {
+		return false
+	}
+
+	numberAtI, _ := strconv.ParseInt(numberMatchAtI[indexOfNumberMatch], 10, 32)
+	numberAtJ, _ := strconv.ParseInt(numberMatchAtJ[indexOfNumberMatch], 10, 32)
+
+	return numberAtI < numberAtJ
+}
+
 func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 	headers := deriveHeaders(summary)
 
@@ -41,10 +78,16 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 		Add(join(headers...)).
 		Add(newline)
 
+	summarySet := make([]string, 0)
 	for id, variables := range *summary {
 		trimmedId := trimId(id)
-		joinedVariableAttributes := joinAttributes(trimmedId, variables)
-		builder.Add(joinedVariableAttributes).Add(newline)
+		summarySet = append(summarySet, joinAttributes(trimmedId, variables))
+	}
+
+	sort.Sort(sortableSummaries(summarySet))
+
+	for _, sortedSummary := range summarySet {
+		builder.Add(sortedSummary).Add(newline)
 	}
 
 	return builder.String()
@@ -88,9 +131,21 @@ func join(entries ...string) string {
 }
 
 func trimId(id string) string {
+	if strings2.Contains(id, "As-Is") {
+		return trimAsIsId(id)
+	}
+	return trimNumberedId(id)
+}
+
+func trimAsIsId(id string) string {
+	return "As-Is"
+}
+
+func trimNumberedId(id string) string {
 	iterationMatcher := regexp.MustCompile("\\d+/\\d+")
 	trimmedId := iterationMatcher.FindString(id)
 	prettifiedMatcher := regexp.MustCompile("/")
 	prettifiedId := prettifiedMatcher.ReplaceAllString(trimmedId, " of ")
+
 	return prettifiedId
 }
