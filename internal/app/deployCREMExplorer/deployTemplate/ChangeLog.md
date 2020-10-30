@@ -3,6 +3,8 @@
 ## Version 0.13.1 (30/10/2020):
 ### New Features
 *  Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix) 
+### Bug Fixes
+* Fixed Excel resource handlers released in wrong order, triggering runtime error in SOSA solution saving. 
 
 ## Version 0.12 (07/10/2020):
 ### New Features

@@ -47,9 +47,10 @@ func (sa *NullAnnealer) DeepClone() annealing.Annealer {
 func (sa *NullAnnealer) EventAttributes(eventType observer.EventType) attributes.Attributes {
 	return nil
 }
-func (sa *NullAnnealer) SetParameters(params parameters.Map) error    { return nil }
-func (sa *NullAnnealer) ParameterErrors() error                       { return nil }
-func (sa *NullAnnealer) Model() model.Model                           { return model.NullModel }
-func (sa *NullAnnealer) Anneal()                                      {}
-func (sa *NullAnnealer) AddObserver(observer observer.Observer) error { return nil }
-func (sa *NullAnnealer) Observers() []observer.Observer               { return nil }
+func (sa *NullAnnealer) SetParameters(params parameters.Map) error           { return nil }
+func (sa *NullAnnealer) ParameterErrors() error                              { return nil }
+func (sa *NullAnnealer) Model() model.Model                                  { return model.NullModel }
+func (sa *NullAnnealer) Anneal()                                             {}
+func (sa *NullAnnealer) AddObserver(observer observer.Observer) error        { return nil }
+func (sa *NullAnnealer) AddObserverAsFirst(observer observer.Observer) error { return nil }
+func (sa *NullAnnealer) Observers() []observer.Observer                      { return nil }

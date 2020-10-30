@@ -16,22 +16,26 @@ func TestWorkbooks_Add(t *testing.T) {
 	workbooksUnderTest := excelHandlerUnderTest.Workbooks()
 	defer workbooksUnderTest.Release()
 
+	// Warning:  THis is driven by generic user-overridable Excel configuration.
+	// This number must match what your locally installed Excel configuration has been set to.
+	const expectedInitialValue = 1
+
 	originalWorkbookCount := workbooksUnderTest.Count()
-	g.Expect(originalWorkbookCount).To(BeNumerically("==", 0), "Original Workbooks count should be 1")
+	g.Expect(originalWorkbookCount).To(BeNumerically("==", expectedInitialValue), "Original Workbooks count should be 1")
 
 	var workbook Workbook
 	addWWorkbookCall := func() {
 		workbook = workbooksUnderTest.Add()
 	}
-	defer workbook.Release()
 
 	g.Expect(addWWorkbookCall).To(Not(Panic()), "Workbooks Add should not panic")
 	g.Expect(workbook).To(Not(BeNil()), "Workbooks add should return new workbook")
 
 	newWorkbookCount := workbooksUnderTest.Count()
 
-	g.Expect(newWorkbookCount).To(BeNumerically("==", 1), "Workbooks add should increment count")
-
+	g.Expect(newWorkbookCount).To(BeNumerically("==", expectedInitialValue+1), "Workbooks add should increment count")
+	workbook.Close()
+	workbook.Release()
 }
 
 func TestWorkbooks_Open_Bad(t *testing.T) {
@@ -60,8 +64,9 @@ func TestWorkbooks_Open_Good(t *testing.T) {
 	addWWorkbookCall := func() {
 		validWorkbook = workbooksUnderTest.Open(testFixtureAbsolutePath)
 	}
-	defer validWorkbook.Release()
 
 	g.Expect(addWWorkbookCall).To(Not(Panic()), "Workbooks Open of good file path should not panic")
 	g.Expect(validWorkbook).To(Not(BeNil()), "Open Workbooks to good file path should return workbook")
+
+	validWorkbook.Close()
 }

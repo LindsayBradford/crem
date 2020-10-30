@@ -206,6 +206,10 @@ func (sa *SimpleAnnealer) AddObserver(observer observer.Observer) error {
 	return sa.EventNotifier().AddObserver(observer)
 }
 
+func (sa *SimpleAnnealer) AddObserverAsFirst(observer observer.Observer) error {
+	return sa.EventNotifier().AddObserverAsFirst(observer)
+}
+
 func (sa *SimpleAnnealer) Observers() []observer.Observer {
 	return sa.EventNotifier().Observers()
 }

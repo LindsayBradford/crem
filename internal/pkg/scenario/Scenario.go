@@ -30,7 +30,7 @@ func (s *BaseScenario) SetAnnealer(annealer annealing.Annealer) {
 	assert.That(s.observer != nil)
 
 	s.runner.SetAnnealer(annealer)
-	annealer.AddObserver(s.observer)
+	annealer.AddObserverAsFirst(s.observer)
 
 	s.annealer = annealer
 }

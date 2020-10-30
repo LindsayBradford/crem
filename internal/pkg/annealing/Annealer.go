@@ -25,6 +25,8 @@ type Annealer interface {
 	observer.EventNotifierContainer
 
 	AddObserver(observer observer.Observer) error
+	AddObserverAsFirst(observer observer.Observer) error
+
 	Observers() []observer.Observer
 
 	EventAttributes(eventType observer.EventType) attributes.Attributes

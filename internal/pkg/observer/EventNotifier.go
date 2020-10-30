@@ -8,6 +8,7 @@ import (
 
 type EventNotifier interface {
 	AddObserver(observer Observer) error
+	AddObserverAsFirst(observer Observer) error
 	Observers() []Observer
 	NotifyObserversOfEvent(event Event)
 }
@@ -54,6 +55,14 @@ func (notifier *SynchronousAnnealingEventNotifier) AddObserver(newObserver Obser
 	return nil
 }
 
+func (notifier *SynchronousAnnealingEventNotifier) AddObserverAsFirst(newObserver Observer) error {
+	if newObserver == nil {
+		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
+	}
+	notifier.observers = append([]Observer{newObserver}, notifier.observers...)
+	return nil
+}
+
 func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfEvent(event Event) {
 	for _, currObserver := range notifier.observers {
 		currObserver.ObserveEvent(event)
@@ -78,6 +87,19 @@ func (notifier *ConcurrentAnnealingEventNotifier) AddObserver(newObserver Observ
 	}
 
 	notifier.observers = append(notifier.observers, newObserver)
+	return notifier.addObserverToChannels(newObserver)
+}
+
+func (notifier *ConcurrentAnnealingEventNotifier) AddObserverAsFirst(newObserver Observer) error {
+	if newObserver == nil {
+		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
+	}
+
+	notifier.observers = append([]Observer{newObserver}, notifier.observers...)
+	return notifier.addObserverToChannels(newObserver)
+}
+
+func (notifier *ConcurrentAnnealingEventNotifier) addObserverToChannels(newObserver Observer) error {
 	newEventChannel := make(chan Event)
 	notifier.observerChannels = append(notifier.observerChannels, newEventChannel)
 
