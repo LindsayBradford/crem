@@ -1,14 +1,8 @@
 # Change Log
 
-## Version 0.13 (TBD):
+## Version 0.13.1 (30/10/2020):
 ### New Features
-* Experimenting with the poorer quality, but much faster return-to-base behaviour of Engrand et.al.
-* Logs now report where there are at in terms of writing out solution set data.
-### Bug Fixes
-* Some fixes around non-dominance and its testing.
-* Fixed a MOSA resource starvation bug where an Excel handler per solution was created as the archive was saved.
-* Python boot scripts now capture standard error output and allow for real-time tailing of output-files.
-* Fixed a bug where a multiple run scenario saw results for subsequent MOSA runs overwrite previous run data.     
+*  Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix) 
 
 ## Version 0.12 (07/10/2020):
 ### New Features

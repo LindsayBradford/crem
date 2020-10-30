@@ -1,17 +1,8 @@
 # Change Log
 
-## Version 0.13 (15/10/2020):
+## Version 0.13.1 (30/10/2020):
 ### New Features
-* Experimenting with the poorer quality, but much faster return-to-base behaviour of Engrand et.al.
-* Logs now report where there are at in terms of writing out solution set data.
-* To properly align with its CRP predecessor, we now support variable limits in MOSA as per the SOSA approach.
-* This includes a change to how we approach each iteration, making a group of valid model changes vs the limit defined.
-* The MOSA Solution set now also reports the As-Is solution for comparison purposes.
-### Bug Fixes
-* Fixed a MOSA memory starvation bug where an Excel handler per solution was created upon soluton archive save.
-* Some fixes around non-dominance and its testing.
-* Fixed a bug where a multiple run scenario saw results for subsequent MOSA runs overwrite previous run data.     
-* Python boot scripts now capture standard error output and allow for real-time tailing of output-files.
+*  Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix) 
 
 ## Version 0.12 (07/10/2020):
 ### New Features

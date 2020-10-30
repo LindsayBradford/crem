@@ -21,7 +21,6 @@ Warnings = "StandardOutput"                             # "Discarded"  | "Standa
 Errors = "StandardError"                                # "Discarded"  | "StandardOutput" | "StandardError" (Default)
 Model = "Discarded"                                     # "Discarded"  (default) | "StandardOutput" | "StandardError"
 
-
 [Annealer]
 Type = "Kirkpatrick"
 EventNotifier = "Sequential"                            # "Sequential" (default) | Concurrent"
@@ -35,7 +34,7 @@ MaximumIterations = 1_000_000
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
-DataSourcePath = "input/Laidley_data_v1_7.xlsx"
+DataSourcePath = "input/Laidley_data_v1_7_1.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)
@@ -52,5 +51,5 @@ HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
 # Only one of the below variable bounds can be applied maximum.
 #MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
 #MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
-MaximumImplementationCost = 10_000_000.0           # ($) No default. If not supplied, no bounds checking will occur.
+MaximumImplementationCost = 10_000_000.0          # ($) No default. If not supplied, no bounds checking will occur.
 #MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.
