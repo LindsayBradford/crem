@@ -62,10 +62,10 @@ func (ds *DataSet) loadExcelFileIntoDataSet(excelFilePath string) {
 	defer workbooks.Release()
 
 	workbook := workbooks.Open(excelFilePath)
+	defer workbook.Release()
 	defer workbook.Close(false)
 
 	ds.loadWorkbook(workbook)
-	workbook.SetProperty("Saved", true)
 }
 
 func (ds *DataSet) loadWorkbook(workbook excel.Workbook) {
@@ -197,8 +197,8 @@ func (ds *DataSet) saveDataSetIntoExcelFile(excelFilePath string) {
 	defer workbooks.Release()
 
 	workbook := workbooks.Add()
-	defer workbook.Close(false)
 	defer workbook.Release()
+	defer workbook.Close(false)
 
 	ds.storeToWorkbook(workbook)
 	ds.saveWorkbookAs(workbook, excelFilePath)

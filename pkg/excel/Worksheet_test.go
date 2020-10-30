@@ -19,7 +19,7 @@ func TestWorksheet_Cells(t *testing.T) {
 	workingDirectory, _ := os.Getwd()
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 	workbookUnderTest := workbooksUnderTest.Open(testFixtureAbsolutePath)
-	defer workbookUnderTest.Close()
+	defer workbookUnderTest.Release()
 
 	worksheetOne := workbookUnderTest.Worksheet(1)
 	defer worksheetOne.Release()

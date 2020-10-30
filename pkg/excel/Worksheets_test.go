@@ -20,7 +20,7 @@ func TestWorksheets_Add(t *testing.T) {
 	defer workbooksUnderTest.Release()
 
 	workbook := workbooksUnderTest.Add()
-	defer workbook.Close()
+	defer workbook.Release()
 
 	worksheets := workbook.Worksheets()
 	defer worksheets.Release()

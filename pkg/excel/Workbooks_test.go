@@ -23,6 +23,7 @@ func TestWorkbooks_Add(t *testing.T) {
 	addWWorkbookCall := func() {
 		workbook = workbooksUnderTest.Add()
 	}
+	defer workbook.Release()
 
 	g.Expect(addWWorkbookCall).To(Not(Panic()), "Workbooks Add should not panic")
 	g.Expect(workbook).To(Not(BeNil()), "Workbooks add should return new workbook")
@@ -31,8 +32,6 @@ func TestWorkbooks_Add(t *testing.T) {
 
 	g.Expect(newWorkbookCount).To(BeNumerically("==", 1), "Workbooks add should increment count")
 
-	workbook.Close()
-	workbook.Release()
 }
 
 func TestWorkbooks_Open_Bad(t *testing.T) {
@@ -61,9 +60,8 @@ func TestWorkbooks_Open_Good(t *testing.T) {
 	addWWorkbookCall := func() {
 		validWorkbook = workbooksUnderTest.Open(testFixtureAbsolutePath)
 	}
+	defer validWorkbook.Release()
 
 	g.Expect(addWWorkbookCall).To(Not(Panic()), "Workbooks Open of good file path should not panic")
 	g.Expect(validWorkbook).To(Not(BeNil()), "Open Workbooks to good file path should return workbook")
-
-	validWorkbook.Close()
 }

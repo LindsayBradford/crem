@@ -20,6 +20,8 @@ func TestUtils_AddWorksheetFromCsvFileToWorkbook(t *testing.T) {
 	testFixtureAbsolutePath := filepath.Join(workingDirectory, "testdata", "ExcelTestFixture.xls")
 
 	workbook := workbooksUnderTest.Open(testFixtureAbsolutePath)
+	defer workbook.Release()
+
 	worksheets := workbook.Worksheets()
 
 	originalWorksheetCount := worksheets.Count()

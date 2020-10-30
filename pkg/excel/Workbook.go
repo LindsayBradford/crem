@@ -53,11 +53,6 @@ func (wb *WorkbookImpl) Worksheet(index uint) Worksheet {
 }
 
 func (wb *WorkbookImpl) WorksheetNamed(name string) Worksheet {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		panic(errors.New("cannot open worksheet [" + name + "]"))
-	// 	}
-	// }()
 	defer handleGoOleLibraryPanicAsErrorPanic()
 	dispatch := wb.getProperty("Worksheets", name)
 	return new(WorksheetImpl).WithDispatch(dispatch)
@@ -90,8 +85,8 @@ func handleGoOleLibraryPanicAsErrorPanic() {
 }
 
 func (wb *WorkbookImpl) Close(parameters ...interface{}) {
+	defer handleGoOleLibraryPanicAsErrorPanic()
 	wb.call("Close", parameters...)
-	wb.Release()
 }
 
 func (wb *WorkbookImpl) getProperty(propertyName string, parameters ...interface{}) *ole.IDispatch {
