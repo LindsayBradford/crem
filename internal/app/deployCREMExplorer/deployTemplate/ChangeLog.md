@@ -1,8 +1,15 @@
 # Change Log
 
+## Version 0.14 (TBD):
+### New Features
+* Added Dissolved Nitrogen and Wetlands management actions.
+### Bug Fixes
+* TBD.
+
 ## Version 0.13.1 (30/10/2020):
 ### New Features
-*  Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix) 
+* Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix)
+* Annealing Observer now take precedence over generic logging, ensuring better ordering of logged events.
 ### Bug Fixes
 * Fixed Excel resource handlers released in wrong order, triggering runtime error in SOSA solution saving. 
 

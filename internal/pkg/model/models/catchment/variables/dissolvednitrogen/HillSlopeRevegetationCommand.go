@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package nitrogenproduction
+package dissolvednitrogen
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
@@ -36,8 +36,8 @@ func (c *HillSlopeRevegetationCommand) WithChange(changeValue float64) *HillSlop
 	return c
 }
 
-func (c *HillSlopeRevegetationCommand) variable() *ParticulateNitrogenProduction {
-	return c.Target().(*ParticulateNitrogenProduction)
+func (c *HillSlopeRevegetationCommand) variable() *DissolvedNitrogenProduction {
+	return c.Target().(*DissolvedNitrogenProduction)
 }
 
 func (c *HillSlopeRevegetationCommand) Do() command.CommandStatus {

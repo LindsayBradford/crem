@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package nitrogenproduction
+package dissolvednitrogen
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	VariableName = "ParticulateNitrogen"
+	VariableName = "DissolvedNitrogen"
 
 	planningUnitIndex           = 0
 	proportionOfVegetationIndex = 8
@@ -31,9 +31,9 @@ const (
 	conversionFactor = 0.01
 )
 
-var _ variable.UndoableDecisionVariable = new(ParticulateNitrogenProduction)
+var _ variable.UndoableDecisionVariable = new(DissolvedNitrogenProduction)
 
-type ParticulateNitrogenProduction struct {
+type DissolvedNitrogenProduction struct {
 	variable.PerPlanningUnitDecisionVariable
 	variable.Bounds
 
@@ -56,7 +56,7 @@ type ParticulateNitrogenProduction struct {
 	subCatchmentAttributes map[planningunit.Id]attributes.Attributes
 }
 
-func (np *ParticulateNitrogenProduction) Initialise(subCatchmentsTable tables.CsvTable, actionsTable tables.CsvTable, parameters catchmentParameters.Parameters) *ParticulateNitrogenProduction {
+func (np *DissolvedNitrogenProduction) Initialise(subCatchmentsTable tables.CsvTable, actionsTable tables.CsvTable, parameters catchmentParameters.Parameters) *DissolvedNitrogenProduction {
 	np.PerPlanningUnitDecisionVariable.Initialise()
 	np.Container.WithActionsTable(actionsTable)
 
@@ -73,38 +73,38 @@ func (np *ParticulateNitrogenProduction) Initialise(subCatchmentsTable tables.Cs
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) WithName(variableName string) *ParticulateNitrogenProduction {
+func (np *DissolvedNitrogenProduction) WithName(variableName string) *DissolvedNitrogenProduction {
 	np.SetName(variableName)
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) WithStartingValue(value float64) *ParticulateNitrogenProduction {
+func (np *DissolvedNitrogenProduction) WithStartingValue(value float64) *DissolvedNitrogenProduction {
 	np.SetPlanningUnitValue(0, value)
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) WithObservers(observers ...variable.Observer) *ParticulateNitrogenProduction {
+func (np *DissolvedNitrogenProduction) WithObservers(observers ...variable.Observer) *DissolvedNitrogenProduction {
 	np.Subscribe(observers...)
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction.SedimentProduction) *ParticulateNitrogenProduction {
+func (np *DissolvedNitrogenProduction) WithSedimentProductionVariable(variable *sedimentproduction.SedimentProduction) *DissolvedNitrogenProduction {
 	np.sedimentProductionVariable = variable
 	return np
 }
 
-func (np *ParticulateNitrogenProduction) deriveInitialState(subCatchmentsTable tables.CsvTable, parameters catchmentParameters.Parameters) {
+func (np *DissolvedNitrogenProduction) deriveInitialState(subCatchmentsTable tables.CsvTable, parameters catchmentParameters.Parameters) {
 	np.deriveNumberOfSubCatchments(subCatchmentsTable)
 	np.initialiseSubCatchmentAttributes()
 	np.deriveInitialNitrogen(subCatchmentsTable)
 }
 
-func (np *ParticulateNitrogenProduction) deriveNumberOfSubCatchments(subCatchmentsTable tables.CsvTable) {
+func (np *DissolvedNitrogenProduction) deriveNumberOfSubCatchments(subCatchmentsTable tables.CsvTable) {
 	_, rowCount := subCatchmentsTable.ColumnAndRowSize()
 	np.numberOfSubCatchments = rowCount
 }
 
-func (np *ParticulateNitrogenProduction) initialiseSubCatchmentAttributes() {
+func (np *DissolvedNitrogenProduction) initialiseSubCatchmentAttributes() {
 	np.subCatchmentAttributes = make(map[planningunit.Id]attributes.Attributes, np.numberOfSubCatchments)
 	for index, _ := range np.subCatchmentAttributes {
 		newAttributes := make(attributes.Attributes, 0)
@@ -112,13 +112,13 @@ func (np *ParticulateNitrogenProduction) initialiseSubCatchmentAttributes() {
 	}
 }
 
-func (np *ParticulateNitrogenProduction) deriveInitialNitrogen(subCatchmentsTable tables.CsvTable) {
+func (np *DissolvedNitrogenProduction) deriveInitialNitrogen(subCatchmentsTable tables.CsvTable) {
 	np.buildDefaultSubCatchmentAttributes(subCatchmentsTable)
 	np.replaceDefaultAttributeValuesWithActionValues()
 	np.calculateInitialParticulateNitrogenPerSubCatchment()
 }
 
-func (np *ParticulateNitrogenProduction) buildDefaultSubCatchmentAttributes(subCatchmentsTable tables.CsvTable) {
+func (np *DissolvedNitrogenProduction) buildDefaultSubCatchmentAttributes(subCatchmentsTable tables.CsvTable) {
 	for row := uint(0); row < np.numberOfSubCatchments; row++ {
 		subCatchmentFloat64 := subCatchmentsTable.CellFloat64(planningUnitIndex, row)
 		subCatchment := Float64ToSubCatchmentId(subCatchmentFloat64)
@@ -135,13 +135,13 @@ func (np *ParticulateNitrogenProduction) buildDefaultSubCatchmentAttributes(subC
 	}
 }
 
-func (np *ParticulateNitrogenProduction) replaceDefaultAttributeValuesWithActionValues() {
+func (np *DissolvedNitrogenProduction) replaceDefaultAttributeValuesWithActionValues() {
 	// Order below matters. Riparian nitrogen contribution depends on base attribute values being pre-calculated.
 	np.calculateBaseAttributes()
 	np.calculateRiparianNitrogenContributionAttribute()
 }
 
-func (np *ParticulateNitrogenProduction) calculateBaseAttributes() {
+func (np *DissolvedNitrogenProduction) calculateBaseAttributes() {
 	for key, value := range np.Map() {
 		components := np.DeriveMapKeyComponents(key)
 		if components == nil {
@@ -153,7 +153,7 @@ func (np *ParticulateNitrogenProduction) calculateBaseAttributes() {
 	}
 }
 
-func (np *ParticulateNitrogenProduction) calculateGullyAndHillSlopeContributions(components *catchmentActions.KeyComponents, value float64) {
+func (np *DissolvedNitrogenProduction) calculateGullyAndHillSlopeContributions(components *catchmentActions.KeyComponents, value float64) {
 	if components.ElementType != catchmentActions.ParticulateNitrogenOriginalAttribute {
 		return
 	}
@@ -170,7 +170,7 @@ func (np *ParticulateNitrogenProduction) calculateGullyAndHillSlopeContributions
 	}
 }
 
-func (np *ParticulateNitrogenProduction) calculateRiparianFineSediment(components *catchmentActions.KeyComponents, value float64) {
+func (np *DissolvedNitrogenProduction) calculateRiparianFineSediment(components *catchmentActions.KeyComponents, value float64) {
 	if components.ElementType != catchmentActions.FineSedimentOriginalAttribute {
 		return
 	}
@@ -183,14 +183,14 @@ func (np *ParticulateNitrogenProduction) calculateRiparianFineSediment(component
 	}
 }
 
-func (np *ParticulateNitrogenProduction) calculateRiparianNitrogenContributionAttribute() {
+func (np *DissolvedNitrogenProduction) calculateRiparianNitrogenContributionAttribute() {
 	sedimentSubCatchmentValues := np.sedimentProductionVariable.PlanningUnitAttributes()
 	for subCatchment, sedimentVariableAttributes := range sedimentSubCatchmentValues {
 		np.calculateRiparianNitrogenContributionForSubCatchment(subCatchment, sedimentVariableAttributes)
 	}
 }
 
-func (np *ParticulateNitrogenProduction) calculateRiparianNitrogenContributionForSubCatchment(subCatchment planningunit.Id, attributes attributes.Attributes) {
+func (np *DissolvedNitrogenProduction) calculateRiparianNitrogenContributionForSubCatchment(subCatchment planningunit.Id, attributes attributes.Attributes) {
 	riverbankSediment := attributes.Value(sedimentproduction.RiverbankSedimentContribution).(float64)
 
 	localAttributes := np.subCatchmentAttributes[subCatchment]
@@ -201,7 +201,7 @@ func (np *ParticulateNitrogenProduction) calculateRiparianNitrogenContributionFo
 		np.subCatchmentAttributes[subCatchment].Replace(RiparianNitrogenContribution, riparianNitrogen)
 }
 
-func (np *ParticulateNitrogenProduction) calculateInitialParticulateNitrogenPerSubCatchment() {
+func (np *DissolvedNitrogenProduction) calculateInitialParticulateNitrogenPerSubCatchment() {
 	for subCatchment, attributes := range np.subCatchmentAttributes {
 		np.updateParticulateNitrogenFor(subCatchment, attributes)
 	}
@@ -215,7 +215,7 @@ type nitrogenContext struct {
 	gullyContribution     float64
 }
 
-func (np *ParticulateNitrogenProduction) updateParticulateNitrogenFor(subCatchment planningunit.Id, attributes attributes.Attributes) {
+func (np *DissolvedNitrogenProduction) updateParticulateNitrogenFor(subCatchment planningunit.Id, attributes attributes.Attributes) {
 
 	context := nitrogenContext{
 		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
@@ -228,7 +228,7 @@ func (np *ParticulateNitrogenProduction) updateParticulateNitrogenFor(subCatchme
 	np.SetPlanningUnitValue(subCatchment, nitrogenProduced)
 }
 
-func (np *ParticulateNitrogenProduction) calculateNitrogenProduction(context nitrogenContext) float64 {
+func (np *DissolvedNitrogenProduction) calculateNitrogenProduction(context nitrogenContext) float64 {
 	filteredHillSlopeContribution := np.deriveHillSlopeNitrogenProduction(context)
 	nitrogenProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
 
@@ -236,7 +236,7 @@ func (np *ParticulateNitrogenProduction) calculateNitrogenProduction(context nit
 	return roundedNitrogenProduced
 }
 
-func (np *ParticulateNitrogenProduction) deriveHillSlopeNitrogenProduction(context nitrogenContext) float64 {
+func (np *DissolvedNitrogenProduction) deriveHillSlopeNitrogenProduction(context nitrogenContext) float64 {
 	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
 	filteredHillSlopeContribution := context.hillSlopeContribution * riparianFilter
 
@@ -257,16 +257,16 @@ func riparianBufferFilter(proportionOfRiparianBufferVegetation float64) float64 
 	return 1 - proportionOfRiparianBufferVegetation
 }
 
-func (np *ParticulateNitrogenProduction) ObserveAction(action action.ManagementAction) {
+func (np *DissolvedNitrogenProduction) ObserveAction(action action.ManagementAction) {
 	np.observeAction(action)
 }
 
-func (np *ParticulateNitrogenProduction) ObserveActionInitialising(action action.ManagementAction) {
+func (np *DissolvedNitrogenProduction) ObserveActionInitialising(action action.ManagementAction) {
 	np.observeAction(action)
 	np.command.Do()
 }
 
-func (np *ParticulateNitrogenProduction) observeAction(action action.ManagementAction) {
+func (np *DissolvedNitrogenProduction) observeAction(action action.ManagementAction) {
 	np.actionObserved = action
 	switch np.actionObserved.Type() {
 	case catchmentActions.RiverBankRestorationType:
@@ -280,7 +280,7 @@ func (np *ParticulateNitrogenProduction) observeAction(action action.ManagementA
 	}
 }
 
-func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
+func (np *DissolvedNitrogenProduction) handleRiverBankRestorationAction() {
 	var asIsVegetation, asIsRiparianSediment, asIsFineSediment,
 		toBeVegetation, toBeRiparianSediment, toBeFineSediment float64
 
@@ -338,7 +338,7 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
-func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
+func (np *DissolvedNitrogenProduction) handleGullyRestorationAction() {
 	var asIsNitrogen, toBeNitrogen float64
 
 	switch np.actionObserved.IsActive() {
@@ -359,7 +359,7 @@ func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
-func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
+func (np *DissolvedNitrogenProduction) handleHillSlopeRestorationAction() {
 	var toBeHillSlopeNitrogen, asIsHillSlopeNitrogen float64
 
 	switch np.actionObserved.IsActive() {
@@ -403,28 +403,28 @@ func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
 
 // NotifyObservers allows structs embedding a BaseInductiveDecisionVariable to trigger a notification of change
 // to any observers watching for state changes to the variableOld.
-func (np *ParticulateNitrogenProduction) NotifyObservers() {
+func (np *DissolvedNitrogenProduction) NotifyObservers() {
 	for _, observer := range np.Observers() {
 		observer.ObserveDecisionVariable(np)
 	}
 }
 
-func (np *ParticulateNitrogenProduction) UndoableValue() float64 {
+func (np *DissolvedNitrogenProduction) UndoableValue() float64 {
 	return np.command.Value()
 }
 
-func (np *ParticulateNitrogenProduction) SetUndoableValue(value float64) {
+func (np *DissolvedNitrogenProduction) SetUndoableValue(value float64) {
 	np.command.SetChange(value)
 }
 
-func (np *ParticulateNitrogenProduction) DifferenceInValues() float64 {
+func (np *DissolvedNitrogenProduction) DifferenceInValues() float64 {
 	return np.command.Change()
 }
 
-func (np *ParticulateNitrogenProduction) ApplyDoneValue() {
+func (np *DissolvedNitrogenProduction) ApplyDoneValue() {
 	np.command.Do()
 }
 
-func (np *ParticulateNitrogenProduction) ApplyUndoneValue() {
+func (np *DissolvedNitrogenProduction) ApplyUndoneValue() {
 	np.command.Undo()
 }

@@ -5,6 +5,7 @@ package catchment
 import (
 	"fmt"
 	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/dissolvednitrogen"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/attributes"
@@ -17,7 +18,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/actions"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/implementationcost"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/particulatenitrogen"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/sedimentproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/model/variable"
@@ -94,6 +95,9 @@ func (m *CoreModel) validateModelParameters() {
 	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
 		boundVariableNumber++
 	}
+	if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
+		boundVariableNumber++
+	}
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		boundVariableNumber++
 	}
@@ -150,13 +154,22 @@ func (m *CoreModel) buildDecisionVariables() {
 		sedimentProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumSedimentProduction))
 	}
 
-	nitrogenProduction := new(nitrogenproduction.ParticulateNitrogenProduction).
+	particulateNitrogen := new(particulatenitrogen.ParticulateNitrogenProduction).
 		WithSedimentProductionVariable(sedimentProduction).
 		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
 		WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
-		nitrogenProduction.SetMaximum(m.parameters.GetFloat64(parameters.MaximumParticulateNitrogenProduction))
+		particulateNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumParticulateNitrogenProduction))
+	}
+
+	dissolvedNitrogen := new(dissolvednitrogen.DissolvedNitrogenProduction).
+		WithSedimentProductionVariable(sedimentProduction).
+		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
+		WithObservers(m)
+
+	if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
+		dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumDissolvedNitrogenProduction))
 	}
 
 	implementationCost := new(implementationcost.ImplementationCost).
@@ -175,7 +188,8 @@ func (m *CoreModel) buildDecisionVariables() {
 
 	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, nitrogenProduction, implementationCost, opportunityCost,
+		sedimentProduction, particulateNitrogen, dissolvedNitrogen,
+		implementationCost, opportunityCost,
 	)
 }
 
@@ -256,11 +270,15 @@ func (m *CoreModel) InitialiseActions() {
 		m.InitialiseAllActionsToInactive()
 	} else if m.parameters.HasEntry(parameters.MaximumSedimentProduction) {
 		m.note("Randomly initialising for Maximum sediment production limit.")
-		m.InitialieAllActionsToActive()
+		m.InitialiseAllActionsToActive()
 	} else if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
 		m.note("Randomly initialising for Maximum particulate nitrogen production limit.")
-		m.InitialieAllActionsToActive()
+		m.InitialiseAllActionsToActive()
+	} else if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
+		m.note("Randomly initialising for Maximum dissolved nitrogen production limit.")
+		m.InitialiseAllActionsToActive()
 	}
+
 	m.initialising = false
 
 	m.note("Finished initialising model actions")
@@ -280,6 +298,9 @@ func (m *CoreModel) Randomize() {
 		m.RandomlyValidlyDeactivateActions()
 	} else if m.parameters.HasEntry(parameters.MaximumParticulateNitrogenProduction) {
 		m.note("Randomly initialising for Maximum particulate nitrogen production limit.")
+		m.RandomlyValidlyDeactivateActions()
+	} else if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
+		m.note("Randomly initialising for Maximum dissolved nitrogen production limit.")
 		m.RandomlyValidlyDeactivateActions()
 	} else {
 		m.note("Randomly initialising for unbounded (no limits).")
@@ -321,11 +342,11 @@ func (m *CoreModel) RandomlyValidlyActivateActions() {
 }
 
 func (m *CoreModel) randomlyDeactivateActionsFromAllActiveStart() {
-	m.InitialieAllActionsToActive()
+	m.InitialiseAllActionsToActive()
 	m.RandomlyValidlyDeactivateActions()
 }
 
-func (m *CoreModel) InitialieAllActionsToActive() {
+func (m *CoreModel) InitialiseAllActionsToActive() {
 	m.note("Initialising all actions as active")
 	for _, action := range m.managementActions.Actions() {
 		action.InitialisingActivation()

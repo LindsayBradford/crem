@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-package nitrogenproduction
+package particulatenitrogen
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"

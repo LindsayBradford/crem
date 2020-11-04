@@ -4,8 +4,8 @@ package catchment
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
-	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/nitrogenproduction"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/particulatenitrogen"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -169,7 +169,7 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 	verifyPlanningUnitValues(g, solution, opportunitycost.VariableName, 0)
 
 	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, solution, nitrogenproduction.VariableName, 2.754)
+	verifyPlanningUnitValues(g, solution, particulatenitrogen.VariableName, 2.754)
 }
 
 func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.T) {
@@ -207,7 +207,7 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, opportunitycost.VariableName, 0)
 
 	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, newSolution, nitrogenproduction.VariableName, 2.754)
+	verifyPlanningUnitValues(g, newSolution, particulatenitrogen.VariableName, 2.754)
 }
 
 func TestCoreModel_IsEquivalentTo_AsExpected(t *testing.T) {
@@ -327,7 +327,7 @@ func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
 
 	g.Expect(newSolution).To(Not(BeNil()))
 
-	variableUnderTest := solutionVariable(solution, nitrogenproduction.VariableName)
+	variableUnderTest := solutionVariable(solution, particulatenitrogen.VariableName)
 	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[1]
 
 	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
@@ -372,7 +372,7 @@ func TestCoreModel_ParticulateNitrogen_HillSlopeRiverbankDependency_NoRoundingEr
 
 	g.Expect(newSolution).To(Not(BeNil()))
 
-	variableUnderTest := solutionVariable(solution, nitrogenproduction.VariableName)
+	variableUnderTest := solutionVariable(solution, particulatenitrogen.VariableName)
 	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[3]
 
 	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
