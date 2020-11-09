@@ -30,7 +30,7 @@ func (annealer *ElapsedTimeTrackingAnnealer) Anneal() {
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) generateElapsedTimeString() string {
-	return fmt.Sprintf("%s: total elapsed time of annealing = [%v]", annealer.Id(), annealer.ElapsedTime())
+	return fmt.Sprintf("Scenario [%s]: total elapsed time of annealing = [%v]", annealer.Id(), annealer.ElapsedTime())
 }
 
 func (annealer *ElapsedTimeTrackingAnnealer) ElapsedTime() time.Duration {

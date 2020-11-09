@@ -103,7 +103,7 @@ func (runner *Runner) Run() error {
 	runError := runner.runScenario()
 
 	runner.finishTime = Now()
-	runner.logHandler.Info("Finished running scenario \"" + runner.name + "\"")
+	runner.logHandler.Info("Finished running scenario [" + runner.name + "]")
 
 	runner.logHandler.Info(runner.generateElapsedTimeString())
 
@@ -124,12 +124,12 @@ func (runner *Runner) logScenarioStartMessage() {
 		runTypeText = "executing runs sequentially"
 	}
 
-	message := fmt.Sprintf("Scenario \"%s\": configured for %d run(s), %s", runner.name, runner.runNumber, runTypeText)
+	message := fmt.Sprintf("Scenario [%s]: configured for %d run(s), %s", runner.name, runner.runNumber, runTypeText)
 	runner.logHandler.Info(message)
 }
 
 func (runner *Runner) generateElapsedTimeString() string {
-	return fmt.Sprintf("Total elapsed time of scenario = [%v]", runner.ElapsedTime())
+	return fmt.Sprintf("Total elapsed time of scenario [%s] = [%v]", runner.name, runner.ElapsedTime())
 }
 
 func (runner *Runner) ElapsedTime() Duration {
