@@ -11,9 +11,6 @@ import (
 type RiverBankRestorationCommand struct {
 	variable.ChangePerPlanningUnitDecisionVariableCommand
 
-	doneRiparianVegetationProportion   float64
-	undoneRiparianVegetationProportion float64
-
 	undoneRiparianContribution float64
 	doneRiparianContribution   float64
 }
@@ -28,14 +25,7 @@ func (c *RiverBankRestorationCommand) InPlanningUnit(planningUnit planningunit.I
 	return c
 }
 
-func (c *RiverBankRestorationCommand) WithVegetationProportion(proportion float64) *RiverBankRestorationCommand {
-	planningUnitAttributes := c.variable().subCatchmentAttributes[c.PlanningUnit()]
-	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(RiverbankVegetationProportion).(float64)
-	c.doneRiparianVegetationProportion = proportion
-	return c
-}
-
-func (c *RiverBankRestorationCommand) WithRiverBankNitrogenContribution(contribution float64) *RiverBankRestorationCommand {
+func (c *RiverBankRestorationCommand) WithNitrogenContribution(contribution float64) *RiverBankRestorationCommand {
 	c.undoneRiparianContribution = c.riparianNitrogenContribution()
 	c.doneRiparianContribution = contribution
 	return c
@@ -55,7 +45,6 @@ func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
-	c.setRiparianVegetationProportion(c.doneRiparianVegetationProportion)
 	c.setRiparianNitrogenContribution(c.doneRiparianContribution)
 	return command.Done
 }
@@ -65,14 +54,8 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 		return command.NoChange
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
-	c.setRiparianVegetationProportion(c.undoneRiparianVegetationProportion)
 	c.setRiparianNitrogenContribution(c.undoneRiparianContribution)
 	return command.UnDone
-}
-
-func (c *RiverBankRestorationCommand) setRiparianVegetationProportion(proportion float64) {
-	c.variable().subCatchmentAttributes[c.PlanningUnit()] =
-		c.variable().subCatchmentAttributes[c.PlanningUnit()].Replace(RiverbankVegetationProportion, proportion)
 }
 
 func (c *RiverBankRestorationCommand) riparianNitrogenContribution() float64 {

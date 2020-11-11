@@ -29,7 +29,7 @@ func (g *GullyRestorationGroup) WithGullyTable(gullyTable tables.CsvTable) *Gull
 }
 
 func (g *GullyRestorationGroup) WithActionsTable(actionsTable tables.CsvTable) *GullyRestorationGroup {
-	g.Container.WithSourceFilter(GullySource).WithActionsTable(actionsTable)
+	g.Container.WithFilter(GullyType).WithActionsTable(actionsTable)
 	return g
 }
 
@@ -60,6 +60,9 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 	originalParticulateNitrogen := g.originalParticulateNitrogen(planningUnit)
 	actionedParticulateNitrogen := g.actionedParticulateNitrogen(planningUnit)
 
+	originalDissolvedNitrogen := g.originalDissolvedNitrogen(planningUnit)
+	actionedDissolvedNitrogen := g.actionedDissolvedNitrogen(planningUnit)
+
 	g.actionMap[planningUnit] =
 		NewGullyRestoration().
 			WithPlanningUnit(planningUnit).
@@ -67,6 +70,8 @@ func (g *GullyRestorationGroup) createManagementAction(planningUnit planningunit
 			WithActionedGullySediment(actionedGullySedimentReduction * originalGullySediment).
 			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
 			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
+			WithOriginalDissolvedNitrogen(originalDissolvedNitrogen).
+			WithActionedDissolvedNitrogen(actionedDissolvedNitrogen).
 			WithImplementationCost(costInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

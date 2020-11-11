@@ -30,7 +30,7 @@ type HillSlopeSedimentContribution struct {
 
 func (h *HillSlopeSedimentContribution) Initialise(dataSet *dataset.DataSetImpl, parameters parameters.Parameters) {
 	h.planningUnitTable = dataSet.SubCatchmentsTable
-	h.Container.WithSourceFilter(HillSlopeSource).WithActionsTable(dataSet.ActionsTable)
+	h.Container.WithFilter(HillSlopeType).WithActionsTable(dataSet.ActionsTable)
 	h.parameters = parameters
 	h.populateContributionMap()
 }

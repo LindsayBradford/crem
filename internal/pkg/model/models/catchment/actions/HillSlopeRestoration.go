@@ -55,6 +55,14 @@ func (h *HillSlopeRestoration) WithActionedParticulateNitrogen(costInDollars flo
 	return h.WithVariable(ParticulateNitrogenActionedAttribute, costInDollars)
 }
 
+func (h *HillSlopeRestoration) WithOriginalDissolvedNitrogen(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(DissolvedNitrogenOriginalAttribute, costInDollars)
+}
+
+func (h *HillSlopeRestoration) WithActionedDissolvedNitrogen(costInDollars float64) *HillSlopeRestoration {
+	return h.WithVariable(DissolvedNitrogenActionedAttribute, costInDollars)
+}
+
 func (h *HillSlopeRestoration) WithVariable(variableName action.ModelVariableName, value float64) *HillSlopeRestoration {
 	h.SimpleManagementAction.WithVariable(variableName, value)
 	return h

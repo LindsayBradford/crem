@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type ActionSource string
+type ActionType string
 
 const (
 	subCatchmentIndex                = 0
@@ -25,10 +25,18 @@ const (
 	fineSedimentOriginalIndex        = 8
 	fineSedimentActionedIndex        = 9
 
-	RiparianSource  ActionSource = "Riparian"
-	HillSlopeSource ActionSource = "Hillslope"
-	GullySource     ActionSource = "Gully"
-	UndefinedSource ActionSource = ""
+	dissolvedNitrogenOriginalIndex            = 10
+	dissolvedNitrogenActionedIndex            = 11
+	dissolvedNitrogenRemovalEfficiencyIndex   = 12
+	particulateNitrogenRemovalEfficiencyIndex = 13
+	sedimentRemovalEfficiencyIndex            = 14
+
+	RiparianType  ActionType = "Riparian"
+	HillSlopeType ActionType = "Hillslope"
+	GullyType     ActionType = "Gully"
+	WetlandType   ActionType = "Wetland"
+
+	UndefinedType ActionType = ""
 
 	OpportunityCostAttribute             = "OpportunityCot"
 	ImplementationCostAttribute          = "ImplementationCost"
@@ -38,15 +46,21 @@ const (
 	HillSlopeErosionActionedAttribute    = "HillSlopeErosionActioned"
 	FineSedimentOriginalAttribute        = "FineSedimentOriginal"
 	FineSedimentActionedAttribute        = "FineSedimentActioned"
+
+	DissolvedNitrogenOriginalAttribute   = "DissolvedNitrogenOriginal"
+	DissolvedNitrogenActionedAttribute   = "DissolvedNitrogenActioned"
+	DissolvedNitrogenRemovalEfficiency   = "DissolvedNitrogenRemovalEfficiency"
+	ParticulateNitrogenRemovalEfficiency = "ParticulateNitrogenRemovalEfficiency"
+	SedimentRemovalEfficiency            = "SedimentRemovalEfficiency"
 )
 
 type Container struct {
-	sourceFilter ActionSource
-	actionsMap   map[string]float64
+	filter     ActionType
+	actionsMap map[string]float64
 }
 
-func (c *Container) WithSourceFilter(sourceFilter ActionSource) *Container {
-	c.sourceFilter = sourceFilter
+func (c *Container) WithFilter(filter ActionType) *Container {
+	c.filter = filter
 	return c
 }
 
@@ -56,8 +70,8 @@ func (c *Container) WithActionsTable(actionsTable tables.CsvTable) *Container {
 
 	for rowNumber := uint(0); rowNumber < rowCount; rowNumber++ {
 
-		sourceType := ActionSource(actionsTable.CellString(filterIndex, rowNumber))
-		if c.sourceFilter != UndefinedSource && sourceType != c.sourceFilter {
+		sourceType := ActionType(actionsTable.CellString(filterIndex, rowNumber))
+		if c.filter != UndefinedType && sourceType != c.filter {
 			continue
 		}
 
@@ -80,6 +94,13 @@ func (c *Container) WithActionsTable(actionsTable tables.CsvTable) *Container {
 
 		mapAttribute(fineSedimentOriginalIndex, FineSedimentOriginalAttribute)
 		mapAttribute(fineSedimentActionedIndex, FineSedimentActionedAttribute)
+
+		mapAttribute(dissolvedNitrogenOriginalIndex, DissolvedNitrogenOriginalAttribute)
+		mapAttribute(dissolvedNitrogenActionedIndex, DissolvedNitrogenActionedAttribute)
+
+		mapAttribute(dissolvedNitrogenRemovalEfficiencyIndex, DissolvedNitrogenRemovalEfficiency)
+		mapAttribute(particulateNitrogenRemovalEfficiencyIndex, ParticulateNitrogenRemovalEfficiency)
+		mapAttribute(sedimentRemovalEfficiencyIndex, SedimentRemovalEfficiency)
 	}
 	return c
 }
@@ -93,13 +114,13 @@ func (c *Container) MapValue(key string) float64 {
 
 type KeyComponents struct {
 	SubCatchment planningunit.Id
-	SourceType   ActionSource
+	Action       ActionType
 	ElementType  string
 }
 
-func (c *Container) DeriveMapKey(subCatchment planningunit.Id, sourceType ActionSource, elementType string) string {
-	if c.sourceFilter == UndefinedSource {
-		return fmt.Sprintf("%d,%s,%s", subCatchment, sourceType, elementType)
+func (c *Container) DeriveMapKey(subCatchment planningunit.Id, actionType ActionType, elementType string) string {
+	if c.filter == UndefinedType {
+		return fmt.Sprintf("%d,%s,%s", subCatchment, actionType, elementType)
 	}
 	return fmt.Sprintf("%d,%s", subCatchment, elementType)
 }
@@ -112,12 +133,12 @@ func (c *Container) DeriveMapKeyComponents(mapKey string) *KeyComponents {
 		return nil
 	}
 
-	if c.sourceFilter == UndefinedSource {
-		rawSourceType := ActionSource(rawComponents[1])
+	if c.filter == UndefinedType {
+		actionType := ActionType(rawComponents[1])
 		rawElementType := rawComponents[2]
 		return &KeyComponents{
 			SubCatchment: planningunit.Id(rawPlanningUnitId),
-			SourceType:   rawSourceType,
+			Action:       actionType,
 			ElementType:  rawElementType,
 		}
 	} else {
@@ -130,42 +151,67 @@ func (c *Container) DeriveMapKeyComponents(mapKey string) *KeyComponents {
 }
 
 func (c *Container) opportunityCost(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, OpportunityCostAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, OpportunityCostAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) implementationCost(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ImplementationCostAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, ImplementationCostAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) originalParticulateNitrogen(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ParticulateNitrogenOriginalAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, ParticulateNitrogenOriginalAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) actionedParticulateNitrogen(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, ParticulateNitrogenActionedAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, ParticulateNitrogenActionedAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) originalHillSlopeErosion(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionOriginalAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, HillSlopeErosionOriginalAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) actionedHillSlopeErosion(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, HillSlopeErosionActionedAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, HillSlopeErosionActionedAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) originalFineSediment(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, FineSedimentOriginalAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, FineSedimentOriginalAttribute)
 	return c.actionsMap[key]
 }
 
 func (c *Container) actionedFineSediment(planningUnit planningunit.Id) float64 {
-	key := c.DeriveMapKey(planningUnit, c.sourceFilter, FineSedimentActionedAttribute)
+	key := c.DeriveMapKey(planningUnit, c.filter, FineSedimentActionedAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) originalDissolvedNitrogen(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.filter, DissolvedNitrogenOriginalAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) actionedDissolvedNitrogen(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.filter, DissolvedNitrogenActionedAttribute)
+	return c.actionsMap[key]
+}
+
+func (c *Container) dissolvedNitrogenRemovalEfficiency(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.filter, DissolvedNitrogenRemovalEfficiency)
+	return c.actionsMap[key]
+}
+
+func (c *Container) particulateNitrogenRemovalEfficiency(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.filter, ParticulateNitrogenRemovalEfficiency)
+	return c.actionsMap[key]
+}
+
+func (c *Container) sedimentNitrogenRemovalEfficiency(planningUnit planningunit.Id) float64 {
+	key := c.DeriveMapKey(planningUnit, c.filter, SedimentRemovalEfficiency)
 	return c.actionsMap[key]
 }
 

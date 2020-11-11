@@ -25,7 +25,7 @@ func (c *HillSlopeRevegetationCommand) InPlanningUnit(planningUnit planningunit.
 	return c
 }
 
-func (c *HillSlopeRevegetationCommand) WithFilteredNitrogenContribution(contribution float64) *HillSlopeRevegetationCommand {
+func (c *HillSlopeRevegetationCommand) WithNitrogenContribution(contribution float64) *HillSlopeRevegetationCommand {
 	c.undoneHillSlopeContribution = c.hillSlopeNitrogenContribution()
 	c.doneHillSlopeContribution = contribution
 	return c

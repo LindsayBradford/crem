@@ -373,10 +373,10 @@ func TestCoreModel_ParticulateNitrogen_HillSlopeRiverbankDependency_NoRoundingEr
 	g.Expect(newSolution).To(Not(BeNil()))
 
 	variableUnderTest := solutionVariable(solution, particulatenitrogen.VariableName)
-	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[3]
+	planningUnitEntry := variableUnderTest.ValuePerPlanningUnit[3]
 
-	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
-	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 0.404))
+	g.Expect(planningUnitEntry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
+	g.Expect(planningUnitEntry.Value).To(BeNumerically(equalTo, 0.404))
 
 	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
 }

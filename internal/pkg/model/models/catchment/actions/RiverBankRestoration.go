@@ -79,6 +79,14 @@ func (r *RiverBankRestoration) WithActionedFineSediment(fineSediment float64) *R
 	return r.WithVariable(FineSedimentActionedAttribute, fineSediment)
 }
 
+func (r *RiverBankRestoration) WithOriginalDissolvedNitrogen(fineSediment float64) *RiverBankRestoration {
+	return r.WithVariable(DissolvedNitrogenOriginalAttribute, fineSediment)
+}
+
+func (r *RiverBankRestoration) WithActionedDissolvedNitrogen(fineSediment float64) *RiverBankRestoration {
+	return r.WithVariable(DissolvedNitrogenActionedAttribute, fineSediment)
+}
+
 func (r *RiverBankRestoration) WithVariable(variableName action.ModelVariableName, value float64) *RiverBankRestoration {
 	r.SimpleManagementAction.WithVariable(variableName, value)
 	return r

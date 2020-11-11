@@ -24,7 +24,7 @@ func (r *RiverBankRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (r *RiverBankRestorationGroup) WithActionsTable(parentSoilsTable tables.CsvTable) *RiverBankRestorationGroup {
-	r.Container.WithSourceFilter(RiparianSource).WithActionsTable(parentSoilsTable)
+	r.Container.WithFilter(RiparianType).WithActionsTable(parentSoilsTable)
 	return r
 }
 
@@ -76,6 +76,9 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	originalFineSediment := r.originalFineSediment(planningUnitAsId)
 	actionedFineSediment := r.actionedFineSediment(planningUnitAsId)
 
+	originalDissolvedNitrogen := r.originalDissolvedNitrogen(planningUnitAsId)
+	actionedDissolvedNitrogen := r.actionedDissolvedNitrogen(planningUnitAsId)
+
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
@@ -87,6 +90,8 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
 			WithOriginalFineSediment(originalFineSediment).
 			WithActionedFineSediment(actionedFineSediment).
+			WithOriginalDissolvedNitrogen(originalDissolvedNitrogen).
+			WithActionedDissolvedNitrogen(actionedDissolvedNitrogen).
 			WithImplementationCost(implementationCostInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

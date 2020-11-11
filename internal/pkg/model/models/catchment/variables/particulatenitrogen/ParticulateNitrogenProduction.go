@@ -158,12 +158,12 @@ func (np *ParticulateNitrogenProduction) calculateGullyAndHillSlopeContributions
 		return
 	}
 
-	switch components.SourceType {
-	case catchmentActions.HillSlopeSource:
+	switch components.Action {
+	case catchmentActions.HillSlopeType:
 		deliveryAdjustedValue := value * np.hillSlopeDeliveryRatio
 		np.subCatchmentAttributes[components.SubCatchment] =
 			np.subCatchmentAttributes[components.SubCatchment].Replace(HillSlopeNitrogenContribution, deliveryAdjustedValue)
-	case catchmentActions.GullySource:
+	case catchmentActions.GullyType:
 		np.subCatchmentAttributes[components.SubCatchment] =
 			np.subCatchmentAttributes[components.SubCatchment].Replace(GullyNitrogenContribution, value)
 	default: // Deliberately does nothing
@@ -175,8 +175,8 @@ func (np *ParticulateNitrogenProduction) calculateRiparianFineSediment(component
 		return
 	}
 
-	switch components.SourceType {
-	case catchmentActions.RiparianSource:
+	switch components.Action {
+	case catchmentActions.RiparianType:
 		np.subCatchmentAttributes[components.SubCatchment] =
 			np.subCatchmentAttributes[components.SubCatchment].Replace(RiparianFineSediment, value)
 	default: // Deliberately does nothing

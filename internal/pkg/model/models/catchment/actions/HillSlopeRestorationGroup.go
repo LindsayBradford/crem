@@ -29,7 +29,7 @@ func (h *HillSlopeRestorationGroup) WithPlanningUnitTable(planningUnitTable tabl
 }
 
 func (h *HillSlopeRestorationGroup) WithActionsTable(actionsTable tables.CsvTable) *HillSlopeRestorationGroup {
-	h.Container.WithSourceFilter(HillSlopeSource).WithActionsTable(actionsTable)
+	h.Container.WithFilter(HillSlopeType).WithActionsTable(actionsTable)
 	return h
 }
 
@@ -56,6 +56,8 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
 	originalBufferVegetation := h.originalBufferVegetation(rowNumber)
+	actionedBufferVegetation := h.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
+
 	riparianFilter := riparianBufferFilter(originalBufferVegetation)
 
 	if !h.actionNeededFor(planningUnitAsId, riparianFilter) {
@@ -73,6 +75,9 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
 	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
 
+	originalDissolvedNitrogen := h.originalDissolvedNitrogen(planningUnitAsId) * originalBufferVegetation
+	actionedDissolvedNitrogen := h.actionedDissolvedNitrogen(planningUnitAsId) * actionedBufferVegetation
+
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
 			WithPlanningUnit(planningUnitAsId).
@@ -80,6 +85,8 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 			WithActionedSedimentErosion(actionedHillSlopeErosion).
 			WithOriginalParticulateNitrogen(originalParticulateNitrogen).
 			WithActionedParticulateNitrogen(actionedParticulateNitrogen).
+			WithOriginalDissolvedNitrogen(originalDissolvedNitrogen).
+			WithActionedDissolvedNitrogen(actionedDissolvedNitrogen).
 			WithOpportunityCost(opportunityCostInDollars).
 			WithImplementationCost(implementationCostInDollars)
 }

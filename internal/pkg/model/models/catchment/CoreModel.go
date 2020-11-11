@@ -164,7 +164,6 @@ func (m *CoreModel) buildDecisionVariables() {
 	}
 
 	dissolvedNitrogen := new(dissolvednitrogen.DissolvedNitrogenProduction).
-		WithSedimentProductionVariable(sedimentProduction).
 		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
 		WithObservers(m)
 

@@ -59,6 +59,14 @@ func (g *GullyRestoration) WithActionedParticulateNitrogen(costInDollars float64
 	return g.WithVariable(ParticulateNitrogenActionedAttribute, costInDollars)
 }
 
+func (g *GullyRestoration) WithOriginalDissolvedNitrogen(costInDollars float64) *GullyRestoration {
+	return g.WithVariable(DissolvedNitrogenOriginalAttribute, costInDollars)
+}
+
+func (g *GullyRestoration) WithActionedDissolvedNitrogen(costInDollars float64) *GullyRestoration {
+	return g.WithVariable(DissolvedNitrogenActionedAttribute, costInDollars)
+}
+
 func (g *GullyRestoration) WithVariable(variableName action.ModelVariableName, value float64) *GullyRestoration {
 	g.SimpleManagementAction.WithVariable(variableName, value)
 	return g
