@@ -34,7 +34,7 @@ MaximumIterations = 1_000_000
 [Model]
 Type = "CatchmentModel"
 [Model.Parameters]
-DataSourcePath = "input/Laidley_data_v1_7_1.xlsx"
+DataSourcePath = "input/Laidley_data_v1_8_2.xlsx"
 
 BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
 WaterDensity = 1.0                  # 1 t/m^3 (default)

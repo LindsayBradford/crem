@@ -56,7 +56,6 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	planningUnitAsId := planningunit.Float64ToId(planningUnit)
 
 	originalBufferVegetation := h.originalBufferVegetation(rowNumber)
-	actionedBufferVegetation := h.parameters.GetFloat64(parameters.RiparianBufferVegetationProportionTarget)
 
 	riparianFilter := riparianBufferFilter(originalBufferVegetation)
 
@@ -75,8 +74,8 @@ func (h *HillSlopeRestorationGroup) createManagementAction(rowNumber uint) {
 	originalParticulateNitrogen := h.originalParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
 	actionedParticulateNitrogen := h.actionedParticulateNitrogen(planningUnitAsId) * hillSlopeDeliveryRatio
 
-	originalDissolvedNitrogen := h.originalDissolvedNitrogen(planningUnitAsId) * originalBufferVegetation
-	actionedDissolvedNitrogen := h.actionedDissolvedNitrogen(planningUnitAsId) * actionedBufferVegetation
+	originalDissolvedNitrogen := h.originalDissolvedNitrogen(planningUnitAsId)
+	actionedDissolvedNitrogen := h.actionedDissolvedNitrogen(planningUnitAsId)
 
 	h.actionMap[planningUnitAsId] =
 		NewHillSlopeRestoration().
