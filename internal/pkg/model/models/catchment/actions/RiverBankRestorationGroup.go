@@ -79,6 +79,8 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 	originalDissolvedNitrogen := r.originalDissolvedNitrogen(planningUnitAsId)
 	actionedDissolvedNitrogen := r.actionedDissolvedNitrogen(planningUnitAsId)
 
+	dissolvedNitrogenRemovalEfficiency := r.dissolvedNitrogenRemovalEfficiency(planningUnitAsId)
+
 	r.actionMap[planningUnitAsId] =
 		NewRiverBankRestoration().
 			WithPlanningUnit(planningUnitAsId).
@@ -92,6 +94,7 @@ func (r *RiverBankRestorationGroup) createManagementAction(rowNumber uint) {
 			WithActionedFineSediment(actionedFineSediment).
 			WithOriginalDissolvedNitrogen(originalDissolvedNitrogen).
 			WithActionedDissolvedNitrogen(actionedDissolvedNitrogen).
+			WithDissolvedNitrogenRemovalEfficiency(dissolvedNitrogenRemovalEfficiency).
 			WithImplementationCost(implementationCostInDollars).
 			WithOpportunityCost(opportunityCostInDollars)
 }

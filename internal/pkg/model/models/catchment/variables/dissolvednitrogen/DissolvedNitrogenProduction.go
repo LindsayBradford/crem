@@ -167,16 +167,22 @@ func (dn *DissolvedNitrogenProduction) calculateInitialNitrogenPerSubCatchment()
 
 type nitrogenContext struct {
 	riparianContribution  float64
-	hillSlopeContribution float64
 	gullyContribution     float64
+	hillSlopeContribution float64
+
+	riparianBufferVegetation                   float64
+	riparianDissolvedNitrogenRemovalEfficiency float64
 }
 
 func (dn *DissolvedNitrogenProduction) updateParticulateNitrogenFor(subCatchment planningunit.Id, attributes attributes.Attributes) {
 
 	context := nitrogenContext{
-		riparianContribution:  attributes.Value(RiparianNitrogenContribution).(float64),
-		gullyContribution:     attributes.Value(GullyNitrogenContribution).(float64),
-		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
+		riparianContribution: attributes.Value(RiparianNitrogenContribution).(float64),
+		gullyContribution:    attributes.Value(GullyNitrogenContribution).(float64),
+
+		hillSlopeContribution:                      attributes.Value(HillSlopeNitrogenContribution).(float64),
+		riparianBufferVegetation:                   attributes.Value(ProportionOfRiparianVegetation).(float64),
+		riparianDissolvedNitrogenRemovalEfficiency: attributes.Value(RiparianDissolvedNitrogenRemovalEfficiency).(float64),
 	}
 
 	nitrogenProduced := dn.calculateNitrogenProduction(context)
@@ -184,7 +190,11 @@ func (dn *DissolvedNitrogenProduction) updateParticulateNitrogenFor(subCatchment
 }
 
 func (dn *DissolvedNitrogenProduction) calculateNitrogenProduction(context nitrogenContext) float64 {
-	nitrogenProduced := context.riparianContribution + context.gullyContribution + context.hillSlopeContribution
+	riparianEfficiency := context.riparianBufferVegetation * context.riparianDissolvedNitrogenRemovalEfficiency
+	efficiencyAdjustedHillSlopeContribution := (1 - riparianEfficiency) * context.hillSlopeContribution
+
+	nitrogenProduced := context.riparianContribution + context.gullyContribution + efficiencyAdjustedHillSlopeContribution
+
 	roundedNitrogenProduced := math.RoundFloat(nitrogenProduced, int(dn.Precision()))
 	return roundedNitrogenProduced
 }
@@ -286,13 +296,13 @@ func (dn *DissolvedNitrogenProduction) handleHillSlopeRestorationAction() {
 
 	removalEfficiency := vegetationProportion * dissolvedNitrogenRemovalEfficiency
 
-	finalisedAsIsNitrogen := asIsNitrogen * removalEfficiency
-	finalisedToBeNitrogen := toBeNitrogen * removalEfficiency
+	finalisedAsIsNitrogen := asIsNitrogen * (1 - removalEfficiency)
+	finalisedToBeNitrogen := toBeNitrogen * (1 - removalEfficiency)
 
 	dn.command = new(HillSlopeRevegetationCommand).
 		ForVariable(dn).
 		InPlanningUnit(actionSubCatchment).
-		WithNitrogenContribution(finalisedToBeNitrogen).
+		WithNitrogenContribution(toBeNitrogen).
 		WithChange(finalisedToBeNitrogen - finalisedAsIsNitrogen)
 }
 
