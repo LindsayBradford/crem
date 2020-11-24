@@ -4,7 +4,7 @@
 ### New Features
 * Added Dissolved Nitrogen and Wetlands management actions.
 ### Bug Fixes
-* TBD.
+* Small logging tweaks to scenario log entries to make them more consistent with annealing logging.
 
 ## Version 0.13.1 (30/10/2020):
 ### New Features
