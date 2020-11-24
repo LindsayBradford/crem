@@ -125,7 +125,6 @@ func (dn *DissolvedNitrogenProduction) replaceDefaultAttributeValuesWithActionOr
 			continue
 		}
 		dn.cacheRiparianAttributes(components, value)
-		dn.cacheWetlandsAttributes(components, value)
 
 		dn.calculateOriginalDissolvedNitrogenContributions(components, value)
 	}
@@ -140,19 +139,6 @@ func (dn *DissolvedNitrogenProduction) cacheRiparianAttributes(components *catch
 	case catchmentActions.DissolvedNitrogenRemovalEfficiency:
 		dn.subCatchmentAttributes[components.SubCatchment] =
 			dn.subCatchmentAttributes[components.SubCatchment].Replace(RiparianDissolvedNitrogenRemovalEfficiency, value)
-	default: // Deliberately does nothing
-	}
-}
-
-func (dn *DissolvedNitrogenProduction) cacheWetlandsAttributes(components *catchmentActions.KeyComponents, value float64) {
-	if components.Action != catchmentActions.WetlandType {
-		return
-	}
-
-	switch components.ElementType {
-	case catchmentActions.DissolvedNitrogenRemovalEfficiency:
-		dn.subCatchmentAttributes[components.SubCatchment] =
-			dn.subCatchmentAttributes[components.SubCatchment].Replace(WetlandsDissolvedNitrogenRemovalEfficiency, value)
 	default: // Deliberately does nothing
 	}
 }
