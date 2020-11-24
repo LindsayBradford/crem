@@ -14,9 +14,6 @@ type RiverBankRestorationCommand struct {
 	undoneRiparianVegetationProportion float64
 	doneRiparianVegetationProportion   float64
 
-	undoneRemovalEfficiency float64
-	doneRemovalEfficiency   float64
-
 	undoneRiparianContribution float64
 	doneRiparianContribution   float64
 }
@@ -35,13 +32,6 @@ func (c *RiverBankRestorationCommand) WithVegetationProportion(proportion float6
 	planningUnitAttributes := c.variable().subCatchmentAttributes[c.PlanningUnit()]
 	c.undoneRiparianVegetationProportion = planningUnitAttributes.Value(ProportionOfRiparianVegetation).(float64)
 	c.doneRiparianVegetationProportion = proportion
-	return c
-}
-
-func (c *RiverBankRestorationCommand) WithRemovalEfficiency(efficiency float64) *RiverBankRestorationCommand {
-	planningUnitAttributes := c.variable().subCatchmentAttributes[c.PlanningUnit()]
-	c.undoneRemovalEfficiency = planningUnitAttributes.Value(RiparianDissolvedNitrogenRemovalEfficiency).(float64)
-	c.doneRemovalEfficiency = efficiency
 	return c
 }
 
@@ -66,7 +56,6 @@ func (c *RiverBankRestorationCommand) Do() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.DoUnguarded()
 	c.setRiparianVegetationProportion(c.doneRiparianVegetationProportion)
-	c.setRemovalEfficiency(c.doneRemovalEfficiency)
 	c.setRiparianNitrogenContribution(c.doneRiparianContribution)
 	return command.Done
 }
@@ -77,7 +66,6 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 	}
 	c.ChangePerPlanningUnitDecisionVariableCommand.UndoUnguarded()
 	c.setRiparianVegetationProportion(c.undoneRiparianVegetationProportion)
-	c.setRemovalEfficiency(c.undoneRemovalEfficiency)
 	c.setRiparianNitrogenContribution(c.undoneRiparianContribution)
 	return command.UnDone
 }
@@ -85,11 +73,6 @@ func (c *RiverBankRestorationCommand) Undo() command.CommandStatus {
 func (c *RiverBankRestorationCommand) setRiparianVegetationProportion(proportion float64) {
 	c.variable().subCatchmentAttributes[c.PlanningUnit()] =
 		c.variable().subCatchmentAttributes[c.PlanningUnit()].Replace(ProportionOfRiparianVegetation, proportion)
-}
-
-func (c *RiverBankRestorationCommand) setRemovalEfficiency(proportion float64) {
-	c.variable().subCatchmentAttributes[c.PlanningUnit()] =
-		c.variable().subCatchmentAttributes[c.PlanningUnit()].Replace(RiparianDissolvedNitrogenRemovalEfficiency, proportion)
 }
 
 func (c *RiverBankRestorationCommand) riparianNitrogenContribution() float64 {

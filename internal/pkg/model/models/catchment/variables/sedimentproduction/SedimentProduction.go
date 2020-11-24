@@ -19,9 +19,11 @@ const (
 	VariableName = "SedimentProduction"
 
 	RiverbankVegetationProportion = "RiverbankVegetationProportion"
-	HillSlopeVegetationProportion = "HillSlopeVegetationProportion"
 	RiverbankSedimentContribution = "RiverbankSedimentContribution"
 	GullySedimentContribution     = "GullySedimentContribution"
+
+	HillSlopeVegetationProportion = "HillSlopeVegetationProportion"
+	WetlandRemovalEfficiency      = "WetlandRemovalEfficiency"
 	HillSlopeSedimentContribution = "HillSlopeSedimentContribution"
 )
 
@@ -111,6 +113,7 @@ func (sl *SedimentProduction) deriveInitialSedimentProduction(planningUnitTable 
 		hillSlopeSedimentContribution := sl.hillSlopeSedimentContribution.OriginalSubCatchmentSedimentContribution(planningUnit) * riparianFilter
 
 		sl.planningUnitAttributes[planningUnit] = new(attributes.Attributes).
+			Add(WetlandRemovalEfficiency, float64(0)).
 			Add(RiverbankVegetationProportion, riverBankVegetationProportion).
 			Add(RiverbankSedimentContribution, riverbankSedimentContribution).
 			Add(GullySedimentContribution, gullySedimentContribution).
@@ -159,6 +162,8 @@ func (sl *SedimentProduction) observeAction(action action.ManagementAction) {
 		sl.handleGullyRestorationAction()
 	case actions.HillSlopeRestorationType:
 		sl.handleHillSlopeRestorationAction()
+	case actions.WetlandsEstablishmentType:
+		sl.handleWetlandsEstablishmentAction()
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}
@@ -189,6 +194,7 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 		riparianContribution:         asIsRiverBankSediment,
 		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
 		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
 	}
 
 	asIsSediment := sl.calculateSedimentProduction(asIsContext)
@@ -198,6 +204,7 @@ func (sl *SedimentProduction) handleRiverBankRestorationAction() {
 		riparianContribution:         toBeRiverBankSediment,
 		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
 		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
 	}
 
 	toBeSediment := sl.calculateSedimentProduction(toBeContext)
@@ -269,6 +276,7 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
 		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
 		hillSlopeContribution:        asIsHillSlopeSediment,
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
 	}
 
 	asIsSediment := sl.calculateSedimentProduction(asIsContext)
@@ -278,6 +286,7 @@ func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
 		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
 		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
 		hillSlopeContribution:        toBeHillSlopeSediment,
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
 	}
 
 	toBeSediment := sl.calculateSedimentProduction(toBeContext)
@@ -297,6 +306,47 @@ func (sl *SedimentProduction) filteredHillSlopeSediment(planningUnit planninguni
 	filteredHillSlopeSediment := hillSlopeSediment * filter
 
 	return filteredHillSlopeSediment
+}
+
+func (sl *SedimentProduction) handleWetlandsEstablishmentAction() {
+	var asIsRemovalEfficiency, toBeRemovalEfficiency float64
+
+	switch sl.actionObserved.IsActive() {
+	case true:
+		asIsRemovalEfficiency = 0
+		toBeRemovalEfficiency = sl.actionObserved.ModelVariableValue(actions.SedimentRemovalEfficiency)
+	case false:
+		asIsRemovalEfficiency = sl.actionObserved.ModelVariableValue(actions.SedimentRemovalEfficiency)
+		toBeRemovalEfficiency = 0
+	}
+
+	attributes := sl.planningUnitAttributes[sl.actionObserved.PlanningUnit()]
+
+	asIsContext := sedimentContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     asIsRemovalEfficiency,
+	}
+
+	asIsSediment := sl.calculateSedimentProduction(asIsContext)
+
+	toBeContext := sedimentContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            attributes.Value(GullySedimentContribution).(float64),
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     toBeRemovalEfficiency,
+	}
+
+	toBeSediment := sl.calculateSedimentProduction(toBeContext)
+
+	sl.command = new(WetlandsEstablishmentCommand).
+		ForVariable(sl).
+		InPlanningUnit(sl.actionObserved.PlanningUnit()).
+		WithRemovalEfficiency(toBeRemovalEfficiency).
+		WithChange(toBeSediment - asIsSediment)
 }
 
 func (sl *SedimentProduction) UndoableValue() float64 {
@@ -331,13 +381,16 @@ type sedimentContext struct {
 	riparianContribution         float64
 	riparianVegetationProportion float64
 
-	hillSlopeContribution float64
-	gullyContribution     float64
+	wetlandRemovalEfficiency float64
+	hillSlopeContribution    float64
+	gullyContribution        float64
 }
 
 func (sl *SedimentProduction) calculateSedimentProduction(context sedimentContext) float64 {
 	riparianFilter := riparianBufferFilter(context.riparianVegetationProportion)
-	filteredHillSlopeContribution := context.hillSlopeContribution * riparianFilter
+
+	wetlandMediatedHillSlopeContribution := (1 - context.wetlandRemovalEfficiency) * context.hillSlopeContribution
+	filteredHillSlopeContribution := wetlandMediatedHillSlopeContribution * riparianFilter
 
 	sedimentProduced := context.riparianContribution + context.gullyContribution + filteredHillSlopeContribution
 

@@ -204,6 +204,7 @@ func (m *CoreModel) buildModelActions() []action.ManagementAction {
 	modelActions = append(modelActions, m.buildGullyRestorations()...)
 	modelActions = append(modelActions, m.buildRiverBankRestorations()...)
 	modelActions = append(modelActions, m.buildHillSlopeRestorations()...)
+	modelActions = append(modelActions, m.buildWetlandsEstablishments()...)
 
 	return modelActions
 }
@@ -233,6 +234,15 @@ func (m *CoreModel) buildHillSlopeRestorations() []action.ManagementAction {
 		WithParameters(m.parameters).
 		ManagementActions()
 	return hillSlopeRestorations
+}
+
+func (m *CoreModel) buildWetlandsEstablishments() []action.ManagementAction {
+	wetlandsEstablishments := new(actions.WetlandsEstablishmentGroup).
+		WithPlanningUnitTable(m.planningUnitTable).
+		WithActionsTable(m.actionsTable).
+		WithParameters(m.parameters).
+		ManagementActions()
+	return wetlandsEstablishments
 }
 
 func (m *CoreModel) buildActionObservers() []action.Observer {

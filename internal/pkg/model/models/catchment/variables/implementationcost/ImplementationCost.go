@@ -64,6 +64,8 @@ func (ic *ImplementationCost) observeAction(action action.ManagementAction) {
 		ic.handleActionForModelVariable(actions.GullyRestorationCost)
 	case actions.HillSlopeRestorationType:
 		ic.handleActionForModelVariable(actions.HillSlopeRestorationCost)
+	case actions.WetlandsEstablishmentType:
+		ic.handleActionForModelVariable(actions.WetlandsEstablishmentCost)
 	default:
 		panic(errors.New("Unhandled observation of management action type [" + string(action.Type()) + "]"))
 	}

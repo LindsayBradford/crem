@@ -66,7 +66,7 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 	model.Initialise()
 
 	actualActions := model.ManagementActions()
-	expectedActionNumber := 12
+	expectedActionNumber := 13
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 
@@ -107,7 +107,7 @@ func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
 	copiedModel.Initialise()
 
 	actualActions := copiedModel.ManagementActions()
-	expectedActionNumber := 12
+	expectedActionNumber := 13
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 

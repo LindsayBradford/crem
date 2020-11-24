@@ -150,6 +150,14 @@ func (c *Container) DeriveMapKeyComponents(mapKey string) *KeyComponents {
 	}
 }
 
+func (c *Container) mapsToPlanningUnit(planningUnit planningunit.Id) bool {
+	key := c.DeriveMapKey(planningUnit, c.filter, ImplementationCostAttribute)
+	if _, exist := c.actionsMap[key]; exist {
+		return true
+	}
+	return false
+}
+
 func (c *Container) opportunityCost(planningUnit planningunit.Id) float64 {
 	key := c.DeriveMapKey(planningUnit, c.filter, OpportunityCostAttribute)
 	return c.actionsMap[key]
