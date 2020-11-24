@@ -331,8 +331,9 @@ func (m *CoreModel) InitialiseAllActionsToInactive() {
 }
 
 func (m *CoreModel) RandomlyValidlyActivateActions() {
+	attemptLimit := len(m.managementActions.Actions())
 	isValid := true
-	for isValid {
+	for isValid && attemptLimit > 0 {
 		actionChanged := m.managementActions.RandomlyInitialiseAnyAction()
 		if actionChanged == nil {
 			continue
@@ -347,6 +348,7 @@ func (m *CoreModel) RandomlyValidlyActivateActions() {
 			m.note("Activation was invalid. Reverting.")
 			actionChanged.InitialisingDeactivation()
 		}
+		attemptLimit--
 	}
 }
 
@@ -363,8 +365,9 @@ func (m *CoreModel) InitialiseAllActionsToActive() {
 }
 
 func (m *CoreModel) RandomlyValidlyDeactivateActions() {
+	attemptLimit := len(m.managementActions.Actions())
 	isValid := true
-	for isValid {
+	for isValid && attemptLimit > 0 {
 		actionChanged := m.managementActions.RandomlyDeInitialiseAnyAction()
 		if actionChanged == nil {
 			continue
@@ -379,6 +382,7 @@ func (m *CoreModel) RandomlyValidlyDeactivateActions() {
 			m.note("Deactivation was invalid. Reverting.")
 			actionChanged.InitialisingActivation()
 		}
+		attemptLimit--
 	}
 }
 

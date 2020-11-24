@@ -5,6 +5,8 @@
 * Added Dissolved Nitrogen and Wetlands management actions.
 ### Bug Fixes
 * Small logging tweaks to scenario log entries to make them more consistent with annealing logging.
+* Fixed a bug around SOSA algorithms not randomly initialising state.
+* Fixed a bug where poor configuration could see explorer initialisation hang in an infinite loop.
 
 ## Version 0.13.1 (30/10/2020):
 ### New Features

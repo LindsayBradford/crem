@@ -64,6 +64,7 @@ func (ke *Explorer) Initialise() {
 
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
+	ke.Model().Randomize()
 }
 
 func (ke *Explorer) notifyInitialisation() {
