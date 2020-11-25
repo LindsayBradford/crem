@@ -469,7 +469,7 @@ func (np *ParticulateNitrogenProduction) NotifyObservers() {
 }
 
 func (np *ParticulateNitrogenProduction) UndoableValue() float64 {
-	return np.command.Value()
+	return np.Value() + np.command.Value()
 }
 
 func (np *ParticulateNitrogenProduction) SetUndoableValue(value float64) {

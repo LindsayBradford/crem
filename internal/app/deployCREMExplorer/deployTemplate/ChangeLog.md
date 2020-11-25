@@ -2,9 +2,13 @@
 
 ## Version 0.14 (TBD):
 ### New Features
-* Added Dissolved Nitrogen and Wetlands management actions.
+* Added Dissolved Nitrogen Decision Variable and Wetlands Establishment management action.
 ### Bug Fixes
 * Small logging tweaks to scenario log entries to make them more consistent with annealing logging.
+* Fixed a bug around SOSA algorithms not randomly initialising state.
+* Fixed a bug where poor configuration could see explorer initialisation hang in an infinite loop.
+* Related to the above, logging changes around initialisation to better track what's actually happening.
+* Fixed bugs in decision variables around undoable values.  
 
 ## Version 0.13.1 (30/10/2020):
 ### New Features

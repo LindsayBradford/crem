@@ -3,6 +3,7 @@
 package catchment
 
 import (
+	errors2 "errors"
 	"fmt"
 	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/dissolvednitrogen"
@@ -331,7 +332,12 @@ func (m *CoreModel) InitialiseAllActionsToInactive() {
 }
 
 func (m *CoreModel) RandomlyValidlyActivateActions() {
-	attemptLimit := len(m.managementActions.Actions())
+	actionNumber := len(m.managementActions.Actions())
+	attemptLimit := actionNumber
+
+	attemptNote := fmt.Sprintf("Making [%d] attempts to find solution close to decision variable limit.", attemptLimit)
+	m.note(attemptNote)
+
 	isValid := true
 	for isValid && attemptLimit > 0 {
 		actionChanged := m.managementActions.RandomlyInitialiseAnyAction()
@@ -343,12 +349,22 @@ func (m *CoreModel) RandomlyValidlyActivateActions() {
 		isValid, _ = m.ChangeIsValid()
 
 		if isValid {
-			m.note("Activation was valid. Keeping.")
+			attemptNote = fmt.Sprintf("Attempt [%d]: Action was valid. Keeping.", actionNumber-attemptLimit+1)
+			m.note(attemptNote)
 		} else {
-			m.note("Activation was invalid. Reverting.")
+			attemptNote = fmt.Sprintf("Attempt [%d]: Activation was invalid. Reverting.", actionNumber-attemptLimit+1)
+			m.note(attemptNote)
 			actionChanged.InitialisingDeactivation()
 		}
 		attemptLimit--
+	}
+	if attemptLimit == 0 {
+		attemptNote := "Attempt limit reached while seeking a solution near configured decision variable limit. Please check configuration."
+		m.note(attemptNote)
+
+		panic(errors2.New(attemptNote))
+	} else {
+		m.note("Solution close to limit found. Using this as initial model state.")
 	}
 }
 
@@ -365,9 +381,14 @@ func (m *CoreModel) InitialiseAllActionsToActive() {
 }
 
 func (m *CoreModel) RandomlyValidlyDeactivateActions() {
-	attemptLimit := len(m.managementActions.Actions())
+	numberToAttempt := len(m.managementActions.Actions())
+	attemptsLeft := numberToAttempt
+
+	attemptNote := fmt.Sprintf("Making [%d] attempts to find solution close to decision variable limit.", attemptsLeft)
+	m.note(attemptNote)
+
 	isValid := true
-	for isValid && attemptLimit > 0 {
+	for isValid && attemptsLeft > 0 {
 		actionChanged := m.managementActions.RandomlyDeInitialiseAnyAction()
 		if actionChanged == nil {
 			continue
@@ -377,12 +398,22 @@ func (m *CoreModel) RandomlyValidlyDeactivateActions() {
 		isValid, _ = m.ChangeIsValid()
 
 		if isValid {
-			m.note("Deactivation was valid. Keeping.")
+			attemptNote = fmt.Sprintf("Attempt [%d]: Action was valid. Keeping.", numberToAttempt-attemptsLeft+1)
+			m.note(attemptNote)
 		} else {
-			m.note("Deactivation was invalid. Reverting.")
+			attemptNote = fmt.Sprintf("Attempt [%d]: Activation was invalid. Reverting.", numberToAttempt-attemptsLeft+1)
+			m.note(attemptNote)
 			actionChanged.InitialisingActivation()
 		}
-		attemptLimit--
+		attemptsLeft--
+	}
+	if attemptsLeft == 0 {
+		attemptNote := "Attempt limit reached while seeking a solution near configured decision variable limit. Please check configuration."
+		m.note(attemptNote)
+
+		panic(errors2.New(attemptNote))
+	} else {
+		m.note("Solution close to limit found. Using this as initial solution.")
 	}
 }
 
@@ -545,7 +576,8 @@ func (m *CoreModel) checkValidityWith(validationFunction func(*compositeErrors.C
 }
 
 func (m *CoreModel) undoableValueBoundsChecker(validationErrors *compositeErrors.CompositeError) {
-	for _, name := range m.DecisionVariableNames() {
+	variableNames := m.DecisionVariableNames()
+	for _, name := range variableNames {
 		m.checkVariableUndoableValueBounds(name, validationErrors)
 	}
 }
@@ -560,7 +592,8 @@ func (m *CoreModel) StateIsValid() (bool, *compositeErrors.CompositeError) {
 }
 
 func (m *CoreModel) actualValueBoundsChecker(validationErrors *compositeErrors.CompositeError) {
-	for _, name := range m.DecisionVariableNames() {
+	variableNames := m.DecisionVariableNames()
+	for _, name := range variableNames {
 		m.checkVariableActualValueBounds(name, validationErrors)
 	}
 }

@@ -409,7 +409,7 @@ func (dn *DissolvedNitrogenProduction) NotifyObservers() {
 }
 
 func (dn *DissolvedNitrogenProduction) UndoableValue() float64 {
-	return dn.command.Value()
+	return dn.Value() + dn.command.Value()
 }
 
 func (dn *DissolvedNitrogenProduction) SetUndoableValue(value float64) {

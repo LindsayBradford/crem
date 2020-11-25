@@ -123,3 +123,15 @@ func TestSedimentBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testi
 	bootstrap.LogHandler = loggers.DefaultTestingLogger
 	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
 }
+
+func TestDissolvedNitrogenBoundCREMExplorer_Kirkpatrick_WhiteBox_ExitWithSuccess(t *testing.T) {
+	context := configTesting.WhiteboxTestingContext{
+		Name:           "Bound Dissolved Nitrogen Kirkpatrick",
+		T:              t,
+		ConfigFilePath: "testdata/TestDissolvedNitrogenBoundCREMExplorer-Kirkpatrick-WhiteBox.toml",
+		Runner:         bootstrap.RunExcelCompatibleScenarioFromConfigFile,
+	}
+
+	bootstrap.LogHandler = loggers.DefaultTestingLogger
+	context.VerifyGoroutineScenarioRunViaConfigFileDoesNotPanic()
+}
