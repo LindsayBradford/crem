@@ -437,7 +437,7 @@ func (np *ParticulateNitrogenProduction) handleWetlandsEstablishmentAction() {
 
 		riparianContribution:  attributes.Value(RiparianNitrogenContribution).(float64),
 		gullyContribution:     attributes.Value(GullyNitrogenContribution).(float64),
-		hillSlopeContribution: asIsRemovalEfficiency,
+		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
 	}
 
 	asIsNitrogen := np.calculateNitrogenProduction(asIsContext)
@@ -448,7 +448,7 @@ func (np *ParticulateNitrogenProduction) handleWetlandsEstablishmentAction() {
 
 		riparianContribution:  attributes.Value(RiparianNitrogenContribution).(float64),
 		gullyContribution:     attributes.Value(GullyNitrogenContribution).(float64),
-		hillSlopeContribution: toBeRemovalEfficiency,
+		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
 	}
 
 	toBeNitrogen := np.calculateNitrogenProduction(toBeContext)
