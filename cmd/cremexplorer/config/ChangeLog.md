@@ -8,7 +8,7 @@
 * Fixed a bug around SOSA algorithms not randomly initialising state.
 * Fixed a bug where poor configuration could see explorer initialisation hang in an infinite loop.
 * Related to the above, logging changes around initialisation to better track what's actually happening.
-* Fixed bugs in decision variables around undoable values.  
+* Fixed bugs in decision variables around undoable values and rounding errors.  
 
 ## Version 0.13.1 (30/10/2020):
 ### New Features

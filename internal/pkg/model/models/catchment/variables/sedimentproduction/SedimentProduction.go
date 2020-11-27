@@ -251,10 +251,12 @@ func (sl *SedimentProduction) handleGullyRestorationAction() {
 		toBeSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
 	}
 
+	roundedSedimentChange := math.RoundFloat(toBeSediment-asIsSediment, int(sl.Precision()))
+
 	sl.command = new(GullyRestorationCommand).
 		ForVariable(sl).
 		InPlanningUnit(sl.actionObserved.PlanningUnit()).
-		WithChange(toBeSediment - asIsSediment)
+		WithChange(roundedSedimentChange)
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {

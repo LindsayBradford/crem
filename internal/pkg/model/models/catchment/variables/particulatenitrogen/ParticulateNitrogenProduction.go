@@ -365,11 +365,13 @@ func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
 
 	actionSubCatchment := np.actionObserved.PlanningUnit()
 
+	roundedNitrogenChange := math.RoundFloat(toBeNitrogen-asIsNitrogen, int(np.Precision()))
+
 	np.command = new(GullyRestorationCommand).
 		ForVariable(np).
 		InPlanningUnit(actionSubCatchment).
 		WithNitrogenContribution(toBeNitrogen).
-		WithChange(toBeNitrogen - asIsNitrogen)
+		WithChange(roundedNitrogenChange)
 }
 
 func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {
