@@ -300,13 +300,37 @@ func (dn *DissolvedNitrogenProduction) handleGullyRestorationAction() {
 	}
 
 	actionSubCatchment := dn.actionObserved.PlanningUnit()
-	roundedNitrogenChange := math.RoundFloat(toBeNitrogen-asIsNitrogen, int(dn.Precision()))
+	attributes := dn.subCatchmentAttributes[actionSubCatchment]
+
+	asIsContext := nitrogenContext{
+		riparianBufferVegetation: attributes.Value(ProportionOfRiparianVegetation).(float64),
+		riparianContribution:     attributes.Value(RiparianNitrogenContribution).(float64),
+		gullyContribution:        asIsNitrogen,
+
+		hillSlopeContribution:                      attributes.Value(HillSlopeNitrogenContribution).(float64),
+		wetlandsDissolvedNitrogenRemovalEfficiency: attributes.Value(WetlandsDissolvedNitrogenRemovalEfficiency).(float64),
+		riparianDissolvedNitrogenRemovalEfficiency: attributes.Value(RiparianDissolvedNitrogenRemovalEfficiency).(float64),
+	}
+
+	finalisedAsIsNitrogen := dn.calculateNitrogenProduction(asIsContext)
+
+	toBeContext := nitrogenContext{
+		riparianBufferVegetation: attributes.Value(ProportionOfRiparianVegetation).(float64),
+		riparianContribution:     attributes.Value(RiparianNitrogenContribution).(float64),
+		gullyContribution:        toBeNitrogen,
+
+		hillSlopeContribution:                      attributes.Value(HillSlopeNitrogenContribution).(float64),
+		wetlandsDissolvedNitrogenRemovalEfficiency: attributes.Value(WetlandsDissolvedNitrogenRemovalEfficiency).(float64),
+		riparianDissolvedNitrogenRemovalEfficiency: attributes.Value(RiparianDissolvedNitrogenRemovalEfficiency).(float64),
+	}
+
+	finalisedToBeNitrogen := dn.calculateNitrogenProduction(toBeContext)
 
 	dn.command = new(GullyRestorationCommand).
 		ForVariable(dn).
 		InPlanningUnit(actionSubCatchment).
 		WithNitrogenContribution(toBeNitrogen).
-		WithChange(roundedNitrogenChange)
+		WithChange(finalisedToBeNitrogen - finalisedAsIsNitrogen)
 }
 
 func (dn *DissolvedNitrogenProduction) handleHillSlopeRestorationAction() {

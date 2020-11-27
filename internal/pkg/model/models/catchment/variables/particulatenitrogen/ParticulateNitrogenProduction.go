@@ -352,26 +352,47 @@ func (np *ParticulateNitrogenProduction) handleRiverBankRestorationAction() {
 }
 
 func (np *ParticulateNitrogenProduction) handleGullyRestorationAction() {
-	var asIsNitrogen, toBeNitrogen float64
+	var asIsGullyNitrogen, toBeGullyNitrogen float64
 
 	switch np.actionObserved.IsActive() {
 	case true:
-		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
-		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+		asIsGullyNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+		toBeGullyNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
 	case false:
-		asIsNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
-		toBeNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
+		asIsGullyNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenActionedAttribute)
+		toBeGullyNitrogen = np.actionObserved.ModelVariableValue(catchmentActions.ParticulateNitrogenOriginalAttribute)
 	}
 
 	actionSubCatchment := np.actionObserved.PlanningUnit()
+	attributes := np.subCatchmentAttributes[actionSubCatchment]
 
-	roundedNitrogenChange := math.RoundFloat(toBeNitrogen-asIsNitrogen, int(np.Precision()))
+	asIsContext := nitrogenContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
+
+		riparianContribution:  attributes.Value(RiparianNitrogenContribution).(float64),
+		gullyContribution:     asIsGullyNitrogen,
+		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
+	}
+
+	asIsNitrogen := np.calculateNitrogenProduction(asIsContext)
+
+	toBeContext := nitrogenContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
+
+		riparianContribution:  attributes.Value(RiparianNitrogenContribution).(float64),
+		gullyContribution:     toBeGullyNitrogen,
+		hillSlopeContribution: attributes.Value(HillSlopeNitrogenContribution).(float64),
+	}
+
+	toBeNitrogen := np.calculateNitrogenProduction(toBeContext)
 
 	np.command = new(GullyRestorationCommand).
 		ForVariable(np).
 		InPlanningUnit(actionSubCatchment).
-		WithNitrogenContribution(toBeNitrogen).
-		WithChange(roundedNitrogenChange)
+		WithNitrogenContribution(toBeGullyNitrogen).
+		WithChange(toBeNitrogen - asIsNitrogen)
 }
 
 func (np *ParticulateNitrogenProduction) handleHillSlopeRestorationAction() {

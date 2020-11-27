@@ -240,23 +240,43 @@ func (sl *SedimentProduction) hillSlopeSediment(planningUnit planningunit.Id) fl
 }
 
 func (sl *SedimentProduction) handleGullyRestorationAction() {
-	var toBeSediment, asIsSediment float64
+	var toBeGullySediment, asIsGullySediment float64
 
 	switch sl.actionObserved.IsActive() {
 	case true:
-		asIsSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
-		toBeSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
+		asIsGullySediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
+		toBeGullySediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
 	case false:
-		asIsSediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
-		toBeSediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
+		asIsGullySediment = sl.actionObserved.ModelVariableValue(actions.ActionedGullySediment)
+		toBeGullySediment = sl.actionObserved.ModelVariableValue(actions.OriginalGullySediment)
 	}
 
-	roundedSedimentChange := math.RoundFloat(toBeSediment-asIsSediment, int(sl.Precision()))
+	attributes := sl.planningUnitAttributes[sl.actionObserved.PlanningUnit()]
+
+	asIsContext := sedimentContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            asIsGullySediment,
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
+	}
+
+	asIsSediment := sl.calculateSedimentProduction(asIsContext)
+
+	toBeContext := sedimentContext{
+		riparianVegetationProportion: attributes.Value(RiverbankVegetationProportion).(float64),
+		riparianContribution:         attributes.Value(RiverbankSedimentContribution).(float64),
+		gullyContribution:            toBeGullySediment,
+		hillSlopeContribution:        attributes.Value(HillSlopeSedimentContribution).(float64),
+		wetlandRemovalEfficiency:     attributes.Value(WetlandRemovalEfficiency).(float64),
+	}
+
+	toBeSediment := sl.calculateSedimentProduction(toBeContext)
 
 	sl.command = new(GullyRestorationCommand).
 		ForVariable(sl).
 		InPlanningUnit(sl.actionObserved.PlanningUnit()).
-		WithChange(roundedSedimentChange)
+		WithChange(toBeSediment - asIsSediment)
 }
 
 func (sl *SedimentProduction) handleHillSlopeRestorationAction() {
