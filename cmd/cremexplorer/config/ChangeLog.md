@@ -1,8 +1,13 @@
 # Change Log
 
-## Version 0.14 (TBD):
+## Version 0.15 (02/12/2020):
+### New Features
+* Now deploys with Laidley_data_v1_8_3.xlsx (containing updated dissolved nitrogen data)
+
+## Version 0.14 (30/11/2020):
 ### New Features
 * Added Dissolved Nitrogen Decision Variable and Wetlands Establishment management action.
+* Now deploys with Laidley_data_v1_8_2.xlsx (containing dissolved nitrogen and wetland data)
 ### Bug Fixes
 * Small logging tweaks to scenario log entries to make them more consistent with annealing logging.
 * Fixed a bug around SOSA algorithms not randomly initialising state.
