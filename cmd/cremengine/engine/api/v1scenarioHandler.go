@@ -113,7 +113,12 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) requestContentTypeWasNotToml(r *http.Request, w http.ResponseWriter) bool {
-	if r.Header.Get(rest.ContentTypeHeaderKey) != rest.TomlMimeType {
+	suppliedContentType := r.Header.Get(rest.ContentTypeHeaderKey)
+	if suppliedContentType != rest.TomlMimeType {
+		contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.TomlMimeType + "]")
+		wrappingError := errors.Wrap(contentTypeError, "v1 POST scenario handler")
+		m.Logger().Warn(wrappingError)
+
 		m.MethodNotAllowedError(w, r)
 		return true
 	}
