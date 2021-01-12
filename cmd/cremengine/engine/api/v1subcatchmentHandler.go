@@ -50,10 +50,11 @@ func (m *Mux) v1GetSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) respondWithSubcatchmentState(w http.ResponseWriter, subCatchment planningunit.Id) {
-	scenarioName := m.Attribute(scenarioNameKey).(string)
-	responseMessage := fmt.Sprintf("Responding with model [%s] subcatchment [%d] state", scenarioName, subCatchment)
-	m.Logger().Info(responseMessage)
+	m.logSubcatchmentStateMessage(subCatchment)
+	m.sendSubcatchmentStateResponse(w, subCatchment)
+}
 
+func (m *Mux) sendSubcatchmentStateResponse(w http.ResponseWriter, subCatchment planningunit.Id) {
 	responseAttributes := m.deriveResponseAttributesFor(subCatchment)
 
 	restResponse := new(rest.Response).
@@ -69,6 +70,12 @@ func (m *Mux) respondWithSubcatchmentState(w http.ResponseWriter, subCatchment p
 		wrappingError := errors.Wrap(writeError, "v1 subcatchment handler")
 		m.Logger().Error(wrappingError)
 	}
+}
+
+func (m *Mux) logSubcatchmentStateMessage(subCatchment planningunit.Id) {
+	scenarioName := m.Attribute(scenarioNameKey).(string)
+	responseMessage := fmt.Sprintf("Responding with model [%s] subcatchment [%d] state", scenarioName, subCatchment)
+	m.Logger().Info(responseMessage)
 }
 
 func (m *Mux) deriveResponseAttributesFor(subCatchment planningunit.Id) attributes.Attributes {
@@ -102,24 +109,16 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 
 	processingError := m.processSubcatchmentPost(w, r, subCatchment)
 	if processingError != nil {
-		m.Logger().Error(processingError)
-		m.RespondWithError(http.StatusBadRequest, processingError.Error(), w, r)
+		m.reportProcessingError(w, r, processingError)
 		return
 	}
 
-	restResponse := new(rest.Response).
-		Initialise().
-		WithWriter(w).
-		WithResponseCode(http.StatusOK).
-		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent(m.modelSolution)
+	m.sendSubcatchmentResponse(w)
+}
 
-	writeError := restResponse.Write()
-
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 POST subcatchment handler")
-		m.Logger().Error(wrappingError)
-	}
+func (m *Mux) reportProcessingError(w http.ResponseWriter, r *http.Request, processingError error) {
+	m.Logger().Error(processingError)
+	m.RespondWithError(http.StatusBadRequest, processingError.Error(), w, r)
 }
 
 func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, subCatchment planningunit.Id) error {
@@ -213,4 +212,20 @@ func (m *Mux) modelContains(subCatchment planningunit.Id) bool {
 		}
 	}
 	return false
+}
+
+func (m *Mux) sendSubcatchmentResponse(w http.ResponseWriter) {
+	restResponse := new(rest.Response).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(m.CacheMaxAge()).
+		WithJsonContent(m.modelSolution)
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "v1 POST subcatchment handler")
+		m.Logger().Error(wrappingError)
+	}
 }
