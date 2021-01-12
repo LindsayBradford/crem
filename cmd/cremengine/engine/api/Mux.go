@@ -16,10 +16,12 @@ import (
 	"net/http"
 )
 
-const v1Path = "v1"
+const (
+	v1Path = "v1"
 
-const scenarioTextKey = "ScenarioText"
-const scenarioNameKey = "ScenarioName"
+	scenarioTextKey = "ScenarioText"
+	scenarioNameKey = "ScenarioName"
+)
 
 type JobArray []*job.Job
 
@@ -37,13 +39,20 @@ type Mux struct {
 }
 
 func (m *Mux) Initialise() *Mux {
+	const (
+		scenarioPath         = "scenario"
+		modelPath            = "model"
+		subcatchmentPath     = "subcatchment"
+		identityMatchingPath = "\\d+"
+	)
+
 	m.Mux.Initialise()
 
 	m.modelConfigInterpreter = interpreter.NewModelConfigInterpreter()
 
-	m.AddHandler(buildV1ApiPath("model"), m.v1modelHandler)
-	m.AddHandler(buildV1ApiPath("scenario"), m.v1scenarioHandler)
-	m.AddHandler(buildV1ApiPath("model/subcatchment/\\d+"), m.v1subcatchmentHandler)
+	m.AddHandler(buildV1ApiPath(scenarioPath), m.v1scenarioHandler)
+	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
+	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
 
 	return m
 }
@@ -59,13 +68,18 @@ func (m *Mux) WithCacheMaxAge(maxAgeInSeconds uint64) *Mux {
 }
 
 func buildV1ApiPath(pathElements ...string) string {
+	const (
+		startPathMatcher = "^"
+		endPathMatcher   = "$"
+	)
+
 	builtPath := rest.UrlPathSeparator + serverApi.BasePath + rest.UrlPathSeparator + v1Path
 
 	for _, element := range pathElements {
 		builtPath = builtPath + rest.UrlPathSeparator + element
 	}
 
-	return "^" + builtPath + "$"
+	return startPathMatcher + builtPath + endPathMatcher
 }
 
 func (m *Mux) AddHandler(address string, handler rest.HandlerFunc) {

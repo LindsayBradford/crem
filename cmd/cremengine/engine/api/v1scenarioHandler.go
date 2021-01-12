@@ -26,6 +26,14 @@ func (m *Mux) v1GetScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	restResponse := m.buildScenarioGetResponse(w)
+	m.logScenarioGetResponse()
+	writeError := restResponse.Write()
+
+	m.handleScenarioGetWriteError(writeError)
+}
+
+func (m *Mux) buildScenarioGetResponse(w http.ResponseWriter) *rest.Response {
 	responseText := m.Attribute(scenarioTextKey).(string)
 
 	restResponse := new(rest.Response).
@@ -34,11 +42,15 @@ func (m *Mux) v1GetScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
 		WithTomlContent(responseText)
+	return restResponse
+}
 
+func (m *Mux) logScenarioGetResponse() {
 	scenarioName := m.Attribute(scenarioNameKey).(string)
 	m.Logger().Info("Responding with scenario [" + scenarioName + "] configuration")
-	writeError := restResponse.Write()
+}
 
+func (m *Mux) handleScenarioGetWriteError(writeError error) {
 	if writeError != nil {
 		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
 		m.Logger().Error(wrappingError)
@@ -50,42 +62,88 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestContent := requestBodyToString(r)
-	config, retrieveError := data.RetrieveScenarioConfigFromString(requestContent)
-
-	if retrieveError != nil {
-		wrappingError := errors.Wrap(retrieveError, "v1 POST scenario handler")
-		m.Logger().Error(wrappingError)
-		m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
+	scenarioConfig, retrievalError := m.processScenarioPostText(w, r)
+	if retrievalError != nil {
 		return
 	}
 
+	modelErrors := m.deriveDefaultModelForScenario(w, r, scenarioConfig)
+	if modelErrors != nil {
+		return
+	}
+
+	restResponse := m.buildScenarioPostResponse(w)
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
+		m.Logger().Error(wrappingError)
+	}
+}
+
+func (m *Mux) deriveDefaultModelForScenario(w http.ResponseWriter, r *http.Request, scenarioConfig *data.ScenarioConfig) error {
+	interpretedModel := m.modelConfigInterpreter.Interpret(&scenarioConfig.Model).Model()
+	if modelAsCatchmentModel, isCatchmentModel := interpretedModel.(*catchment.Model); isCatchmentModel {
+		m.rememberModelState(modelAsCatchmentModel, scenarioConfig)
+	}
+	if m.modelConfigInterpreter.Errors() != nil {
+		m.handleModelInterpreterErrors(w, r, m.modelConfigInterpreter.Errors())
+		return m.modelConfigInterpreter.Errors()
+	}
+
+	if m.model.ParameterErrors() != nil {
+		m.handleModelParameterErrors(w, r)
+		return m.model.ParameterErrors()
+	}
+	return nil
+}
+
+func (m *Mux) processScenarioPostText(w http.ResponseWriter, r *http.Request) (*data.ScenarioConfig, error) {
+	requestContent := requestBodyToString(r)
+	config, retrievalError := data.RetrieveScenarioConfigFromString(requestContent)
+
+	if retrievalError != nil {
+		m.handleScenarioRetrievalErrors(w, r, retrievalError)
+		return config, retrievalError
+	}
+
+	m.rememberScenarioAttributeState(config, requestContent)
+	return config, nil
+}
+
+func (m *Mux) handleScenarioRetrievalErrors(w http.ResponseWriter, r *http.Request, retrieveError error) {
+	wrappingError := errors.Wrap(retrieveError, "v1 POST scenario handler")
+	m.Logger().Error(wrappingError)
+	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
+}
+
+func (m *Mux) rememberScenarioAttributeState(config *data.ScenarioConfig, requestContent string) {
 	m.ReplaceAttribute(scenarioNameKey, config.Scenario.Name)
 	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] successfully retrieved")
 
 	m.ReplaceAttribute(scenarioTextKey, requestContent)
+}
 
-	interpretedModel := m.modelConfigInterpreter.Interpret(&config.Model).Model()
-	if modelAsCatchmentModel, isCatchmentModel := interpretedModel.(*catchment.Model); isCatchmentModel {
-		m.model = modelAsCatchmentModel
-		m.model.InitialiseToAsIsState()
-		m.model.SetId(config.Scenario.Name)
-	} else {
-		interpreterError := m.modelConfigInterpreter.Errors()
-		wrappingError := errors.Wrap(interpreterError, "v1 POST scenario handler")
-		m.Logger().Error(wrappingError)
-		m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
-		return
-	}
+func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config *data.ScenarioConfig) {
+	m.model = modelAsCatchmentModel
+	m.model.InitialiseToAsIsState()
+	m.model.SetId(config.Scenario.Name)
+}
 
-	if m.model.ParameterErrors() != nil {
-		parameterErrors := m.model.ParameterErrors()
-		wrappingError := errors.Wrap(parameterErrors, "v1 POST scenario handler")
-		m.Logger().Error(wrappingError)
-		m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
-		return
-	}
+func (m *Mux) handleModelInterpreterErrors(w http.ResponseWriter, r *http.Request, interpreterError error) {
+	wrappingError := errors.Wrap(interpreterError, "v1 POST scenario handler")
+	m.Logger().Error(wrappingError)
+	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
+}
 
+func (m *Mux) handleModelParameterErrors(w http.ResponseWriter, r *http.Request) {
+	parameterErrors := m.model.ParameterErrors()
+	wrappingError := errors.Wrap(parameterErrors, "v1 POST scenario handler")
+	m.Logger().Error(wrappingError)
+	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
+}
+
+func (m *Mux) buildScenarioPostResponse(w http.ResponseWriter) *rest.Response {
 	m.modelSolution = new(solution.SolutionBuilder).
 		WithId(m.model.Id()).
 		ForModel(m.model).
@@ -104,23 +162,22 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 		)
 
 	m.Logger().Info("Responding with acknowledgement of scenario configuration receipt")
-	writeError := restResponse.Write()
-
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
-		m.Logger().Error(wrappingError)
-	}
+	return restResponse
 }
 
 func (m *Mux) requestContentTypeWasNotToml(r *http.Request, w http.ResponseWriter) bool {
 	suppliedContentType := r.Header.Get(rest.ContentTypeHeaderKey)
 	if suppliedContentType != rest.TomlMimeType {
-		contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.TomlMimeType + "]")
-		wrappingError := errors.Wrap(contentTypeError, "v1 POST scenario handler")
-		m.Logger().Warn(wrappingError)
-
-		m.MethodNotAllowedError(w, r)
+		m.handleNonTomlContentResponse(r, w, suppliedContentType)
 		return true
 	}
 	return false
+}
+
+func (m *Mux) handleNonTomlContentResponse(r *http.Request, w http.ResponseWriter, suppliedContentType string) {
+	contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.TomlMimeType + "]")
+	wrappingError := errors.Wrap(contentTypeError, "v1 POST scenario handler")
+	m.Logger().Warn(wrappingError)
+
+	m.MethodNotAllowedError(w, r)
 }
