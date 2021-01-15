@@ -90,11 +90,6 @@ func (m *Mux) deriveDefaultModelForScenario(w http.ResponseWriter, r *http.Reque
 		m.handleModelInterpreterErrors(w, r, m.modelConfigInterpreter.Errors())
 		return m.modelConfigInterpreter.Errors()
 	}
-
-	if m.model.ParameterErrors() != nil {
-		m.handleModelParameterErrors(w, r)
-		return m.model.ParameterErrors()
-	}
 	return nil
 }
 
@@ -132,13 +127,6 @@ func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config 
 
 func (m *Mux) handleModelInterpreterErrors(w http.ResponseWriter, r *http.Request, interpreterError error) {
 	wrappingError := errors.Wrap(interpreterError, "v1 POST scenario handler")
-	m.Logger().Error(wrappingError)
-	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
-}
-
-func (m *Mux) handleModelParameterErrors(w http.ResponseWriter, r *http.Request) {
-	parameterErrors := m.model.ParameterErrors()
-	wrappingError := errors.Wrap(parameterErrors, "v1 POST scenario handler")
 	m.Logger().Error(wrappingError)
 	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
 }

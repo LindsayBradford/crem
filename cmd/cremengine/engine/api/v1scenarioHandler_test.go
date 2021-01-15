@@ -197,3 +197,74 @@ func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer httptest.Jso
 
 	g.Expect(responseTime).To(BeTemporally("~", time.Now(), time.Millisecond*5), " should return status time of about now")
 }
+
+func TestScenarioPutRequest_NotAllowedResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+
+	// when
+	context := TestContext{
+		Name: "PUT /scenario request returns 405 (not allowed) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "PUT",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: "here is some text",
+		},
+		ExpectedResponseStatus: http.StatusMethodNotAllowed,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, context)
+	muxUnderTest.Shutdown()
+}
+
+func TestInvalidModelPostScenario_BadRequestResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+
+	scenarioTomlText := readTestFileAsText("testdata/InvalidModelTestScenario.toml")
+
+	// when
+	postContext := TestContext{
+		Name: "POST /scenario text request with invalid model returns 400 (bad request) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: scenarioTomlText,
+			ContentType: rest.TomlMimeType,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
+}
+
+func TestInvalidModelParameterPostScenario_BadRequestResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+
+	scenarioTomlText := readTestFileAsText("testdata/InvalidModelParameterTestScenario.toml")
+
+	// when
+	postContext := TestContext{
+		Name: "POST /scenario text request with invalid model parameter returns 400 (bad request) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: scenarioTomlText,
+			ContentType: rest.TomlMimeType,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
+}

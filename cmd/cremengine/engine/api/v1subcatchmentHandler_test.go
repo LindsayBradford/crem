@@ -207,7 +207,7 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 	actionStatusBytes, _ := json.Marshal(actionAttributes)
 
 	// when
-	getContext := TestContext{
+	postContext := TestContext{
 		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 200 (ok) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
@@ -220,7 +220,22 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 	}
 
 	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	// when
+	getContext := TestContext{
+		Name: http.MethodGet + " " + validSubcatchmentUrl + " request returns 200 (ok) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:    http.MethodGet,
+			TargetUrl: validSubcatchmentUrl,
+		},
+		ExpectedResponseStatus: http.StatusOK,
+	}
+
+	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+
 	muxUnderTest.Shutdown()
 }
 

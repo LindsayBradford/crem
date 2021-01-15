@@ -41,5 +41,5 @@ func (m *Mux) v1GetModelHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) v1PostModelHandler(w http.ResponseWriter, r *http.Request) {
-	m.RespondWithError(http.StatusNotFound, "Behaviour not yet implemented", w, r)
+	m.RespondWithError(http.StatusNotImplemented, "Behaviour not yet implemented", w, r)
 }
