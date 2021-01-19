@@ -42,6 +42,7 @@ func (m *Mux) Initialise() *Mux {
 	const (
 		scenarioPath         = "scenario"
 		modelPath            = "model"
+		actionsPath          = "actions"
 		subcatchmentPath     = "subcatchment"
 		identityMatchingPath = "\\d+"
 	)
@@ -52,6 +53,7 @@ func (m *Mux) Initialise() *Mux {
 
 	m.AddHandler(buildV1ApiPath(scenarioPath), m.v1scenarioHandler)
 	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
+	m.AddHandler(buildV1ApiPath(modelPath, actionsPath), m.v1actionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
 
 	return m
