@@ -1,6 +1,8 @@
 package api
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
 	"net/http"
@@ -17,10 +19,18 @@ func (m *Mux) v1actionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+type actionsWrapper struct {
+	ActiveManagementActions map[planningunit.Id]solution.ManagementActions
+}
+
 func (m *Mux) v1GetActionsHandler(w http.ResponseWriter, r *http.Request) {
 	if m.modelSolution == nil {
 		m.NotFoundError(w, r)
 		return
+	}
+
+	activeActions := actionsWrapper{
+		ActiveManagementActions: m.modelSolution.ActiveManagementActions,
 	}
 
 	restResponse := new(rest.Response).
@@ -28,7 +38,7 @@ func (m *Mux) v1GetActionsHandler(w http.ResponseWriter, r *http.Request) {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent(m.modelSolution.ActiveManagementActions)
+		WithJsonContent(activeActions)
 
 	scenarioName := m.Attribute(scenarioNameKey).(string)
 	m.Logger().Info("Responding with model [" + scenarioName + "] state")
