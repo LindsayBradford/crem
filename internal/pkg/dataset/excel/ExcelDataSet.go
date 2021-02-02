@@ -153,8 +153,8 @@ func (ds *DataSet) loadCsvWorksheet(sheet excel.Worksheet) {
 	ds.AddTable(sheet.Name(), newCsvTable)
 }
 
-func buildCsvHeader(sheet excel.Worksheet) tables.CsvHeader {
-	newCsvHeader := make(tables.CsvHeader, 0)
+func buildCsvHeader(sheet excel.Worksheet) dataset.TableHeader {
+	newCsvHeader := make(dataset.TableHeader, 0)
 
 	colCount := excel.ColumnCount(sheet)
 	for col := uint(1); col <= colCount; col++ {

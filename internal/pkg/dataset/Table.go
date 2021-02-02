@@ -16,3 +16,10 @@ type Table interface {
 	SetColumnAndRowSize(colNum uint, rowNum uint)
 	ColumnAndRowSize() (colNum uint, rowNum uint)
 }
+
+type TableHeader []string
+
+type HeadingsTable interface {
+	Table
+	Header() TableHeader
+}

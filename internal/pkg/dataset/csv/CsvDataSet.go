@@ -25,6 +25,8 @@ func init() {
 func NewDataSet(name string) *DataSet {
 	dataSet := new(DataSet)
 	dataSet.Initialise(name)
+
+	dataSet.errors = myErrors.New("Csv Dataset Errors")
 	return dataSet
 }
 
@@ -38,7 +40,6 @@ type DataSet struct {
 
 func (ds *DataSet) Load(baseCsvFilePath string) error {
 	ds.filePath = baseCsvFilePath
-	ds.errors = myErrors.New("Csv File Load Errors")
 	pathInfo, err := os.Stat(baseCsvFilePath)
 	if os.IsNotExist(err) {
 		newError := errors.Errorf("file specified [%s] does not exist", baseCsvFilePath)
@@ -51,6 +52,13 @@ func (ds *DataSet) Load(baseCsvFilePath string) error {
 
 	ds.loadMetaFile(baseCsvFilePath)
 
+	if ds.errors.Size() > 0 {
+		return ds.errors
+	}
+	return nil
+}
+
+func (ds *DataSet) Errors() error {
 	if ds.errors.Size() > 0 {
 		return ds.errors
 	}
@@ -135,55 +143,111 @@ func (ds *DataSet) verifyMetaTableRows(metaTable tables.CsvTable) {
 }
 
 func (ds *DataSet) loadCsvIntoTable(csvFilePath string) tables.CsvTable {
-	table := new(tables.CsvTableImpl)
-
-	records, loadError := loadCvsRecords(csvFilePath)
+	records, loadError := loadCsvRecords(csvFilePath)
 	if loadError != nil {
 		ds.errors.Add(loadError)
 		return nil
 	}
 
-	rowSize := uint(len(records)) - 1
-	colSize := uint(len(records[0]))
-	table.SetColumnAndRowSize(colSize, rowSize)
+	return ds.deriveTableFromRecords(records)
+}
 
-	newCsvHeader := deriveHeader(records)
-	table.SetHeader(newCsvHeader)
-
-	for rowIndex := uint(1); rowIndex <= rowSize; rowIndex++ {
-		for colIndex := uint(0); colIndex < colSize; colIndex++ {
-			recordAsBaseType := toBaseType(records[rowIndex][colIndex])
-			table.SetCell(colIndex, rowIndex-1, recordAsBaseType)
-		}
+func (ds *DataSet) ParseCsvTextIntoTable(tableName string, csvContent string) {
+	records, parseError := parseCsvText(csvContent)
+	if parseError != nil {
+		ds.errors.Add(parseError)
+		return
 	}
 
-	return table
+	derivedTable := ds.deriveTableFromRecords(records)
+	ds.AddTable(tableName, derivedTable)
+}
+
+type tableContext struct {
+	records [][]string
+	rowSize uint
+	colSize uint
+
+	table *tables.CsvTableImpl
+}
+
+func (ds *DataSet) deriveTableFromRecords(inputRecords [][]string) tables.CsvTable {
+	context := ds.deriveContextFromRecords(inputRecords)
+
+	ds.assignTableHeaders(context)
+	ds.assignTableContent(context)
+
+	return context.table
+}
+
+func (ds *DataSet) assignTableContent(context *tableContext) {
+	for rowIndex := uint(1); rowIndex <= context.rowSize; rowIndex++ {
+		for colIndex := uint(0); colIndex < context.colSize; colIndex++ {
+			recordAsBaseType := toBaseType(context.records[rowIndex][colIndex])
+			context.table.SetCell(colIndex, rowIndex-1, recordAsBaseType)
+		}
+	}
+}
+
+func (ds *DataSet) assignTableHeaders(context *tableContext) {
+	newCsvHeader := deriveHeader(context.records)
+	context.table.SetHeader(newCsvHeader)
+}
+
+func (ds *DataSet) deriveContextFromRecords(inputRecords [][]string) *tableContext {
+	context := tableContext{records: inputRecords}
+
+	context.rowSize = uint(len(inputRecords)) - 1
+	context.colSize = uint(len(inputRecords[0]))
+
+	context.table = new(tables.CsvTableImpl)
+	context.table.SetColumnAndRowSize(context.colSize, context.rowSize)
+
+	return &context
 }
 
 func toBaseType(value string) interface{} {
 	return caster.Cast(value)
 }
 
-func loadCvsRecords(filePath string) ([][]string, error) {
-	metaFile, openError := os.Open(filePath)
-	defer metaFile.Close()
-	if openError != nil {
-		return nil, errors.Wrap(openError, "opening csv meta-file")
-	}
+func parseCsvText(csvText string) ([][]string, error) {
+	textReader := strings.NewReader(csvText)
 
-	r := csv.NewReader(metaFile)
+	r := csv.NewReader(textReader)
 	r.TrimLeadingSpace = true
 
 	records, readError := r.ReadAll()
 	if readError != nil {
-		return nil, errors.Wrap(readError, "reading csv meta-file")
+		return nil, errors.Wrap(readError, "parsing csv text")
 	}
 
 	return records, nil
 }
 
-func deriveHeader(records [][]string) tables.CsvHeader {
-	newCsvHeader := make(tables.CsvHeader, 0)
+func loadCsvRecords(filePath string) ([][]string, error) {
+	fileHandle, openError := os.Open(filePath)
+	defer fileHandle.Close()
+	if openError != nil {
+		return nil, errors.Wrap(openError, "opening csv file")
+	}
+
+	return loadCsvRecordsFromFileHandle(fileHandle)
+}
+
+func loadCsvRecordsFromFileHandle(fileHandle *os.File) ([][]string, error) {
+	r := csv.NewReader(fileHandle)
+	r.TrimLeadingSpace = true
+
+	records, readError := r.ReadAll()
+	if readError != nil {
+		return nil, errors.Wrap(readError, "reading csv file")
+	}
+
+	return records, nil
+}
+
+func deriveHeader(records [][]string) dataset.TableHeader {
+	newCsvHeader := make(dataset.TableHeader, 0)
 	for _, heading := range records[0] {
 		newCsvHeader = append(newCsvHeader, heading)
 	}

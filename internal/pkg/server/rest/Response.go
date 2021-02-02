@@ -85,6 +85,15 @@ func (r *Response) WithTomlContent(content interface{}) *Response {
 	return r
 }
 
+func (r *Response) WithCsvContent(content interface{}) *Response {
+	r.WithContentType(CsvMimeType)
+	contentAsString, ok := content.(string)
+	if ok {
+		r.Content = contentAsString
+	}
+	return r
+}
+
 func (r *Response) Write() error {
 	r.writeHeader()
 	r.writeBody()

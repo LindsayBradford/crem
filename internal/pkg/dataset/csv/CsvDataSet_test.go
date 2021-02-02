@@ -3,6 +3,7 @@
 package csv
 
 import (
+	"io/ioutil"
 	"testing"
 
 	tables2 "github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
@@ -126,4 +127,48 @@ func TestDataSet_Load_ValidDataSet(t *testing.T) {
 	actualCsvCols, actualCsvRows := typedCsvTable.ColumnAndRowSize()
 	g.Expect(actualCsvCols).To(BeNumerically("==", 4))
 	g.Expect(actualCsvRows).To(BeNumerically("==", 5))
+}
+
+func TestDataTable_Parse_Valid(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+	dataSetUnderTest := NewDataSet("dataSetUnderTest")
+	csvText := loadTextFromFile(g, "testdata/validCsvFile.csv")
+
+	// when
+	parseDataSetCall := func() {
+		dataSetUnderTest.ParseCsvTextIntoTable("testTable", csvText)
+	}
+
+	// then
+	g.Expect(parseDataSetCall).To(Not(Panic()), "DataSet Load of good file path should not panic")
+	g.Expect(dataSetUnderTest.Errors()).To(BeNil(), "DataSet Load  to good file path should not return an error ")
+	g.Expect(dataSetUnderTest.Tables()).To(Not(BeNil()), "DataSet Load to good file path should return tables")
+
+	tables := dataSetUnderTest.Tables()
+
+	g.Expect(tables).To(HaveKey("testTable"))
+
+	testCsvTable := dataSetUnderTest.Tables()["testTable"]
+	typedCsvTable, _ := testCsvTable.(tables2.CsvTable)
+	g.Expect(typedCsvTable.Header()).To(ContainElement("StringColumn"))
+
+	g.Expect(typedCsvTable.Cell(0, 0)).To(BeNumerically("==", 1))
+	g.Expect(typedCsvTable.Cell(1, 1)).To(BeIdenticalTo("entry2"))
+	g.Expect(typedCsvTable.Cell(2, 2)).To(BeNumerically("==", 3.001))
+	g.Expect(typedCsvTable.Cell(3, 3)).To(BeFalse())
+
+	actualCsvCols, actualCsvRows := typedCsvTable.ColumnAndRowSize()
+	g.Expect(actualCsvCols).To(BeNumerically("==", 4))
+	g.Expect(actualCsvRows).To(BeNumerically("==", 5))
+}
+
+func loadTextFromFile(g *GomegaWithT, filePath string) string {
+	fileContent, openError := ioutil.ReadFile(filePath)
+
+	g.Expect(openError).To(BeNil())
+
+	text := string(fileContent)
+	return text
 }

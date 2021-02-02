@@ -11,22 +11,20 @@ var _ CsvTable = new(CsvTableImpl)
 
 type CsvTable interface {
 	dataset.Table
-	Header() CsvHeader
-	SetHeader(header CsvHeader)
+	Header() dataset.TableHeader
+	SetHeader(header dataset.TableHeader)
 }
-
-type CsvHeader []string
 
 type CsvTableImpl struct {
 	baseTable
-	header CsvHeader
+	header dataset.TableHeader
 }
 
-func (ct *CsvTableImpl) Header() CsvHeader {
+func (ct *CsvTableImpl) Header() dataset.TableHeader {
 	return ct.header
 }
 
-func (ct *CsvTableImpl) SetHeader(header CsvHeader) {
+func (ct *CsvTableImpl) SetHeader(header dataset.TableHeader) {
 	ct.header = header
 }
 

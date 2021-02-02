@@ -106,6 +106,10 @@ func (mi *MuxImpl) handlerFor(r *http.Request) (handlerFunction HandlerFunc, fou
 	return nil, false
 }
 
+func (mi *MuxImpl) BadRequestError(w http.ResponseWriter, r *http.Request) {
+	mi.RespondWithError(http.StatusBadRequest, "HTTP Bad Request", w, r)
+}
+
 func (mi *MuxImpl) NotFoundError(w http.ResponseWriter, r *http.Request) {
 	mi.RespondWithError(http.StatusNotFound, "HTTP Resource not found", w, r)
 }

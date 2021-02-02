@@ -14,7 +14,8 @@ const UrlPathSeparator = "/"
 
 const TomlMimeType = "application/toml"
 const JsonMimeType = "application/json"
-const TextMimeType = "application/text"
+const TextMimeType = "text/plain"
+const CsvMimeType = "text/csv"
 
 const DefaultResponseContentType = JsonMimeType
 
