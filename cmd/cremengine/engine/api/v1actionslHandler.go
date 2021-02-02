@@ -66,14 +66,57 @@ func (m *Mux) v1PostActionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// requestContent := requestBodyToString(r)
-	// m.writePostContentAsResponse(requestContent,w)
-
 	m.processRequestContentForActiveActions(r, w)
 	m.writeActiveActionResponse(w)
 }
 
 func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.ResponseWriter) {
+	requestTable, requestError := m.deriveRequestTable(r, w)
+	if requestError != nil {
+		return
+	}
+	m.processRequestTable(requestTable)
+	m.updateModelSolution()
+}
+
+func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
+	colSize, rowSize := headingsTable.ColumnAndRowSize()
+	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
+		for colIndex := uint(1); colIndex < colSize; colIndex++ {
+			m.processTableCell(headingsTable, colIndex, rowIndex)
+		}
+	}
+}
+
+func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) {
+	suppliedActionState := m.deriveSuppliedActionState(headingsTable, colIndex, rowIndex)
+	modelActions := m.model.ManagementActions()
+
+	for actionIndex := 0; actionIndex < len(modelActions); actionIndex++ {
+		currentAction := modelActions[actionIndex]
+
+		rawPlanningUnit := headingsTable.CellFloat64(0, rowIndex)
+		rawType := headingsTable.Header()[colIndex]
+
+		if currentAction.PlanningUnit() == planningunit.Id(rawPlanningUnit) &&
+			string(currentAction.Type()) == rawType {
+			m.model.SetManagementAction(actionIndex, suppliedActionState)
+		}
+	}
+}
+
+func (m *Mux) deriveSuppliedActionState(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) bool {
+	var suppliedActionState bool
+
+	if headingsTable.CellFloat64(colIndex, rowIndex) == 0 {
+		suppliedActionState = false
+	} else {
+		suppliedActionState = true
+	}
+	return suppliedActionState
+}
+
+func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (dataset.HeadingsTable, error) {
 	tmpDataSet := csv.NewDataSet("Content Dataset")
 	defer tmpDataSet.Teardown()
 
@@ -81,21 +124,21 @@ func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.Resp
 	if tmpDataSet.Errors() != nil {
 		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
-		return
+		return nil, wrappingError
 	}
 
 	contentTable, tableError := tmpDataSet.Table("requestContent")
 	if tableError != nil {
 		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
-		return
+		return nil, wrappingError
 	}
 
 	if contentTable == nil {
 		wrappingError := errors.Wrap(errors.New("No CSV table content found"), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
 		m.BadRequestError(w, r)
-		return
+		return nil, wrappingError
 	}
 
 	headingsTable, hasHeadings := contentTable.(dataset.HeadingsTable)
@@ -103,7 +146,7 @@ func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.Resp
 		wrappingError := errors.Wrap(errors.New("CSV table does not have a header row"), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
 		m.BadRequestError(w, r)
-		return
+		return nil, wrappingError
 	}
 
 	if headingsTable.Header()[0] != "SubCatchment" {
@@ -112,55 +155,9 @@ func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.Resp
 			"v1 model actions handler")
 		m.Logger().Error(wrappingError)
 		m.BadRequestError(w, r)
-		return
+		return nil, wrappingError
 	}
-
-	modelActions := m.model.ManagementActions()
-
-	var suppliedActionState bool
-	colSize, rowSize := headingsTable.ColumnAndRowSize()
-	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
-		for colIndex := uint(1); colIndex < colSize; colIndex++ {
-			if headingsTable.CellFloat64(colIndex, rowIndex) == 0 {
-				suppliedActionState = false
-			} else {
-				suppliedActionState = true
-			}
-
-			for actionIndex := 0; actionIndex < len(modelActions); actionIndex++ {
-				currentAction := modelActions[actionIndex]
-
-				rawPlanningUnit := headingsTable.CellFloat64(0, rowIndex)
-				rawType := headingsTable.Header()[colIndex]
-
-				if currentAction.PlanningUnit() == planningunit.Id(rawPlanningUnit) &&
-					string(currentAction.Type()) == rawType {
-					m.model.SetManagementAction(actionIndex, suppliedActionState)
-				}
-			}
-		}
-	}
-
-	m.updateModelSolution()
-}
-
-// TODO: deprecate once CSV content POST processing is in place.
-func (m *Mux) writePostContentAsResponse(postContent string, w http.ResponseWriter) {
-	restResponse := new(rest.Response).
-		Initialise().
-		WithWriter(w).
-		WithResponseCode(http.StatusOK).
-		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithCsvContent(postContent)
-
-	scenarioName := m.Attribute(scenarioNameKey).(string)
-	m.Logger().Info("Responding with model [" + scenarioName + "] active actions state")
-	writeError := restResponse.Write()
-
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model actions handler")
-		m.Logger().Error(wrappingError)
-	}
+	return headingsTable, nil
 }
 
 func (m *Mux) requestContentTypeWasNotCsv(r *http.Request, w http.ResponseWriter) bool {
