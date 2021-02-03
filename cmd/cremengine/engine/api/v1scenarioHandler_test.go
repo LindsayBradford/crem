@@ -157,7 +157,7 @@ func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) {
+func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) httptest.JsonResponseContainer {
 	g := NewGomegaWithT(context.T)
 
 	var responseContainer httptest.JsonResponseContainer
@@ -166,6 +166,8 @@ func verifyResponseStatusCode(muxUnderTest *Mux, context TestContext) {
 
 	g.Expect(responseContainer.StatusCode).To(BeNumerically("==", context.ExpectedResponseStatus),
 		context.Name+" should return status "+strconv.Itoa(context.ExpectedResponseStatus))
+
+	return responseContainer
 }
 
 func buildMuxUnderTest() *Mux {

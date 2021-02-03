@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
 )
@@ -225,6 +226,42 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, context)
+	responseContainer := verifyResponseStatusCode(muxUnderTest, context)
+
+	g := NewGomegaWithT(context.T)
+
+	g.Expect(responseContainer.JsonMap["ActiveManagementActions"]).To(Not(BeNil()),
+		context.Name+" should return an ActiveManagementActions json map")
+
+	rawActionsMap := responseContainer.JsonMap["ActiveManagementActions"]
+	actionsMap, isStringMap := rawActionsMap.(map[string]interface{})
+	if !isStringMap {
+		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions map didn't match expected type")
+	}
+
+	rawSc17Array := actionsMap["17"]
+	g.Expect(rawSc17Array).To(BeNil())
+
+	rawSc18Array := actionsMap["18"]
+	sc18Array, sc18ValueIsArray := rawSc18Array.([]interface{})
+	if !sc18ValueIsArray {
+		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions[18] map didn't match expected type")
+	}
+
+	g.Expect(len(sc18Array)).To(BeNumerically("==", 1))
+	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), context.Name+" Subcatchment 18 expected to have river bank restoration")
+
+	rawSc19Array := actionsMap["19"]
+	sc19Array, sc19ValueIsArray := rawSc19Array.([]interface{})
+	if !sc19ValueIsArray {
+		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions[19] map didn't match expected type")
+	}
+
+	g.Expect(len(sc19Array)).To(BeNumerically("==", 1))
+	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), context.Name+" Subcatchment 19 expected to have river bank restoration")
+
+	rawSc20Array := actionsMap["20"]
+	g.Expect(rawSc20Array).To(BeNil())
+
 	muxUnderTest.Shutdown()
 }
