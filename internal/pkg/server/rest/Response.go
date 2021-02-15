@@ -12,6 +12,7 @@ import (
 )
 
 type MessageResponse struct {
+	Type    string
 	Message string
 	Time    string
 }

@@ -144,6 +144,7 @@ func (m *Mux) buildScenarioPostResponse(w http.ResponseWriter) *rest.Response {
 		WithCacheControlMaxAge(m.CacheMaxAge()).
 		WithJsonContent(
 			rest.MessageResponse{
+				Type:    "SUCCESS",
 				Message: "Scenario configuration successfully posted",
 				Time:    rest.FormattedTimestamp(),
 			},

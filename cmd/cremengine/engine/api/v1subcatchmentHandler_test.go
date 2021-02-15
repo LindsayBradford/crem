@@ -5,6 +5,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	"github.com/LindsayBradford/crem/pkg/attributes"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
 )
@@ -106,6 +107,8 @@ func TestDeleteValidSubcathmentResource_BadMethodResponse(t *testing.T) {
 }
 
 func TestGetValidSubcathmentResource_OkResponse(t *testing.T) {
+	g := NewGomegaWithT(t)
+
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -122,11 +125,11 @@ func TestGetValidSubcathmentResource_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, getContext)
-	muxUnderTest.Shutdown()
+	response := verifyResponseStatusCode(muxUnderTest, getContext)
+	jsonResponse := response.JsonMap
+	g.Expect(len(jsonResponse)).To(BeNumerically("==", 0))
 
-	// TODO: Limitation of current test framework is that I can't easily get to response content.
-	// TODO: Consider retrieval of response body and interrogating its Json payload for expected action state.
+	muxUnderTest.Shutdown()
 }
 
 func TestFirstSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
@@ -195,6 +198,8 @@ func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 }
 
 func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
+	g := NewGomegaWithT(t)
+
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -220,7 +225,9 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, postContext)
+	postResponse := verifyResponseStatusCode(muxUnderTest, postContext)
+	jsonPostResponse := postResponse.JsonMap
+	g.Expect(jsonPostResponse["Type"]).To(Equal("SUCCESS"))
 
 	// when
 	getContext := TestContext{
@@ -235,6 +242,7 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+	// TODO: Check altered subcatchment state
 
 	muxUnderTest.Shutdown()
 }

@@ -190,12 +190,13 @@ func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
 }
 
 func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
+	g := NewGomegaWithT(t)
 	muxUnderTest := buildMuxUnderTest()
 
 	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
-	postContext := TestContext{
+	scenarioPostContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
@@ -208,12 +209,12 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, postContext)
+	verifyResponseStatusCode(muxUnderTest, scenarioPostContext)
 
 	// when
 	validRequestBody := readTestFileAsText("testdata/ValidActiveActions.csv")
 
-	context := TestContext{
+	actionsPostContext := TestContext{
 		Name: "POST /model/actions request returns 200 (ok) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
@@ -226,14 +227,29 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	// then
-	responseContainer := verifyResponseStatusCode(muxUnderTest, context)
+	actionsPostResponseContainer := verifyResponseStatusCode(muxUnderTest, actionsPostContext)
+	jsonPostResponse := actionsPostResponseContainer.JsonMap
+	g.Expect(jsonPostResponse["Type"]).To(Equal("SUCCESS"))
 
-	g := NewGomegaWithT(context.T)
+	//when
 
-	g.Expect(responseContainer.JsonMap["ActiveManagementActions"]).To(Not(BeNil()),
-		context.Name+" should return an ActiveManagementActions json map")
+	actionsGetContext := TestContext{
+		Name: "GET /model/actions request returns 200 (ok) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:    "GET",
+			TargetUrl: baseUrl + "api/v1/model/actions",
+		},
+		ExpectedResponseStatus: http.StatusOK,
+	}
 
-	rawActionsMap := responseContainer.JsonMap["ActiveManagementActions"]
+	// then
+	actionsGetResponseContainer := verifyResponseStatusCode(muxUnderTest, actionsGetContext)
+
+	g.Expect(actionsGetResponseContainer.JsonMap["ActiveManagementActions"]).To(Not(BeNil()),
+		actionsPostContext.Name+" should return an ActiveManagementActions json map")
+
+	rawActionsMap := actionsGetResponseContainer.JsonMap["ActiveManagementActions"]
 	actionsMap, isStringMap := rawActionsMap.(map[string]interface{})
 	if !isStringMap {
 		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions map didn't match expected type")
@@ -249,7 +265,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	g.Expect(len(sc18Array)).To(BeNumerically("==", 1))
-	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), context.Name+" Subcatchment 18 expected to have river bank restoration")
+	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), actionsPostContext.Name+" Subcatchment 18 expected to have river bank restoration")
 
 	rawSc19Array := actionsMap["19"]
 	sc19Array, sc19ValueIsArray := rawSc19Array.([]interface{})
@@ -258,7 +274,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	g.Expect(len(sc19Array)).To(BeNumerically("==", 1))
-	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), context.Name+" Subcatchment 19 expected to have river bank restoration")
+	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), actionsPostContext.Name+" Subcatchment 19 expected to have river bank restoration")
 
 	rawSc20Array := actionsMap["20"]
 	g.Expect(rawSc20Array).To(BeNil())

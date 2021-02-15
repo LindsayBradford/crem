@@ -67,7 +67,34 @@ func (m *Mux) v1PostActionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.processRequestContentForActiveActions(r, w)
-	m.writeActiveActionResponse(w)
+	restResponse := m.buildPostActionsResponse(w)
+
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "v1 model actions handler")
+		m.Logger().Error(wrappingError)
+	}
+
+}
+
+func (m *Mux) buildPostActionsResponse(w http.ResponseWriter) *rest.Response {
+	restResponse := new(rest.Response).
+		Initialise().
+		WithWriter(w).
+		WithResponseCode(http.StatusOK).
+		WithCacheControlMaxAge(m.CacheMaxAge()).
+		WithJsonContent(
+			rest.MessageResponse{
+				Type:    "SUCCESS",
+				Message: "Management actions state change successfully applied",
+				Time:    rest.FormattedTimestamp(),
+			},
+		)
+
+	m.Logger().Info("Responding with acknowledgement of management actions state change ")
+
+	return restResponse
 }
 
 func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.ResponseWriter) {
@@ -171,7 +198,7 @@ func (m *Mux) requestContentTypeWasNotCsv(r *http.Request, w http.ResponseWriter
 
 func (m *Mux) handleNonCsvContentResponse(r *http.Request, w http.ResponseWriter, suppliedContentType string) {
 	contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.CsvMimeType + "]")
-	wrappingError := errors.Wrap(contentTypeError, "v1 POST model actions handler")
+	wrappingError := errors.Wrap(contentTypeError, "v1 model actions handler")
 	m.Logger().Warn(wrappingError)
 
 	m.MethodNotAllowedError(w, r)

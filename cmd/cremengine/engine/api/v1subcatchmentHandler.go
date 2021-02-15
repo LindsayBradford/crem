@@ -113,7 +113,13 @@ func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	m.sendSubcatchmentResponse(w)
+	restResponse := m.buildSubcatchmentResponse(w)
+	writeError := restResponse.Write()
+
+	if writeError != nil {
+		wrappingError := errors.Wrap(writeError, "v1 POST subcatchment handler")
+		m.Logger().Error(wrappingError)
+	}
 }
 
 func (m *Mux) reportProcessingError(w http.ResponseWriter, r *http.Request, processingError error) {
@@ -131,7 +137,7 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 
 	unmnarshalError := json.Unmarshal(requestContent, &postedAttributes)
 	if unmnarshalError != nil {
-		return errors.Wrap(unmnarshalError, "v1 POST subcatchment handler")
+		return errors.Wrap(unmnarshalError, "v1 subcatchment handler")
 	}
 
 	verificationError := m.verifyPostedAttributes(postedAttributes)
@@ -214,18 +220,21 @@ func (m *Mux) modelContains(subCatchment planningunit.Id) bool {
 	return false
 }
 
-func (m *Mux) sendSubcatchmentResponse(w http.ResponseWriter) {
+func (m *Mux) buildSubcatchmentResponse(w http.ResponseWriter) *rest.Response {
 	restResponse := new(rest.Response).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent(m.modelSolution)
+		WithJsonContent(
+			rest.MessageResponse{
+				Type:    "SUCCESS",
+				Message: "Subcatchment state change successfully applied",
+				Time:    rest.FormattedTimestamp(),
+			},
+		)
 
-	writeError := restResponse.Write()
+	m.Logger().Info("Responding with acknowledgement of subcatchment state change ")
 
-	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 POST subcatchment handler")
-		m.Logger().Error(wrappingError)
-	}
+	return restResponse
 }
