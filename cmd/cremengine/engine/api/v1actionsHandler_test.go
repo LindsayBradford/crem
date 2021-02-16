@@ -189,6 +189,52 @@ func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
+func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
+	g := NewGomegaWithT(t)
+	muxUnderTest := buildMuxUnderTest()
+
+	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
+
+	// when
+	postContext := TestContext{
+		Name: "POST /scenario request returns 202 (accepted) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: scenarioTomlText,
+			ContentType: rest.TomlMimeType,
+		},
+		ExpectedResponseStatus: http.StatusOK,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	// when
+
+	invalidRequestBody := readTestFileAsText("testdata/InvalidActiveActions.csv")
+
+	context := TestContext{
+		Name: "POST /model/actions request returns 400 (bad request) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/model/actions",
+			ContentType: rest.CsvMimeType,
+			RequestBody: invalidRequestBody,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
+	}
+
+	// then
+	responseBody := verifyResponseStatusCode(muxUnderTest, context)
+	jsonResponseBody := responseBody.JsonMap
+	g.Expect(jsonResponseBody["Type"]).To(Equal("ERROR"))
+
+	muxUnderTest.Shutdown()
+}
+
 func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	g := NewGomegaWithT(t)
 	muxUnderTest := buildMuxUnderTest()

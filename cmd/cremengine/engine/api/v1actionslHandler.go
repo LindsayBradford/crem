@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
@@ -66,7 +67,11 @@ func (m *Mux) v1PostActionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.processRequestContentForActiveActions(r, w)
+	processError := m.processRequestContentForActiveActions(r, w)
+	if processError != nil {
+		return
+	}
+
 	restResponse := m.buildPostActionsResponse(w)
 
 	writeError := restResponse.Write()
@@ -97,13 +102,16 @@ func (m *Mux) buildPostActionsResponse(w http.ResponseWriter) *rest.Response {
 	return restResponse
 }
 
-func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.ResponseWriter) {
+func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.ResponseWriter) error {
 	requestTable, requestError := m.deriveRequestTable(r, w)
 	if requestError != nil {
-		return
+		return requestError
 	}
+
 	m.processRequestTable(requestTable)
 	m.updateModelSolution()
+
+	return nil
 }
 
 func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
@@ -184,6 +192,23 @@ func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (datase
 		m.BadRequestError(w, r)
 		return nil, wrappingError
 	}
+
+	colSize, rowSize := headingsTable.ColumnAndRowSize()
+	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
+		for colIndex := uint(1); colIndex < colSize; colIndex++ {
+			cellValue := headingsTable.CellFloat64(colIndex, rowIndex)
+			if cellValue != 0 && cellValue != 1 {
+				msgText := fmt.Sprintf(
+					"Table management action cell [%d,%d] has invalid value [%v]. Must be one of [0,1]",
+					colIndex, rowIndex, cellValue)
+				wrappingError := errors.Wrap(errors.New(msgText), "v1 model actions handler")
+				m.Logger().Error(wrappingError)
+				m.RespondWithError(http.StatusBadRequest, msgText, w, r)
+				return nil, wrappingError
+			}
+		}
+	}
+
 	return headingsTable, nil
 }
 
