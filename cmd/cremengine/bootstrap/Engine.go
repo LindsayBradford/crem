@@ -9,7 +9,7 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"os"
 
-	"github.com/LindsayBradford/crem/cmd/cremexplorer/commandline"
+	"github.com/LindsayBradford/crem/cmd/cremengine/commandline"
 	"github.com/LindsayBradford/crem/pkg/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -24,16 +24,16 @@ var (
 
 func init() {
 	myInterpreter = *interpreter.NewEngineConfigInterpreter()
-	LogHandler = loggers.DefaultTestingLogger // TODO: get final log handler wired in.
+	LogHandler = loggers.DefaultTestingLogger
 }
 
-func RunMainThreadBoundEngineFromConfigFile(configFile string) {
+func RunMainThreadBoundEngineFromArguments(args *commandline.Arguments) {
 	defer gracefullyHandlePanics()
 
 	excel.EnableSpreadsheetSafeties()
 	defer excel.DisableSpreadsheetSafeties()
 
-	go runMainThreadBoundEngineFromConfigFile(configFile)
+	go runMainThreadBoundEngineFromArguments(args)
 	threading.GetMainThreadChannel().RunHandler()
 }
 
@@ -47,7 +47,7 @@ func gracefullyHandlePanics() {
 	}
 }
 
-func runMainThreadBoundEngineFromConfigFile(configFile string) {
+func runMainThreadBoundEngineFromArguments(args *commandline.Arguments) {
 	defer func() {
 		if r := recover(); r != nil {
 			if recoveredError, isError := r.(error); isError {
@@ -58,12 +58,13 @@ func runMainThreadBoundEngineFromConfigFile(configFile string) {
 		}
 	}()
 
-	RunEngineFromConfigFile(configFile)
+	RunEngineFromArguments(args)
 	defer threading.GetMainThreadChannel().Close()
 }
 
-func RunEngineFromConfigFile(configFile string) {
-	deriveEngineBehaviour(configFile)
+func RunEngineFromArguments(args *commandline.Arguments) {
+	deriveEngineBehaviour(args)
+	deriveInitialEngineState(args)
 	runEngine()
 	flushStreams()
 }
@@ -81,8 +82,8 @@ func flushStreams() {
 	os.Stderr.Sync()
 }
 
-func deriveEngineBehaviour(configFile string) {
-	myConfig := loadConfig(configFile)
+func deriveEngineBehaviour(args *commandline.Arguments) {
+	myConfig := loadConfig(args.EngineConfigFile)
 	myEngine = myInterpreter.Interpret(myConfig.Engine).Engine()
 
 	myEngine.LogHandler().Info("Configuring with [" + myConfig.MetaData.FilePath + "]")
@@ -92,6 +93,14 @@ func deriveEngineBehaviour(configFile string) {
 	if interpreterErrors != nil {
 		wrappingError := errors.Wrap(interpreterErrors, "interpreting engine configuration file")
 		commandline.Exit(wrappingError)
+	}
+}
+
+func deriveInitialEngineState(args *commandline.Arguments) {
+	if args.ScenarioFile != "" {
+		myEngine.LogHandler().Info("Initialising engine with scenario [" + args.ScenarioFile + "]")
+
+		myEngine.SetScenario(args.ScenarioFile)
 	}
 }
 

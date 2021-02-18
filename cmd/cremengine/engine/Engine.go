@@ -13,6 +13,7 @@ import (
 
 type Engine interface {
 	LogHandler() logging.Logger
+	SetScenario(scenarioFilePath string)
 	Run() error
 }
 
@@ -68,9 +69,14 @@ func (s *BaseEngine) Run() error {
 	return nil
 }
 
+func (s *BaseEngine) SetScenario(scenarioFilePath string) {
+	s.RestServer.SetScenario(scenarioFilePath)
+}
+
 var NullEngine Engine = new(nullEngine)
 
 type nullEngine struct{}
 
-func (s *nullEngine) LogHandler() logging.Logger { return loggers.NewNullLogger() }
-func (s *nullEngine) Run() error                 { return nil }
+func (s *nullEngine) LogHandler() logging.Logger          { return loggers.NewNullLogger() }
+func (s *nullEngine) Run() error                          { return nil }
+func (s *nullEngine) SetScenario(scenarioFilePath string) {}

@@ -29,6 +29,7 @@ func ParseArguments() *Arguments {
 type Arguments struct {
 	Version          bool
 	EngineConfigFile string
+	ScenarioFile     string
 }
 
 // THe define sets up the relevant command-line
@@ -48,6 +49,13 @@ func (args *Arguments) define() {
 		"Version",
 		false,
 		"Prints the version number of this utility and exits.",
+	)
+
+	flag.StringVar(
+		&args.ScenarioFile,
+		"ScenarioFile",
+		"",
+		"file dictating scenario run-time behaviour",
 	)
 
 	flag.Usage = usageMessage
@@ -74,6 +82,10 @@ func (args *Arguments) process() {
 
 	if args.EngineConfigFile != "" {
 		validateFilePath(args.EngineConfigFile)
+	}
+
+	if args.ScenarioFile != "" {
+		validateFilePath(args.ScenarioFile)
 	}
 }
 
@@ -116,6 +128,9 @@ func usageMessage() {
 	fmt.Println("  --Help                          Prints this help message.")
 	fmt.Println("  --Version                       Prints the version number of this utility.")
 	fmt.Println("  --EngineConfigFile  <FilePath>  File describing the engine run-time behaviour.")
+	fmt.Println()
+	fmt.Println("  --ScenarioFile  <FilePath>      File describing a scenario to run and its  run-time behaviour.")
+
 	Exit(0)
 }
 

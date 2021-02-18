@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -169,4 +170,34 @@ func (m *Mux) handleNonTomlContentResponse(r *http.Request, w http.ResponseWrite
 	m.Logger().Warn(wrappingError)
 
 	m.MethodNotAllowedError(w, r)
+}
+
+func (m *Mux) SetScenario(scenarioFilePath string) {
+	config, retrievalError := data.RetrieveScenarioConfigFromFile(scenarioFilePath)
+
+	if retrievalError != nil {
+		m.Logger().Warn(retrievalError)
+		return
+	}
+
+	m.ReplaceAttribute(scenarioNameKey, config.Scenario.Name)
+	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] successfully retrieved")
+
+	configFileContent := readTestFileAsText(scenarioFilePath)
+	m.ReplaceAttribute(scenarioTextKey, configFileContent)
+
+	interpretedModel := m.modelConfigInterpreter.Interpret(&config.Model).Model()
+	if modelAsCatchmentModel, isCatchmentModel := interpretedModel.(*catchment.Model); isCatchmentModel {
+		m.rememberModelState(modelAsCatchmentModel, config)
+	}
+	if m.modelConfigInterpreter.Errors() != nil {
+		m.Logger().Warn(m.modelConfigInterpreter.Errors())
+	}
+}
+
+func readTestFileAsText(filePath string) string {
+	if b, err := ioutil.ReadFile(filePath); err == nil {
+		return string(b)
+	}
+	return "error reading file"
 }

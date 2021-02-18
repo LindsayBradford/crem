@@ -11,5 +11,5 @@ import (
 
 func main() {
 	args := commandline.ParseArguments()
-	bootstrap.RunMainThreadBoundEngineFromConfigFile(args.EngineConfigFile)
+	bootstrap.RunMainThreadBoundEngineFromArguments(args)
 }

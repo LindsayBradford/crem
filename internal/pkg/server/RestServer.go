@@ -97,3 +97,8 @@ func (s *RestServer) shutdown() {
 func (s *RestServer) AddApiMapping(address string, handlerFunction rest.HandlerFunc) {
 	s.apiMux.AddHandler(address, handlerFunction)
 }
+
+func (s *RestServer) SetScenario(scenarioFilePath string) {
+	// TODO: How do I tie this into my Mux implementation.
+	// s.apiMux.SetScenario(scenarioFilePath)
+}

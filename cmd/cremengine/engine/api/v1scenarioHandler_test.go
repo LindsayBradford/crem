@@ -6,7 +6,6 @@ import (
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	"github.com/LindsayBradford/crem/pkg/threading"
 	. "github.com/onsi/gomega"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"testing"
@@ -181,13 +180,6 @@ func buildMuxUnderTest() *Mux {
 func sendRequest(muxUnderTest *Mux, context httptest.HttpTestRequestContext) httptest.JsonResponseContainer {
 	context.Handler = muxUnderTest.ServeHTTP
 	return context.BuildJsonResponse()
-}
-
-func readTestFileAsText(filePath string) string {
-	if b, err := ioutil.ReadFile(filePath); err == nil {
-		return string(b)
-	}
-	return "error reading file"
 }
 
 func verifyResponseTimeIsAboutNow(g *GomegaWithT, responseContainer httptest.JsonResponseContainer) {
