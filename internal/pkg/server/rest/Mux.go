@@ -26,6 +26,8 @@ type Mux interface {
 
 const DefaultCacheMaxAgeInSeconds = 10
 
+var _ Mux = new(MuxImpl)
+
 type MuxImpl struct {
 	http.ServeMux
 	muxType              string
@@ -88,6 +90,10 @@ func (mi *MuxImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		mi.NotFoundError(w, r)
 	}
+}
+
+func (mi *MuxImpl) AddHandler(address string, handler HandlerFunc) {
+	mi.HandlerMap.AddHandler(address, handler)
 }
 
 func (mi *MuxImpl) logRequestReceipt(r *http.Request) {

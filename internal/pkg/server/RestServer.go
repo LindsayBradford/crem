@@ -6,7 +6,7 @@ package server
 
 import (
 	"fmt"
-
+	engineApi "github.com/LindsayBradford/crem/cmd/cremengine/engine/api"
 	"github.com/LindsayBradford/crem/internal/pkg/server/admin"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/logging"
@@ -99,6 +99,7 @@ func (s *RestServer) AddApiMapping(address string, handlerFunction rest.HandlerF
 }
 
 func (s *RestServer) SetScenario(scenarioFilePath string) {
-	// TODO: How do I tie this into my Mux implementation.
-	// s.apiMux.SetScenario(scenarioFilePath)
+	if engineApiMux, isEngineApiMux := s.apiMux.(*engineApi.Mux); isEngineApiMux {
+		engineApiMux.SetScenario(scenarioFilePath)
+	}
 }
