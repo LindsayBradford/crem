@@ -5,6 +5,7 @@ import (
 	"github.com/BurntSushi/toml"
 	errors2 "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
+	"strings"
 )
 
 func RetrieveScenarioConfigFromFile(configFilePath string) (*ScenarioConfig, error) {
@@ -33,11 +34,6 @@ func retrieveScenarioConfig(source decoderSummary) (*ScenarioConfig, error) {
 	if decodeErr != nil {
 		allErrors.Add(errors.Wrap(decodeErr, "failed retrieving config from "+source.contentType.String()))
 	}
-	//if len(metaData.Undecoded()) > 0 {
-	//	errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
-	//	allErrors.Add(errors.New(errorMsg))
-	//}
-	//conf.MetaData.FilePath = deriveFilePathFromSource(source)
 
 	if allErrors.Size() > 0 {
 		return nil, allErrors
@@ -58,8 +54,24 @@ func retrieveScenarioConfigFromFile(source decoderSummary) (*ScenarioConfig, err
 	if decodeErr != nil {
 		allErrors.Add(errors.Wrap(decodeErr, "failed retrieving config from "+source.contentType.String()))
 	}
-	if len(metaData.Undecoded()) > 0 {
-		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", metaData.Undecoded())
+
+	var filteredKeys []string
+	for _, rawUnknownKey := range metaData.Undecoded() {
+		unknownKey := rawUnknownKey.String()
+		if unknownKey == "" || strings.TrimSpace(unknownKey) == "" {
+			continue
+		}
+		if strings.HasPrefix(unknownKey, "Scenario") {
+			continue
+		}
+		if strings.HasPrefix(unknownKey, "Annealer") {
+			continue
+		}
+		filteredKeys = append(filteredKeys, unknownKey)
+	}
+
+	if len(filteredKeys) > 0 {
+		errorMsg := fmt.Sprintf("unrecognised configuration key(s) %q", filteredKeys)
 		allErrors.Add(errors.New(errorMsg))
 	}
 

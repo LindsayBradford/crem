@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/LindsayBradford/crem/cmd/cremexplorer/config"
+	"github.com/LindsayBradford/crem/cmd/cremengine/config"
 	"github.com/pkg/errors"
 )
 
