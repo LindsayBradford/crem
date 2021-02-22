@@ -193,6 +193,11 @@ func (m *Mux) SetScenario(scenarioFilePath string) {
 	if m.modelConfigInterpreter.Errors() != nil {
 		m.Logger().Warn(m.modelConfigInterpreter.Errors())
 	}
+
+	m.modelSolution = new(solution.SolutionBuilder).
+		WithId(m.model.Id()).
+		ForModel(m.model).
+		Build()
 }
 
 func readTestFileAsText(filePath string) string {
