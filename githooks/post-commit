@@ -1,37 +1,47 @@
-#!/usr/bin/perl
-# Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+#!/bin/python
 
-use strict;
-use warnings;
+import subprocess
+import sys
+import sharedhook
 
-use File::Copy qw(copy);
+checkPrefix = 'git post-commit:'
 
-use File::Basename qw(dirname);
-use Cwd  qw(abs_path);
-use lib dirname(dirname abs_path $0) . '/githooks';
+def main():
+    print('Doing git post-commit functionality:') 
+    doPostProcessing()
 
-use shared;
+def doPostProcessing():
+    failureCount = 0
+    failureCount += buildCremExplorer()
+    failureCount += buildCremEngine()
+    sharedhook.reportStatusAndExit(failureCount, checkPrefix)
 
-use constant checkPrefix => "git post-commit:";
+def buildCremExplorer():
+    return buildExecutable('cremexplorer')
 
-doPostCommitWork();
+def buildCremEngine():
+    return buildExecutable('cremengine')
 
-sub doPostCommitWork {
-	my $failureCount=0;
+def buildExecutable(executableName):
+    baseDir = f'cmd/{executableName}'
+    sourceFile = f'{baseDir}/main.go'
+    deployFile = f'{baseDir}/{executableName}.exe'
 
-	$failureCount += buildCremEngineInDeployDirectory();
+    commandArray = ['go', 'build', '-o', deployFile, sourceFile]
+    output = subprocess.run(commandArray, capture_output=True, text=True)
 
-	shared::reportStatusAndExit($failureCount, checkPrefix);
-}
+    command = ' '.join(commandArray)
+    exitStatus = deriveExitStatus(output.returncode)
+    
+    print (f'  {command}: {exitStatus.name}')
 
-sub buildCremEngineInDeployDirectory {
-	my $deployDir = $ENV{'CREM_ENGINE_PATH'};
-	my $deployFile = "$deployDir/cremengine.exe";
-	my $sourceFile = "cmd/cremengine/main.go";
-	
-	my $buildCommand = "go build -o \"$deployFile\" $sourceFile";
-	
-	print checkPrefix, " ", $buildCommand, "\n";
-	
-	return system($buildCommand);
-}
+    return exitStatus.value
+    
+
+def deriveExitStatus(returncode):
+    if returncode == 0:
+        return sharedhook.ExitStatus.SUCCESS
+    return sharedhook.ExitStatus.FAILURE
+
+if __name__ == '__main__':
+    main()

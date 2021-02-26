@@ -1,62 +1,104 @@
-#!/usr/bin/perl
-# Copyright (c) 2018 Australian Rivers Institute. Author: Lindsay Bradford
+#!/bin/python
 
-use strict;
-use warnings;
+import subprocess
+import sys
+import sharedhook
 
-use File::Basename qw(dirname);
-use Cwd  qw(abs_path);
-use lib dirname(dirname abs_path $0) . '/githooks';
+checkPrefix = 'git pre-commit check:'
 
-use shared;
+def main():
+    print('Doing git pre-commit checks:') 
+    doChecks()
 
-use constant checkPrefix => "git pre-commit check:";
+def doChecks():
+    failureCount = 0
+    failureCount += checkStagedGoFileFormatting()
+    failureCount += checkGoTestPasses()
 
-doChecks();
+    sharedhook.reportStatusAndExit(failureCount, checkPrefix)
 
-sub doChecks {
-	my $failureCount=0;
+def checkStagedGoFileFormatting():
+    sys.stdout.write('  Checking Go File Formatting...') 
+    sys.stdout.flush()
 
-	$failureCount += checkStagedGoFileFormatting();
-	$failureCount += checkGoTestPasses();
+    result = sharedhook.ExitStatus.SUCCESS
 
-	shared::reportStatusAndExit($failureCount, checkPrefix);
-}
+    goStagedDiffResults = generateGoStagedDiffResults()
+    finalResult = deriveUnformattedGoFiles(goStagedDiffResults)
 
-sub checkStagedGoFileFormatting {
-	my @allStagedFiles = `git diff --staged --name-only`;
-	my @stagedGoFiles = grep(/\.go$/, @allStagedFiles);
+    print(finalResult.name)
+    return finalResult.value
 
-	my $unformattedFileNumber = 0;
-	foreach my $file (@stagedGoFiles) {
-		my $unformattedFile = `gofmt -l $file`;
-		if ($unformattedFile ne "") {
-			print checkPrefix, " file needs gofmt: $unformattedFile\n";
-			$unformattedFileNumber += 1;
-		}
-	}
+def deriveUnformattedGoFiles(results):
+    finalResult = sharedhook.ExitStatus.SUCCESS
 
-	if ($unformattedFileNumber ge 1) {
-		return shared::FAILURE;
-	}
+    foundUnformattedGoFile = False
+    for goFile in results:
+        if gofile == '':
+            continue
+        if not goFileIsFormatted(goFile):
+            print(f'    test(s) failed in {failedTestFile}')
+            sys.stdout.flush()
+            foundUnformattedGoFile = True
 
-	return shared::SUCCESS;
-}
+    if foundUnformattedGoFile:
+        finalResult = sharedbook.ExitStatus.FAILURE
 
-sub checkGoTestPasses {
-	my @goTestResults = `go test ./...`;
-	my @failedTests = grep(/FAIL:/, @goTestResults);
+    return finalResult
 
-	foreach my $failedTest (@failedTests) {
-		my @failureDetail = split(/\s/, $failedTest);
-		my $failedFileName = $failureDetail[2];
-		print checkPrefix, " file with failing test(s): $failedFileName\n";
-	}
-	
-	my $failedTestNumber = @failedTests;
-	if ($failedTestNumber ge 1) {
-		return shared::FAILURE;
-	}
-	
-	return shared::SUCCESS;
-}
+def goFileIsFormatted(goFile):
+    commandArray = ['gofmt', '-l', goFile]
+    output = subprocess.run(commandArray, capture_output=True, text=True)
+    if output != '':
+        return False
+    return True
+
+def generateGoStagedDiffResults():
+    commandArray = ['go', 'diff', '--staged', '--name-only']
+    output = subprocess.run(commandArray, capture_output=True, text=True)
+    goDiffResults = output.stdout.split('\n')
+
+    filteredResults = []
+    for result in goDiffResults:
+        if result.endswith('.go'):
+            filteredResults.append(result)        
+    
+    return filteredResults
+
+def checkGoTestPasses():
+    sys.stdout.write('  Checking Go Test Results...')
+    sys.stdout.flush()
+
+    goTestResults = generateGoTestResults()
+    finalResult = deriveFinalResult(goTestResults)
+    
+    print(finalResult.name)
+    return finalResult.value
+
+def generateGoTestResults():
+    commandArray = ['go', 'test', './...']
+    output = subprocess.run(commandArray, capture_output=True, text=True)
+    return output.stdout.split('\n')
+
+def deriveFinalResult(goTestResults):
+    finalResult = sharedhook.ExitStatus.SUCCESS
+
+    failureFound = False
+    for result in goTestResults:
+        resultArray = result.split()
+        if len(resultArray) > 1 and resultArray[0] == "FAIL":
+            if not failureFound:
+                print('')
+                failureFound = True
+            failedTestFile = resultArray[1]
+            print(f'    test(s) failed in {failedTestFile}')
+            sys.stdout.flush()
+    
+    if failureFound:
+        sys.stdout.write('  Checking Go Test Results...')
+        finalResult = sharedhook.ExitStatus.FAILURE
+
+    return finalResult
+
+if __name__ == '__main__':
+    main()
