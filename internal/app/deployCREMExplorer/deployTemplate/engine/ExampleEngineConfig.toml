@@ -1,0 +1,7 @@
+[Engine]
+ApiPort = 8080 # 8080
+AdminPort = 8081 # 8081
+
+[Engine.Logger]
+[Engine.Logger.LogLevelDestinations]
+Debug = "StandardOutput"

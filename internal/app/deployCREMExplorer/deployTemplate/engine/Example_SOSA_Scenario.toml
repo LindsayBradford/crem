@@ -1,0 +1,56 @@
+[Scenario]
+Name = "Example SOSA Scenario"
+RunNumber = 1                                           # 1 (default)
+MaximumConcurrentRunNumber = 1                          # 1 (default)
+OutputPath = "output"                                   # Relative directory path to place results files
+OutputType = "EXCEL"                                    # "CSV" (default) | "JSON" | "EXCEL"
+[Scenario.UserDetail]
+TextEntry = "Some Text"                                 # Example user-defined data for scenario. Not used by system.
+IntegerEntry = 42                                       # Example user-defined data for scenario. Not used by system.
+FloatEntry = 42.42                                      # Example user-defined data for scenario. Not used by system.
+BooleanEntry = true                                     # Example user-defined data for scenario. Not used by system.
+[Scenario.Reporting]
+ReportEveryNumberOfIterations = 10_000
+Type = "NativeLibrary"                                  # "NativeLibrary" (Default) | "BareBones"
+Formatter = "RawMessage"                                # "RawMessage" (Default) | "JSON" | "NameValuePair"
+[Scenario.Reporting.LogLevelDestinations]
+Annealer = "StandardOutput"                             # "Discarded"  | "StandardOutput" (Default) | "StandardError"
+Debugging = "Discarded"                                 # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput"                          # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"                             # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"                                # "Discarded"  | "StandardOutput" | "StandardError" (Default)
+Model = "Discarded"                                     # "Discarded"  (default) | "StandardOutput" | "StandardError"
+
+[Annealer]
+Type = "Kirkpatrick"
+EventNotifier = "Sequential"                            # "Sequential" (default) | Concurrent"
+[Annealer.Parameters]
+DecisionVariable = "SedimentProduction"
+OptimisationDirection = "Minimising"                    # Minimising (default) | "Maximising"
+StartingTemperature = 10_000.0
+CoolingFactor = 0.999
+MaximumIterations = 1_000_000
+
+[Model]
+Type = "CatchmentModel"
+[Model.Parameters]
+DataSourcePath = "../explorer/input/Laidley_data_v1_8_3.xlsx"
+
+BankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)
+WaterDensity = 1.0                  # 1 t/m^3 (default)
+LocalAcceleration = 9.81            # 9.81 m/s^2 (default)
+GullyCompensationFactor = 0.5       # 0.5 (default)
+SedimentDensity = 1.5               # (1.5 t/m^3 default)
+SuspendedSedimentProportion = 0.5   # 0.5 (default)
+YearsOfErosion = 100                # 100.0 (default)
+
+RiparianBufferVegetationProportionTarget = 0.75         # 0.75 (default)
+GullySedimentReductionTarget = 0.8                      # 0.8 (default)
+HillSlopeDeliveryRatio = 0.05                           # 0.05 (default)
+
+# Only one of the below variable bounds can be applied maximum.
+#MaximumSedimentProduction = 10_000.0             # (t/y) No default. If not supplied, no bounds checking will occur.
+#MaximumParticulateNitrogenProduction = 1_000.0   # (t/y) No default. If not supplied, no bounds checkign will occur.
+#MaximumDissolvedNitrogenProduction = 150.0       # (t/y) No default. If not supplied, no bounds checkign will occur.
+MaximumImplementationCost = 10_000_000.0          # ($) No default. If not supplied, no bounds checking will occur.
+#MaximumOpportunityCost = 10_000.0                # ($) No default. If not supplied, no bounds checking will occur.
