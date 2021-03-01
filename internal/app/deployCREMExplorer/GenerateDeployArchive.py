@@ -9,16 +9,21 @@ def main():
     generateDeployArchive(config)
 
 def deriveConfiguration():
-    sourceDir = '../../../cmd/cremexplorer/'
+    explorerSourceDir = '../../../cmd/cremexplorer/'
     baseExecutableName = 'CREMExplorer'
+    targetTemplateDir = './deployTemplate'
     return {
-        'sourceDir': sourceDir,
+        'explorerSourceDir': explorerSourceDir,
 
-        'targetTemplateDir': './deployTemplate',
+        'targetTemplateDir': targetTemplateDir,
         'targetDir': './deploy',
 
+        'sourceChangeLog': f'{explorerSourceDir}/config/ChangeLog.md',
+        'targetChangeLog': f'{targetTemplateDir}/ChangeLog.md',
+
         'baseExecutableName': baseExecutableName,
-        'executableName': f'{sourceDir}/{baseExecutableName}.exe'
+        'sourceExecutable': f'{explorerSourceDir}/{baseExecutableName}.exe',
+        'targetExecutable': f'{targetTemplateDir}/{baseExecutableName}.exe'
     }
 
 def generateDeployArchive(config):
@@ -26,12 +31,8 @@ def generateDeployArchive(config):
     generateArchiveFromTemplate(config)
 
 def updateExplorerDeployTemplate(config):
-    targetExecutableName = f'{config["targetTemplateDir"]}/{config["baseExecutableName"]}.exe'
-    updateTemplate(config['executableName'], targetExecutableName)
-
-    changeLog = f'{config["sourceDir"]}/config/ChangeLog.md'
-    targetChangeLogName = f'{config["targetTemplateDir"]}/ChangeLog.md'
-    updateTemplate(changeLog, targetChangeLogName)
+    updateTemplate(config['sourceExecutable'], config['targetExecutable'])
+    updateTemplate(config['sourceChangeLog'], config['targetChangeLog'])
 
 def updateTemplate(sourceFile, targetFile):
     print (f'Copying {sourceFile} to {targetFile}\n')
@@ -45,7 +46,7 @@ def generateArchiveFromTemplate(config):
     shutil.make_archive(zipFileName, 'zip', config["targetTemplateDir"])        
 
 def getExecutableVersion(config):
-    commandArray = [config['executableName'], '--Version']
+    commandArray = [config['sourceExecutable'], '--Version']
     output = subprocess.run(commandArray, capture_output=True, text=True)
     version = output.stdout.split()[1]
     return version
