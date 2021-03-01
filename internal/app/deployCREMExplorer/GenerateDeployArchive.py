@@ -5,53 +5,45 @@ import subprocess
 import shutil
 
 def main():
-    config = initialise()
-    zipDeploymentFile(config)
+    config = deriveConfiguration()
+    generateDeployArchive(config)
 
-
-def initialise():
+def deriveConfiguration():
     sourceDir = '../../../cmd/cremexplorer/'
-    binDir = sourceDir
-    dataDir = f'{sourceDir}/testdata/'
-
     baseExecutableName = 'CREMExplorer'
-    executableName = f'{binDir}/{baseExecutableName}.exe'
-
     return {
         'sourceDir': sourceDir,
-        'dataDir': dataDir,
+
         'targetTemplateDir': './deployTemplate',
         'targetDir': './deploy',
-        'type': 'Release',
+
         'baseExecutableName': baseExecutableName,
-        'executableName': executableName
+        'executableName': f'{sourceDir}/{baseExecutableName}.exe'
     }
 
+def generateDeployArchive(config):
+    updateExplorerDeployTemplate(config)
+    generateArchiveFromTemplate(config)
 
-def zipDeploymentFile(config):
+def updateExplorerDeployTemplate(config):
+    targetExecutableName = f'{config["targetTemplateDir"]}/{config["baseExecutableName"]}.exe'
+    updateTemplate(config['executableName'], targetExecutableName)
+
+    changeLog = f'{config["sourceDir"]}/config/ChangeLog.md'
+    targetChangeLogName = f'{config["targetTemplateDir"]}/ChangeLog.md'
+    updateTemplate(changeLog, targetChangeLogName)
+
+def updateTemplate(sourceFile, targetFile):
+    print (f'Copying {sourceFile} to {targetFile}\n')
+    shutil.copy(sourceFile, targetFile)
+
+def generateArchiveFromTemplate(config):
     versionNumber = getExecutableVersion(config)
+    zipFileName = f'{config["targetDir"]}/CREMExplorer_{versionNumber}'
 
-    targetTemplateDir = config['targetTemplateDir']
-    baseExecutableName = config['baseExecutableName']
-    targetExecutableName = f'{targetTemplateDir}/{baseExecutableName}.exe'
+    print (f'Adding directory ({config["targetTemplateDir"]}) to archive ({zipFileName}.zip).\n')
+    shutil.make_archive(zipFileName, 'zip', config["targetTemplateDir"])        
 
-    executableName = config['executableName']
-    print (f'Copying {executableName} to {targetExecutableName}\n')
-    shutil.copy(executableName, targetExecutableName)
-
-    sourceDir = config['sourceDir']
-    changeLog = f'{sourceDir}/config/ChangeLog.md'
-    targetChangeLogName = f'{targetTemplateDir}/ChangeLog.md'
-    print (f'Copying {changeLog} to {targetChangeLogName}\n')
-    shutil.copy(changeLog, targetChangeLogName)
-   
-    targetDir = config['targetDir']
-    zipFileName = f'{targetDir}/CREMExplorer_{versionNumber}'
-
-    print (f'Adding directory ({targetTemplateDir}) to archive ({zipFileName}.zip).\n')
-    shutil.make_archive(zipFileName, 'zip', targetTemplateDir)        
-
- 
 def getExecutableVersion(config):
     commandArray = [config['executableName'], '--Version']
     output = subprocess.run(commandArray, capture_output=True, text=True)
