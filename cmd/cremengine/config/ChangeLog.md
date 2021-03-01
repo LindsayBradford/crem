@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.2 (TBD):
+## Version 0.2 (02 March 2021):
 ### New Features
 * Addition of new running engine api behaviour:
   * GET  /api/v1/scenario                   -- Returns the configuration for the currently running scenario

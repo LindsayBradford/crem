@@ -1,4 +1,4 @@
-# (c) 2020, Australian Rivers Institute
+# (c) 2021, Australian Rivers Institute
 # Author: Lindsay Bradford
 
 import subprocess
@@ -18,6 +18,8 @@ def deriveConfiguration():
 
     targetTemplateDir = './deployTemplate'
     return {
+        'versionNumber': 'v0.1',
+        
         'baseArchiveName': baseArchiveName,
         'explorerSourceDir': explorerSourceDir,
 
@@ -57,21 +59,10 @@ def updateTemplate(sourceFile, targetFile):
     shutil.copy(sourceFile, targetFile)
 
 def generateArchiveFromTemplate(config):
-    versionNumber = getExecutableVersion(config)
-    zipFileName = f'{config["targetDir"]}/{config["baseArchiveName"]}_{versionNumber}'
+    zipFileName = f'{config["targetDir"]}/{config["baseArchiveName"]}_{config["versionNumber"]}'
 
     print (f'Adding directory ({config["targetTemplateDir"]}) to archive ({zipFileName}.zip).\n')
     shutil.make_archive(zipFileName, 'zip', config["targetTemplateDir"])        
-
-def getExecutableVersion(config):
-    commandArray = [config['sourceExplorer'], '--Version']
-    output = subprocess.run(commandArray, capture_output=True, text=True)
-    version = output.stdout.split()[1]
-    return version
-
-def logCommand(commandArray):
-    command = ' '.join(commandArray)
-    print (f'\nRunning "{command}".\n\n')
 
 if __name__ == '__main__':
     main()

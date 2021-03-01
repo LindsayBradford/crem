@@ -23,3 +23,5 @@ vendor/*/
 /internal/app/deployCREMExplorer/deployTemplate/output
 /internal/app/deployCREMExplorer/deploy/*.zip
 /internal/app/deployCREMExplorer/deployTemplate/*.md
+/internal/app/deployCREMExplorer/deployTemplate/explorer/ChangeLog.md
+/internal/app/deployCREMExplorer/deployTemplate/engine/ChangeLog.md
