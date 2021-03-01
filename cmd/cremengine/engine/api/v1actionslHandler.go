@@ -152,10 +152,20 @@ func (m *Mux) deriveSuppliedActionState(headingsTable dataset.HeadingsTable, col
 }
 
 func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (dataset.HeadingsTable, error) {
+	rawTableContent := requestBodyToString(r)
+
+	requestTable, parseError := m.deriveSolutionTable(rawTableContent)
+	if parseError != nil {
+		m.BadRequestError(w, r)
+	}
+	return requestTable, parseError
+}
+
+func (m *Mux) deriveSolutionTable(rawTableContent string) (dataset.HeadingsTable, error) {
 	tmpDataSet := csv.NewDataSet("Content Dataset")
 	defer tmpDataSet.Teardown()
 
-	tmpDataSet.ParseCsvTextIntoTable("requestContent", requestBodyToString(r))
+	tmpDataSet.ParseCsvTextIntoTable("requestContent", rawTableContent)
 	if tmpDataSet.Errors() != nil {
 		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
@@ -172,7 +182,6 @@ func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (datase
 	if contentTable == nil {
 		wrappingError := errors.Wrap(errors.New("No CSV table content found"), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
-		m.BadRequestError(w, r)
 		return nil, wrappingError
 	}
 
@@ -180,7 +189,6 @@ func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (datase
 	if !hasHeadings {
 		wrappingError := errors.Wrap(errors.New("CSV table does not have a header row"), "v1 model actions handler")
 		m.Logger().Error(wrappingError)
-		m.BadRequestError(w, r)
 		return nil, wrappingError
 	}
 
@@ -189,7 +197,6 @@ func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (datase
 			errors.New("CSV table header column misses mandatory 'SubCatchment' first entry"),
 			"v1 model actions handler")
 		m.Logger().Error(wrappingError)
-		m.BadRequestError(w, r)
 		return nil, wrappingError
 	}
 
@@ -203,7 +210,6 @@ func (m *Mux) deriveRequestTable(r *http.Request, w http.ResponseWriter) (datase
 					colIndex, rowIndex, cellValue)
 				wrappingError := errors.Wrap(errors.New(msgText), "v1 model actions handler")
 				m.Logger().Error(wrappingError)
-				m.RespondWithError(http.StatusBadRequest, msgText, w, r)
 				return nil, wrappingError
 			}
 		}
@@ -227,4 +233,16 @@ func (m *Mux) handleNonCsvContentResponse(r *http.Request, w http.ResponseWriter
 	m.Logger().Warn(wrappingError)
 
 	m.MethodNotAllowedError(w, r)
+}
+
+func (m *Mux) SetSolution(solutionFilePath string) {
+	rawTableContent := readFileAsText(solutionFilePath)
+
+	requestTable, parseError := m.deriveSolutionTable(rawTableContent)
+	if parseError != nil {
+		return
+	}
+
+	m.processRequestTable(requestTable)
+	m.updateModelSolution()
 }

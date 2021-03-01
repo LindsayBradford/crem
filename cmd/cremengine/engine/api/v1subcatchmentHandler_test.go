@@ -329,7 +329,7 @@ func TestPostInvalidSubcatchmentActionStateResource_OkResponse(t *testing.T) {
 }
 
 func buildValidScenario(t *testing.T, muxUnderTest *Mux) {
-	scenarioTomlText := readTestFileAsText(validScenarioFile)
+	scenarioTomlText := readFileAsText(validScenarioFile)
 
 	// when
 	postContext := TestContext{

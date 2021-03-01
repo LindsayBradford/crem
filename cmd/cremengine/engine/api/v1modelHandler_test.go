@@ -32,7 +32,7 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
+	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
 	postContext := TestContext{

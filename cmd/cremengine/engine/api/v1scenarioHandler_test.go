@@ -72,7 +72,7 @@ func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
+	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
 	postContext := TestContext{
@@ -120,7 +120,7 @@ func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readTestFileAsText("testdata/ValidTestScenario.toml")
+	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
 	postContext := TestContext{
@@ -217,7 +217,7 @@ func TestInvalidModelPostScenario_BadRequestResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readTestFileAsText("testdata/InvalidModelTestScenario.toml")
+	scenarioTomlText := readFileAsText("testdata/InvalidModelTestScenario.toml")
 
 	// when
 	postContext := TestContext{
@@ -242,7 +242,7 @@ func TestInvalidModelParameterPostScenario_BadRequestResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readTestFileAsText("testdata/InvalidModelParameterTestScenario.toml")
+	scenarioTomlText := readFileAsText("testdata/InvalidModelParameterTestScenario.toml")
 
 	// when
 	postContext := TestContext{

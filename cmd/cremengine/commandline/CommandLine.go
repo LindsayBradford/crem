@@ -30,6 +30,7 @@ type Arguments struct {
 	Version          bool
 	EngineConfigFile string
 	ScenarioFile     string
+	SolutionFile     string
 }
 
 // THe define sets up the relevant command-line
@@ -56,6 +57,13 @@ func (args *Arguments) define() {
 		"ScenarioFile",
 		"",
 		"file dictating scenario run-time behaviour",
+	)
+
+	flag.StringVar(
+		&args.SolutionFile,
+		"SolutionFile",
+		"",
+		"file dictating scenario run-time management action state",
 	)
 
 	flag.Usage = usageMessage
@@ -87,6 +95,12 @@ func (args *Arguments) process() {
 	if args.ScenarioFile != "" {
 		validateFilePath(args.ScenarioFile)
 	}
+
+	if args.SolutionFile != "" {
+		validateFilePath(args.SolutionFile)
+	}
+
+	validateArgInterdependence(args)
 }
 
 func validateFilePath(filePath string) {
@@ -97,6 +111,13 @@ func validateFilePath(filePath string) {
 	}
 	if pathInfo.Mode().IsDir() {
 		exitError := errors.Errorf("file specified [%s] is a directory, not a file", filePath)
+		Exit(exitError)
+	}
+}
+
+func validateArgInterdependence(args *Arguments) {
+	if args.SolutionFile != "" && args.ScenarioFile == "" {
+		exitError := errors.Errorf("solution file [%s] needs a scenario file (--ScenarioFile flag) specified", args.SolutionFile)
 		Exit(exitError)
 	}
 }
@@ -130,6 +151,7 @@ func usageMessage() {
 	fmt.Println("  --EngineConfigFile  <FilePath>  File describing the engine run-time behaviour.")
 	fmt.Println()
 	fmt.Println("  --ScenarioFile  <FilePath>      File describing a scenario to run and its  run-time behaviour.")
+	fmt.Println("  --SolutionFile  <FilePath>      File describing a scenario run-time management action state.")
 
 	Exit(0)
 }

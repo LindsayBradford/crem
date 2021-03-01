@@ -10,7 +10,8 @@
   * POST /api/v1/model/actions              -- Supplies a solution of active management actions to the current running model
   * GET  /api/v1/model/subcatchment/[0-9]*  -- Returns the state of management actions for the given model's subcatchment
   * POST /api/v1/model/subcatchment/[0-9]*  -- Supplies updates to the state of mgt actions for the given model's subcatchment
-* Command-line now allows an initial scenario to be specified via the new --ScenarioFile command-line argument.    
+* Command-line now allows an initial scenario to be specified via --ScenarioFile <FileName>.
+* Command-line now allows an initial scenario's managenemt action state to be specified via --SolutionFile <FileName>.
 
 ## Version 0.1 (18 July 2019):
 ### New Features

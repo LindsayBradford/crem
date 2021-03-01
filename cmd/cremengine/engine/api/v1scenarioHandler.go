@@ -183,7 +183,7 @@ func (m *Mux) SetScenario(scenarioFilePath string) {
 	m.ReplaceAttribute(scenarioNameKey, config.Scenario.Name)
 	m.Logger().Info("Scenario configuration [" + config.Scenario.Name + "] successfully retrieved")
 
-	configFileContent := readTestFileAsText(scenarioFilePath)
+	configFileContent := readFileAsText(scenarioFilePath)
 	m.ReplaceAttribute(scenarioTextKey, configFileContent)
 
 	interpretedModel := m.modelConfigInterpreter.Interpret(&config.Model).Model()
@@ -200,7 +200,7 @@ func (m *Mux) SetScenario(scenarioFilePath string) {
 		Build()
 }
 
-func readTestFileAsText(filePath string) string {
+func readFileAsText(filePath string) string {
 	if b, err := ioutil.ReadFile(filePath); err == nil {
 		return string(b)
 	}

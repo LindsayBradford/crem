@@ -103,3 +103,9 @@ func (s *RestServer) SetScenario(scenarioFilePath string) {
 		engineApiMux.SetScenario(scenarioFilePath)
 	}
 }
+
+func (s *RestServer) SetSolution(solutionFilePath string) {
+	if engineApiMux, isEngineApiMux := s.apiMux.(*engineApi.Mux); isEngineApiMux {
+		engineApiMux.SetSolution(solutionFilePath)
+	}
+}
