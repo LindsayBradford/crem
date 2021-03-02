@@ -1,26 +1,31 @@
 #!/bin/python
 
 import subprocess
-import sys
 import sharedhook
 
+
 checkPrefix = 'git post-commit:'
+
 
 def main():
     print('Doing git post-commit functionality:') 
     doPostProcessing()
 
+
 def doPostProcessing():
     failureCount = 0
-    failureCount += buildCremExplorer()
-    failureCount += buildCremEngine()
+    failureCount += buildExplorer()
+    failureCount += buildEngine()
     sharedhook.reportStatusAndExit(failureCount, checkPrefix)
 
-def buildCremExplorer():
+
+def buildExplorer():
     return buildExecutable('cremexplorer')
 
-def buildCremEngine():
+
+def buildEngine():
     return buildExecutable('cremengine')
+
 
 def buildExecutable(executableName):
     baseDir = f'cmd/{executableName}'
@@ -38,10 +43,11 @@ def buildExecutable(executableName):
     return exitStatus.value
     
 
-def deriveExitStatus(returncode):
-    if returncode == 0:
+def deriveExitStatus(returnCode):
+    if returnCode == 0:
         return sharedhook.ExitStatus.SUCCESS
     return sharedhook.ExitStatus.FAILURE
+
 
 if __name__ == '__main__':
     main()

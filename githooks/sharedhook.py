@@ -1,8 +1,10 @@
 from enum import Enum
 
+
 class ExitStatus(Enum):
     SUCCESS = 0
     FAILURE = 1
+
 
 def reportStatusAndExit(errorCount, checkPrefix):
     exitStatus = ExitStatus.SUCCESS

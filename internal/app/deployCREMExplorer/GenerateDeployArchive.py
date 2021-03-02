@@ -1,12 +1,13 @@
 # (c) 2021, Australian Rivers Institute
 # Author: Lindsay Bradford
 
-import subprocess
 import shutil
+
 
 def main():
     config = deriveConfiguration()
     generateDeployArchive(config)
+
 
 def deriveConfiguration():
     explorerSourceDir = '../../../cmd/cremexplorer/'
@@ -41,28 +42,34 @@ def deriveConfiguration():
         'targetEngine': f'{targetTemplateDir}/engine/{baseEngineName}.exe'
     }
 
+
 def generateDeployArchive(config):
     updateExplorerDeployTemplate(config)
     updateEngineDeployTemplate(config)
     generateArchiveFromTemplate(config)
 
+
 def updateExplorerDeployTemplate(config):
     updateTemplate(config['sourceExplorer'], config['targetExplorer'])
     updateTemplate(config['sourceExplorerChangeLog'], config['targetExplorerChangeLog'])
+
 
 def updateEngineDeployTemplate(config):
     updateTemplate(config['sourceEngine'], config['targetEngine'])
     updateTemplate(config['sourceEngineChangeLog'], config['targetEngineChangeLog'])
 
+
 def updateTemplate(sourceFile, targetFile):
     print (f'Copying {sourceFile} to {targetFile}\n')
     shutil.copy(sourceFile, targetFile)
+
 
 def generateArchiveFromTemplate(config):
     zipFileName = f'{config["targetDir"]}/{config["baseArchiveName"]}_{config["versionNumber"]}'
 
     print (f'Adding directory ({config["targetTemplateDir"]}) to archive ({zipFileName}.zip).\n')
     shutil.make_archive(zipFileName, 'zip', config["targetTemplateDir"])        
+
 
 if __name__ == '__main__':
     main()

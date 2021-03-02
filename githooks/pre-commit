@@ -4,11 +4,14 @@ import subprocess
 import sys
 import sharedhook
 
+
 checkPrefix = 'git pre-commit check:'
+
 
 def main():
     print('Doing git pre-commit checks:') 
     doChecks()
+
 
 def doChecks():
     failureCount = 0
@@ -16,6 +19,7 @@ def doChecks():
     failureCount += checkGoTestPasses()
 
     sharedhook.reportStatusAndExit(failureCount, checkPrefix)
+
 
 def checkStagedGoFileFormatting():
     sys.stdout.write('  Checking Go File Formatting...') 
@@ -29,15 +33,16 @@ def checkStagedGoFileFormatting():
     print(finalResult.name)
     return finalResult.value
 
+
 def deriveUnformattedGoFiles(results):
     finalResult = sharedhook.ExitStatus.SUCCESS
 
     foundUnformattedGoFile = False
     for goFile in results:
-        if gofile == '':
+        if goFile == '':
             continue
         if not goFileIsFormatted(goFile):
-            print(f'    test(s) failed in {failedTestFile}')
+            print(f'    test(s) failed in {goFile}')
             sys.stdout.flush()
             foundUnformattedGoFile = True
 
@@ -46,12 +51,14 @@ def deriveUnformattedGoFiles(results):
 
     return finalResult
 
+
 def goFileIsFormatted(goFile):
     commandArray = ['gofmt', '-l', goFile]
     output = subprocess.run(commandArray, capture_output=True, text=True)
     if output != '':
         return False
     return True
+
 
 def generateGoStagedDiffResults():
     commandArray = ['go', 'diff', '--staged', '--name-only']
@@ -65,6 +72,7 @@ def generateGoStagedDiffResults():
     
     return filteredResults
 
+
 def checkGoTestPasses():
     sys.stdout.write('  Checking Go Test Results...')
     sys.stdout.flush()
@@ -75,10 +83,12 @@ def checkGoTestPasses():
     print(finalResult.name)
     return finalResult.value
 
+
 def generateGoTestResults():
     commandArray = ['go', 'test', './...']
     output = subprocess.run(commandArray, capture_output=True, text=True)
     return output.stdout.split('\n')
+
 
 def deriveFinalResult(goTestResults):
     finalResult = sharedhook.ExitStatus.SUCCESS
@@ -99,6 +109,7 @@ def deriveFinalResult(goTestResults):
         finalResult = sharedhook.ExitStatus.FAILURE
 
     return finalResult
+
 
 if __name__ == '__main__':
     main()
