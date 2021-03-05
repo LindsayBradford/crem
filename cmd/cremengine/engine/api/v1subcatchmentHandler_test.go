@@ -1,18 +1,21 @@
 package api
 
 import (
+	_ "embed"
 	"encoding/json"
+	"net/http"
+	"testing"
+
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"testing"
 )
 
-const (
-	validScenarioFile = "testdata/ValidTestScenario.toml"
+//go:embed testdata/ValidTestScenario.toml
+var validScenarioTomlConfig string
 
+const (
 	scenarioUrl = baseUrl + "api/v1/scenario"
 
 	baseSubcatchmentUrl  = baseUrl + "api/v1/model/subcatchment"
@@ -329,7 +332,6 @@ func TestPostInvalidSubcatchmentActionStateResource_OkResponse(t *testing.T) {
 }
 
 func buildValidScenario(t *testing.T, muxUnderTest *Mux) {
-	scenarioTomlText := readFileAsText(validScenarioFile)
 
 	// when
 	postContext := TestContext{
@@ -338,7 +340,7 @@ func buildValidScenario(t *testing.T, muxUnderTest *Mux) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      http.MethodPost,
 			TargetUrl:   scenarioUrl,
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,

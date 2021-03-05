@@ -3,17 +3,23 @@
 package data
 
 import (
+	_ "embed"
 	"github.com/LindsayBradford/crem/internal/pkg/config/data"
-	"io/ioutil"
 	"testing"
 
 	. "github.com/onsi/gomega"
 )
 
+const richValidConfigFile = "testdata/RichValidConfig.toml"
+
+//go:embed testdata/RichValidConfig.toml
+var richValidConfig string
+
+//go:embed testdata/RichInvalidSyntaxConfig.toml
+var richInvalidConfig string
+
 const (
-	emptyTestFile             = "testdata/EmptyConfig.toml"
-	richValidTestFile         = "testdata/RichValidConfig.toml"
-	richInvalidSyntaxTestFile = "testdata/RichInvalidSyntaxConfig.toml"
+	emptyTestFile = "testdata/EmptyConfig.toml"
 )
 
 func TestRetrieveConfigFromFile_MissingConfig_Errors(t *testing.T) {
@@ -51,7 +57,7 @@ func TestRetrieveConfigFromFile_RichValidConfig_NoErrors(t *testing.T) {
 
 	// given
 	const (
-		expectedCMetaDataFilePath        = richValidTestFile
+		expectedCMetaDataFilePath        = richValidConfigFile
 		expectedApiPort                  = uint64(3030)
 		expectedAdminPort                = uint64(3031)
 		expectedCacheMaximumAgeInSeconds = uint64(5)
@@ -59,7 +65,7 @@ func TestRetrieveConfigFromFile_RichValidConfig_NoErrors(t *testing.T) {
 	)
 
 	// when
-	config, retrieveError := RetrieveConfigFromFile(richValidTestFile)
+	config, retrieveError := RetrieveConfigFromFile(richValidConfigFile)
 	if retrieveError != nil {
 		t.Log(retrieveError)
 	}
@@ -78,7 +84,6 @@ func TestRetrieveConfigFromString_RichValidConfig_NoErrors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
-	configText := readTestFileAsText(richValidTestFile)
 	const (
 		expectedCMetaDataFilePath        = "<unspecified>"
 		expectedApiPort                  = uint64(3030)
@@ -88,7 +93,7 @@ func TestRetrieveConfigFromString_RichValidConfig_NoErrors(t *testing.T) {
 	)
 
 	// when
-	config, retrieveError := RetrieveConfigFromString(configText)
+	config, retrieveError := RetrieveConfigFromString(richValidConfig)
 	if retrieveError != nil {
 		t.Log(retrieveError)
 	}
@@ -107,22 +112,12 @@ func TestRetrieveConfigFromString_RichValidConfig_NoErrors(t *testing.T) {
 func TestRetrieveConfigFromString_RichInvalidSyntaxConfig_Errors(t *testing.T) {
 	g := NewGomegaWithT(t)
 
-	// given
-	configText := readTestFileAsText(richInvalidSyntaxTestFile)
-
 	// when
-	_, retrieveError := RetrieveConfigFromString(configText)
+	_, retrieveError := RetrieveConfigFromString(richInvalidConfig)
 	if retrieveError != nil {
 		t.Log(retrieveError)
 	}
 
 	// then
 	g.Expect(retrieveError).To(Not(BeNil()))
-}
-
-func readTestFileAsText(filePath string) string {
-	if b, err := ioutil.ReadFile(filePath); err == nil {
-		return string(b)
-	}
-	return "error reading file"
 }

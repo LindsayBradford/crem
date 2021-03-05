@@ -1,6 +1,7 @@
 package api
 
 import (
+	_ "embed"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
@@ -22,6 +23,15 @@ type TestContext struct {
 	Request                httptest.HttpTestRequestContext
 	ExpectedResponseStatus int
 }
+
+//go:embed testdata/InvalidModelParameterTestScenario.toml
+var invalidModelParameterTomlText string
+
+//go:embed testdata/InvalidModelTestScenario.toml
+var invalidModelTomlText string
+
+//go:embed testdata/ValidTestScenario.toml
+var validScenarioTomlText string
 
 func TestFirstScenarioGetRequest_NotFoundResponse(t *testing.T) {
 	// given
@@ -72,8 +82,6 @@ func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario text request returns 200 (ok) response",
@@ -81,7 +89,7 @@ func TestPostScenarioTomlResource_OkResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -120,8 +128,6 @@ func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
@@ -129,7 +135,7 @@ func TestPostValidScenarioResource_OkResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlText,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -217,8 +223,6 @@ func TestInvalidModelPostScenario_BadRequestResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/InvalidModelTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario text request with invalid model returns 400 (bad request) response",
@@ -226,7 +230,7 @@ func TestInvalidModelPostScenario_BadRequestResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: invalidModelTomlText,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusBadRequest,
@@ -242,8 +246,6 @@ func TestInvalidModelParameterPostScenario_BadRequestResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/InvalidModelParameterTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario text request with invalid model parameter returns 400 (bad request) response",
@@ -251,7 +253,7 @@ func TestInvalidModelParameterPostScenario_BadRequestResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: invalidModelParameterTomlText,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusBadRequest,

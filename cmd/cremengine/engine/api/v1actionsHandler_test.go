@@ -1,12 +1,19 @@
 package api
 
 import (
+	_ "embed"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
 )
+
+//go:embed testdata/InvalidActiveActions.csv
+var invalidActionsCsvContent string
+
+//go:embed testdata/ValidActiveActions.csv
+var validRActionsCsvContent string
 
 func TestFirstActionsGetRequest_NotFoundResponse(t *testing.T) {
 	// given
@@ -33,8 +40,6 @@ func TestGetValidModelActionsResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /api/v1/scenario request returns 202 (accepted) response",
@@ -42,7 +47,7 @@ func TestGetValidModelActionsResource_OkResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -114,8 +119,6 @@ func TestModelActionsPutRequest_NotAllowedResponse(t *testing.T) {
 func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
@@ -123,7 +126,7 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -151,9 +154,8 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 }
 
 func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
+	// given
 	muxUnderTest := buildMuxUnderTest()
-
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
 
 	// when
 	postContext := TestContext{
@@ -162,7 +164,7 @@ func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -193,8 +195,6 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 	g := NewGomegaWithT(t)
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
@@ -202,7 +202,7 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -213,8 +213,6 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 
 	// when
 
-	invalidRequestBody := readFileAsText("testdata/InvalidActiveActions.csv")
-
 	context := TestContext{
 		Name: "POST /model/actions request returns 400 (bad request) response",
 		T:    t,
@@ -222,7 +220,7 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.CsvMimeType,
-			RequestBody: invalidRequestBody,
+			RequestBody: invalidActionsCsvContent,
 		},
 		ExpectedResponseStatus: http.StatusBadRequest,
 	}
@@ -239,8 +237,6 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	g := NewGomegaWithT(t)
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	scenarioPostContext := TestContext{
 		Name: "POST /scenario request returns 202 (accepted) response",
@@ -248,7 +244,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -258,8 +254,6 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	verifyResponseStatusCode(muxUnderTest, scenarioPostContext)
 
 	// when
-	validRequestBody := readFileAsText("testdata/ValidActiveActions.csv")
-
 	actionsPostContext := TestContext{
 		Name: "POST /model/actions request returns 200 (ok) response",
 		T:    t,
@@ -267,7 +261,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.CsvMimeType,
-			RequestBody: validRequestBody,
+			RequestBody: validRActionsCsvContent,
 		},
 		ExpectedResponseStatus: http.StatusOK,
 	}

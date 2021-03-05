@@ -32,8 +32,6 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
-	scenarioTomlText := readFileAsText("testdata/ValidTestScenario.toml")
-
 	// when
 	postContext := TestContext{
 		Name: "POST /api/v1/scenario request returns 202 (accepted) response",
@@ -41,7 +39,7 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/scenario",
-			RequestBody: scenarioTomlText,
+			RequestBody: validScenarioTomlConfig,
 			ContentType: rest.TomlMimeType,
 		},
 		ExpectedResponseStatus: http.StatusOK,
