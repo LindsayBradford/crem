@@ -37,8 +37,7 @@ func TestModelCompressor_Decompress_InitialModel(t *testing.T) {
 	compressorUnderTest.Decompress(compressedModelState, decompressedModel)
 
 	// then
-	g.Expect(decompressedModel.DecisionVariables()).To(Equal(originalModel.DecisionVariables()))
-	g.Expect(decompressedModel.ManagementActions()).To(Equal(originalModel.ManagementActions()))
+	g.Expect(decompressedModel.IsEquivalentTo(originalModel)).To(BeTrue())
 	g.Expect(compressedModelState.MatchesStateOf(originalModel)).To(BeTrue())
 }
 
@@ -47,29 +46,27 @@ func TestModelCompressor_Decompress_AlteredModel(t *testing.T) {
 
 	// given
 	compressorUnderTest := new(ModelCompressor)
+
 	originalModel := buildMultiObjectiveDumbModel()
 
-	modifiedModel := originalModel.DeepClone()
+	modifiedModel := buildMultiObjectiveDumbModel()
 	numberOfRandomChanges := 7
 	for change := 0; change < numberOfRandomChanges; change++ {
 		modifiedModel.DoRandomChange()
 	}
 
-	decompressedModel := originalModel.DeepClone()
+	decompressedModel := buildMultiObjectiveDumbModel()
 
 	// when
 	compressedModifiedModelState := compressorUnderTest.Compress(modifiedModel)
 	compressorUnderTest.Decompress(compressedModifiedModelState, decompressedModel)
 
 	// then
-	// TODO: I don't understand why these break. Investigate.
-	// g.Expect(decompressedModel.DecisionVariables()).To(Not(Equal(originalModel.DecisionVariables())))
-	// g.Expect(decompressedModel.ManagementActions()).To(Not(Equal(originalModel.ManagementActions())))
-	// g.Expect(compressedModifiedModelState.MatchesStateOf(originalModel)).To(BeFalse())
+	g.Expect(originalModel.IsEquivalentTo(modifiedModel)).To(BeFalse())
+	g.Expect(compressedModifiedModelState.MatchesStateOf(originalModel)).To(BeFalse())
 
-	g.Expect(decompressedModel.DecisionVariables()).To(Equal(modifiedModel.DecisionVariables()))
-	g.Expect(decompressedModel.ManagementActions()).To(Equal(modifiedModel.ManagementActions()))
 	g.Expect(compressedModifiedModelState.MatchesStateOf(modifiedModel)).To(BeTrue())
+	g.Expect(decompressedModel.IsEquivalentTo(modifiedModel)).To(BeTrue())
 }
 
 func buildMultiObjectiveDumbModel() *modumb.Model {

@@ -15,6 +15,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	baseParameters "github.com/LindsayBradford/crem/internal/pkg/parameters"
 	"github.com/LindsayBradford/crem/internal/pkg/rand"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/LindsayBradford/crem/pkg/name"
 )
@@ -190,7 +191,10 @@ func (m *Model) ActiveManagementActions() []action.ManagementAction {
 }
 
 func (m *Model) SetManagementAction(index int, value bool) {
-	m.managementActions.SetActivation(index, value)
+	if m.ManagementActions()[index].IsActive() != value {
+		m.managementActions.SetActivation(index, value)
+		m.AcceptChange()
+	}
 }
 
 func (m *Model) SetManagementActionUnobserved(index int, value bool) {
@@ -248,6 +252,44 @@ func (m *Model) noteAppliedManagementAction(actionToNote action.ManagementAction
 
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
-func (m *Model) IsEquivalentTo(model.Model) bool { return false } // TODO: implement
+func (m *Model) IsEquivalentTo(otherModel model.Model) bool {
+	if !m.checkActions(otherModel) {
+		return false
+	}
+	if !m.checkVariables(otherModel) {
+		return false
+	}
+	return true
+}
 
-func (m *Model) SynchroniseTo(model.Model) {} // TODO: implement
+func (m *Model) checkActions(otherModel model.Model) bool {
+	myActions := m.ManagementActions()
+	otherActions := otherModel.ManagementActions()
+	for index := range myActions {
+		assert.That(myActions[index].PlanningUnit() == otherActions[index].PlanningUnit()).Holds()
+		assert.That(myActions[index].Type() == otherActions[index].Type()).Holds()
+
+		if myActions[index].IsActive() != otherActions[index].IsActive() {
+			return false
+		}
+	}
+	return true
+}
+
+func (m *Model) checkVariables(otherModel model.Model) bool {
+	myDecisionVariables := *m.DecisionVariables()
+	for _, variable := range myDecisionVariables {
+		otherVariable := otherModel.DecisionVariable(variable.Name())
+		if variable.Value() != otherVariable.Value() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (m *Model) SynchroniseTo(otherModel model.Model) {
+	for index, action := range otherModel.ManagementActions() {
+		m.SetManagementAction(index, action.IsActive())
+	}
+}
