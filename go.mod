@@ -1,4 +1,8 @@
+// Copyright (c) 2021 Australian Rivers Institute.
+
 module github.com/LindsayBradford/crem
+
+// 	To sync the vendor directory, run:  go mod vendor
 
 go 1.16
 
