@@ -3,19 +3,30 @@
 package variable
 
 import (
-	"bytes"
 	"fmt"
-	"sort"
-
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/math"
 	"github.com/LindsayBradford/crem/pkg/strings"
+	"sort"
+	strings2 "strings"
 )
 
 var currencyConverter = strings.NewConverter().Localised().WithFloatingPointPrecision(2).PaddingZeros()
 var defaultConverter = strings.NewConverter().Localised().WithFloatingPointPrecision(3).PaddingZeros()
 
 type EncodeableDecisionVariables []EncodeableDecisionVariable
+
+const (
+	nameKey                 = "Name"
+	measureKey              = "Measure"
+	valueKey                = "Value"
+	valuePerPlanningUnitKey = "ValuePerPlanningUnit"
+
+	comma      = ","
+	openBrace  = "{"
+	closeBrace = "}"
+)
 
 func (v EncodeableDecisionVariables) Len() int {
 	return len(v)
@@ -91,60 +102,55 @@ func encodeValuesPerPlanningUnit(variable DecisionVariable) PlanningUnitValues {
 }
 
 func (v *EncodeableDecisionVariable) MarshalJSON() ([]byte, error) {
-	// TODO: Code-stink is high.  Scrub this down.
-	buffer := bytes.NewBufferString("{")
+	planningUnitValues := v.deriveFormattedPerPlanningUnitValues()
 
-	var key string
-	var value string
+	perAttributeJson := new(strings.FluentBuilder).
+		Add(openBrace).
+		Add(formatKeyValuePair(nameKey, v.Name)).Add(comma).
+		Add(formatKeyValuePair(measureKey, v.Measure.String())).Add(comma).
+		Add(formatKeyValuePair(valueKey, v.formatMeasureValue(v.Value))).
+		AddIf(v.hasValuesPerPlanningUnit(), comma, formatKeyArrayPair(valuePerPlanningUnitKey, planningUnitValues)).
+		Add(closeBrace).
+		String()
 
-	key = "Name"
-	value = v.Name
-	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", key, value))
+	return []byte(perAttributeJson), nil
+}
 
-	key = "Measure"
-	value = v.Measure.String()
-	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\",", key, value))
+func (v *EncodeableDecisionVariable) deriveFormattedPerPlanningUnitValues() []string {
+	perPlanningUnitValues := make([]string, 0)
+	for _, planningUnitValue := range v.ValuePerPlanningUnit {
+		formattedValue := v.formatPlanningUnitValue(planningUnitValue)
+		perPlanningUnitValues = append(perPlanningUnitValues, formattedValue)
+	}
+	return perPlanningUnitValues
+}
 
-	key = "Value"
+func (v *EncodeableDecisionVariable) formatPlanningUnitValue(planningUnitValue PlanningUnitValue) string {
+	key := planningUnitValue.PlanningUnit.String()
+	formattedValue := v.formatMeasureValue(planningUnitValue.Value)
+	return fmt.Sprintf("{\"PlanningUnit\":\"%s\", \"Value\":\"%s\"}", key, formattedValue)
+}
 
+func (v *EncodeableDecisionVariable) hasValuesPerPlanningUnit() bool {
+	return len(v.ValuePerPlanningUnit) > 0
+}
+
+func (v *EncodeableDecisionVariable) formatMeasureValue(value float64) string {
 	switch v.Measure {
 	case Dollars:
-		value = currencyConverter.Convert(v.Value)
+		return currencyConverter.Convert(value)
 	default:
-		value = defaultConverter.Convert(v.Value)
+		return defaultConverter.Convert(value)
 	}
+	assert.That(false).WithFailureMessage("Should not reach here").Holds()
+	return ""
+}
 
-	buffer.WriteString(fmt.Sprintf("\"%s\":\"%s\"", key, value))
+func formatKeyValuePair(key string, value string) string {
+	return fmt.Sprintf("\"%s\":\"%s\"", key, value)
+}
 
-	if len(v.ValuePerPlanningUnit) > 0 {
-		buffer.WriteString(",")
-		key = "ValuePerPlanningUnit"
-		buffer.WriteString(fmt.Sprintf("\"%s\":[", key))
-
-		length := len(v.ValuePerPlanningUnit)
-		count := 0
-		for _, planningUnitValue := range v.ValuePerPlanningUnit {
-
-			key = planningUnitValue.PlanningUnit.String()
-
-			var formattedPlanningUnitValue string
-			switch v.Measure {
-			case Dollars:
-				formattedPlanningUnitValue = currencyConverter.Convert(planningUnitValue.Value)
-			default:
-				formattedPlanningUnitValue = defaultConverter.Convert(planningUnitValue.Value)
-			}
-
-			buffer.WriteString(fmt.Sprintf("{\"PlanningUnit\":\"%s\", \"Value\":\"%s\"}", key, formattedPlanningUnitValue))
-
-			count++
-			if count < length {
-				buffer.WriteString(",")
-			}
-		}
-		buffer.WriteString("]")
-	}
-
-	buffer.WriteString("}")
-	return buffer.Bytes(), nil
+func formatKeyArrayPair(key string, values []string) string {
+	commaSeparatedValues := strings2.Join(values[:], comma)
+	return fmt.Sprintf("\"%s\": [%s]", key, commaSeparatedValues)
 }

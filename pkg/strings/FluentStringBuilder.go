@@ -18,6 +18,16 @@ func (fb *FluentBuilder) Add(strings ...string) *FluentBuilder {
 	return fb
 }
 
+// AddIf appends the contents of each supplied strings to its buffer, returning a reference to the FluentBuilder,
+// only when shouldAdd is true, allowing a chaining of a number of Add() calls
+func (fb *FluentBuilder) AddIf(shouldAdd bool, strings ...string) *FluentBuilder {
+	if !shouldAdd {
+		return fb
+	}
+	fb.writeStrings(strings...)
+	return fb
+}
+
 // writeStrings appends the contents of each supplied strings to its buffer via the Builder.WriteString() method
 func (fb *FluentBuilder) writeStrings(strings ...string) (int, error) {
 	var fullLength = 0

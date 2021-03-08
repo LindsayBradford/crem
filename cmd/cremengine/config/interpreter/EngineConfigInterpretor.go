@@ -64,8 +64,6 @@ func (i *EngineConfigInterpreter) buildEngine(engineConfig data2.HttpServerConfi
 		WithCacheMaximumAge(engineConfig.CacheMaximumAgeInSeconds).
 		WithLogHandler(ServerLogger).
 		WithStatus(engineStatus)
-
-	// TODO: Job Queue Length?
 }
 
 func buildApiMux(serverConfig data2.HttpServerConfig) *api.Mux {

@@ -25,11 +25,7 @@ func FormattedTimestamp() string {
 	return fmt.Sprintf("%v", time.Now().Format(time.RFC3339Nano))
 }
 
-func NameAndVersionString() string {
-	// TODO:  This should be application specific. Not a general utility function.
-	return fmt.Sprintf("%s, version %s", "Some application name", "<someVersion>")
-}
-
+// Below useful for quick debugging.
 func SendTextOnResponseBody(text string, w http.ResponseWriter) {
 	fmt.Fprintf(w, text)
 }
