@@ -31,17 +31,9 @@ const (
 	DataSourcePath              string = "DataSourcePath"
 
 	RiparianBufferVegetationProportionTarget string = "RiparianBufferVegetationProportionTarget"
-	HillSlopeRevegetationProportionTarget    string = "HillSlopeRevegetationProportionTarget" // TODO: verify if still needed
 	GullySedimentReductionTarget             string = "GullySedimentReductionTarget"
 
 	HillSlopeDeliveryRatio string = "HillSlopeDeliveryRatio"
-
-	RiparianRevegetationCostPerKilometer        string = "RiparianRevegetationCostPerKilometer"
-	GullyRestorationCostPerKilometer            string = "GullyRestorationCostPerKilometer"
-	HillSlopeRestorationCostPerKilometerSquared string = "HillSlopeRestorationCostPerKilometerSquared"
-
-	SedimentProductionDecisionWeight string = "SedimentProductionDecisionWeight"
-	ImplementationCostDecisionWeight string = "ImplementationCostDecisionWeight"
 
 	MaximumSedimentProduction            = "MaximumSedimentProduction"
 	MaximumImplementationCost            = "MaximumImplementationCost"

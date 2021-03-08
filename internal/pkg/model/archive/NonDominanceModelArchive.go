@@ -194,13 +194,13 @@ func (a *NonDominanceModelArchive) ArchiveSummary() Summary {
 }
 
 func (a *NonDominanceModelArchive) SelectRandomModel() *CompressedModelState {
-	// TODO: This is the Engrand approach, and constant time in computational complexity, with unlikely isolation model selection..
+	// This is the Engrand approach, and constant time in computational complexity, with unlikely isolation model selection..
 	fullArchiveRange := len(a.archive)
 	return a.selectRandomModel(fullArchiveRange)
 }
 
 func (a *NonDominanceModelArchive) SelectRandomIsolatedModel(selectionRange int) *CompressedModelState {
-	// TODO: This is Suppapitmarm approach, and archiveSize^2 in computational complexity for good isolation model selection.
+	// This is Suppapitmarm approach, and archiveSize^2 in computational complexity for good isolation model selection.
 	a.calculateArchiveIsolation()
 	sort.Sort(a)
 	return a.selectRandomModel(selectionRange)
@@ -223,7 +223,6 @@ func (a *NonDominanceModelArchive) calculatedModelStateIsolation(state *Compress
 
 func (a *NonDominanceModelArchive) isIsolated(summary Summary, state *CompressedModelState) bool {
 	for index, variableSummary := range summary {
-		// TODO: As these are floats, a precision match might be needed instead?
 		if variableSummary.Minimum == state.Variables[index] {
 			return false
 		}

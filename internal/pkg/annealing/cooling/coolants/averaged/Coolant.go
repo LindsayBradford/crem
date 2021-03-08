@@ -81,9 +81,8 @@ func (c *Coolant) Temperature() float64 {
 	return c.temperature
 }
 
-func (c *Coolant) SetTemperature(temperature float64) error {
+func (c *Coolant) SetTemperature(temperature float64) {
 	c.temperature = temperature
-	return nil // TODO: Why do I need an error return?
 }
 
 func (c *Coolant) CoolingFactor() float64 {

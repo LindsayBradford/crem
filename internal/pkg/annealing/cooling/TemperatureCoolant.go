@@ -11,7 +11,7 @@ type TemperatureCoolant interface {
 	rand.Container
 	parameters.Container
 
-	SetTemperature(temperature float64) error
+	SetTemperature(temperature float64)
 	Temperature() float64
 
 	DecideIfAcceptable(variableChanges []float64) bool

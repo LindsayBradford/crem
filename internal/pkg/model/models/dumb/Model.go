@@ -3,6 +3,7 @@
 package dumb
 
 import (
+	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
@@ -71,7 +72,7 @@ func (m *Model) Initialise() {
 }
 
 func (m *Model) Randomize() {
-	// TODO: deliberately does nothing
+	// deliberately does nothing
 }
 
 func (m *Model) TearDown() {
@@ -164,6 +165,44 @@ func (m *Model) DecisionVariableChange(decisionVariableName string) float64 {
 
 func (m *Model) ChangeIsValid() (bool, *errors.CompositeError) { return true, nil }
 
-func (m *Model) IsEquivalentTo(model.Model) bool { return false } // TODO: implement
+func (m *Model) IsEquivalentTo(otherModel model.Model) bool {
+	if !m.checkActions(otherModel) {
+		return false
+	}
+	if !m.checkVariables(otherModel) {
+		return false
+	}
+	return true
+}
 
-func (m *Model) SynchroniseTo(model.Model) {} // TODO: implement
+func (m *Model) checkActions(otherModel model.Model) bool {
+	myActions := m.ManagementActions()
+	otherActions := otherModel.ManagementActions()
+	for index := range myActions {
+		assert.That(myActions[index].PlanningUnit() == otherActions[index].PlanningUnit()).Holds()
+		assert.That(myActions[index].Type() == otherActions[index].Type()).Holds()
+
+		if myActions[index].IsActive() != otherActions[index].IsActive() {
+			return false
+		}
+	}
+	return true
+}
+
+func (m *Model) checkVariables(otherModel model.Model) bool {
+	myDecisionVariables := *m.DecisionVariables()
+	for _, variable := range myDecisionVariables {
+		otherVariable := otherModel.DecisionVariable(variable.Name())
+		if variable.Value() != otherVariable.Value() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (m *Model) SynchroniseTo(otherModel model.Model) {
+	for index, action := range otherModel.ManagementActions() {
+		m.SetManagementAction(index, action.IsActive())
+	}
+}

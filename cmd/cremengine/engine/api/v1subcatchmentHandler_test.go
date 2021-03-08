@@ -245,8 +245,6 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
-	// TODO: Check altered subcatchment state
-
 	muxUnderTest.Shutdown()
 }
 

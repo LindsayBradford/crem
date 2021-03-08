@@ -79,7 +79,7 @@ func (m *Model) Initialise() {
 }
 
 func (m *Model) Randomize() {
-	// TODO: deliberately does nothing
+	// deliberately does nothing
 }
 
 func (m *Model) buildDecisionVariables() {
