@@ -47,6 +47,8 @@ type Explorer struct {
 	objectiveValueChange float64
 
 	observer.SynchronousAnnealingEventNotifier
+
+	baseAttributes attributes.Attributes
 }
 
 func New() *Explorer {
@@ -65,6 +67,10 @@ func (ke *Explorer) Initialise() {
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
 	ke.Model().Initialise()
 	ke.Model().Randomize()
+
+	ke.baseAttributes = new(attributes.Attributes).
+		Add(ObjectiveValue, ke.ObjectiveValue()).
+		Add(explorer.Temperature, ke.Temperature)
 }
 
 func (ke *Explorer) notifyInitialisation() {
@@ -97,6 +103,10 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 
 	ke.setOptimisationDirectionFromParams()
 	ke.checkDecisionVariableFromParams()
+
+	ke.baseAttributes = new(attributes.Attributes).
+		Add(ObjectiveValue, ke.ObjectiveValue()).
+		Add(explorer.Temperature, ke.Temperature)
 
 	return ke.parameters.ValidationErrors()
 }
@@ -272,31 +282,29 @@ func (ke *Explorer) setAcceptanceProbability(probability float64) {
 }
 
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
-	baseAttributes := new(attributes.Attributes).
-		Add(ObjectiveValue, ke.ObjectiveValue()).
-		Add(explorer.Temperature, ke.Temperature)
-
 	switch eventType {
 	case observer.StartedAnnealing:
-		return new(attributes.Attributes).
-			Add(explorer.Temperature, ke.Temperature).
-			Add(explorer.CoolingFactor, ke.CoolingFactor).
-			Add(ObjectiveValue, ke.ObjectiveValue())
+		return ke.baseAttributes.
+			Replace(ObjectiveValue, ke.ObjectiveValue()).
+			Replace(explorer.Temperature, ke.Temperature).
+			Add(explorer.CoolingFactor, ke.CoolingFactor)
 	case observer.StartedIteration:
-		return new(attributes.Attributes).
-			Add(explorer.Temperature, ke.Temperature).
-			Add(ObjectiveValue, ke.ObjectiveValue())
+		return ke.baseAttributes.
+			Replace(ObjectiveValue, ke.ObjectiveValue()).
+			Replace(explorer.Temperature, ke.Temperature)
 	case observer.FinishedAnnealing:
-		return new(attributes.Attributes).
-			Add(explorer.Temperature, ke.Temperature).
-			Add(ObjectiveValue, ke.ObjectiveValue()).
+		return ke.baseAttributes.
+			Replace(ObjectiveValue, ke.ObjectiveValue()).
+			Replace(explorer.Temperature, ke.Temperature).
 			Add(Solution, *ke.fetchFinalModelSolution())
 	case observer.Explorer:
-		return baseAttributes
+		return ke.baseAttributes.
+			Replace(ObjectiveValue, ke.ObjectiveValue()).
+			Replace(explorer.Temperature, ke.Temperature)
 	case observer.FinishedIteration:
-		return new(attributes.Attributes).
-			Add(explorer.Temperature, ke.Temperature).
-			Add(ObjectiveValue, ke.ObjectiveValue())
+		return ke.baseAttributes.
+			Replace(ObjectiveValue, ke.ObjectiveValue()).
+			Replace(explorer.Temperature, ke.Temperature)
 	}
 	return nil
 }
