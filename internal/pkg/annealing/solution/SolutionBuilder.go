@@ -40,8 +40,7 @@ func (sb *SolutionBuilder) Build() *Solution {
 
 func (sb *SolutionBuilder) transferAttributes() {
 	if attributeContainingModel, hasAttributes := sb.model.(attributes.Interface); hasAttributes {
-		modelAttributes := attributeContainingModel.AllAttributes()
-		sb.solution.JoiningAttributes(modelAttributes)
+		sb.solution.JoiningAttributes(attributeContainingModel.AllAttributes())
 	}
 }
 

@@ -39,6 +39,8 @@ type SimpleAnnealer struct {
 
 	maximumIterations uint64
 	currentIteration  uint64
+
+	baseAttributes attributes.Attributes
 }
 
 func (sa *SimpleAnnealer) Initialise() {
@@ -52,6 +54,10 @@ func (sa *SimpleAnnealer) Initialise() {
 
 	sa.parameters.Initialise()
 	sa.assignStateFromParameters()
+
+	sa.baseAttributes = new(attributes.Attributes).
+		Add(Id, sa.Id()).
+		Add(MaximumIterations, sa.maximumIterations)
 }
 
 func (sa *SimpleAnnealer) SetId(title string) {
@@ -75,6 +81,9 @@ func (sa *SimpleAnnealer) SetParameters(params parameters.Map) error {
 	sa.SolutionExplorer().SetParameters(params)
 
 	sa.assignStateFromParameters()
+
+	sa.baseAttributes = sa.baseAttributes.Replace(MaximumIterations, sa.maximumIterations)
+
 	return sa.parameters.ValidationErrors()
 }
 
@@ -160,35 +169,25 @@ func (sa *SimpleAnnealer) annealingFinished() {
 }
 
 func (sa *SimpleAnnealer) newEvent(eventType observer.EventType) *observer.Event {
-	eventAttributes := sa.EventAttributes(eventType)
-	return observer.NewEvent(eventType).JoiningAttributes(eventAttributes)
+	return observer.NewEvent(eventType).
+		JoiningAttributes(sa.EventAttributes(eventType))
 }
 
 func (sa *SimpleAnnealer) EventAttributes(eventType observer.EventType) attributes.Attributes {
-	baseAttributes := new(attributes.Attributes).
-		Add(Id, sa.Id()).
-		Add(MaximumIterations, sa.maximumIterations).
-		Join(sa.SolutionExplorer().EventAttributes(eventType))
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes
+		return sa.baseAttributes.Join(sa.SolutionExplorer().EventAttributes(eventType))
 	case observer.StartedIteration:
-		return new(attributes.Attributes).
-			Add(Id, sa.Id()).
+		return sa.baseAttributes.
 			Add(CurrentIteration, sa.currentIteration).
-			Add(MaximumIterations, sa.maximumIterations).
 			Join(sa.SolutionExplorer().EventAttributes(eventType))
 	case observer.FinishedIteration:
-		return new(attributes.Attributes).
-			Add(Id, sa.Id()).
+		return sa.baseAttributes.
 			Add(CurrentIteration, sa.currentIteration).
-			Add(MaximumIterations, sa.maximumIterations).
 			Join(sa.SolutionExplorer().EventAttributes(eventType))
 	case observer.FinishedAnnealing:
-		return new(attributes.Attributes).
-			Add(Id, sa.Id()).
+		return sa.baseAttributes.
 			Add(CurrentIteration, sa.currentIteration).
-			Add(MaximumIterations, sa.maximumIterations).
 			Join(sa.SolutionExplorer().EventAttributes(eventType))
 	}
 	return nil

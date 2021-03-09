@@ -17,12 +17,12 @@ func (a *Attributes) Value(name string) interface{} {
 }
 
 func (a Attributes) Entries(entries ...string) Attributes {
-	slice := make(Attributes, 0)
+	slice := make(Attributes, len(entries))
 
 	for _, attribute := range a {
-		for _, entry := range entries {
+		for entryIndex, entry := range entries {
 			if attribute.Name == entry {
-				slice = append(slice, attribute)
+				slice[entryIndex] = attribute
 			}
 		}
 	}
