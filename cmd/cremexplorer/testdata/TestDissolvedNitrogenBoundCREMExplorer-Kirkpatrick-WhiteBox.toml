@@ -8,7 +8,7 @@ ReportEveryNumberOfIterations = 5
 CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
 Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Annealer = "StandardOutput"
+Annealing = "StandardOutput"
 Model = "StandardOutput"
 
 [Annealer]

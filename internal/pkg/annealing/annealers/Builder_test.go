@@ -29,7 +29,7 @@ func TestBuild_OverridingDefaults(t *testing.T) {
 	expectedSolutionExplorer := new(null.Explorer)
 	expectedObservers := []observer.Observer{new(dummyObserver)}
 	expectedId := "someId"
-	expectedEventNotifier := new(observer.ConcurrentAnnealingEventNotifier)
+	expectedEventNotifier := new(observer.SynchronousAnnealingEventNotifier)
 
 	builder := new(Builder)
 

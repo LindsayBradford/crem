@@ -5,7 +5,7 @@ OutputPath="testdata/solutions"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]
-Annealer = "StandardOutput"
+Annealing = "StandardOutput"
 
 [Annealer]
 Type="Kirkpatrick"

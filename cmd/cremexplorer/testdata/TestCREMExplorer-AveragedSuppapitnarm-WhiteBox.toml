@@ -7,7 +7,7 @@ OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 ReportEveryNumberOfIterations = 1
 [Scenario.Reporting.LogLevelDestinations]
 #Debugging = "StandardOutput"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Annealer = "StandardOutput"
+Annealing = "StandardOutput"
 #Model = "StandardOutput"
 
 [Annealer]

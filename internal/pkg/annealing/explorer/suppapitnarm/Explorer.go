@@ -212,7 +212,7 @@ func (ke *Explorer) generatePotentialModel() {
 	ke.note("Creating and Randomizing potential new model off old.")
 	ke.potentialModel.SynchroniseTo(ke.currentModel)
 	ke.potentialModel.Randomize()
-	ke.note(" Finished creating and Randomizing potential new model.")
+	ke.note("Finished creating and Randomizing potential new model.")
 }
 
 func (ke *Explorer) note(note string) {

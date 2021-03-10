@@ -131,51 +131,6 @@ func TestSimpleAnnealer_AddObserver(t *testing.T) {
 	g.Expect(counter.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations))
 }
 
-func TestSimpleAnnealer_ConcurrentEventNotifier(t *testing.T) {
-	g := NewGomegaWithT(t)
-
-	annealer := new(SimpleAnnealer)
-	annealer.Initialise()
-
-	notifier := new(observer.ConcurrentAnnealingEventNotifier)
-	annealer.SetEventNotifier(notifier)
-	g.Expect(annealer.EventNotifier()).To(Equal(notifier))
-
-	const expectedIterations = uint64(3)
-
-	expectedParams := parameters.Map{
-		MaximumIterations: int64(expectedIterations),
-	}
-
-	annealer.SetParameters(expectedParams)
-
-	g.Expect(annealer.Observers()).To(BeNil())
-
-	observerError := annealer.AddObserver(nil)
-	g.Expect(observerError).To(Not(BeNil()))
-
-	counter := new(CountingObserver)
-	counter.eventCounts = make(map[observer.EventType]uint64)
-
-	observerError = annealer.AddObserver(counter)
-
-	g.Expect(observerError).To(BeNil())
-	g.Expect(annealer.Observers()).To(ContainElement(counter))
-
-	annealer.Anneal()
-
-	// Poll on last expected event with gomega's Eventually().  Expect rest to hold (without polling).
-
-	g.Eventually(
-		func() uint64 {
-			return counter.eventCounts[observer.FinishedAnnealing]
-		}).Should(BeNumerically("==", 1))
-
-	g.Expect(counter.eventCounts[observer.StartedAnnealing]).To(BeNumerically("==", 1))
-	g.Expect(counter.eventCounts[observer.StartedIteration]).To(BeNumerically("==", expectedIterations))
-	g.Expect(counter.eventCounts[observer.FinishedIteration]).To(BeNumerically("==", expectedIterations))
-}
-
 type CountingObserver struct {
 	eventCounts map[observer.EventType]uint64
 }

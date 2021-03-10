@@ -7,6 +7,7 @@ import (
 )
 
 type EventNotifier interface {
+	HasObservers() bool
 	AddObserver(observer Observer) error
 	AddObserverAsFirst(observer Observer) error
 	Observers() []Observer
@@ -40,6 +41,10 @@ type SynchronousAnnealingEventNotifier struct {
 	observers []Observer
 }
 
+func (notifier *SynchronousAnnealingEventNotifier) HasObservers() bool {
+	return len(notifier.observers) > 0
+}
+
 func (notifier *SynchronousAnnealingEventNotifier) Observers() []Observer {
 	if len(notifier.observers) == 0 {
 		return nil
@@ -66,55 +71,5 @@ func (notifier *SynchronousAnnealingEventNotifier) AddObserverAsFirst(newObserve
 func (notifier *SynchronousAnnealingEventNotifier) NotifyObserversOfEvent(event Event) {
 	for _, currObserver := range notifier.observers {
 		currObserver.ObserveEvent(event)
-	}
-}
-
-type ConcurrentAnnealingEventNotifier struct {
-	observers        []Observer
-	observerChannels []chan Event
-}
-
-func (notifier *ConcurrentAnnealingEventNotifier) Observers() []Observer {
-	if len(notifier.observers) == 0 {
-		return nil
-	}
-	return notifier.observers
-}
-
-func (notifier *ConcurrentAnnealingEventNotifier) AddObserver(newObserver Observer) error {
-	if newObserver == nil {
-		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
-	}
-
-	notifier.observers = append(notifier.observers, newObserver)
-	return notifier.addObserverToChannels(newObserver)
-}
-
-func (notifier *ConcurrentAnnealingEventNotifier) AddObserverAsFirst(newObserver Observer) error {
-	if newObserver == nil {
-		return errors.New("invalid attempt to add non-existent observer to annealing event notifier")
-	}
-
-	notifier.observers = append([]Observer{newObserver}, notifier.observers...)
-	return notifier.addObserverToChannels(newObserver)
-}
-
-func (notifier *ConcurrentAnnealingEventNotifier) addObserverToChannels(newObserver Observer) error {
-	newEventChannel := make(chan Event)
-	notifier.observerChannels = append(notifier.observerChannels, newEventChannel)
-
-	go func() {
-		for {
-			newEvent := <-newEventChannel
-			newObserver.ObserveEvent(newEvent)
-		}
-	}()
-
-	return nil
-}
-
-func (notifier *ConcurrentAnnealingEventNotifier) NotifyObserversOfEvent(event Event) {
-	for _, observerChannel := range notifier.observerChannels {
-		observerChannel <- event
 	}
 }

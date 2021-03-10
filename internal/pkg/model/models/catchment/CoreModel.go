@@ -517,6 +517,10 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 	if m.initialising {
 		return
 	}
+
+	if !m.HasObservers() {
+		return
+	}
 	event := observer.NewEvent(observer.ManagementAction).
 		WithAttribute("Type", action.Type()).
 		WithAttribute("PlanningUnit", action.PlanningUnit()).
@@ -525,11 +529,19 @@ func (m *CoreModel) noteAppliedManagementAction(action action.ManagementAction) 
 }
 
 func (m *CoreModel) note(text string) {
+	if !m.HasObservers() {
+		return
+	}
+
 	event := observer.NewEvent(observer.Model).WithNote(text)
 	m.NotifyObserversOfEvent(*event)
 }
 
 func (m *CoreModel) noteManagementAction(text string, action action.ManagementAction) {
+	if !m.HasObservers() {
+		return
+	}
+
 	m.managementActionEvent.
 		ReplaceNote(text).
 		ReplacingAttribute("Type", action.Type()).

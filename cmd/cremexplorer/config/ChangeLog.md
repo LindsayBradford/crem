@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.16 (TBD):
+### New Features
+* Many CPU optimisations
+
 ## Version 0.15 (02/12/2020):
 ### New Features
 * Now deploys with Laidley_data_v1_8_3.xlsx (containing updated dissolved nitrogen data)
