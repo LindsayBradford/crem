@@ -49,6 +49,11 @@ func (e *Event) WithNote(text string) *Event {
 	return e
 }
 
+func (e *Event) ReplaceNote(text string) *Event {
+	e.ReplaceAttribute(noteTextKey, text)
+	return e
+}
+
 func (e *Event) Note() string {
 	note := e.Attribute(noteTextKey)
 	if note == nil {
@@ -63,6 +68,11 @@ func (e *Event) HasNote() bool {
 
 func (e *Event) WithAttribute(name string, value interface{}) *Event {
 	e.AddAttribute(name, value)
+	return e
+}
+
+func (e *Event) ReplacingAttribute(name string, value interface{}) *Event {
+	e.ContainedAttributes.ReplaceAttribute(name, value)
 	return e
 }
 

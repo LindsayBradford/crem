@@ -62,6 +62,12 @@ type Explorer struct {
 	objectiveValueChange float64
 
 	observer.SynchronousAnnealingEventNotifier
+	baseAttributes attributes.Attributes
+
+	desirableAcceptanceEvent   *observer.Event
+	undesirableAcceptanceEvent *observer.Event
+	undesirableReversionEvent  *observer.Event
+	noteEvent                  *observer.Event
 }
 
 func New() *Explorer {
@@ -88,6 +94,25 @@ func (ke *Explorer) Initialise() {
 
 	ke.deriveIterationsUntilReturnToBase()
 	ke.currentIteration = 1
+
+	ke.baseAttributes = new(attributes.Attributes).
+		Add(explorer.Temperature, ke.coolant.Temperature()).
+		Add(ArchiveSize, ke.modelArchive.Len())
+
+	ke.desirableAcceptanceEvent = observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Desirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.undesirableAcceptanceEvent = observer.NewEvent(observer.Explorer).
+		WithNote("Accepting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.undesirableReversionEvent = observer.NewEvent(observer.Explorer).
+		WithNote("Reverting Undesirable Change").
+		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+
+	ke.noteEvent = observer.NewEvent(observer.Explorer).
+		WithAttribute(observer.Note.String(), "")
 }
 
 func (ke *Explorer) WithName(name string) *Explorer {
@@ -126,6 +151,10 @@ func (ke *Explorer) SetParameters(params parameters.Map) error {
 
 	ke.returnToBaseStep = float64(ke.parameters.GetInt64(InitialReturnToBaseStep))
 	ke.returnToBaseIsolationFraction = 1
+
+	ke.baseAttributes = new(attributes.Attributes).
+		Add(explorer.Temperature, ke.coolant.Temperature()).
+		Add(ArchiveSize, ke.modelArchive.Len())
 
 	return ke.parameters.ValidationErrors()
 }
@@ -182,15 +211,13 @@ func (ke *Explorer) TryRandomChange() {
 func (ke *Explorer) generatePotentialModel() {
 	ke.note("Creating and Randomizing potential new model off old.")
 	ke.potentialModel.SynchroniseTo(ke.currentModel)
-	//ke.potentialModel.Initialise()
 	ke.potentialModel.Randomize()
 	ke.note(" Finished creating and Randomizing potential new model.")
 }
 
 func (ke *Explorer) note(note string) {
-	noteEvent := observer.NewEvent(observer.Explorer).
-		WithAttribute(observer.Note.String(), note)
-	ke.NotifyObserversOfEvent(*noteEvent)
+	ke.noteEvent.ReplaceAttribute(observer.Note.String(), note)
+	ke.NotifyObserversOfEvent(*ke.noteEvent)
 }
 
 func (ke *Explorer) AcceptOrRevertChange(variableDifferences []float64) {
@@ -215,27 +242,18 @@ func (ke *Explorer) AcceptDesirableChange() {
 }
 
 func (ke *Explorer) notifyDesirableAcceptance() {
-	event := observer.NewEvent(observer.Explorer).
-		WithNote("Accepting Desirable Change").
-		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
-
-	ke.NotifyObserversOfEvent(*event)
+	ke.desirableAcceptanceEvent.ReplaceAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+	ke.NotifyObserversOfEvent(*ke.desirableAcceptanceEvent)
 }
 
 func (ke *Explorer) notifyUndesirableAcceptance() {
-	acceptEvent := observer.NewEvent(observer.Explorer).
-		WithNote("Accepting Undesirable Change").
-		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
-
-	ke.NotifyObserversOfEvent(*acceptEvent)
+	ke.undesirableAcceptanceEvent.ReplaceAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+	ke.NotifyObserversOfEvent(*ke.undesirableAcceptanceEvent)
 }
 
 func (ke *Explorer) notifyUndesirableReversion() {
-	revertEvent := observer.NewEvent(observer.Explorer).
-		WithNote("Reverting Undesirable Change").
-		WithAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
-
-	ke.NotifyObserversOfEvent(*revertEvent)
+	ke.undesirableReversionEvent.ReplaceAttribute(explorer.AcceptanceProbability, ke.coolant.AcceptanceProbability())
+	ke.NotifyObserversOfEvent(*ke.undesirableReversionEvent)
 }
 
 func (ke *Explorer) changeTriedIsDesirable() bool {
@@ -400,19 +418,25 @@ func (ke *Explorer) setAcceptanceProbability(probability float64) {
 }
 
 func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Attributes {
-	baseAttributes := new(attributes.Attributes).
-		Add(explorer.Temperature, ke.coolant.Temperature())
 	switch eventType {
 	case observer.StartedAnnealing:
-		return baseAttributes.Add(explorer.CoolingFactor, ke.coolant.CoolingFactor())
+		return ke.baseAttributes.
+			Replace(explorer.Temperature, ke.coolant.Temperature()).
+			Replace(ArchiveSize, ke.modelArchive.Len()).
+			Add(explorer.CoolingFactor, ke.coolant.CoolingFactor())
 	case observer.StartedIteration:
-		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len())
+		return ke.baseAttributes.
+			Replace(explorer.Temperature, ke.coolant.Temperature()).
+			Replace(ArchiveSize, ke.modelArchive.Len())
 	case observer.FinishedAnnealing:
-		return baseAttributes.Add(ArchiveSize, ke.modelArchive.Len()).
+		return ke.baseAttributes.
+			Replace(explorer.Temperature, ke.coolant.Temperature()).
+			Replace(ArchiveSize, ke.modelArchive.Len()).
 			Add(SolutionSet, ke.modelArchive)
 	case observer.FinishedIteration:
-		return baseAttributes.
-			Add(ArchiveSize, ke.modelArchive.Len()).
+		return ke.baseAttributes.
+			Replace(explorer.Temperature, ke.coolant.Temperature()).
+			Replace(ArchiveSize, ke.modelArchive.Len()).
 			Add(LastReturnedToBase, ke.lastReturnedToBase)
 	}
 	return nil

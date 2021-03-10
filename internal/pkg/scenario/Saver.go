@@ -143,7 +143,6 @@ func (s *Saver) toJson(structure *solution.Solution) string {
 }
 
 func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
-	// s.debugLogSolutionInJson(solution)
 	s.ensureOutputPathIsUsable()
 	s.encodeSolutionSet(solutionSet)
 }

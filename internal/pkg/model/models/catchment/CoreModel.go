@@ -65,6 +65,8 @@ type CoreModel struct {
 	observer.SynchronousAnnealingEventNotifier
 
 	attributes.ContainedAttributes
+
+	managementActionEvent *observer.Event
 }
 
 func (m *CoreModel) WithName(name string) *CoreModel {
@@ -131,6 +133,13 @@ func (m *CoreModel) Initialise() {
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
 	m.InitialiseActions()
+
+	firstAction := m.ManagementActions()[0]
+	m.managementActionEvent = observer.NewEvent(observer.Model).
+		WithNote("").
+		WithAttribute("Type", firstAction.Type()).
+		WithAttribute("PlanningUnit", firstAction.PlanningUnit()).
+		WithAttribute("IsActive", firstAction.IsActive())
 }
 
 func (m *CoreModel) fetchCsvTable(tableName string) tables.CsvTable {
@@ -521,12 +530,13 @@ func (m *CoreModel) note(text string) {
 }
 
 func (m *CoreModel) noteManagementAction(text string, action action.ManagementAction) {
-	event := observer.NewEvent(observer.Model).
-		WithNote(text).
-		WithAttribute("Type", action.Type()).
-		WithAttribute("PlanningUnit", action.PlanningUnit()).
-		WithAttribute("IsActive", action.IsActive())
-	m.NotifyObserversOfEvent(*event)
+	m.managementActionEvent.
+		ReplaceNote(text).
+		ReplacingAttribute("Type", action.Type()).
+		ReplacingAttribute("PlanningUnit", action.PlanningUnit()).
+		ReplaceAttribute("IsActive", action.IsActive())
+
+	m.NotifyObserversOfEvent(*m.managementActionEvent)
 }
 
 func (m *CoreModel) ObserveDecisionVariable(variable variable.DecisionVariable) {
