@@ -42,8 +42,7 @@ func (a Attributes) Join(attributes Attributes) Attributes {
 func (a Attributes) Rename(oldName string, newName string) Attributes {
 	for index, attrib := range a {
 		if attrib.Name == oldName {
-			newEntry := NameValuePair{Name: newName, Value: attrib.Value}
-			a[index] = newEntry
+			a[index].Name = newName
 		}
 	}
 	return a
@@ -69,8 +68,7 @@ func (a Attributes) Remove(name string) Attributes {
 func (a Attributes) Replace(name string, value interface{}) Attributes {
 	for index, attrib := range a {
 		if attrib.Name == name {
-			newEntry := NameValuePair{Name: name, Value: value}
-			a[index] = newEntry
+			a[index].Value = value
 		}
 	}
 	return a
