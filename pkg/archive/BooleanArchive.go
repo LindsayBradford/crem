@@ -6,11 +6,9 @@ package archive
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/pkg/errors"
 	"math"
 	"strconv"
-	"sync"
-
-	"github.com/pkg/errors"
 )
 
 const entriesPerArchiveEntry = 64
@@ -19,7 +17,6 @@ const entriesPerArchiveEntry = 64
 type BooleanArchive struct {
 	size int
 
-	cacheMutex  sync.Mutex
 	detailCache entryDetail
 
 	archiveArray []uint64
@@ -61,9 +58,6 @@ func (a *BooleanArchive) SetValue(entryIndex int, value bool) {
 		panic(outOfBoundsError)
 	}
 
-	a.cacheMutex.Lock()
-	defer a.cacheMutex.Unlock()
-
 	entry := a.deriveDetail(entryIndex)
 
 	if entry.value == value {
@@ -85,9 +79,6 @@ func (a *BooleanArchive) Value(entryIndex int) bool {
 		outOfBoundsError := errors.New("index out of range")
 		panic(outOfBoundsError)
 	}
-
-	a.cacheMutex.Lock()
-	defer a.cacheMutex.Unlock()
 
 	return a.deriveDetail(entryIndex).value
 }
