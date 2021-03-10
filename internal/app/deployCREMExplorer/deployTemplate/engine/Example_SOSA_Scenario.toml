@@ -14,7 +14,7 @@ ReportEveryNumberOfIterations = 10_000
 Type = "NativeLibrary"                                  # "NativeLibrary" (Default) | "BareBones"
 Formatter = "RawMessage"                                # "RawMessage" (Default) | "JSON" | "NameValuePair"
 [Scenario.Reporting.LogLevelDestinations]
-Annealer = "StandardOutput"                             # "Discarded"  | "StandardOutput" (Default) | "StandardError"
+Annealing = "StandardOutput"                            # "Discarded"  | "StandardOutput" (Default) | "StandardError"
 Debugging = "Discarded"                                 # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Information = "StandardOutput"                          # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
 Warnings = "StandardOutput"                             # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
