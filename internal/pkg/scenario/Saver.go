@@ -7,6 +7,7 @@ import (
 	solutionset "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
 	encoding2 "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding"
 	"os"
+	"sync"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
@@ -36,6 +37,8 @@ type Saver struct {
 	decompressionModel model.Model
 	outputType         encoding.OutputType
 	outputPath         string
+
+	decompressionMutex sync.Mutex
 }
 
 func NewSaver() *Saver {
@@ -163,6 +166,9 @@ func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) 
 }
 
 func (s *Saver) deriveASsIsSolution(solutionSet archive.NonDominanceModelArchive) *solution.Solution {
+	s.decompressionMutex.Lock()
+	defer s.decompressionMutex.Unlock()
+
 	s.decompressionModel.Initialise()
 	asIsSolutionId := s.deriveAsIsSolutionId(solutionSet)
 
@@ -184,21 +190,17 @@ func (s *Saver) deriveModelSolution(solutionSet archive.NonDominanceModelArchive
 }
 
 func (s *Saver) deriveSolutionFrom(solutionSet archive.NonDominanceModelArchive, compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
-	decompressedModel := s.decompress(solutionSet, compressedModel)
+	s.decompressionMutex.Lock()
+	defer s.decompressionMutex.Unlock()
+
+	solutionSet.Decompress(compressedModel, s.decompressionModel)
 
 	decompressedModelSolution := new(solution.SolutionBuilder).
 		WithId(solutionId).
-		ForModel(decompressedModel).
+		ForModel(s.decompressionModel).
 		Build()
 
 	return decompressedModelSolution
-}
-
-func (s *Saver) decompress(solutionSet archive.NonDominanceModelArchive, compressedModel *archive.CompressedModelState) model.Model {
-	decompressedModel := s.decompressionModel.DeepClone()
-	decompressedModel.Initialise()
-	solutionSet.Decompress(compressedModel, decompressedModel)
-	return decompressedModel
 }
 
 func (s *Saver) deriveSolutionId(solutionSet archive.NonDominanceModelArchive, currentSolution int) string {
