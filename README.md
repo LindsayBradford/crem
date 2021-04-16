@@ -9,7 +9,7 @@
 This repository produces two key applications:
 
 - The [CREMExplorer](https://github.com/LindsayBradford/crem/blob/master/cmd/cremexplorer)
-- The [CREMEngine](https://github.com/LindsayBradford/crem/blob/master/cmd/cremexplorer)
+- The [CREMEngine](https://github.com/LindsayBradford/crem/blob/master/cmd/cremengine)
 
 Both applications are configured via [TOML](https://github.com/toml-lang/toml) files, based on
 a '[convention over configuration](https://en.wikipedia.org/wiki/Convention_over_configuration)' approach.
@@ -31,8 +31,7 @@ tracks the following stakeholder objectives:
 - Management Action Opportunity Cost
 
 This river catchment model allows management actions to be applied in order to mitigate pollutants entering a river
-system:
-The following management actions have been implemented:
+system. The following management actions have been implemented:
 
 - Riparian revegetation
     - predominately targeting sediment and particulate nitrogen
@@ -44,7 +43,7 @@ The following management actions have been implemented:
     - predominately targeting dissolved nitrogen
 
 [Single-objective simulated annealing](https://github.com/LindsayBradford/crem/blob/master/internal/pkg/annealing/explorer/kirkpatrick)
-is used to find optimal solutions to minimising/maximising a particular stakeholder objective, optionally limited by a
+is used to find optimised solutions to minimising/maximising a particular stakeholder objective, optionally limited by a
 2nd objective. For instance, a scenario can be configured to answer a question like "Find a near-optimal minimised
 sediment producted for a budget of $10M in implementation costs."
 
@@ -56,7 +55,7 @@ costs"
 
 ### CREMEngine:
 
-The [CREMEngine](https://github.com/LindsayBradford/crem/blob/master/cmd/cremexplorer) wraps the river catchment model
+The [CREMEngine](https://github.com/LindsayBradford/crem/blob/master/cmd/cremengine) wraps the river catchment model
 described above in a web-server interface, allowing the following:
 
 - The river catchment model can be deployed independent of the annealing, and manipulated it in real-time for
