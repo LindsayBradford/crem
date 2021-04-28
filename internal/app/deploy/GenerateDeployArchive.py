@@ -17,7 +17,7 @@ def deriveConfiguration():
     baseExplorerName = f'{baseArchiveName}Explorer'
     baseEngineName = f'{baseArchiveName}Engine'
 
-    targetTemplateDir = './deployTemplate'
+    targetTemplateDir = './template'
     return {
         'versionNumber': 'v0.3',
         
@@ -25,7 +25,7 @@ def deriveConfiguration():
         'explorerSourceDir': explorerSourceDir,
 
         'targetTemplateDir': targetTemplateDir,
-        'targetDir': './deploy',
+        'targetDir': './archive',
 
         'sourceExplorerChangeLog': f'{explorerSourceDir}/config/ChangeLog.md',
         'targetExplorerChangeLog': f'{targetTemplateDir}/explorer/ChangeLog.md',

@@ -1,0 +1,458 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0",
+        "title": "CREMEngine",
+        "license": {
+            "name": "BSD-3"
+        }
+    },
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "paths": {
+        "/status": {
+            "get": {
+                "summary": "Details on the server's current state",
+                "tags": [
+                    "admin",
+                    "status"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details about the server's state",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/shutdown": {
+            "post": {
+                "summary": "Trigger server shutdown",
+                "tags": [
+                    "admin",
+                    "status"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details about the server's state",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServerStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/scenario": {
+            "get": {
+                "description": "Details on the current state of the engine's scenario",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's scenario as described by its configuration",
+                        "content": {
+                            "application/toml": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Upload a new scenario for the engine",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/toml": {}
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Confirmation that the posted scenrario wsa acceppted and now the scenario of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the posted scenario was somehow invalid, and will not be used as the scenario of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Notification that the posted scenario data cannot be processed, and therefore not used as the scenario of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/model": {
+            "get": {
+                "summary": "Details on the current state of the engine's catchment model",
+                "tags": [
+                    "model",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's catchment model",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatchmentModel"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },    
+        "/api/v1/model/actions": {
+            "get": {
+                "summary": "Details on the current state of the engine's catchment model",
+                "tags": [
+                    "model",
+                    "actions",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's catchment model's active management actions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActiveManagementActionsModel"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Upload a new combination of active managemnet actions for an active scenarion in the engine",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "requestBody": {
+                    "content": {
+                        "text/csv": {} 
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Confirmation that the posted active management state wsa acceppted and now action state for the active scenario of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the posted active management state was somehow invalid, and will not be used as in altering scenario state of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification that no mudel running in the engine for which to apply the management acttion detail supplied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Notification that the posted scenario data cannot be processed, and therefore not usable as the scenario of the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/model/subcatchment/{{subcatchmentId}}": {
+            "get": {
+                "summary": "Details on the current state of the engine's catchment model's selected subcaatchment",
+                "tags": [
+                    "model",
+                    "actions",
+                    "subcatchment",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's catchment model's active management actions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ManagementActionStateArray"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification that the subcatchment specified doesn't exist for the current mudel running in the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Upload a new combination of active managemnet actions for an active scenarion in the engine",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ManagementActionStateArray"
+                            }
+                        } 
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Confirmation that the management action state supplied for the specified subcatchmant was accepted as the new state for the running engine model",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the management action state supplied was invalid, leaving the running model state unchagned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification that the subcatchment specified doesn't exist for the current mudel running in the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ServerStatus": {
+                "properties": {
+                    "ServiceName": {
+                        "type": "string"
+                    },
+                    "Version": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "Status": {
+                        "type": "string"
+                    },
+                    "Time": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "ResponseSummary": {
+                "properties": {
+                    "Type": {
+                        "type": "string"
+                    },
+                    "Message": {
+                        "type": "string"
+                    },
+                    "Time": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "CatchmentModel": {
+                "required": [
+                    "Id",
+                    "DecisionVariables",
+                    "ActiveManagementActions"
+                ],
+                "properties": {
+                    "Id": {
+                        "type": "string"
+                    },
+                    "DecisionVariables": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DecisionVariable"
+                        }
+                    },
+                    "ActievManagementActions": {
+                        "$ref": "#/components/schemas/ActiveManagementActionsMap"
+                    }
+                }
+            },
+            "DecisionVariable": {
+                "required": [
+                    "Name",
+                    "Measure",
+                    "Value",
+                    "ValuesPerPlanningUnit"
+                ],
+                "properties": {
+                    "Name": {
+                        "type": "string"
+                    },
+                    "Measure": {
+                        "type": "string"
+                    },
+                    "Value": {
+                        "type": "string",
+                        "pattern": "^/d*\\./d*$"
+                    },
+                    "ValuesPerPlanningUnit": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DecisionVariablAtPlanningUnit"
+                        }
+                    }
+                }
+            },
+            "DecisionVariablAtPlanningUnit": {
+                "type": "object",
+                "required": [
+                    "PlanningUnit",
+                    "Value"
+                ],
+                "properties": {
+                    "PlanningUnit": {
+                        "type": "string",
+                        "pattern": "^/d*$"
+                    },
+                    "Value": {
+                        "type": "string",
+                        "pattern": "^/d*\\./d*$"
+                    }
+                }
+            },
+            "ActiveManagementActionsMap": {
+                "type": "object",
+                "properties": {
+                    "itemType": {
+                        "$ref": "#/components/schemas/ManagementActionArray"
+                    },
+                    "itemCount": {
+                        "$ref": "#/components/schemas/ManagementActionArray"
+                    }
+                }
+            },
+            "ManagementActionArray": {
+                "type": "object",
+                "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                        "enum": ["RiverBankRestoration", "GullyRepair", "HillSlopeRestoration", "WetlandsEstablishment"]
+                    }
+                }
+            },
+            "ActiveManagementActionsModel": {
+                "required": [
+                    "ActiveManagementActions"
+                ],
+                "properties": {
+                    "ActievManagementActions": {
+                        "$ref": "#/components/schemas/ActiveManagementActionsMap"
+                    }
+                }
+            },
+            "ManagementActionStateArray": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/MangementActionState"
+                }
+            },
+            "MangementActionState": {
+                "type": "object",
+                "required": [
+                    "Name",
+                    "Value"
+                ],
+                "properties": {
+                    "Name": {
+                        "type": "string",                 
+                        "enum": ["RiverBankRestoration", "GullyRepair", "HillSlopeRestoration", "WetlandsEstablishment"]
+                    },
+                    "Value": {
+                        "type": "string",
+                        "enum": ["Active", "Inactive"]
+                    }
+                }
+            }
+        }
+    }
+}
