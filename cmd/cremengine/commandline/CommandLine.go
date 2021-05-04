@@ -3,6 +3,7 @@
 package commandline
 
 import (
+	_ "embed"
 	"flag"
 	"fmt"
 	"os"
@@ -12,6 +13,9 @@ import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/config"
 	"github.com/pkg/errors"
 )
+
+//go:embed LICENCE.md
+var licence string
 
 // ParseArguments processes the command-line arguments supplied
 // to the utility and returns a populated Arguments struct containing
@@ -28,6 +32,7 @@ func ParseArguments() *Arguments {
 
 type Arguments struct {
 	Version          bool
+	Licence          bool
 	EngineConfigFile string
 	ScenarioFile     string
 	SolutionFile     string
@@ -50,6 +55,13 @@ func (args *Arguments) define() {
 		"Version",
 		false,
 		"Prints the version number of this utility and exits.",
+	)
+
+	flag.BoolVar(
+		&args.Licence,
+		"Licence",
+		false,
+		"Prints the copyright licence under which this software is released.",
 	)
 
 	flag.StringVar(
@@ -84,6 +96,13 @@ func (args *Arguments) process() {
 	if args.Version == true {
 		fmt.Println(
 			GetVersionString(),
+		)
+		Exit(0)
+	}
+
+	if args.Licence == true {
+		fmt.Println(
+			GetLicenceString(),
 		)
 		Exit(0)
 	}
@@ -148,6 +167,7 @@ func usageMessage() {
 	fmt.Printf("Usage of %s\n", GetVersionString())
 	fmt.Println("  --Help                          Prints this help message.")
 	fmt.Println("  --Version                       Prints the version number of this utility.")
+	fmt.Println("  --Licence                       Prints the copyright licence of this utility.")
 	fmt.Println("  --EngineConfigFile  <FilePath>  File describing the engine run-time behaviour.")
 	fmt.Println()
 	fmt.Println("  --ScenarioFile  <FilePath>      File describing a scenario to run and its  run-time behaviour.")
@@ -161,6 +181,10 @@ func usageMessage() {
 
 func GetVersionString() string {
 	return fmt.Sprintf("%s v%s (%s)", justExecutableName(), config.Version, runtime.Version())
+}
+
+func GetLicenceString() string {
+	return fmt.Sprintf("%s", licence)
 }
 
 func justExecutableName() string {
