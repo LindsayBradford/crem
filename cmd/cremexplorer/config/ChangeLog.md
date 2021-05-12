@@ -3,6 +3,7 @@
 ## Version 0.16 (TBD):
 ### New Features
 * Many CPU optimisations
+* MOSA solution summary now has a summary per solution with free-form text describing that solution.  
 
 ## Version 0.15 (02/12/2020):
 ### New Features

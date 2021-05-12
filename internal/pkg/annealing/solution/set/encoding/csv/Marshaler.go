@@ -3,6 +3,7 @@
 package csv
 
 import (
+	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
 	"github.com/LindsayBradford/crem/pkg/strings"
@@ -15,14 +16,16 @@ import (
 // https://tools.ietf.org/html/rfc4180
 
 const (
-	idHeading = "Solution"
-	separator = ", "
-	newline   = "\n"
+	idHeading      = "Solution"
+	summaryHeading = "Summary"
+	separator      = ", "
+	newline        = "\n"
 )
 
-var variableHeadings = []string{idHeading}
-
-var defaultConverter = strings.NewConverter().WithFloatingPointPrecision(3).PaddingZeros()
+var (
+	variableHeadings = []string{idHeading}
+	defaultConverter = strings.NewConverter().WithFloatingPointPrecision(3).PaddingZeros()
+)
 
 type SummaryMarshaler struct{}
 
@@ -35,12 +38,6 @@ func (cm *SummaryMarshaler) marshalSummary(summary *set.Summary) ([]byte, error)
 	return csvStringAsBytes, nil
 }
 
-var numberMatcher *regexp.Regexp
-
-func init() {
-	numberMatcher = regexp.MustCompile(`(\d+) of `)
-}
-
 type sortableSummaries []string
 
 func (v sortableSummaries) Len() int {
@@ -50,6 +47,8 @@ func (v sortableSummaries) Len() int {
 func (v sortableSummaries) Swap(i, j int) {
 	v[i], v[j] = v[j], v[i]
 }
+
+var numberMatcher = regexp.MustCompile(`(\d+) of `)
 
 func (v sortableSummaries) Less(i, j int) bool {
 	const indexOfNumberMatch = 1
@@ -79,9 +78,10 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 		Add(newline)
 
 	summarySet := make([]string, 0)
-	for id, variables := range *summary {
+	for id, solutionSummary := range *summary {
 		trimmedId := trimId(id)
-		summarySet = append(summarySet, joinAttributes(trimmedId, variables))
+		note := deriveNoteFor(id, solutionSummary)
+		summarySet = append(summarySet, joinAttributes(trimmedId, solutionSummary, note))
 	}
 
 	sort.Sort(sortableSummaries(summarySet))
@@ -95,12 +95,15 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 
 func deriveHeaders(summary *set.Summary) []string {
 	exampleVariables := justSomeVariables(summary)
-	headers := make([]string, len(exampleVariables)+1)
+
+	headingNumber := len(exampleVariables) + 2
+	headers := make([]string, headingNumber)
 
 	headers[0] = idHeading
 	for index, variable := range exampleVariables {
 		headers[index+1] = variable.Name
 	}
+	headers[headingNumber-1] = summaryHeading
 
 	return headers
 }
@@ -112,9 +115,9 @@ func justSomeVariables(summary *set.Summary) []solution.VariableSummary {
 	return nil
 }
 
-func joinAttributes(id string, variables []solution.VariableSummary) string {
+func joinAttributes(id string, variables []solution.VariableSummary, note string) string {
 	joinedVariableValues := join(variableValueList(variables)...)
-	joinedAttributes := join(id, joinedVariableValues)
+	joinedAttributes := join(id, joinedVariableValues, note)
 	return joinedAttributes
 }
 
@@ -137,14 +140,30 @@ func trimId(id string) string {
 	return trimNumberedId(id)
 }
 
+var membershipMatcher = regexp.MustCompile("\\((\\d+)/(\\d+)\\)")
+
+func deriveNoteFor(id string, solutionSummary solution.Summary) string {
+	if strings2.Contains(id, "As-Is") {
+		return "Zero active management actions. Not a member of the pareto front."
+	}
+
+	member := membershipMatcher.FindStringSubmatch(id)
+
+	formattedNote := fmt.Sprintf("Pareto front member %s of %s", member[1], member[2])
+	return formattedNote
+}
+
 func trimAsIsId(id string) string {
 	return "As-Is"
 }
 
+var (
+	iterationMatcher  = regexp.MustCompile("\\d+/\\d+")
+	prettifiedMatcher = regexp.MustCompile("/")
+)
+
 func trimNumberedId(id string) string {
-	iterationMatcher := regexp.MustCompile("\\d+/\\d+")
 	trimmedId := iterationMatcher.FindString(id)
-	prettifiedMatcher := regexp.MustCompile("/")
 	prettifiedId := prettifiedMatcher.ReplaceAllString(trimmedId, " of ")
 
 	return prettifiedId
