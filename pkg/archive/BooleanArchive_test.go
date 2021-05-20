@@ -205,3 +205,49 @@ func TestBooleanArchive_IsEquivalentTo_InvalidTest(t *testing.T) {
 
 	g.Expect(baseArchiveUnderTest.IsEquivalentTo(differentlySizedArchiveUnderTest)).To(BeFalse())
 }
+
+func TestBooleanArchive_Encoding(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	expectedSize := 100
+	archiveUnderTest := New(expectedSize)
+
+	expectedDefaultEncoding := "0000000000000000:0000000000000000"
+
+	encoding := archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal(expectedDefaultEncoding))
+
+	archiveUnderTest.SetValue(0, true)
+	encoding = archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal("0000000000000001:0000000000000000"))
+
+	archiveUnderTest.SetValue(64, true)
+	encoding = archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal("0000000000000001:0000000000000001"))
+
+	expectedThreeValueEncoding := "8000000000000001:0000000000000001"
+	archiveUnderTest.SetValue(63, true)
+	threeValueEncoding := archiveUnderTest.Encoding()
+	t.Log(threeValueEncoding)
+	g.Expect(threeValueEncoding).To(Equal(expectedThreeValueEncoding))
+
+	archiveUnderTest.Decode(expectedDefaultEncoding)
+	encoding = archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal(expectedDefaultEncoding))
+
+	archiveUnderTest.Decode(expectedThreeValueEncoding)
+	encoding = archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
+
+	// TODO: uncomment when masking out invalid bits is a thing.
+	//outOfBoundsEncoding := "8000000000000001:8000000000000001"
+	//archiveUnderTest.Decode(outOfBoundsEncoding)
+	//encoding = archiveUnderTest.Encoding()
+	//t.Log(encoding)
+	//g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
+}

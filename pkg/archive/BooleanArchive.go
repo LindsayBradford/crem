@@ -6,9 +6,11 @@ package archive
 import (
 	"crypto/sha256"
 	"fmt"
+	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/pkg/errors"
 	"math"
 	"strconv"
+	strings2 "strings"
 )
 
 const entriesPerArchiveEntry = 64
@@ -21,6 +23,7 @@ type BooleanArchive struct {
 
 	archiveArray []uint64
 	sha256       string
+	encoding     string
 }
 
 type entryDetail struct {
@@ -71,6 +74,8 @@ func (a *BooleanArchive) SetValue(entryIndex int, value bool) {
 	} else {
 		a.archiveArray[arrayIndex] = a.archiveArray[arrayIndex] - entry.mask
 	}
+
+	a.resetCache()
 }
 
 // Value retrieves the boolean value stored at the requested entryIndex of the archive.
@@ -119,6 +124,47 @@ func (a *BooleanArchive) Sha256() string {
 	a.sha256 = fmt.Sprintf("%x", sha256OfArchive)
 
 	return a.sha256
+}
+
+func (a *BooleanArchive) Encoding() string {
+	if a.encoding != "" {
+		return a.encoding
+	}
+
+	builder := new(strings.FluentBuilder)
+
+	for index, entry := range a.archiveArray {
+		builder.AddIf(index > 0, ":")
+		builder.Add(fmt.Sprintf("%016X", entry))
+	}
+
+	a.encoding = builder.String()
+	return a.encoding
+}
+
+func (a *BooleanArchive) Decode(encoding string) error {
+	entries := strings2.Split(encoding, ":")
+	if len(entries) != a.ArchiveLen() {
+		return errors.New("wrong number of encoding entries")
+	}
+
+	for index, entry := range entries {
+		entryAsInt, parseError := strconv.ParseUint(entry, 16, 64)
+		if parseError != nil {
+			return parseError
+		}
+		a.archiveArray[index] = entryAsInt
+	}
+
+	// TODO: mask out the range of unused entries (AND mask the valid value range).
+
+	a.resetCache()
+	return nil
+}
+
+func (a *BooleanArchive) resetCache() {
+	a.sha256 = ""
+	a.encoding = ""
 }
 
 func archiveArrayAsByteArray(arrayInt []uint64) []byte {
