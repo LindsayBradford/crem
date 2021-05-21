@@ -244,10 +244,9 @@ func TestBooleanArchive_Encoding(t *testing.T) {
 	t.Log(encoding)
 	g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
 
-	// TODO: uncomment when masking out invalid bits is a thing.
-	//outOfBoundsEncoding := "8000000000000001:8000000000000001"
-	//archiveUnderTest.Decode(outOfBoundsEncoding)
-	//encoding = archiveUnderTest.Encoding()
-	//t.Log(encoding)
-	//g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
+	outOfBoundsEncoding := "8000000000000001:8000000000000001"
+	archiveUnderTest.Decode(outOfBoundsEncoding)
+	encoding = archiveUnderTest.Encoding()
+	t.Log(encoding)
+	g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
 }

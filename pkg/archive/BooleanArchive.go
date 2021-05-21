@@ -60,7 +60,12 @@ func (a *BooleanArchive) SetValue(entryIndex int, value bool) {
 		outOfBoundsError := errors.New("index out of range")
 		panic(outOfBoundsError)
 	}
+	a.setValueUnchecked(entryIndex, value)
+	a.resetCache()
+}
 
+// SetValue stores the supplied boolean value in the archive at entryIndex.
+func (a *BooleanArchive) setValueUnchecked(entryIndex int, value bool) {
 	entry := a.deriveDetail(entryIndex)
 
 	if entry.value == value {
@@ -74,8 +79,6 @@ func (a *BooleanArchive) SetValue(entryIndex int, value bool) {
 	} else {
 		a.archiveArray[arrayIndex] = a.archiveArray[arrayIndex] - entry.mask
 	}
-
-	a.resetCache()
 }
 
 // Value retrieves the boolean value stored at the requested entryIndex of the archive.
@@ -143,23 +146,44 @@ func (a *BooleanArchive) Encoding() string {
 }
 
 func (a *BooleanArchive) Decode(encoding string) error {
-	entries := strings2.Split(encoding, ":")
-	if len(entries) != a.ArchiveLen() {
-		return errors.New("wrong number of encoding entries")
+	entries, decodeEntriesError := a.deriveStringEncodingsOfArrayEntries(encoding)
+	if decodeEntriesError != nil {
+		return decodeEntriesError
 	}
 
+	parseError := a.parseEntriesIntoArrayValues(entries)
+	if parseError != nil {
+		return parseError
+	}
+	a.zeroOutUnusedArrayEntries()
+	a.resetCache()
+	return nil
+}
+
+func (a *BooleanArchive) parseEntriesIntoArrayValues(entries []string) error {
 	for index, entry := range entries {
-		entryAsInt, parseError := strconv.ParseUint(entry, 16, 64)
+		entryAsInt, parseError := strconv.ParseUint(entry, 16, 64) // 64-bit hexidecimal encoding expected
 		if parseError != nil {
 			return parseError
 		}
 		a.archiveArray[index] = entryAsInt
 	}
-
-	// TODO: mask out the range of unused entries (AND mask the valid value range).
-
-	a.resetCache()
 	return nil
+}
+
+func (a *BooleanArchive) deriveStringEncodingsOfArrayEntries(encoding string) ([]string, error) {
+	entries := strings2.Split(encoding, ":")
+	if len(entries) != a.ArchiveLen() {
+		return nil, errors.New("wrong number of encoding entries")
+	}
+	return entries, nil
+}
+
+func (a *BooleanArchive) zeroOutUnusedArrayEntries() {
+	lastPossibleArrayIndex := len(a.archiveArray)*entriesPerArchiveEntry - 1
+	for indexToClear := a.size; indexToClear <= lastPossibleArrayIndex; indexToClear++ {
+		a.setValueUnchecked(indexToClear, false)
+	}
 }
 
 func (a *BooleanArchive) resetCache() {
