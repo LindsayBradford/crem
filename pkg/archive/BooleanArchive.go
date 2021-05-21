@@ -138,7 +138,7 @@ func (a *BooleanArchive) Encoding() string {
 
 	for index, entry := range a.archiveArray {
 		builder.AddIf(index > 0, ":")
-		builder.Add(fmt.Sprintf("%016X", entry))
+		builder.Add(fmt.Sprintf("%X", entry))
 	}
 
 	a.encoding = builder.String()

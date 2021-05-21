@@ -9,7 +9,12 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const equalTo = "=="
+const (
+	equalTo = "=="
+
+	expectedDefaultEncoding        = "0:0"
+	expectedBoundaryValuesEncoding = "8000000000000001:1"
+)
 
 func TestBooleanArchive_New(t *testing.T) {
 	g := NewGomegaWithT(t)
@@ -206,47 +211,117 @@ func TestBooleanArchive_IsEquivalentTo_InvalidTest(t *testing.T) {
 	g.Expect(baseArchiveUnderTest.IsEquivalentTo(differentlySizedArchiveUnderTest)).To(BeFalse())
 }
 
-func TestBooleanArchive_Encoding(t *testing.T) {
+func TestBooleanArchive_EncodingDefault_Success(t *testing.T) {
 	g := NewGomegaWithT(t)
+
+	// given
 
 	expectedSize := 100
 	archiveUnderTest := New(expectedSize)
 
-	expectedDefaultEncoding := "0000000000000000:0000000000000000"
-
+	// when
 	encoding := archiveUnderTest.Encoding()
 	t.Log(encoding)
+
+	// then
+
 	g.Expect(encoding).To(Equal(expectedDefaultEncoding))
+}
+
+func TestBooleanArchive_Encoding_DelimiterBoundariesCorrect(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+
+	expectedSize := 100
+	archiveUnderTest := New(expectedSize)
+
+	// when
 
 	archiveUnderTest.SetValue(0, true)
-	encoding = archiveUnderTest.Encoding()
-	t.Log(encoding)
-	g.Expect(encoding).To(Equal("0000000000000001:0000000000000000"))
+	encodingUnderTest := archiveUnderTest.Encoding()
+
+	// then
+
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal("1:0"))
+
+	// when
 
 	archiveUnderTest.SetValue(64, true)
-	encoding = archiveUnderTest.Encoding()
-	t.Log(encoding)
-	g.Expect(encoding).To(Equal("0000000000000001:0000000000000001"))
+	encodingUnderTest = archiveUnderTest.Encoding()
 
-	expectedThreeValueEncoding := "8000000000000001:0000000000000001"
+	// then
+
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal("1:1"))
+
+	// when
+
 	archiveUnderTest.SetValue(63, true)
 	threeValueEncoding := archiveUnderTest.Encoding()
+
+	// then
+
 	t.Log(threeValueEncoding)
-	g.Expect(threeValueEncoding).To(Equal(expectedThreeValueEncoding))
+	g.Expect(threeValueEncoding).To(Equal(expectedBoundaryValuesEncoding))
+}
+
+func TestBooleanArchive_Decode_Success(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+
+	expectedSize := 100
+	archiveUnderTest := New(expectedSize)
+
+	// when
+
+	archiveUnderTest.Decode(expectedBoundaryValuesEncoding)
+	encodingUnderTest := archiveUnderTest.Encoding()
+
+	// then
+
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal(expectedBoundaryValuesEncoding))
+
+	// when
 
 	archiveUnderTest.Decode(expectedDefaultEncoding)
-	encoding = archiveUnderTest.Encoding()
-	t.Log(encoding)
-	g.Expect(encoding).To(Equal(expectedDefaultEncoding))
+	encodingUnderTest = archiveUnderTest.Encoding()
 
-	archiveUnderTest.Decode(expectedThreeValueEncoding)
-	encoding = archiveUnderTest.Encoding()
-	t.Log(encoding)
-	g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
+	// then
 
-	outOfBoundsEncoding := "8000000000000001:8000000000000001"
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal(expectedDefaultEncoding))
+
+	// when
+
+	outOfBoundsEncoding := "8000000000000001:1"
 	archiveUnderTest.Decode(outOfBoundsEncoding)
-	encoding = archiveUnderTest.Encoding()
-	t.Log(encoding)
-	g.Expect(encoding).To(Equal(expectedThreeValueEncoding))
+	encodingUnderTest = archiveUnderTest.Encoding()
+
+	// then
+
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal(expectedBoundaryValuesEncoding))
+}
+
+func TestBooleanArchive_Decode_OutOfBoundsBecomeBounded(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	// given
+
+	expectedSize := 100
+	archiveUnderTest := New(expectedSize)
+	// when
+
+	outOfBoundsEncoding := "8000000000000001:8000000000000001" // bit 127 is true here, but we only use range 0-99
+	archiveUnderTest.Decode(outOfBoundsEncoding)
+	encodingUnderTest := archiveUnderTest.Encoding()
+
+	// then  -- decoding expected to zero out flagged but unused bits (size of 100 means bits 100 thru 127 are unused).
+
+	t.Log(encodingUnderTest)
+	g.Expect(encodingUnderTest).To(Equal(expectedBoundaryValuesEncoding))
 }
