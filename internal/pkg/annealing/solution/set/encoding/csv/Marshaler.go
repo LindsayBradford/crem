@@ -17,6 +17,7 @@ import (
 
 const (
 	idHeading      = "Solution"
+	actionsHeading = "Actions"
 	summaryHeading = "Summary"
 	separator      = ", "
 	newline        = "\n"
@@ -81,7 +82,7 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 	for id, solutionSummary := range *summary {
 		trimmedId := trimId(id)
 		note := deriveNoteFor(id, solutionSummary)
-		summarySet = append(summarySet, joinAttributes(trimmedId, solutionSummary, note))
+		summarySet = append(summarySet, joinAttributes(trimmedId, solutionSummary.Variables, solutionSummary.Actions, note))
 	}
 
 	sort.Sort(sortableSummaries(summarySet))
@@ -103,21 +104,22 @@ func deriveHeaders(summary *set.Summary) []string {
 	for index, variable := range exampleVariables {
 		headers[index+1] = variable.Name
 	}
+	headers[headingNumber-2] = actionsHeading
 	headers[headingNumber-1] = summaryHeading
 
 	return headers
 }
 
-func justSomeVariables(summary *set.Summary) []solution.VariableSummary {
-	for _, variables := range *summary {
-		return variables
+func justSomeVariables(summary *set.Summary) solution.VariableSetSummary {
+	for _, currentSummary := range *summary {
+		return currentSummary.Variables
 	}
 	return nil
 }
 
-func joinAttributes(id string, variables []solution.VariableSummary, note string) string {
+func joinAttributes(id string, variables []solution.VariableSummary, actions solution.ActionSummary, note string) string {
 	joinedVariableValues := join(variableValueList(variables)...)
-	joinedAttributes := join(id, joinedVariableValues, note)
+	joinedAttributes := join(id, joinedVariableValues, string(actions), note)
 	return joinedAttributes
 }
 
