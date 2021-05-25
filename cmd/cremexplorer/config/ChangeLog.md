@@ -1,9 +1,10 @@
 # Change Log
 
-## Version 0.16 (TBD):
+## Version 0.16 (02/12/2020):
 ### New Features
 * Many CPU optimisations
 * MOSA solution summaries now have summary text per solution providing a short description of that solution.
+* MOSA solution summaries now supply a hexidecimal encoding of all management action state per solution.
 
 ## Version 0.15 (02/12/2020):
 ### New Features
