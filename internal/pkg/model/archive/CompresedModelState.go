@@ -56,10 +56,6 @@ func (c *CompressedModelState) IsEquivalentTo(otherSate *CompressedModelState) b
 	return c.Actions.IsEquivalentTo(&otherSate.Actions)
 }
 
-func (c *CompressedModelState) Sha256() string {
-	return c.Actions.Sha256()
-}
-
 func (c *CompressedModelState) Encoding() string {
 	return c.Actions.Encoding()
 }

@@ -330,6 +330,6 @@ func buildSilentMultiObjectiveDumbModel() *modumb.Model {
 
 func showArchiveState(t *testing.T, archive *NonDominanceModelArchive) {
 	for _, entry := range archive.archive {
-		t.Logf("Variables: %v, action SHA265: %s\n", entry.Variables, entry.Actions.Sha256())
+		t.Logf("Variables: %v, action Encoding: %s\n", entry.Variables, entry.Actions.Encoding())
 	}
 }

@@ -196,7 +196,7 @@ func (ke *Explorer) TryRandomChange() {
 
 	event := observer.NewEvent(observer.Explorer).
 		WithNote("Attempting to Archive Changed Model").
-		WithAttribute("Model SHA256", compressedChangedModelState.Sha256())
+		WithAttribute("Model Encoding", compressedChangedModelState.Encoding())
 
 	ke.NotifyObserversOfEvent(*event)
 
@@ -317,9 +317,9 @@ func (ke *Explorer) returnToBaseInsideArchive(currentModelState *archive.Compres
 
 	// Is this actually a problem?  Suppapitnarm paper doesn't mention it.  Original CRP doesn't cater for it.
 	// It just seems odd to trawl through the isolated entries only to return to the current if its isolated.
-	if currentModelState.Sha256() == selectedModel.Sha256() {
+	if currentModelState.Encoding() == selectedModel.Encoding() {
 		warningMessage := fmt.Sprintf("Randomly selected return-to-base isolated model is same as current [%s]",
-			currentModelState.Sha256())
+			currentModelState.Encoding())
 		ke.LogHandler().Warn(warningMessage)
 	}
 
@@ -336,7 +336,7 @@ func (ke *Explorer) returnToBaseInsideArchive(currentModelState *archive.Compres
 		WithNote("Returning to Base").
 		WithAttribute("SelectionRangeLimit", selectionRangeLimit).
 		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
-		WithAttribute("New Base Model SHA256", selectedModel.Sha256())
+		WithAttribute("New Base Model Encoding", selectedModel.Encoding())
 
 	ke.lastReturnedToBase = ke.currentIteration
 
@@ -351,7 +351,7 @@ func (ke *Explorer) returnToBaseOutsideArchive(currentModelState *archive.Compre
 	selectedModel.Initialise()
 	selectedModelArchive := ke.modelArchive.Compress(selectedModel)
 
-	for currentModelState.Sha256() == selectedModelArchive.Sha256() {
+	for currentModelState.Encoding() == selectedModelArchive.Encoding() {
 		selectedModel.Initialise()
 		selectedModelArchive = ke.modelArchive.Compress(selectedModel)
 	}
@@ -367,7 +367,7 @@ func (ke *Explorer) returnToBaseOutsideArchive(currentModelState *archive.Compre
 		WithNote("Returning to Base").
 		WithAttribute("SelectionRangeLimit", selectionRangeLimit).
 		WithAttribute("IsolationFraction", ke.returnToBaseIsolationFraction).
-		WithAttribute("New Base Model SHA256", selectedModelArchive.Sha256())
+		WithAttribute("New Base Model Encoding", selectedModelArchive.Encoding())
 
 	ke.lastReturnedToBase = ke.currentIteration
 

@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.17 (TBD):
+### New Features
+* Retired Sha256 encoding of models in logging, using hexidecimal encoding instead.
+
 ## Version 0.16 (02/12/2020):
 ### New Features
 * Many CPU optimisations

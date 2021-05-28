@@ -4,7 +4,6 @@
 package archive
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"github.com/LindsayBradford/crem/pkg/strings"
 	"github.com/pkg/errors"
@@ -13,7 +12,10 @@ import (
 	strings2 "strings"
 )
 
-const entriesPerArchiveEntry = 64
+const (
+	entriesPerArchiveEntry = 64
+	encodingDelimiter      = ":"
+)
 
 // BooleanArchive offers a compact storage and retrieval mechanism for a fixed size set of boolean data.
 type BooleanArchive struct {
@@ -22,7 +24,6 @@ type BooleanArchive struct {
 	detailCache entryDetail
 
 	archiveArray []uint64
-	sha256       string
 	encoding     string
 }
 
@@ -117,18 +118,6 @@ func (a *BooleanArchive) IsEquivalentTo(b *BooleanArchive) bool {
 	return true
 }
 
-func (a *BooleanArchive) Sha256() string {
-	if a.sha256 != "" {
-		return a.sha256
-	}
-
-	archiveByteArray := archiveArrayAsByteArray(a.archiveArray)
-	sha256OfArchive := sha256.Sum256(archiveByteArray)
-	a.sha256 = fmt.Sprintf("%x", sha256OfArchive)
-
-	return a.sha256
-}
-
 func (a *BooleanArchive) Encoding() string {
 	if a.encoding != "" {
 		return a.encoding
@@ -137,12 +126,15 @@ func (a *BooleanArchive) Encoding() string {
 	builder := new(strings.FluentBuilder)
 
 	for index, entry := range a.archiveArray {
-		builder.AddIf(index > 0, ":")
-		builder.Add(fmt.Sprintf("%X", entry))
+		builder.AddIf(index > 0, encodingDelimiter).Add(uInt64toHex(entry))
 	}
 
 	a.encoding = builder.String()
 	return a.encoding
+}
+
+func uInt64toHex(number uint64) string {
+	return fmt.Sprintf("%X", number)
 }
 
 func (a *BooleanArchive) Decode(encoding string) error {
@@ -187,15 +179,5 @@ func (a *BooleanArchive) zeroOutUnusedArrayEntries() {
 }
 
 func (a *BooleanArchive) resetCache() {
-	a.sha256 = ""
 	a.encoding = ""
-}
-
-func archiveArrayAsByteArray(arrayInt []uint64) []byte {
-	archiveAsByteArray := make([]byte, 0)
-	for index := range arrayInt {
-		bytes := []byte(strconv.FormatUint(arrayInt[index], 10))
-		archiveAsByteArray = append(archiveAsByteArray, bytes...)
-	}
-	return archiveAsByteArray
 }
