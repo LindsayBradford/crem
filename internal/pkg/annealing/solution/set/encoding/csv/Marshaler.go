@@ -145,8 +145,13 @@ func trimId(id string) string {
 var membershipMatcher = regexp.MustCompile("\\((\\d+)/(\\d+)\\)")
 
 func deriveNoteFor(id string, solutionSummary solution.Summary) string {
+	// TODO: This needs explicit support for both single and multi-objective annealing notes.
 	if strings2.Contains(id, "As-Is") {
-		return "Zero active management actions. Not a member of the pareto front."
+		return "As-is state; zero active management actions"
+	}
+
+	if strings2.Contains(id, "(1/1)") {
+		return "Computationally optimised solution"
 	}
 
 	member := membershipMatcher.FindStringSubmatch(id)

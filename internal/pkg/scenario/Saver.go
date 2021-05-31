@@ -100,7 +100,7 @@ func (s *Saver) ObserveEvent(event observer.Event) {
 	if event.HasAttribute(Solution) {
 		s.LogHandler().Info("Saving annealing optimised solution")
 		solution := event.Attribute(Solution).(solution.Solution)
-		s.saveSolution(solution)
+		s.saveOptimisedSolution(&solution)
 	}
 	if event.HasAttribute(SolutionSet) {
 		s.LogHandler().Info("Saving annealing solution set")
@@ -109,10 +109,42 @@ func (s *Saver) ObserveEvent(event observer.Event) {
 	}
 }
 
-func (s *Saver) saveSolution(solution solution.Solution) {
-	s.debugLogSolutionInJson(solution)
+func (s *Saver) saveOptimisedSolution(solution *solution.Solution) {
 	s.ensureOutputPathIsUsable()
-	s.encodeSolution(solution)
+	s.encodeOptimisedSolution(solution)
+}
+
+func (s *Saver) encodeOptimisedSolution(optimisedSolution *solution.Solution) {
+	summary := make(solutionset.Summary, 0)
+
+	asIsSolution := s.deriveASsIsSolutionForOptimised(optimisedSolution)
+	s.encodeSolution(*asIsSolution)
+	s.summarise(&summary, asIsSolution)
+
+	optimisedSolution.Id = optimisedSolution.Id + " Solution (1/1)" // Necessary for summary parsing later.
+
+	s.encodeSolution(*optimisedSolution)
+	s.summarise(&summary, optimisedSolution)
+	s.encodeSummary(&summary)
+}
+
+func (s *Saver) deriveASsIsSolutionForOptimised(optimisedSolution *solution.Solution) *solution.Solution {
+	s.decompressionMutex.Lock()
+	defer s.decompressionMutex.Unlock()
+
+	s.decompressionModel.Initialise()
+	asIsSolutionId := s.deriveAsIsOptimisedSolutionId(optimisedSolution)
+
+	decompressedModelSolution := new(solution.SolutionBuilder).
+		WithId(asIsSolutionId).
+		ForModel(s.decompressionModel).
+		Build()
+
+	return decompressedModelSolution
+}
+
+func (s *Saver) deriveAsIsOptimisedSolutionId(optimisedSolution *solution.Solution) string {
+	return optimisedSolution.Id + " Solution (As-Is)"
 }
 
 func (s *Saver) encodeSolution(modelSolution solution.Solution) {
