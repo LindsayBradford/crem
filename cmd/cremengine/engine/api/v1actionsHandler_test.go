@@ -296,7 +296,13 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	rawSc17Array := actionsMap["17"]
-	g.Expect(rawSc17Array).To(BeNil())
+	sc17Array, sc17ValueIsArray := rawSc17Array.([]interface{})
+	if !sc17ValueIsArray {
+		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions[17] map didn't match expected type")
+	}
+
+	g.Expect(len(sc17Array)).To(BeNumerically("==", 1))
+	g.Expect(sc17Array[0]).To(Equal("GullyRestoration"), actionsPostContext.Name+" Subcatchment 17 expected to have gully restoration")
 
 	rawSc18Array := actionsMap["18"]
 	sc18Array, sc18ValueIsArray := rawSc18Array.([]interface{})
@@ -314,10 +320,19 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 	}
 
 	g.Expect(len(sc19Array)).To(BeNumerically("==", 1))
-	g.Expect(sc18Array[0]).To(Equal("RiverBankRestoration"), actionsPostContext.Name+" Subcatchment 19 expected to have river bank restoration")
+	g.Expect(sc19Array[0]).To(Equal("HillSlopeRestoration"), actionsPostContext.Name+" Subcatchment 19 expected to have hillslope restoration")
 
 	rawSc20Array := actionsMap["20"]
 	g.Expect(rawSc20Array).To(BeNil())
+
+	rawSc21Array := actionsMap["21"]
+	sc21Array, sc21ValueIsArray := rawSc21Array.([]interface{})
+	if !sc21ValueIsArray {
+		g.Expect("").ToNot(BeEmpty(), "ActiveManagementActions[21] map didn't match expected type")
+	}
+
+	g.Expect(len(sc21Array)).To(BeNumerically("==", 1))
+	g.Expect(sc21Array[0]).To(Equal("WetlandsEstablishment"), actionsPostContext.Name+" Subcatchment 21 expected to have wetlands establishment")
 
 	muxUnderTest.Shutdown()
 }
