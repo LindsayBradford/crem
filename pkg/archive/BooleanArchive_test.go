@@ -314,6 +314,7 @@ func TestBooleanArchive_Decode_OutOfBoundsBecomeBounded(t *testing.T) {
 
 	expectedSize := 100
 	archiveUnderTest := New(expectedSize)
+
 	// when
 
 	outOfBoundsEncoding := "8000000000000001:8000000000000001" // bit 127 is true here, but we only use range 0-99
