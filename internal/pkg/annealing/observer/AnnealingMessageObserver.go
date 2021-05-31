@@ -65,8 +65,8 @@ func (amo *AnnealingMessageObserver) observeEvent(event observer.Event, builder 
 	case observer.StartedAnnealing:
 		amo.stringifyEvent(event, builder)
 	case observer.FinishedAnnealing:
-		event.RemoveAttribute("Solution")
-		event.RemoveAttribute("SolutionSet")
+		event.RemoveAttribute("CompressedModel")
+		event.RemoveAttribute("ModelArchive")
 		fusedIterationsEvent := fuseIterationAttributes(event)
 		amo.stringifyEvent(fusedIterationsEvent, builder)
 	default:

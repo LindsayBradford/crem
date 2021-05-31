@@ -35,5 +35,5 @@ func (s *Solution) produceVariableSummary() VariableSetSummary {
 }
 
 func (s *Solution) produceActionSummary() ActionSummary {
-	return "#ReplaceMe" // TODO: get action summary out of solution.
+	return ActionSummary(s.EncodedActions)
 }

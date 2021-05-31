@@ -26,7 +26,7 @@ const (
 	ArchiveSize                     = "ArchiveSize"
 	ArchiveResult                   = "ArchiveResult"
 	IterationsUntilNextReturnToBase = "IterationsUntilNextReturnToBase"
-	SolutionSet                     = "SolutionSet"
+	ModelArchive                    = "ModelArchive"
 	LastReturnedToBase              = "LastReturnedToBase"
 )
 
@@ -432,7 +432,7 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return ke.baseAttributes.
 			Replace(explorer.Temperature, ke.coolant.Temperature()).
 			Replace(ArchiveSize, ke.modelArchive.Len()).
-			Add(SolutionSet, ke.modelArchive)
+			Add(ModelArchive, ke.modelArchive)
 	case observer.FinishedIteration:
 		return ke.baseAttributes.
 			Replace(explorer.Temperature, ke.coolant.Temperature()).

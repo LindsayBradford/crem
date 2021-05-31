@@ -97,7 +97,7 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 func deriveHeaders(summary *set.Summary) []string {
 	exampleVariables := justSomeVariables(summary)
 
-	headingNumber := len(exampleVariables) + 2
+	headingNumber := len(exampleVariables) + 3
 	headers := make([]string, headingNumber)
 
 	headers[0] = idHeading

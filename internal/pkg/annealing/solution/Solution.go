@@ -54,6 +54,7 @@ type Solution struct {
 	ActiveManagementActions   map[planningunit.Id]ManagementActions
 	InactiveManagementActions map[planningunit.Id]ManagementActions `json:"-"`
 
+	EncodedActions string
 	attributes.ContainedAttributes
 }
 

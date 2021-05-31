@@ -3,11 +3,11 @@
 package kirkpatrick
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"math"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/cooling/coolants/kirkpatrick"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/explorer"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	Solution               = "Solution"
+	CompressedModel        = "CompressedModel"
 	ObjectiveValue         = "ObjectiveValue"
 	ChangeInObjectiveValue = "ChangeInObjectiveValue"
 )
@@ -60,7 +60,7 @@ func New() *Explorer {
 }
 
 func (ke *Explorer) Initialise() {
-	ke.LogHandler().Debug(ke.scenarioId + ": Initialising Solution Explorer")
+	ke.LogHandler().Debug(ke.scenarioId + ": Initialising CompressedModel Explorer")
 
 	ke.notifyInitialisation()
 
@@ -273,7 +273,7 @@ func (ke *Explorer) DeepClone() explorer.Explorer {
 }
 
 func (ke *Explorer) TearDown() {
-	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of Solution Explorer")
+	ke.LogHandler().Debug(ke.scenarioId + ": Triggering tear-down of CompressedModel Explorer")
 	ke.Model().TearDown()
 }
 
@@ -296,7 +296,7 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 		return ke.baseAttributes.
 			Replace(ObjectiveValue, ke.ObjectiveValue()).
 			Replace(explorer.Temperature, ke.Temperature).
-			Add(Solution, *ke.fetchFinalModelSolution())
+			Add(CompressedModel, *ke.fetchFinalCompressedModel())
 	case observer.Explorer:
 		return ke.baseAttributes.
 			Replace(ObjectiveValue, ke.ObjectiveValue()).
@@ -309,11 +309,10 @@ func (ke *Explorer) EventAttributes(eventType observer.EventType) attributes.Att
 	return nil
 }
 
-func (ke *Explorer) fetchFinalModelSolution() *solution.Solution {
-	return new(solution.SolutionBuilder).
-		WithId(ke.Id()).
-		ForModel(ke.Model()).
-		Build()
+func (ke *Explorer) fetchFinalCompressedModel() *archive.CompressedModelState {
+	compressedModel := new(archive.ModelCompressor).Compress(ke.Model())
+	compressedModel.SetId(ke.Model().Id())
+	return compressedModel
 }
 
 func (ke *Explorer) newEvent(eventType observer.EventType) {

@@ -6,9 +6,12 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/pkg/archive"
 	"github.com/LindsayBradford/crem/pkg/dominance"
+	"github.com/LindsayBradford/crem/pkg/name"
 )
 
 type CompressedModelState struct {
+	name.IdentifiableContainer
+
 	Variables dominance.Float64Vector
 	Actions   archive.BooleanArchive
 }
