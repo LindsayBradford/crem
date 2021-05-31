@@ -157,9 +157,11 @@ func (m *Mux) updateModelSolution() {
 }
 
 func (m *Mux) verifyPostedAttributes(postedAttributes attributes.Attributes) error {
+	// TODO:  Hardcoding these is a bad code smell.
 	for _, entry := range postedAttributes {
-		if entry.Name != "RiverBankRestoration" && entry.Name != "HillSlopeRestoration" && entry.Name != "GullyRestoration" {
-			baseError := errors.New("Name [" + entry.Name + "] not one of [RiverBankRestoration, HillSlopeRestoration, GullyRestoration]")
+		if entry.Name != "RiverBankRestoration" && entry.Name != "HillSlopeRestoration" &&
+			entry.Name != "GullyRestoration" && entry.Name != "WetlandsEstablishment" {
+			baseError := errors.New("Name [" + entry.Name + "] not one of [RiverBankRestoration, HillSlopeRestoration, GullyRestoration, WetlandsEstablishment]")
 			return errors.Wrap(baseError, "v1 POST subcatchment handler")
 		}
 

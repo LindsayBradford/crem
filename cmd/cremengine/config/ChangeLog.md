@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.3 (TBD):
+* Fixed bug in Subcatchment parser, stopping WetlandsEstablishment action from having state set.
+
 ## Version 0.2 (02 March 2021):
 ### New Features
 * Addition of new running engine api behaviour:

@@ -210,7 +210,8 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 	actionAttributes := attributes.Attributes{}.
 		Add("GullyRestoration", ActiveAction).
 		Add("RiverBankRestoration", ActiveAction).
-		Add("HillSlopeRestoration", InactiveAction)
+		Add("HillSlopeRestoration", InactiveAction).
+		Add("WetlandsEstablishment", ActiveAction)
 
 	actionStatusBytes, _ := json.Marshal(actionAttributes)
 
@@ -245,6 +246,9 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
+
+	// TODO: Confirm active/inactive states of actions posted.
+
 	muxUnderTest.Shutdown()
 }
 
