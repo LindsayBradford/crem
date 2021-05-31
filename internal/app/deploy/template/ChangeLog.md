@@ -1,7 +1,7 @@
 # Change Log
 
 ## Version 0.3 (TBD):
-### New Features
+* Now ships with and uses Laidly Data version 1.8.4, containng a typo fix.
 
 ## Version 0.2 (25 May 2021):
 ### New Features
