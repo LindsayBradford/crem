@@ -171,7 +171,7 @@ var (
 
 func trimNumberedId(id string) string {
 	trimmedId := iterationMatcher.FindString(id)
-	prettifiedId := prettifiedMatcher.ReplaceAllString(trimmedId, " of ")
+	prettifiedId := prettifiedMatcher.ReplaceAllString(trimmedId, "-of-")
 
 	return prettifiedId
 }
