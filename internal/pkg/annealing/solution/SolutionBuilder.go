@@ -3,6 +3,7 @@
 package solution
 
 import (
+	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"sort"
 
@@ -11,8 +12,9 @@ import (
 )
 
 type SolutionBuilder struct {
-	id    string
-	model model.Model
+	id              string
+	model           model.Model
+	compressedModel *archive.CompressedModelState
 
 	solution *Solution
 }
@@ -24,12 +26,12 @@ func (sb *SolutionBuilder) WithId(id string) *SolutionBuilder {
 
 func (sb *SolutionBuilder) ForModel(model model.Model) *SolutionBuilder {
 	sb.model = model
+	sb.compressedModel = new(archive.ModelCompressor).Compress(model)
 	return sb
 }
 
 func (sb *SolutionBuilder) Build() *Solution {
 	sb.solution = NewSolution(sb.id)
-
 	sb.transferAttributes()
 	sb.addDecisionVariables()
 	sb.addPlanningUnits()
@@ -68,6 +70,8 @@ func (sb *SolutionBuilder) addPlanningUnits() {
 }
 
 func (sb *SolutionBuilder) addPlanningUnitManagementActionMaps() {
+	sb.solution.EncodedActions = sb.compressedModel.Encoding()
+
 	for _, action := range sb.model.ManagementActions() {
 		planningUnit := action.PlanningUnit()
 		actionType := ManagementActionType(action.Type())

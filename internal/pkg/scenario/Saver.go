@@ -11,7 +11,6 @@ import (
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/observer"
@@ -129,16 +128,21 @@ func (s *Saver) saveOptimisedModel(optimisedModel *archive.CompressedModelState)
 
 func (s *Saver) encodeOptimisedModel(optimisedModel *archive.CompressedModelState) {
 	summary := make(solutionset.Summary, 0)
+	s.encodeAndSummariseAsIsSolution(optimisedModel, summary)
+	s.encodeAndSummariseOptimisedSolution(optimisedModel, summary)
+	s.encodeSummary(&summary)
+}
 
+func (s *Saver) encodeAndSummariseAsIsSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	asIsSolution := s.deriveASsIsSolutionForOptimised(optimisedModel.Id())
 	s.encodeSolutionDetail(*asIsSolution)
-
 	s.summarise(&summary, asIsSolution)
+}
 
+func (s *Saver) encodeAndSummariseOptimisedSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	optimisedSolution := s.deriveSolutionFromCompressedModel(optimisedModel, optimisedModel.Id()+" Solution (1/1)")
 	s.encodeSolutionDetail(*optimisedSolution)
 	s.summarise(&summary, optimisedSolution)
-	s.encodeSummary(&summary)
 }
 
 func (s *Saver) deriveSolutionFromCompressedModel(compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
@@ -146,13 +150,10 @@ func (s *Saver) deriveSolutionFromCompressedModel(compressedModel *archive.Compr
 	defer s.decompressionMutex.Unlock()
 
 	new(archive.ModelCompressor).Decompress(compressedModel, s.decompressionModel)
-
 	decompressedModelSolution := new(solution.SolutionBuilder).
 		WithId(solutionId).
 		ForModel(s.decompressionModel).
 		Build()
-
-	decompressedModelSolution.EncodedActions = compressedModel.Encoding() // TODO: Cleanup
 
 	return decompressedModelSolution
 }
@@ -164,15 +165,10 @@ func (s *Saver) deriveASsIsSolutionForOptimised(solutionId string) *solution.Sol
 	s.decompressionModel.Initialise()
 	asIsSolutionId := s.deriveAsIsOptimisedSolutionId(solutionId)
 
-	// TODO: Cleanup
-	compressedInitialModel := new(archive.ModelCompressor).Compress(s.decompressionModel)
-
 	decompressedModelSolution := new(solution.SolutionBuilder).
 		WithId(asIsSolutionId).
 		ForModel(s.decompressionModel).
 		Build()
-
-	decompressedModelSolution.EncodedActions = compressedInitialModel.Encoding()
 
 	return decompressedModelSolution
 }
@@ -197,24 +193,6 @@ func (s *Saver) encodeSolutionDetail(modelSolution solution.Solution) {
 	}
 }
 
-func (s *Saver) debugLogSolutionInJson(modelSolution solution.Solution) {
-	s.LogHandler().Debug("JSON Encoding of solution after annealing finished:")
-
-	modelSolutionAsJson := s.toJson(&modelSolution)
-	s.LogHandler().Debug(modelSolutionAsJson)
-}
-
-func (s *Saver) toJson(structure *solution.Solution) string {
-	marshaler := new(json.Marshaler)
-	solutionAsJson, marshalError := marshaler.Marshal(structure)
-
-	if marshalError != nil {
-		panic(errors.Wrap(marshalError, "failed marshalling solution to JSON"))
-	}
-
-	return string(solutionAsJson)
-}
-
 func (s *Saver) saveSolutionSet(solutionSet archive.NonDominanceModelArchive) {
 	s.ensureOutputPathIsUsable()
 	s.encodeSolutionSet(solutionSet)
@@ -229,9 +207,9 @@ func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) 
 	s.summarise(&summary, asIsSolution)
 
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
-		solution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
-		s.encodeSolutionDetail(*solution)
-		s.summarise(&summary, solution)
+		currentSolution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
+		s.encodeSolutionDetail(*currentSolution)
+		s.summarise(&summary, currentSolution)
 	}
 	s.encodeSummary(&summary)
 }
@@ -243,14 +221,10 @@ func (s *Saver) deriveASsIsSolution(solutionSet archive.NonDominanceModelArchive
 	s.decompressionModel.Initialise()
 	asIsSolutionId := s.deriveAsIsSolutionId(solutionSet)
 
-	compressedInitialModel := solutionSet.Compress(s.decompressionModel)
-
 	decompressedModelSolution := new(solution.SolutionBuilder).
 		WithId(asIsSolutionId).
 		ForModel(s.decompressionModel).
 		Build()
-
-	decompressedModelSolution.EncodedActions = compressedInitialModel.Encoding() // TODO: Cleanup
 
 	return decompressedModelSolution
 }
@@ -261,21 +235,19 @@ func (s *Saver) deriveAsIsSolutionId(solutionSet archive.NonDominanceModelArchiv
 
 func (s *Saver) deriveModelSolution(solutionSet archive.NonDominanceModelArchive, solutionIndex int, compressedModel *archive.CompressedModelState) *solution.Solution {
 	solutionId := s.deriveSolutionId(solutionSet, solutionIndex+1)
-	return s.deriveSolutionFrom(solutionSet, compressedModel, solutionId)
+	return s.deriveSolutionFrom(compressedModel, solutionId)
 }
 
-func (s *Saver) deriveSolutionFrom(solutionSet archive.NonDominanceModelArchive, compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
+func (s *Saver) deriveSolutionFrom(compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
 	s.decompressionMutex.Lock()
 	defer s.decompressionMutex.Unlock()
 
-	solutionSet.Decompress(compressedModel, s.decompressionModel)
+	new(archive.ModelCompressor).Decompress(compressedModel, s.decompressionModel)
 
 	decompressedModelSolution := new(solution.SolutionBuilder).
 		WithId(solutionId).
 		ForModel(s.decompressionModel).
 		Build()
-
-	decompressedModelSolution.EncodedActions = compressedModel.Encoding() // TODO: Cleanup
 
 	return decompressedModelSolution
 }
