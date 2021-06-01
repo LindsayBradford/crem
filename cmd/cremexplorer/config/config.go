@@ -1,4 +1,4 @@
 package config
 
-const Version = "0.16"
+const Version = "0.17"
 const ExecutableName = "CREMExplorer"

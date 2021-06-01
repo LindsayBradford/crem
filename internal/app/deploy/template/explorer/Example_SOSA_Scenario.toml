@@ -1,32 +1,33 @@
 [Scenario]
 Name = "Example SOSA Scenario"
-RunNumber = 1                                           # 1 (default)
-MaximumConcurrentRunNumber = 1                          # 1 (default)
-OutputPath = "output"                                   # Relative directory path to place results files
-OutputType = "EXCEL"                                    # "CSV" (default) | "JSON" | "EXCEL"
+RunNumber = 1                                          # 1 (default)
+MaximumConcurrentRunNumber = 1                         # 1 (default)
+OutputPath = "output"                                 # Relative directory path to place results files
+OutputLevel = "Summary"                               # "Summary" (default) | "Detail"
+OutputType = "EXCEL"                                   # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.UserDetail]
-TextEntry = "Some Text"                                 # Example user-defined data for scenario. Not used by system.
+TextEntry = "Some Text"                               # Example user-defined data for scenario. Not used by system.
 IntegerEntry = 42                                       # Example user-defined data for scenario. Not used by system.
 FloatEntry = 42.42                                      # Example user-defined data for scenario. Not used by system.
 BooleanEntry = true                                     # Example user-defined data for scenario. Not used by system.
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 10_000
-Type = "NativeLibrary"                                  # "NativeLibrary" (Default) | "BareBones"
-Formatter = "RawMessage"                                # "RawMessage" (Default) | "JSON" | "NameValuePair"
+Type = "NativeLibrary"                               # "NativeLibrary" (Default) | "BareBones"
+Formatter = "RawMessage"                             # "RawMessage" (Default) | "JSON" | "NameValuePair"
 [Scenario.Reporting.LogLevelDestinations]
-Annealing = "StandardOutput"                            # "Discarded"  | "StandardOutput" (Default) | "StandardError"
-Debugging = "Discarded"                                 # "Discarded"  (Default) | "StandardOutput" | "StandardError"
-Information = "StandardOutput"                          # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Warnings = "StandardOutput"                             # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
-Errors = "StandardError"                                # "Discarded"  | "StandardOutput" | "StandardError" (Default)
-Model = "Discarded"                                     # "Discarded"  (default) | "StandardOutput" | "StandardError"
+Annealing = "StandardOutput"                        # "Discarded"  | "StandardOutput" (Default) | "StandardError"
+Debugging = "Discarded"                              # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Information = "StandardOutput"                      # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Warnings = "StandardOutput"                         # "Discarded"  | "StandardOutput"  (Default) | "StandardError"
+Errors = "StandardError"                            # "Discarded"  | "StandardOutput" | "StandardError" (Default)
+Model = "Discarded"                                  # "Discarded"  (default) | "StandardOutput" | "StandardError"
 
 [Annealer]
 Type = "Kirkpatrick"
-EventNotifier = "Sequential"                            # "Sequential" (default) | Concurrent"
+EventNotifier = "Sequential"                         # "Sequential" (default) | Concurrent"
 [Annealer.Parameters]
 DecisionVariable = "SedimentProduction"
-OptimisationDirection = "Minimising"                    # Minimising (default) | "Maximising"
+OptimisationDirection = "Minimising"                 # Minimising (default) | "Maximising"
 StartingTemperature = 10_000.0
 CoolingFactor = 0.999
 MaximumIterations = 1_000_000

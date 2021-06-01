@@ -1,7 +1,9 @@
 # Change Log
 
 ## Version 0.3 (TBD):
-* Now ships with and uses Laidly Data version 1.8.4, containng a typo fix.
+* Now ships with and uses Laidly Data version 1.8.4, containing a typo fix.
+* Updated to contain CREMExplorer 0.17. See its changelog for specific changes.
+* Updated to contain CREMEngine 0.3. See its changelog for specific changes.
 
 ## Version 0.2 (25 May 2021):
 ### New Features

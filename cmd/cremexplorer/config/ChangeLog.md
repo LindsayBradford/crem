@@ -3,6 +3,10 @@
 ## Version 0.17 (TBD):
 ### New Features
 * Retired Sha256 encoding of models in logging, using hexidecimal encoding instead.
+* SOSA scenarios now produce short summary files like MOSA (as-is and optimised solutions).
+* Added new scenario config item 'OutputLevel' to allow generation of just 'Summary' data, or full 'Detail' data
+### Bug Fixes
+* Fixed bug stopping hexidecimal encoding of management action state in summary files.
 
 ## Version 0.16 (02/12/2020):
 ### New Features

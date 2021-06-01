@@ -81,13 +81,19 @@ func (i *ScenarioConfigInterpreter) interpretRunner(config *appData.ScenarioConf
 
 func buildSaver(scenarioConfig *appData.ScenarioConfig) *scenario.Saver {
 	saver := scenario.NewSaver().
-		WithOutputType(configOutputTypeToSolutionOutputType(scenarioConfig.OutputType)).
-		WithOutputPath(scenarioConfig.OutputPath)
+		WithOutputType(configOutputTypeToEncodingOutputType(scenarioConfig.OutputType)).
+		WithOutputPath(scenarioConfig.OutputPath).
+		WithOutputLevel(configOutputLevelToScenarioOutputLevel(scenarioConfig.OutputLevel))
+
 	return saver
 }
 
-func configOutputTypeToSolutionOutputType(outputType appData.ScenarioOutputType) encoding.OutputType {
+func configOutputTypeToEncodingOutputType(outputType appData.ScenarioOutputType) encoding.OutputType {
 	return encoding.OutputType(outputType.String())
+}
+
+func configOutputLevelToScenarioOutputLevel(outputLevel appData.ScenarioOutputLevel) scenario.OutputLevel {
+	return scenario.OutputLevel(outputLevel.String())
 }
 
 func (i *ScenarioConfigInterpreter) Scenario() scenario.Scenario {

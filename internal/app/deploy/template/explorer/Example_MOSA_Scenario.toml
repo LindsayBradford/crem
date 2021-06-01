@@ -3,6 +3,7 @@ Name = "Example MOSA Scenario"
 RunNumber = 1                                           # 1 (default)
 MaximumConcurrentRunNumber = 1                          # 1 (default)
 OutputPath = "output"
+OutputLevel = "Summary"                                # "Summary" (default) | "Detail"
 OutputType = "CSV"                                      # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.UserDetail]
 TextEntry = "Some Text"                                 # Example user-defined data for scenario. Not used by system.

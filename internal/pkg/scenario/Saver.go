@@ -21,10 +21,13 @@ import (
 )
 
 const (
-	CompressedModel   = "CompressedModel"
-	ModelArchive      = "ModelArchive"
-	defaultOutputPath = "solutions"
+	CompressedModel    = "CompressedModel"
+	ModelArchive       = "ModelArchive"
+	defaultOutputPath  = "solutions"
+	defaultOutputLevel = "Summary"
 )
+
+type OutputLevel string
 
 type CallableSaver interface {
 	observer.Observer
@@ -36,6 +39,7 @@ type Saver struct {
 	loggers.ContainedLogger
 	decompressionModel model.Model
 	outputType         encoding.OutputType
+	outputLevel        OutputLevel
 	outputPath         string
 
 	decompressionMutex sync.Mutex
@@ -57,6 +61,15 @@ func (s *Saver) WithOutputPath(outputPath string) *Saver {
 	}
 
 	s.outputPath = outputPath
+	return s
+}
+
+func (s *Saver) WithOutputLevel(outputLevel OutputLevel) *Saver {
+	if outputLevel == "" {
+		outputLevel = defaultOutputLevel
+	}
+
+	s.outputLevel = outputLevel
 	return s
 }
 
@@ -118,11 +131,12 @@ func (s *Saver) encodeOptimisedModel(optimisedModel *archive.CompressedModelStat
 	summary := make(solutionset.Summary, 0)
 
 	asIsSolution := s.deriveASsIsSolutionForOptimised(optimisedModel.Id())
-	s.encodeSolution(*asIsSolution)
+	s.encodeSolutionDetail(*asIsSolution)
+
 	s.summarise(&summary, asIsSolution)
 
 	optimisedSolution := s.deriveSolutionFromCompressedModel(optimisedModel, optimisedModel.Id()+" Solution (1/1)")
-	s.encodeSolution(*optimisedSolution)
+	s.encodeSolutionDetail(*optimisedSolution)
 	s.summarise(&summary, optimisedSolution)
 	s.encodeSummary(&summary)
 }
@@ -167,7 +181,11 @@ func (s *Saver) deriveAsIsOptimisedSolutionId(solutionId string) string {
 	return solutionId + " Solution (As-Is)"
 }
 
-func (s *Saver) encodeSolution(modelSolution solution.Solution) {
+func (s *Saver) encodeSolutionDetail(modelSolution solution.Solution) {
+	if s.outputLevel != "Detail" {
+		return
+	}
+
 	encoder := new(encoding.Builder).
 		ForOutputType(s.outputType).
 		WithOutputPath(s.outputPath).
@@ -206,12 +224,13 @@ func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) 
 	summary := make(solutionset.Summary, 0)
 
 	asIsSolution := s.deriveASsIsSolution(solutionSet)
-	s.encodeSolution(*asIsSolution)
+	s.encodeSolutionDetail(*asIsSolution)
+
 	s.summarise(&summary, asIsSolution)
 
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
 		solution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
-		s.encodeSolution(*solution)
+		s.encodeSolutionDetail(*solution)
 		s.summarise(&summary, solution)
 	}
 	s.encodeSummary(&summary)
