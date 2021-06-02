@@ -1,26 +1,26 @@
 # Change Log
 
-## Version 0.17 (TBD):
+## Version 0.17 (03 June 2021):
 ### New Features
 * Retired Sha256 encoding of models in logging, using hexidecimal encoding instead.
-* SOSA scenarios now produce short summary files like MOSA (containing only as-is and optimised solution).
+* SOSA scenarios now produce short summary files like MOSA (containing an as-is, and an optimised solution).
 * Added new scenario config item 'OutputLevel' to allow generation of just 'Summary' data, or full 'Detail' data
 * Solution identifiers in summary files now use "-" characters instead of spaces to make them more URL friendly.
-* Summary files now respect file formatting as determined by 'OutputType' scenario config. 
+* Summary files now respect 'OutputType' scenario config as pre detail files (previously they were only CSV files). 
 ### Bug Fixes
 * Fixed bug stopping hexidecimal encoding of management action state in summary files.
 
-## Version 0.16 (02/12/2020):
+## Version 0.16 (25 May 2021):
 ### New Features
 * Many CPU optimisations
 * MOSA solution summaries now have summary text per solution providing a short description of that solution.
 * MOSA solution summaries now supply a hexidecimal encoding of all management action state per solution.
 
-## Version 0.15 (02/12/2020):
+## Version 0.15 (02 December 2020):
 ### New Features
 * Now deploys with Laidley_data_v1_8_3.xlsx (containing updated dissolved nitrogen data)
 
-## Version 0.14 (30/11/2020):
+## Version 0.14 (30 November 2020):
 ### New Features
 * Added Dissolved Nitrogen Decision Variable and Wetlands Establishment management action.
 * Now deploys with Laidley_data_v1_8_2.xlsx (containing dissolved nitrogen and wetland data)
@@ -31,14 +31,14 @@
 * Related to the above, logging changes around initialisation to better track what's actually happening.
 * Fixed bugs in decision variables around undoable values and rounding errors.  
 
-## Version 0.13.1 (30/10/2020):
+## Version 0.13.1 (30 October 2020):
 ### New Features
 * Now deploys with Laidley_data_v1_7_1.xlsx (containing a small data fix)
 * Annealing Observer now take precedence over generic logging, ensuring better ordering of logged events.
 ### Bug Fixes
 * Fixed Excel resource handlers released in wrong order, triggering runtime error in SOSA solution saving. 
 
-## Version 0.12 (07/10/2020):
+## Version 0.12 (07 October 2020):
 ### New Features
 * Minor logging changes to allow for easier annealing quality analysis.
 * Now deploys with a 'scripts' directory

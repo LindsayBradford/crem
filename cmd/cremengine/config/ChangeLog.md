@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.3 (TBD):
+## Version 0.3 (03 June 2021):
 ### Bugs Fixed
 * Fixed bug in Subcatchment parser, stopping WetlandsEstablishment action from having state set.
 * Fixed bug in Subcatchment parser, where semantically invalid action state changes would respond with success.
