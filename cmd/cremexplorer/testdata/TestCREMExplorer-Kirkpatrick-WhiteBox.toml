@@ -2,12 +2,13 @@
 Name = "Kirkpatrick"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
-OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
+OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+#OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1
 CheckingLoopInvariant = true
 [Scenario.Reporting.LogLevelDestinations]
-Debugging = "Discarded"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
+Debugging = "StandardOutput"   # "Discarded"  (Default) | "StandardOutput" | "StandardError"
 Annealing = "StandardOutput"
 Model = "StandardOutput"
 

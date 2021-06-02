@@ -3,6 +3,7 @@
 package excel
 
 import (
+	errors2 "errors"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/tables"
 	"github.com/LindsayBradford/crem/pkg/excel"
@@ -193,6 +194,12 @@ func (ds *DataSet) SaveAs(excelFilePath string) error {
 }
 
 func (ds *DataSet) saveDataSetIntoExcelFile(excelFilePath string) {
+	defer func() {
+		if r := recover(); r != nil {
+			panic(errors2.New("OLE Excel Workbook Save-As calls requires file path to be absolute; Is [" + excelFilePath + "] relative?"))
+		}
+	}()
+
 	workbooks := ds.excelHandler.Workbooks()
 	defer workbooks.Release()
 

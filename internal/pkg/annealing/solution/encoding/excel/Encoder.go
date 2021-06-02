@@ -49,12 +49,13 @@ func (e Encoder) Encode(solution *solution.Solution) error {
 }
 
 func (e Encoder) encodeMarshaled(dataSet *excel.DataSet, outputPath string) error {
-	dataSet.SaveAs(outputPath)
+	currentDir, _ := os.Getwd()
+	absolutePath := path.Join(currentDir, outputPath)
+	dataSet.SaveAs(absolutePath)
 	return nil
 }
 
 func (e Encoder) deriveOutputPath(solution *solution.Solution) (outputPath string) {
-	currentDir, _ := os.Getwd()
 	safeIdBasedFileName := solution.FileNameSafeId() + fileTypeExtension
-	return path.Join(currentDir, e.outputPath, safeIdBasedFileName)
+	return path.Join(outputPath, e.outputPath, safeIdBasedFileName)
 }

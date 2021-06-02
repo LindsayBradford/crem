@@ -121,7 +121,7 @@ func Exit(exitValue interface{}) {
 	case nil:
 		exitCode = 0
 	default:
-		fmt.Fprintf(os.Stderr, "Critical Error; forcing application exit for unknown error type %v\n", exitValue)
+		fmt.Fprintf(os.Stderr, "Critical Error; forcing application exit over unhandled panic: %v\n", exitValue)
 		exitCode = 1
 	}
 	os.Exit(exitCode)

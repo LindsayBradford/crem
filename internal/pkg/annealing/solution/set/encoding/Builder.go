@@ -5,6 +5,7 @@ package encoding
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/excel"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	//"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/excel"
@@ -41,8 +42,7 @@ func (b *Builder) Build() Encoder {
 		return new(csv.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
 		//return new(json.Encoder).WithOutputPath(b.outputPath)
 	case encoding.ExcelOutput:
-		return new(csv.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
-		//return new(excel.Encoder).WithOutputPath(b.outputPath)
+		return new(excel.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
 	default:
 		return NullEncoder
 	}

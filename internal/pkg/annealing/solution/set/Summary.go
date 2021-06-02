@@ -12,7 +12,7 @@ func (s Summary) Id() string {
 	baseId := s.justSomeId()
 
 	iterationMatcher := regexp.MustCompile(`Solution \(.+\)`)
-	id := iterationMatcher.ReplaceAllString(baseId, "VariableSetSummary")
+	id := iterationMatcher.ReplaceAllString(baseId, "Summary")
 
 	return id
 }

@@ -136,13 +136,13 @@ func (s *Saver) encodeOptimisedModel(optimisedModel *archive.CompressedModelStat
 func (s *Saver) encodeAndSummariseAsIsSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	asIsSolution := s.deriveASsIsSolutionForOptimised(optimisedModel.Id())
 	s.encodeSolutionDetail(*asIsSolution)
-	s.summarise(&summary, asIsSolution)
+	s.summarise(&summary, asIsSolution, "As=Is")
 }
 
 func (s *Saver) encodeAndSummariseOptimisedSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	optimisedSolution := s.deriveSolutionFromCompressedModel(optimisedModel, optimisedModel.Id()+" Solution (1/1)")
 	s.encodeSolutionDetail(*optimisedSolution)
-	s.summarise(&summary, optimisedSolution)
+	s.summarise(&summary, optimisedSolution, "Computationally optimised solution")
 }
 
 func (s *Saver) deriveSolutionFromCompressedModel(compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
@@ -204,12 +204,12 @@ func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) 
 	asIsSolution := s.deriveASsIsSolution(solutionSet)
 	s.encodeSolutionDetail(*asIsSolution)
 
-	s.summarise(&summary, asIsSolution)
+	s.summarise(&summary, asIsSolution, "As=Is")
 
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
 		currentSolution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
 		s.encodeSolutionDetail(*currentSolution)
-		s.summarise(&summary, currentSolution)
+		s.summarise(&summary, currentSolution, "")
 	}
 	s.encodeSummary(&summary)
 }
@@ -258,9 +258,9 @@ func (s *Saver) deriveSolutionId(solutionSet archive.NonDominanceModelArchive, c
 	return solutionId
 }
 
-func (s *Saver) summarise(summary *solutionset.Summary, solution *solution.Solution) {
+func (s *Saver) summarise(summary *solutionset.Summary, solution *solution.Solution, note string) {
 	baseMap := *summary
-	baseMap[solution.Id] = solution.Summarise()
+	baseMap[solution.Id] = *solution.Summarise().WithId(solution.Id).Noting(note)
 }
 
 func (s *Saver) encodeSummary(summary *solutionset.Summary) {

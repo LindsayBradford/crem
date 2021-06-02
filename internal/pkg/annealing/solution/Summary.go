@@ -1,8 +1,20 @@
 package solution
 
 type Summary struct {
+	Id        string
 	Variables VariableSetSummary
 	Actions   ActionSummary
+	Note      string
+}
+
+func (s *Summary) WithId(id string) *Summary {
+	s.Id = id
+	return s
+}
+
+func (s *Summary) Noting(note string) *Summary {
+	s.Note = note
+	return s
 }
 
 type VariableSetSummary []VariableSummary
@@ -14,8 +26,8 @@ type VariableSummary struct {
 
 type ActionSummary string
 
-func (s *Solution) Summarise() Summary {
-	return Summary{
+func (s *Solution) Summarise() *Summary {
+	return &Summary{
 		Variables: s.produceVariableSummary(),
 		Actions:   s.produceActionSummary(),
 	}
