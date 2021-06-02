@@ -7,6 +7,8 @@ import (
 	solutionset "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
 	encoding2 "github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding"
 	"os"
+	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -24,7 +26,12 @@ const (
 	ModelArchive       = "ModelArchive"
 	defaultOutputPath  = "solutions"
 	defaultOutputLevel = "Summary"
+
+	asIsSolutionNote = "As-is state; zero active management actions"
+	topSummaryEntry  = uint64(0)
 )
+
+var membershipMatcher = regexp.MustCompile("\\((\\d+)/(\\d+)\\)")
 
 type OutputLevel string
 
@@ -136,13 +143,13 @@ func (s *Saver) encodeOptimisedModel(optimisedModel *archive.CompressedModelStat
 func (s *Saver) encodeAndSummariseAsIsSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	asIsSolution := s.deriveASsIsSolutionForOptimised(optimisedModel.Id())
 	s.encodeSolutionDetail(*asIsSolution)
-	s.summarise(&summary, asIsSolution, "As=Is")
+	s.summarise(&summary, asIsSolution, asIsSolutionNote, topSummaryEntry)
 }
 
 func (s *Saver) encodeAndSummariseOptimisedSolution(optimisedModel *archive.CompressedModelState, summary solutionset.Summary) {
 	optimisedSolution := s.deriveSolutionFromCompressedModel(optimisedModel, optimisedModel.Id()+" Solution (1/1)")
 	s.encodeSolutionDetail(*optimisedSolution)
-	s.summarise(&summary, optimisedSolution, "Computationally optimised solution")
+	s.summarise(&summary, optimisedSolution, "Computationally optimised solution", topSummaryEntry+1)
 }
 
 func (s *Saver) deriveSolutionFromCompressedModel(compressedModel *archive.CompressedModelState, solutionId string) *solution.Solution {
@@ -204,12 +211,14 @@ func (s *Saver) encodeSolutionSet(solutionSet archive.NonDominanceModelArchive) 
 	asIsSolution := s.deriveASsIsSolution(solutionSet)
 	s.encodeSolutionDetail(*asIsSolution)
 
-	s.summarise(&summary, asIsSolution, "As=Is")
+	s.summarise(&summary, asIsSolution, asIsSolutionNote, topSummaryEntry)
 
+	numberOfSolutions := len(solutionSet.Archive())
 	for solutionIndex, compressedModel := range solutionSet.Archive() {
 		currentSolution := s.deriveModelSolution(solutionSet, solutionIndex, compressedModel)
 		s.encodeSolutionDetail(*currentSolution)
-		s.summarise(&summary, currentSolution, "")
+		formattedNote := fmt.Sprintf("Pareto front member %d of %d", solutionIndex+1, numberOfSolutions)
+		s.summarise(&summary, currentSolution, formattedNote, topSummaryEntry+uint64(1+solutionIndex))
 	}
 	s.encodeSummary(&summary)
 }
@@ -230,7 +239,7 @@ func (s *Saver) deriveASsIsSolution(solutionSet archive.NonDominanceModelArchive
 }
 
 func (s *Saver) deriveAsIsSolutionId(solutionSet archive.NonDominanceModelArchive) string {
-	return solutionSet.Id() + " Solution (As-Is)"
+	return solutionSet.Id() + " As-Is"
 }
 
 func (s *Saver) deriveModelSolution(solutionSet archive.NonDominanceModelArchive, solutionIndex int, compressedModel *archive.CompressedModelState) *solution.Solution {
@@ -258,10 +267,31 @@ func (s *Saver) deriveSolutionId(solutionSet archive.NonDominanceModelArchive, c
 	return solutionId
 }
 
-func (s *Saver) summarise(summary *solutionset.Summary, solution *solution.Solution, note string) {
+func (s *Saver) summarise(summary *solutionset.Summary, solution *solution.Solution, note string, sortOrder uint64) {
 	baseMap := *summary
-	baseMap[solution.Id] = *solution.Summarise().WithId(solution.Id).Noting(note)
+	summaryId := deriveSummaryIdFromSolution(solution)
+	baseMap[solution.Id] =
+		*solution.Summarise().WithId(summaryId).Noting(note).WithSortOrder(sortOrder)
 }
+func deriveSummaryIdFromSolution(solution *solution.Solution) string {
+	if strings.Contains(solution.Id, "(1/1)") {
+		return "Optimised"
+	}
+
+	if strings.Contains(solution.Id, "As-Is") {
+		return "As-Is"
+	}
+
+	trimmedId := iterationMatcher.FindString(solution.Id)
+	urlUsableId := prettifiedMatcher.ReplaceAllString(trimmedId, "-of-")
+
+	return urlUsableId
+}
+
+var (
+	iterationMatcher  = regexp.MustCompile("\\d+/\\d+")
+	prettifiedMatcher = regexp.MustCompile("/")
+)
 
 func (s *Saver) encodeSummary(summary *solutionset.Summary) {
 	encoder := new(encoding2.Builder).

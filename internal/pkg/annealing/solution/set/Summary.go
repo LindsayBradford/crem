@@ -3,6 +3,7 @@ package set
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -34,4 +35,27 @@ func (s Summary) justSomeId() string {
 		return key
 	}
 	return ""
+}
+
+type sortableSummaries []solution.Summary
+
+func (v sortableSummaries) Len() int {
+	return len(v)
+}
+
+func (v sortableSummaries) Swap(i, j int) {
+	v[i], v[j] = v[j], v[i]
+}
+
+func (v sortableSummaries) Less(i, j int) bool {
+	return v[i].SortIndex < v[j].SortIndex
+}
+
+func (s Summary) AsSortedArray() []solution.Summary {
+	var justTheSummaries sortableSummaries
+	for _, value := range s {
+		justTheSummaries = append(justTheSummaries, value)
+	}
+	sort.Sort(justTheSummaries)
+	return justTheSummaries
 }

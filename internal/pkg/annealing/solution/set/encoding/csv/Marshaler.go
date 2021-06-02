@@ -3,13 +3,9 @@
 package csv
 
 import (
-	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set"
 	"github.com/LindsayBradford/crem/pkg/strings"
-	"regexp"
-	"sort"
-	"strconv"
 	strings2 "strings"
 )
 
@@ -39,37 +35,6 @@ func (cm *SummaryMarshaler) marshalSummary(summary *set.Summary) ([]byte, error)
 	return csvStringAsBytes, nil
 }
 
-type sortableSummaries []string
-
-func (v sortableSummaries) Len() int {
-	return len(v)
-}
-
-func (v sortableSummaries) Swap(i, j int) {
-	v[i], v[j] = v[j], v[i]
-}
-
-var numberMatcher = regexp.MustCompile(`(\d+) of `)
-
-func (v sortableSummaries) Less(i, j int) bool {
-	const indexOfNumberMatch = 1
-	numberMatchAtI := numberMatcher.FindStringSubmatch(v[i])
-	numberMatchAtJ := numberMatcher.FindStringSubmatch(v[j])
-
-	// As-Is entry should always be first, and will not be caught be a number matching regular expression
-
-	if numberMatchAtI == nil {
-		return true
-	} else if numberMatchAtJ == nil {
-		return false
-	}
-
-	numberAtI, _ := strconv.ParseInt(numberMatchAtI[indexOfNumberMatch], 10, 32)
-	numberAtJ, _ := strconv.ParseInt(numberMatchAtJ[indexOfNumberMatch], 10, 32)
-
-	return numberAtI < numberAtJ
-}
-
 func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 	headers := deriveHeaders(summary)
 
@@ -79,13 +44,11 @@ func (cm *SummaryMarshaler) summaryToCsvString(summary *set.Summary) string {
 		Add(newline)
 
 	summarySet := make([]string, 0)
-	for id, solutionSummary := range *summary {
-		trimmedId := trimId(id)
-		note := deriveNoteFor(id, solutionSummary)
-		summarySet = append(summarySet, joinAttributes(trimmedId, solutionSummary.Variables, solutionSummary.Actions, note))
+	for _, solutionSummary := range summary.AsSortedArray() {
+		summaryId := solutionSummary.Id
+		note := solutionSummary.Note
+		summarySet = append(summarySet, joinAttributes(summaryId, solutionSummary.Variables, solutionSummary.Actions, note))
 	}
-
-	sort.Sort(sortableSummaries(summarySet))
 
 	for _, sortedSummary := range summarySet {
 		builder.Add(sortedSummary).Add(newline)
@@ -133,45 +96,4 @@ func variableValueList(variables []solution.VariableSummary) []string {
 
 func join(entries ...string) string {
 	return strings2.Join(entries, separator)
-}
-
-func trimId(id string) string {
-	if strings2.Contains(id, "As-Is") {
-		return trimAsIsId(id)
-	}
-	return trimNumberedId(id)
-}
-
-var membershipMatcher = regexp.MustCompile("\\((\\d+)/(\\d+)\\)")
-
-func deriveNoteFor(id string, solutionSummary solution.Summary) string {
-	// TODO: This needs explicit support for both single and multi-objective annealing notes.
-	if strings2.Contains(id, "As-Is") {
-		return "As-is state; zero active management actions"
-	}
-
-	if strings2.Contains(id, "(1/1)") {
-		return "Computationally optimised solution"
-	}
-
-	member := membershipMatcher.FindStringSubmatch(id)
-
-	formattedNote := fmt.Sprintf("Pareto front member %s of %s", member[1], member[2])
-	return formattedNote
-}
-
-func trimAsIsId(id string) string {
-	return "As-Is"
-}
-
-var (
-	iterationMatcher  = regexp.MustCompile("\\d+/\\d+")
-	prettifiedMatcher = regexp.MustCompile("/")
-)
-
-func trimNumberedId(id string) string {
-	trimmedId := iterationMatcher.FindString(id)
-	prettifiedId := prettifiedMatcher.ReplaceAllString(trimmedId, "-of-")
-
-	return prettifiedId
 }

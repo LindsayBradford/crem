@@ -2,7 +2,7 @@
 Name = "Kirkpatrick"
 OutputPath="testdata/solutions"
 #CpuProfilePath="testdata/profile.pprof"
-OutputType="EXCEL"  # "CSV" (default) | "JSON" | "EXCEL"
+OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 #OutputType="CSV"  # "CSV" (default) | "JSON" | "EXCEL"
 [Scenario.Reporting]
 ReportEveryNumberOfIterations = 1

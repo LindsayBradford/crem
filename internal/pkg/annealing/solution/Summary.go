@@ -1,10 +1,21 @@
 package solution
 
 type Summary struct {
+	SortIndex uint64
 	Id        string
 	Variables VariableSetSummary
 	Actions   ActionSummary
 	Note      string
+}
+
+func (s *Solution) Summarise() *Summary {
+	return &Summary{
+		SortIndex: 0,
+		Id:        "",
+		Variables: s.produceVariableSummary(),
+		Actions:   s.produceActionSummary(),
+		Note:      "",
+	}
 }
 
 func (s *Summary) WithId(id string) *Summary {
@@ -17,20 +28,16 @@ func (s *Summary) Noting(note string) *Summary {
 	return s
 }
 
+func (s *Summary) WithSortOrder(sortIndex uint64) *Summary {
+	s.SortIndex = sortIndex
+	return s
+}
+
 type VariableSetSummary []VariableSummary
 
 type VariableSummary struct {
 	Name  string
 	Value float64
-}
-
-type ActionSummary string
-
-func (s *Solution) Summarise() *Summary {
-	return &Summary{
-		Variables: s.produceVariableSummary(),
-		Actions:   s.produceActionSummary(),
-	}
 }
 
 func (s *Solution) produceVariableSummary() VariableSetSummary {
@@ -45,6 +52,8 @@ func (s *Solution) produceVariableSummary() VariableSetSummary {
 	}
 	return summary
 }
+
+type ActionSummary string
 
 func (s *Solution) produceActionSummary() ActionSummary {
 	return ActionSummary(s.EncodedActions)
