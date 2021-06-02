@@ -1,7 +1,7 @@
 package solution
 
 type Summary struct {
-	SortIndex uint64
+	SortIndex uint64 `json:"-"`
 	Id        string
 	Variables VariableSetSummary
 	Actions   ActionSummary

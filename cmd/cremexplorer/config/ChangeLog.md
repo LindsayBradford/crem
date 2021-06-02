@@ -6,6 +6,7 @@
 * SOSA scenarios now produce short summary files like MOSA (containing only as-is and optimised solution).
 * Added new scenario config item 'OutputLevel' to allow generation of just 'Summary' data, or full 'Detail' data
 * Solution identifiers in summary files now use "-" characters instead of spaces to make them more URL friendly.
+* Summary files now respect file formatting as determined by 'OutputType' scenario config. 
 ### Bug Fixes
 * Fixed bug stopping hexidecimal encoding of management action state in summary files.
 

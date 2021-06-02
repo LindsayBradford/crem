@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/csv"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/excel"
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/json"
 	"github.com/LindsayBradford/crem/pkg/logging"
 	"github.com/LindsayBradford/crem/pkg/logging/loggers"
 	//"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/set/encoding/excel"
@@ -35,12 +36,10 @@ func (b *Builder) WithLogHandler(logHandler logging.Logger) *Builder {
 
 func (b *Builder) Build() Encoder {
 	switch b.outputType {
-	// TODO: Support for Json and Excel needed later.
 	case encoding.UndefinedOutput, encoding.CsvOutput:
 		return new(csv.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
 	case encoding.JsonOutput:
-		return new(csv.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
-		//return new(json.Encoder).WithOutputPath(b.outputPath)
+		return new(json.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
 	case encoding.ExcelOutput:
 		return new(excel.Encoder).WithOutputPath(b.outputPath).WithLogHandler(b.LogHandler())
 	default:
