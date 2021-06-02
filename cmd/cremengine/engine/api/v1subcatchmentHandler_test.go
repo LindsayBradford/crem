@@ -200,7 +200,7 @@ func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
+func TestPostValidSubcatchmentResource_OkResponse(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	// given
@@ -209,9 +209,7 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 
 	actionAttributes := attributes.Attributes{}.
 		Add("GullyRestoration", ActiveAction).
-		Add("RiverBankRestoration", ActiveAction).
-		Add("HillSlopeRestoration", InactiveAction).
-		Add("WetlandsEstablishment", ActiveAction)
+		Add("RiverBankRestoration", ActiveAction)
 
 	actionStatusBytes, _ := json.Marshal(actionAttributes)
 
@@ -247,12 +245,10 @@ func TestPostValidSubcathmentResource_OkResponse(t *testing.T) {
 	// then
 	verifyResponseStatusCode(muxUnderTest, getContext)
 
-	// TODO: Confirm active/inactive states of actions posted.
-
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentJson_OkResponse(t *testing.T) {
+func TestPostInvalidSubcatchmentJson_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -277,7 +273,7 @@ func TestPostInvalidSubcatchmentJson_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentActionResource_OkResponse(t *testing.T) {
+func TestPostInvalidSubcatchmentActionResource_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -305,13 +301,42 @@ func TestPostInvalidSubcatchmentActionResource_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentActionStateResource_OkResponse(t *testing.T) {
+func TestPostInvalidSubcatchmentActionStateResource_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
 
 	actionAttributes := attributes.Attributes{}.
 		Add("GullyRestoration", "ThisIsNotAValidState")
+
+	actionStatusBytes, _ := json.Marshal(actionAttributes)
+
+	// when
+	getContext := TestContext{
+		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      http.MethodPost,
+			TargetUrl:   validSubcatchmentUrl,
+			RequestBody: string(actionStatusBytes),
+			ContentType: rest.JsonMimeType,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, getContext)
+	muxUnderTest.Shutdown()
+}
+
+func TestPostInvalidSubcatchmentActionSemantics_ErrorResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+	buildValidScenario(t, muxUnderTest)
+
+	actionAttributes := attributes.Attributes{}.
+		Add("HillSlopeRestoration", "Active"). // SC 18 doesn't have a WetlandsEstablishment action
+		Add("WetlandsEstablishment", "Active") // SC 18 doesn't have a WetlandsEstablishment action
 
 	actionStatusBytes, _ := json.Marshal(actionAttributes)
 

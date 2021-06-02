@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
+	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
@@ -140,12 +141,16 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 		return errors.Wrap(unmnarshalError, "v1 subcatchment handler")
 	}
 
-	verificationError := m.verifyPostedAttributes(postedAttributes)
-	if verificationError != nil {
-		return verificationError
+	syntaxCheckError := m.syntaxCheckPostedAttributes(postedAttributes)
+	if syntaxCheckError != nil {
+		return syntaxCheckError
 	}
 
-	m.updateModel(subCatchment, postedAttributes)
+	updateModelError := m.updateModel(subCatchment, postedAttributes)
+	if updateModelError != nil {
+		return updateModelError
+	}
+
 	return nil
 }
 
@@ -156,7 +161,7 @@ func (m *Mux) updateModelSolution() {
 		Build()
 }
 
-func (m *Mux) verifyPostedAttributes(postedAttributes attributes.Attributes) error {
+func (m *Mux) syntaxCheckPostedAttributes(postedAttributes attributes.Attributes) error {
 	// TODO:  Hardcoding these is a bad code smell.
 	for _, entry := range postedAttributes {
 		if entry.Name != "RiverBankRestoration" && entry.Name != "HillSlopeRestoration" &&
@@ -173,7 +178,25 @@ func (m *Mux) verifyPostedAttributes(postedAttributes attributes.Attributes) err
 	return nil
 }
 
-func (m *Mux) updateModel(subCatchment planningunit.Id, postedAttributes attributes.Attributes) {
+func (m *Mux) updateModel(subCatchment planningunit.Id, postedAttributes attributes.Attributes) error {
+	updateErrors := compositeErrors.New("Model update failure")
+	for _, entry := range postedAttributes {
+		postedEntryFound := false
+		for _, action := range m.model.ManagementActions() {
+			if entry.Name == string(action.Type()) && subCatchment == action.PlanningUnit() {
+				postedEntryFound = true
+			}
+		}
+		if !postedEntryFound {
+			notFoundWarning := fmt.Sprintf("Subcatchment [%d], Action [%s] is not supported", subCatchment, entry.Name)
+			updateErrors.AddMessage(notFoundWarning)
+		}
+	}
+
+	if updateErrors.Size() > 0 {
+		return updateErrors
+	}
+
 	for actionIndex, action := range m.model.ManagementActions() {
 		if subCatchment != action.PlanningUnit() {
 			continue
@@ -194,6 +217,7 @@ func (m *Mux) updateModel(subCatchment planningunit.Id, postedAttributes attribu
 		}
 	}
 	m.updateModelSolution()
+	return nil
 }
 
 func deriveSubCatchmentFrom(r *http.Request) string {
