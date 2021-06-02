@@ -3,7 +3,8 @@
 ## Version 0.3 (TBD):
 ### Bugs Fixed
 * Fixed bug in Subcatchment parser, stopping WetlandsEstablishment action from having state set.
-* Fixed bug in Subcatchment parser, where semantically invalid action state changes would respond with success. 
+* Fixed bug in Subcatchment parser, where semantically invalid action state changes would respond with success.
+* Fixed bug in actions parser, where strings in the posted CSV table would trigger a panic attack.
 
 ## Version 0.2 (02 March 2021):
 ### New Features

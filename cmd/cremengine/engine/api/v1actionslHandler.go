@@ -7,6 +7,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
+	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 	"net/http"
 )
@@ -200,19 +201,34 @@ func (m *Mux) deriveSolutionTable(rawTableContent string) (dataset.HeadingsTable
 		return nil, wrappingError
 	}
 
+	updateErrors := compositeErrors.New("v1 POST actions handler")
+
 	colSize, rowSize := headingsTable.ColumnAndRowSize()
 	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
 		for colIndex := uint(1); colIndex < colSize; colIndex++ {
-			cellValue := headingsTable.CellFloat64(colIndex, rowIndex)
-			if cellValue != 0 && cellValue != 1 {
+
+			cellValue := headingsTable.Cell(colIndex, rowIndex)
+			switch cellValue.(type) {
+			case float64:
+				if cellValue != float64(0) && cellValue != float64(1) {
+					msgText := fmt.Sprintf(
+						"Table management action cell [%d,%d] has invalid value [%v]. Must be one of [0,1]",
+						colIndex, rowIndex, cellValue)
+					updateErrors.AddMessage(msgText)
+					m.Logger().Error(msgText)
+				}
+			default:
 				msgText := fmt.Sprintf(
 					"Table management action cell [%d,%d] has invalid value [%v]. Must be one of [0,1]",
 					colIndex, rowIndex, cellValue)
-				wrappingError := errors.Wrap(errors.New(msgText), "v1 model actions handler")
-				m.Logger().Error(wrappingError)
-				return nil, wrappingError
+				updateErrors.AddMessage(msgText)
+				m.Logger().Error(msgText)
 			}
 		}
+	}
+
+	if updateErrors.Size() > 0 {
+		return nil, updateErrors
 	}
 
 	return headingsTable, nil
