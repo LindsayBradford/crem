@@ -19,6 +19,8 @@ import (
 	"github.com/LindsayBradford/crem/pkg/threading"
 )
 
+var _ model.Model = NewModel()
+
 func NewModel() *Model {
 	newModel := new(Model)
 
@@ -48,7 +50,7 @@ func (m *Model) WithParameters(params baseParameters.Map) *Model {
 	return m
 }
 
-func (m *Model) Initialise() {
+func (m *Model) Initialise(initialisationType model.InitialisationType) {
 	m.note("Initialising")
 
 	if !m.sourceDataLoaded {
@@ -59,7 +61,7 @@ func (m *Model) Initialise() {
 		}
 		m.sourceDataLoaded = true
 	}
-	m.CoreModel.Initialise()
+	m.CoreModel.Initialise(initialisationType)
 }
 
 func (m *Model) Randomize() {
@@ -67,23 +69,9 @@ func (m *Model) Randomize() {
 	m.CoreModel.Randomize()
 }
 
-func (m *Model) InitialiseToAsIsState() {
-	m.note("Initialising")
-
-	if !m.sourceDataLoaded {
-		loadError := m.loadSourceDataSet()
-		if loadError != nil {
-			m.parameters.AddValidationErrorMessage(loadError.Error())
-			return
-		}
-		m.sourceDataLoaded = true
-	}
-	m.CoreModel.Initialise()
-}
-
 func (m *Model) RandomlyInitialiseActions() {
 	m.initialising = true
-	m.CoreModel.InitialiseActions()
+	m.CoreModel.InitialiseActions(model.Random)
 	m.CoreModel.Randomize()
 	m.initialising = false
 }

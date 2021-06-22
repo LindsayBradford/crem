@@ -73,7 +73,7 @@ func (m *Model) ParameterErrors() error {
 	return m.parameters.ValidationErrors()
 }
 
-func (m *Model) Initialise() {
+func (m *Model) Initialise(initialisationType model.InitialisationType) {
 	m.buildDecisionVariables()
 	m.buildManagementActions()
 }

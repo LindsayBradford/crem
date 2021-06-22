@@ -124,7 +124,7 @@ func (m *CoreModel) ParameterErrors() error {
 	return m.parameters.ValidationErrors()
 }
 
-func (m *CoreModel) Initialise() {
+func (m *CoreModel) Initialise(initialisationType model.InitialisationType) {
 	m.AddAttribute("ModelSuppliedPlanningUnitName", "SubCatchment")
 	m.planningUnitTable = m.fetchCsvTable(catchmentDataSet.SubcatchmentsTableName)
 	m.gulliesTable = m.fetchCsvTable(catchmentDataSet.GulliesTableName)
@@ -132,7 +132,7 @@ func (m *CoreModel) Initialise() {
 
 	m.buildDecisionVariables()
 	m.buildAndObserveManagementActions()
-	m.InitialiseActions()
+	m.InitialiseActions(initialisationType)
 
 	firstAction := m.ManagementActions()[0]
 	m.managementActionEvent = observer.NewEvent(observer.Model).
@@ -277,11 +277,17 @@ func (m *CoreModel) observeActions(actionObservers []action.Observer, actions []
 	m.managementActions.Sort()
 }
 
-func (m *CoreModel) InitialiseActions() {
+func (m *CoreModel) InitialiseActions(initialisationType model.InitialisationType) {
 	m.note("Starting initialising model actions")
 
 	m.initialising = true
-	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
+
+	if initialisationType == model.Unchanged {
+		m.note("Initialising to an unchanged state.")
+	} else if initialisationType == model.AsIs {
+		m.note("Initialising to As-Is state.")
+		m.InitialiseAllActionsToInactive()
+	} else if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		m.note("Initialising for Maximum implementation cost limit.")
 		m.InitialiseAllActionsToInactive()
 	} else if m.parameters.HasEntry(parameters.MaximumOpportunityCost) {

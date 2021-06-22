@@ -87,10 +87,10 @@ func (ke *Explorer) Initialise() {
 	ke.modelArchive.Initialise()
 	ke.coolant.SetRandomNumberGenerator(rand.NewTimeSeeded())
 
-	ke.currentModel.Initialise()
+	ke.currentModel.Initialise(model.Random)
 	ke.currentModel.Randomize()
 
-	ke.potentialModel.Initialise()
+	ke.potentialModel.Initialise(model.Random)
 
 	ke.deriveIterationsUntilReturnToBase()
 	ke.currentIteration = 1
@@ -348,11 +348,11 @@ func (ke *Explorer) returnToBaseOutsideArchive(currentModelState *archive.Compre
 	selectionRangeLimit := int(math.Ceil(float64(ke.modelArchive.Len()) * ke.returnToBaseIsolationFraction))
 
 	selectedModel := ke.currentModel.DeepClone()
-	selectedModel.Initialise()
+	selectedModel.Initialise(model.Unchanged)
 	selectedModelArchive := ke.modelArchive.Compress(selectedModel)
 
 	for currentModelState.Encoding() == selectedModelArchive.Encoding() {
-		selectedModel.Initialise()
+		selectedModel.Initialise(model.Unchanged)
 		selectedModelArchive = ke.modelArchive.Compress(selectedModel)
 	}
 

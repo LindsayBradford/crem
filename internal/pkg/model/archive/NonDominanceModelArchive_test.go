@@ -3,6 +3,7 @@
 package archive
 
 import (
+	model2 "github.com/LindsayBradford/crem/internal/pkg/model"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/modumb"
@@ -324,7 +325,7 @@ func TestNonDominanceModelArchiveSummary_Archive_SummaryValid(t *testing.T) {
 func buildSilentMultiObjectiveDumbModel() *modumb.Model {
 	model := modumb.NewModel().WithId("Test Mo Dumb Model")
 	model.AddObserver(loggers.DefaultTestingAnnealingObserver)
-	model.Initialise()
+	model.Initialise(model2.Random)
 	return model
 }
 

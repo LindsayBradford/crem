@@ -13,12 +13,20 @@ import (
 
 const LogLevel logging.Level = "Model"
 
+type InitialisationType int
+
+const (
+	AsIs InitialisationType = iota
+	Random
+	Unchanged
+)
+
 type Model interface {
 	name.Nameable
 	name.Identifiable
 	DecisionVariableContainer
 
-	Initialise()
+	Initialise(initialisationType InitialisationType)
 	Randomize()
 	TearDown()
 
@@ -87,9 +95,9 @@ func (nm *nullModel) WithName(name string) *nullModel {
 	return nm
 }
 
-func (nm *nullModel) Initialise() {}
-func (nm *nullModel) Randomize()  {}
-func (nm *nullModel) TearDown()   {}
+func (nm *nullModel) Initialise(initialisationType InitialisationType) {}
+func (nm *nullModel) Randomize()                                       {}
+func (nm *nullModel) TearDown()                                        {}
 
 func (nm *nullModel) DoRandomChange() {}
 func (nm *nullModel) UndoChange()     {}

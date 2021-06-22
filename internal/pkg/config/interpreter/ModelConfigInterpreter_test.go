@@ -83,7 +83,7 @@ func TestModelConfigInterpreter_RegisteringValidDummyModel_NoErrors(t *testing.T
 
 	dummyModelConfigFunctions := func(config data.ModelConfig) model.Model {
 		newModel := new(dummyModel)
-		newModel.Initialise()
+		newModel.Initialise(model.Random)
 		return newModel
 	}
 

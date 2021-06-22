@@ -84,9 +84,9 @@ func (s *Saver) WithLogHandler(logHandler logging.Logger) *Saver {
 	return s
 }
 
-func (s *Saver) SetDecompressionModel(model model.Model) {
-	clone := model.DeepClone()
-	clone.Initialise()
+func (s *Saver) SetDecompressionModel(modelToClone model.Model) {
+	clone := modelToClone.DeepClone()
+	clone.Initialise(model.AsIs)
 	s.decompressionModel = clone
 }
 
@@ -169,7 +169,7 @@ func (s *Saver) deriveASsIsSolutionForOptimised(solutionId string) *solution.Sol
 	s.decompressionMutex.Lock()
 	defer s.decompressionMutex.Unlock()
 
-	s.decompressionModel.Initialise()
+	s.decompressionModel.Initialise(model.AsIs)
 	asIsSolutionId := s.deriveAsIsOptimisedSolutionId(solutionId)
 
 	decompressedModelSolution := new(solution.SolutionBuilder).
@@ -227,7 +227,7 @@ func (s *Saver) deriveASsIsSolution(solutionSet archive.NonDominanceModelArchive
 	s.decompressionMutex.Lock()
 	defer s.decompressionMutex.Unlock()
 
-	s.decompressionModel.Initialise()
+	s.decompressionModel.Initialise(model.AsIs)
 	asIsSolutionId := s.deriveAsIsSolutionId(solutionSet)
 
 	decompressedModelSolution := new(solution.SolutionBuilder).

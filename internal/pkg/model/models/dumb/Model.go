@@ -67,7 +67,7 @@ const (
 	upward   = 1
 )
 
-func (m *Model) Initialise() {
+func (m *Model) Initialise(initialisationType model.InitialisationType) {
 	m.SetRandomNumberGenerator(rand.NewTimeSeeded())
 }
 

@@ -3,6 +3,7 @@
 package catchment
 
 import (
+	model2 "github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/particulatenitrogen"
@@ -63,7 +64,7 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 
 	g.Expect(model.Name()).To(Equal(localExpectedName))
 
-	model.Initialise()
+	model.Initialise(model2.Random)
 
 	actualActions := model.ManagementActions()
 	expectedActionNumber := 13
@@ -94,7 +95,7 @@ func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
 
 	g.Expect(model.Name()).To(Equal(localExpectedName))
 
-	model.Initialise()
+	model.Initialise(model2.Random)
 	model.SetManagementAction(0, true)
 	model.AcceptAll()
 
@@ -104,7 +105,7 @@ func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
 	g.Expect(originalActions[implementationcost.VariableName].Value()).To(BeNumerically(">", 0))
 
 	copiedModel := model.DeepClone()
-	copiedModel.Initialise()
+	copiedModel.Initialise(model2.Unchanged)
 
 	actualActions := copiedModel.ManagementActions()
 	expectedActionNumber := 13
@@ -128,7 +129,7 @@ func TestCoreModel_Initialise_InvalidDataSet_Errors(t *testing.T) {
 	g.Expect(loadError).To(BeNil())
 
 	newModelRunner := func() {
-		NewCoreModel().WithSourceDataSet(sourceDataSet).Initialise()
+		NewCoreModel().WithSourceDataSet(sourceDataSet).Initialise(model2.AsIs)
 	}
 
 	g.Expect(newModelRunner).To(Panic())
@@ -259,7 +260,7 @@ func TestCoreModel_Compression_AsExpected(t *testing.T) {
 	compressedModelUnderTest := modelArchive.Compress(modelUnderTest)
 
 	decompressedModel := modelUnderTest.DeepClone()
-	decompressedModel.Initialise()
+	decompressedModel.Initialise(model2.Unchanged)
 	modelArchive.Decompress(compressedModelUnderTest, decompressedModel)
 
 	// then
@@ -283,7 +284,7 @@ func TestCoreModel_CompressionOfChanged_AsExpected(t *testing.T) {
 	compressedModelUnderTest := modelArchive.Compress(modelUnderTest)
 
 	decompressedModel := modelUnderTest.DeepClone()
-	decompressedModel.Initialise()
+	decompressedModel.Initialise(model2.AsIs)
 	modelArchive.Decompress(compressedModelUnderTest, decompressedModel)
 
 	// then
@@ -441,7 +442,7 @@ func TestCoreModel_Bounded_RandomisationStaysValid(t *testing.T) {
 
 	modelUnderTest := buildBoundedTestingModel(g)
 
-	modelUnderTest.InitialiseActions()
+	modelUnderTest.InitialiseActions(model2.Random)
 
 	changeState, changeErrors := modelUnderTest.StateIsValid()
 
@@ -587,7 +588,7 @@ func buildModelUnderTest(sourceDataSet *csv.DataSet, parametersUnderTest paramet
 
 	modelUnderTest.AddObserver(loggers.DefaultTestingAnnealingObserver)
 
-	modelUnderTest.Initialise()
+	modelUnderTest.Initialise(model2.AsIs)
 	return modelUnderTest
 }
 

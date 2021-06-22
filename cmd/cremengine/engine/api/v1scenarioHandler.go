@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/LindsayBradford/crem/cmd/cremengine/config/data"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
@@ -122,7 +123,7 @@ func (m *Mux) rememberScenarioAttributeState(config *data.ScenarioConfig, reques
 
 func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config *data.ScenarioConfig) {
 	m.model = modelAsCatchmentModel
-	m.model.InitialiseToAsIsState()
+	m.model.Initialise(model.AsIs)
 	m.model.SetId(config.Scenario.Name)
 }
 

@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.18 (TBD):
+### Bug Fixes
+* Fixed saving of solutions as-is solution accidentally triggering active actions to respect decision variable limits.
+
 ## Version 0.17 (03 June 2021):
 ### New Features
 * Retired Sha256 encoding of models in logging, using hexidecimal encoding instead.

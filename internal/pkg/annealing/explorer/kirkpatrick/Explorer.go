@@ -65,7 +65,7 @@ func (ke *Explorer) Initialise() {
 	ke.notifyInitialisation()
 
 	ke.SetRandomNumberGenerator(rand.NewTimeSeeded())
-	ke.Model().Initialise()
+	ke.Model().Initialise(model.Random)
 	ke.Model().Randomize()
 
 	ke.baseAttributes = new(attributes.Attributes).
