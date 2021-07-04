@@ -248,7 +248,7 @@ func (m *Mux) handleNonCsvContentResponse(r *http.Request, w http.ResponseWriter
 	wrappingError := errors.Wrap(contentTypeError, "v1 model actions handler")
 	m.Logger().Warn(wrappingError)
 
-	m.MethodNotAllowedError(w, r)
+	m.UnsupportedMediaTypeError(w, r)
 }
 
 func (m *Mux) SetSolution(solutionFilePath string) {

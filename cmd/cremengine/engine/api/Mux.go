@@ -8,7 +8,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	serverApi "github.com/LindsayBradford/crem/internal/pkg/server/api"
-	"github.com/LindsayBradford/crem/internal/pkg/server/job"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/threading"
@@ -23,8 +22,6 @@ const (
 	scenarioNameKey = "ScenarioName"
 )
 
-type JobArray []*job.Job
-
 type Mux struct {
 	serverApi.Mux
 	mainThreadChannel *threading.MainThreadChannel
@@ -32,6 +29,8 @@ type Mux struct {
 	modelConfigInterpreter *interpreter.ModelConfigInterpreter
 	model                  *catchment.Model
 	modelSolution          *solution.Solution
+
+	modelPool ModelPool
 
 	jsonMarshaler json.Marshaler
 
@@ -42,9 +41,11 @@ func (m *Mux) Initialise() *Mux {
 	const (
 		scenarioPath         = "scenario"
 		modelPath            = "model"
+		modelsPath           = "models"
 		actionsPath          = "actions"
 		subcatchmentPath     = "subcatchment"
 		identityMatchingPath = "\\d+"
+		modelLabelPath       = "[\\w\\-]+"
 	)
 
 	m.Mux.Initialise()
@@ -55,6 +56,7 @@ func (m *Mux) Initialise() *Mux {
 	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, actionsPath), m.v1actionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
+	m.AddHandler(buildV1ApiPath(modelsPath, modelLabelPath), m.v1modelsHandler)
 
 	return m
 }

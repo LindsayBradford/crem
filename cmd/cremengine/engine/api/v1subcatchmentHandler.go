@@ -179,7 +179,7 @@ func (m *Mux) syntaxCheckPostedAttributes(postedAttributes attributes.Attributes
 }
 
 func (m *Mux) updateModel(subCatchment planningunit.Id, postedAttributes attributes.Attributes) error {
-	updateErrors := compositeErrors.New("Model update failure")
+	updateErrors := compositeErrors.New("Model Update failure")
 	for _, entry := range postedAttributes {
 		postedEntryFound := false
 		for _, action := range m.model.ManagementActions() {

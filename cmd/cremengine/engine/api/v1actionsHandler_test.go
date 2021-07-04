@@ -137,7 +137,7 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "POST /model/actions request returns 501 (not implemented) response",
+		Name: "POST /model/actions request returns 415 (unsupported media type) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
@@ -145,7 +145,7 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 			ContentType: rest.TomlMimeType,
 			RequestBody: "This is not the expected CSV mime type",
 		},
-		ExpectedResponseStatus: http.StatusMethodNotAllowed,
+		ExpectedResponseStatus: http.StatusUnsupportedMediaType,
 	}
 
 	// then

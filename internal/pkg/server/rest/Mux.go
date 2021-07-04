@@ -124,6 +124,10 @@ func (mi *MuxImpl) MethodNotAllowedError(w http.ResponseWriter, r *http.Request)
 	mi.RespondWithError(http.StatusMethodNotAllowed, "HTTP Method not allowed", w, r)
 }
 
+func (mi *MuxImpl) UnsupportedMediaTypeError(w http.ResponseWriter, r *http.Request) {
+	mi.RespondWithError(http.StatusUnsupportedMediaType, "HTTP Unsupported Media Type", w, r)
+}
+
 func (mi *MuxImpl) InternalServerError(w http.ResponseWriter, r *http.Request, errorDetail error) {
 	finalErrorString := "Internal Server Error"
 	if errorDetail != nil {

@@ -125,6 +125,8 @@ func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config 
 	m.model = modelAsCatchmentModel
 	m.model.Initialise(model.AsIs)
 	m.model.SetId(config.Scenario.Name)
+
+	m.modelPool = NewModelPool(modelAsCatchmentModel)
 }
 
 func (m *Mux) handleModelInterpreterErrors(w http.ResponseWriter, r *http.Request, interpreterError error) {

@@ -126,6 +126,8 @@ func (m *Model) deriveDataSourcePath() string {
 func (m *Model) DeepClone() model.Model {
 	clone := *m
 	clone.managementActions.SetRandomNumberGenerator(rand.NewTimeSeeded())
+	clone.Initialise(model.Unchanged)
+
 	return &clone
 }
 
