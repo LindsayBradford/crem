@@ -6,6 +6,7 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
+	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	serverApi "github.com/LindsayBradford/crem/internal/pkg/server/api"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
@@ -20,6 +21,8 @@ const (
 
 	scenarioTextKey = "ScenarioText"
 	scenarioNameKey = "ScenarioName"
+
+	solutionsTextKey = "SolutionsText"
 )
 
 type Mux struct {
@@ -30,7 +33,8 @@ type Mux struct {
 	model                  *catchment.Model
 	modelSolution          *solution.Solution
 
-	modelPool ModelPool
+	modelPool      ModelPool
+	solutionsTable dataset.HeadingsTable
 
 	jsonMarshaler json.Marshaler
 
@@ -40,6 +44,7 @@ type Mux struct {
 func (m *Mux) Initialise() *Mux {
 	const (
 		scenarioPath         = "scenario"
+		solutionsPath        = "solutions"
 		modelPath            = "model"
 		modelsPath           = "models"
 		actionsPath          = "actions"
@@ -53,6 +58,7 @@ func (m *Mux) Initialise() *Mux {
 	m.modelConfigInterpreter = interpreter.NewModelConfigInterpreter()
 
 	m.AddHandler(buildV1ApiPath(scenarioPath), m.v1scenarioHandler)
+	m.AddHandler(buildV1ApiPath(solutionsPath), m.v1solutionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, actionsPath), m.v1actionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
