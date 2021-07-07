@@ -10,7 +10,7 @@ import (
 	"net/http"
 )
 
-func (m *Mux) v1solutionsHandler(w http.ResponseWriter, r *http.Request) {
+func (m *Mux) v1solutionSetHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		m.v1PostSolutionsHandler(w, r)

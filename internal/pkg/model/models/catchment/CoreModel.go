@@ -125,7 +125,7 @@ func (m *CoreModel) ParameterErrors() error {
 }
 
 func (m *CoreModel) Initialise(initialisationType model.InitialisationType) {
-	m.AddAttribute("ModelSuppliedPlanningUnitName", "SubCatchment")
+	m.ReplaceAttribute("ModelSuppliedPlanningUnitName", "SubCatchment")
 	m.planningUnitTable = m.fetchCsvTable(catchmentDataSet.SubcatchmentsTableName)
 	m.gulliesTable = m.fetchCsvTable(catchmentDataSet.GulliesTableName)
 	m.actionsTable = m.fetchCsvTable(catchmentDataSet.ActionsTableName)

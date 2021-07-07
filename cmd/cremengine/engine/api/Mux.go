@@ -33,7 +33,7 @@ type Mux struct {
 	model                  *catchment.Model
 	modelSolution          *solution.Solution
 
-	modelPool      ModelPool
+	modelPool      SolutionPool
 	solutionsTable dataset.HeadingsTable
 
 	jsonMarshaler json.Marshaler
@@ -50,7 +50,7 @@ func (m *Mux) Initialise() *Mux {
 		actionsPath          = "actions"
 		subcatchmentPath     = "subcatchment"
 		identityMatchingPath = "\\d+"
-		modelLabelPath       = "[\\w\\-]+"
+		solutionLabelPath    = "[\\w\\-]+"
 	)
 
 	m.Mux.Initialise()
@@ -58,11 +58,11 @@ func (m *Mux) Initialise() *Mux {
 	m.modelConfigInterpreter = interpreter.NewModelConfigInterpreter()
 
 	m.AddHandler(buildV1ApiPath(scenarioPath), m.v1scenarioHandler)
-	m.AddHandler(buildV1ApiPath(solutionsPath), m.v1solutionsHandler)
+	m.AddHandler(buildV1ApiPath(solutionsPath), m.v1solutionSetHandler)
+	m.AddHandler(buildV1ApiPath(solutionsPath, solutionLabelPath), m.v1solutionHandler)
 	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, actionsPath), m.v1actionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
-	m.AddHandler(buildV1ApiPath(modelsPath, modelLabelPath), m.v1modelsHandler)
 
 	return m
 }
