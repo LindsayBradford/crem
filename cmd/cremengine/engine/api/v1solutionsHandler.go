@@ -137,15 +137,27 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 		return nil, wrappingError
 	}
 
+	updateErrors := compositeErrors.New("v1 POST solutions handler")
+
+	headerLength := len(contentTableWithHeadings.Header())
+
 	if contentTableWithHeadings.Header()[0] != "Solution" {
-		wrappingError := errors.Wrap(
-			errors.New("CSV table header column misses mandatory 'Solution' first entry"),
-			"v1 solutions handler")
-		m.Logger().Error(wrappingError)
-		return nil, wrappingError
+		msgText := "CSV table header column misses mandatory 'Solution' entry"
+		updateErrors.AddMessage(msgText)
+		m.Logger().Error(msgText)
 	}
 
-	updateErrors := compositeErrors.New("v1 POST solutions handler")
+	if contentTableWithHeadings.Header()[headerLength-2] != "Actions" {
+		msgText := "CSV table header column misses mandatory 'Actions' entry"
+		updateErrors.AddMessage(msgText)
+		m.Logger().Error(msgText)
+	}
+
+	if contentTableWithHeadings.Header()[headerLength-1] != "Summary" {
+		msgText := "CSV table header column misses mandatory 'Summary' entry"
+		updateErrors.AddMessage(msgText)
+		m.Logger().Error(msgText)
+	}
 
 	colSize, rowSize := contentTableWithHeadings.ColumnAndRowSize()
 	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
@@ -160,8 +172,8 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 						break // deliberately do nothing
 					default:
 						msgText := fmt.Sprintf(
-							"Table management action cell [%d,%d] has invalid type. Must be a string",
-							colIndex, rowIndex)
+							"Table management action cell [%d,%d] with value [%v] has invalid type. Must be a string",
+							colIndex, rowIndex, cellValue)
 						updateErrors.AddMessage(msgText)
 						m.Logger().Error(msgText)
 					}
@@ -171,8 +183,8 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 						break // deliberately does nothing
 					default:
 						msgText := fmt.Sprintf(
-							"Table management action cell [%d,%d] has invalid type. Must be a 64-bit floating point decimal",
-							colIndex, rowIndex)
+							"Table management action cell [%d,%d] with value [%v] has invalid type. Must be a 64-bit floating point decimal",
+							colIndex, rowIndex, cellValue)
 						updateErrors.AddMessage(msgText)
 						m.Logger().Error(msgText)
 					}

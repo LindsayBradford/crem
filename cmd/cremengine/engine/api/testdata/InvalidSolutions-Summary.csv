@@ -1,4 +1,4 @@
-Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, Actions, Summary
+NotSolution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, NotActions, NotSummary
 As-Is, 18.441, 0.000, 0.000, 2.350, 1123.303, 0, As-is state; zero active management actions
 1-of-4, 9.340, 10584302.000, 127494.000, 0.431, 213.134, 12, Pareto front member 1 of 4
 2-of-4, 8.540, 10920590.000, 128515.000, 0.431, 213.132, 1FFB, 42
