@@ -2,6 +2,10 @@
 
 package tables
 
+import (
+	"fmt"
+)
+
 type baseTable struct {
 	name string
 
@@ -39,7 +43,15 @@ func (bt *baseTable) CellFloat64(col uint, row uint) float64 {
 }
 
 func (bt *baseTable) CellString(col uint, row uint) string {
-	return bt.cells[row][col].(string)
+	switch bt.cells[row][col].(type) {
+	case string:
+		return bt.cells[row][col].(string)
+	case float64:
+		asFloat64 := bt.CellFloat64(col, row)
+		return fmt.Sprintf("%v", asFloat64)
+	default:
+		return ""
+	}
 }
 
 func (bt *baseTable) SetCell(col uint, row uint, value interface{}) {

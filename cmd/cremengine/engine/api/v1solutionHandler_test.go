@@ -123,7 +123,7 @@ func TestGetSolutionsAThreeOfFourResource_OkResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:    "GET",
-			TargetUrl: baseUrl + "api/v1/solutions/3-of-4",
+			TargetUrl: baseUrl + "api/v1/solutions/3-of-8",
 		},
 		ExpectedResponseStatus: http.StatusOK,
 	}

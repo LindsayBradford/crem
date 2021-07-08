@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
+	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
 	"net/http"
+	"regexp"
 )
 
 func (m *Mux) v1solutionSetHandler(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +81,8 @@ func (m *Mux) v1PostSolutionsHandler(w http.ResponseWriter, r *http.Request) {
 	processError := m.processRequestContentForSolutions(r, w)
 	if processError != nil {
 		m.Logger().Warn("Request to POST scenario solutions dataset with invalid solution data detected.")
-		m.BadRequestError(w, r)
+		m.RespondWithError(http.StatusBadRequest, processError.Error(), w, r)
+		//m.BadRequestError(w, r)
 		return
 	}
 
@@ -101,6 +104,28 @@ func (m *Mux) processRequestContentForSolutions(r *http.Request, w http.Response
 	m.solutionsTable, requestError = m.deriveSolutionsRequestTable(rawTableContent)
 	if requestError != nil {
 		return requestError
+	}
+
+	const labelIndex = 0
+
+	asIsModel := m.model.DeepClone()
+	asIsModel.Initialise(model.AsIs)
+
+	numberOfDecisionVariables := len(*asIsModel.DecisionVariables())
+	_, rowSize := m.solutionsTable.ColumnAndRowSize()
+	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
+		if m.solutionsTable.CellString(labelIndex, rowIndex) == "As-Is" {
+			for colIndex := uint(1); colIndex <= uint(numberOfDecisionVariables); colIndex++ {
+				tableDecisionVariable := m.solutionsTable.Header()[colIndex]
+				tableValue := m.solutionsTable.CellFloat64(colIndex, rowIndex)
+
+				modelValue := asIsModel.DecisionVariable(tableDecisionVariable).Value()
+
+				if tableValue != modelValue {
+					return errors.New("Solution Summary supplied wasn't produced from current scenario")
+				}
+			}
+		}
 	}
 
 	return nil
@@ -166,13 +191,23 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 				cellValue := contentTableWithHeadings.Cell(colIndex, rowIndex)
 				heading := contentTableWithHeadings.Header()[colIndex]
 				switch heading {
-				case "Solution", "Actions", "Summary":
+				case "Solution", "Summary":
 					switch cellValue.(type) {
 					case string:
 						break // deliberately do nothing
 					default:
 						msgText := fmt.Sprintf(
 							"Table management action cell [%d,%d] with value [%v] has invalid type. Must be a string",
+							colIndex, rowIndex, cellValue)
+						updateErrors.AddMessage(msgText)
+						m.Logger().Error(msgText)
+					}
+				case "Actions":
+					actionsValue := contentTableWithHeadings.CellString(colIndex, rowIndex)
+					actionsPattern := regexp.MustCompile("^[0-9A-Fa-f:]*$")
+					if actionsPattern.FindStringIndex(actionsValue) == nil {
+						msgText := fmt.Sprintf(
+							"Table management action cell [%d,%d] with value [%v] has invalid structure. Must be a ':' delimited Hexidecimal pattern'",
 							colIndex, rowIndex, cellValue)
 						updateErrors.AddMessage(msgText)
 						m.Logger().Error(msgText)

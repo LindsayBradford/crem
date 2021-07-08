@@ -14,6 +14,9 @@ var validSolutions string
 //go:embed testdata/InvalidSolutions-Summary.csv
 var invalidSolutions string
 
+//go:embed testdata/WrongVariableSolutions-Summary.csv
+var wrongVariableSolutions string
+
 func TestFirstSolutionsGetRequest_NotFoundResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
@@ -265,64 +268,41 @@ func TestGetSolutionsInvalidCsv_BadContentResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-//func TestPostSolutionsTextResource_BadRequestResponse(t *testing.T) {
-//	// given
-//	muxUnderTest := buildMuxUnderTest()
-//
-//	// when
-//	postContext := TestContext{
-//		Name: "POST /scenario text request returns 200 (ok) response",
-//		T:    t,
-//		Request: httptest.HttpTestRequestContext{
-//			Method:      "POST",
-//			TargetUrl:   baseUrl + "api/v1/scenario",
-//			RequestBody: "This isn't TOML",
-//			ContentType: rest.TomlMimeType,
-//		},
-//		ExpectedResponseStatus: http.StatusBadRequest,
-//	}
-//
-//	// then
-//	verifyResponseStatusCode(muxUnderTest, postContext)
-//
-//	muxUnderTest.Shutdown()
-//}
-//
-//func TestPostValidSolutionsResource_OkResponse(t *testing.T) {
-//	// given
-//	muxUnderTest := buildMuxUnderTest()
-//
-//	// when
-//	postContext := TestContext{
-//		Name: "POST /scenario request returns 202 (accepted) response",
-//		T:    t,
-//		Request: httptest.HttpTestRequestContext{
-//			Method:      "POST",
-//			TargetUrl:   baseUrl + "api/v1/scenario",
-//			RequestBody: validScenarioTomlText,
-//			ContentType: rest.TomlMimeType,
-//		},
-//		ExpectedResponseStatus: http.StatusOK,
-//	}
-//
-//	// then
-//	verifyResponseStatusCode(muxUnderTest, postContext)
-//
-//	// when
-//	getContext := TestContext{
-//		Name: "GET /scenario request returns 200 (ok) response",
-//		T:    t,
-//		Request: httptest.HttpTestRequestContext{
-//			Method:      "GET",
-//			TargetUrl:   baseUrl + "api/v1/scenario",
-//			RequestBody: "here is some text",
-//		},
-//		ExpectedResponseStatus: http.StatusOK,
-//	}
-//
-//	// then
-//	verifyResponseStatusCode(muxUnderTest, getContext)
-//
-//	muxUnderTest.Shutdown()
-//}
-//
+func TestGetSolutionsWrongVariable_BadContentResponse(t *testing.T) {
+	// given
+	muxUnderTest := buildMuxUnderTest()
+
+	// when
+	postContext := TestContext{
+		Name: "POST /scenario text request returns 200 (ok) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/scenario",
+			RequestBody: validScenarioTomlConfig,
+			ContentType: rest.TomlMimeType,
+		},
+		ExpectedResponseStatus: http.StatusOK,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	// when
+	postContext = TestContext{
+		Name: "POST /solutions text request returns 400 (bad request) response",
+		T:    t,
+		Request: httptest.HttpTestRequestContext{
+			Method:      "POST",
+			TargetUrl:   baseUrl + "api/v1/solutions",
+			RequestBody: wrongVariableSolutions,
+			ContentType: rest.CsvMimeType,
+		},
+		ExpectedResponseStatus: http.StatusBadRequest,
+	}
+
+	// then
+	verifyResponseStatusCode(muxUnderTest, postContext)
+
+	muxUnderTest.Shutdown()
+}
