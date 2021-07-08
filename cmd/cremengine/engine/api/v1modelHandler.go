@@ -8,8 +8,6 @@ import (
 
 func (m *Mux) v1modelHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		m.v1PostModelHandler(w, r)
 	case http.MethodGet:
 		m.v1GetModelHandler(w, r)
 	default:
@@ -38,8 +36,4 @@ func (m *Mux) v1GetModelHandler(w http.ResponseWriter, r *http.Request) {
 		wrappingError := errors.Wrap(writeError, "v1 model handler")
 		m.Logger().Error(wrappingError)
 	}
-}
-
-func (m *Mux) v1PostModelHandler(w http.ResponseWriter, r *http.Request) {
-	m.RespondWithError(http.StatusNotImplemented, "Behaviour not yet implemented", w, r)
 }

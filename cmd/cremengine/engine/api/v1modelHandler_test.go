@@ -66,20 +66,20 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestModelPostRequest_NotImplementedResponse(t *testing.T) {
+func TestModelPostRequest_NotAllowedResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
 	// when
 	context := TestContext{
-		Name: "PUT /model request returns 501 (not implemented) response",
+		Name: "PUT /model request returns 405 (method not allowed) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/model",
 			RequestBody: "here is some text",
 		},
-		ExpectedResponseStatus: http.StatusNotImplemented,
+		ExpectedResponseStatus: http.StatusMethodNotAllowed,
 	}
 
 	// then
