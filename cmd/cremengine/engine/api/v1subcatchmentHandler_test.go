@@ -135,17 +135,17 @@ func TestGetValidSubcathmentResource_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestFirstSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
+func TestFirstSubcatchmentPutRequest_NotFoundResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	subcatchmentUrlUnderTest := baseSubcatchmentUrl + rest.UrlPathSeparator + validSubcatchment
 
 	// when
 	context := TestContext{
-		Name: http.MethodPost + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
+		Name: http.MethodPut + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:    http.MethodPost,
+			Method:    http.MethodPut,
 			TargetUrl: subcatchmentUrlUnderTest,
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
@@ -156,7 +156,7 @@ func TestFirstSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestMissingSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
+func TestMissingSubcatchmentPutRequest_NotFoundResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -164,10 +164,10 @@ func TestMissingSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 	// when
 	subcatchmentUrlUnderTest := baseSubcatchmentUrl + "/1"
 	getContext := TestContext{
-		Name: http.MethodPost + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
+		Name: http.MethodPut + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:    http.MethodPost,
+			Method:    http.MethodPut,
 			TargetUrl: subcatchmentUrlUnderTest,
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
@@ -178,7 +178,7 @@ func TestMissingSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
+func TestInvalidSubcatchmentPutRequest_NotFoundResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -186,10 +186,10 @@ func TestInvalidSubcatchmentPostRequest_NotFoundResponse(t *testing.T) {
 	// when
 	subcatchmentUrlUnderTest := baseSubcatchmentUrl + "/nope"
 	getContext := TestContext{
-		Name: http.MethodPost + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
+		Name: http.MethodPut + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:    http.MethodPost,
+			Method:    http.MethodPut,
 			TargetUrl: subcatchmentUrlUnderTest,
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
@@ -215,10 +215,10 @@ func TestPostValidSubcatchmentResource_OkResponse(t *testing.T) {
 
 	// when
 	postContext := TestContext{
-		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 200 (ok) response",
+		Name: http.MethodPut + " " + validSubcatchmentUrl + " request returns 200 (ok) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      http.MethodPost,
+			Method:      http.MethodPut,
 			TargetUrl:   validSubcatchmentUrl,
 			RequestBody: string(actionStatusBytes),
 			ContentType: rest.JsonMimeType,
@@ -248,7 +248,7 @@ func TestPostValidSubcatchmentResource_OkResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentJson_ErrorResponse(t *testing.T) {
+func TestPutInvalidSubcatchmentJson_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -257,10 +257,10 @@ func TestPostInvalidSubcatchmentJson_ErrorResponse(t *testing.T) {
 
 	// when
 	getContext := TestContext{
-		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
+		Name: http.MethodPut + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      http.MethodPost,
+			Method:      http.MethodPut,
 			TargetUrl:   validSubcatchmentUrl,
 			RequestBody: string(invalidJson),
 			ContentType: rest.JsonMimeType,
@@ -273,7 +273,7 @@ func TestPostInvalidSubcatchmentJson_ErrorResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentActionResource_ErrorResponse(t *testing.T) {
+func TestPutInvalidSubcatchmentActionResource_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -285,10 +285,10 @@ func TestPostInvalidSubcatchmentActionResource_ErrorResponse(t *testing.T) {
 
 	// when
 	getContext := TestContext{
-		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
+		Name: http.MethodPut + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      http.MethodPost,
+			Method:      http.MethodPut,
 			TargetUrl:   validSubcatchmentUrl,
 			RequestBody: string(actionStatusBytes),
 			ContentType: rest.JsonMimeType,
@@ -301,7 +301,7 @@ func TestPostInvalidSubcatchmentActionResource_ErrorResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentActionStateResource_ErrorResponse(t *testing.T) {
+func TestPutInvalidSubcatchmentActionStateResource_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -313,10 +313,10 @@ func TestPostInvalidSubcatchmentActionStateResource_ErrorResponse(t *testing.T) 
 
 	// when
 	getContext := TestContext{
-		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
+		Name: http.MethodPut + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      http.MethodPost,
+			Method:      http.MethodPut,
 			TargetUrl:   validSubcatchmentUrl,
 			RequestBody: string(actionStatusBytes),
 			ContentType: rest.JsonMimeType,
@@ -329,7 +329,7 @@ func TestPostInvalidSubcatchmentActionStateResource_ErrorResponse(t *testing.T) 
 	muxUnderTest.Shutdown()
 }
 
-func TestPostInvalidSubcatchmentActionSemantics_ErrorResponse(t *testing.T) {
+func TestPutInvalidSubcatchmentActionSemantics_ErrorResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
@@ -342,10 +342,10 @@ func TestPostInvalidSubcatchmentActionSemantics_ErrorResponse(t *testing.T) {
 
 	// when
 	getContext := TestContext{
-		Name: http.MethodPost + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
+		Name: http.MethodPut + " " + validSubcatchmentUrl + " request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      http.MethodPost,
+			Method:      http.MethodPut,
 			TargetUrl:   validSubcatchmentUrl,
 			RequestBody: string(actionStatusBytes),
 			ContentType: rest.JsonMimeType,

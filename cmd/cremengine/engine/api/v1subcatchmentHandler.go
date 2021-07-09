@@ -23,8 +23,8 @@ func (m *Mux) v1subcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		m.v1GetSubcatchmentHandler(w, r)
-	case http.MethodPost:
-		m.v1PostSubcatchmentHandler(w, r)
+	case http.MethodPut:
+		m.v1PutSubcatchmentHandler(w, r)
 	default:
 		m.MethodNotAllowedError(w, r)
 	}
@@ -94,7 +94,7 @@ func (m *Mux) deriveResponseAttributesFor(subCatchment planningunit.Id) attribut
 	return returnAttributes
 }
 
-func (m *Mux) v1PostSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
+func (m *Mux) v1PutSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	if m.modelSolution == nil {
 		m.NotFoundError(w, r)
 		return
