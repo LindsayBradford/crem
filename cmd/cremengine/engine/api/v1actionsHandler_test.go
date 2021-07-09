@@ -80,10 +80,10 @@ func TestModelActionsRequestNoScenario_NotFoundResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "POST /model/actions request returns 501 (not implemented) response",
+		Name: "PUT /model/actions request returns 501 (not implemented) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "POST",
+			Method:      "PUT",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			RequestBody: "here is some text",
 		},
@@ -101,10 +101,10 @@ func TestModelActionsPutRequest_NotAllowedResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "PUT /model/actions request returns 405 (not allowed) response",
+		Name: "POST /model/actions request returns 405 (not allowed) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "PUT",
+			Method:      "POST",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			RequestBody: "here is some text",
 		},
@@ -137,10 +137,10 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "POST /model/actions request returns 415 (unsupported media type) response",
+		Name: "PUT /model/actions request returns 415 (unsupported media type) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "POST",
+			Method:      "PUT",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.TomlMimeType,
 			RequestBody: "This is not the expected CSV mime type",
@@ -175,10 +175,10 @@ func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "POST /model/actions request returns 400 (bad request) response",
+		Name: "PUT /model/actions request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "POST",
+			Method:      "PUT",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.CsvMimeType,
 			RequestBody: "This text is pretending to be CSV text.",
@@ -214,10 +214,10 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 	// when
 
 	context := TestContext{
-		Name: "POST /model/actions request returns 400 (bad request) response",
+		Name: "PUT /model/actions request returns 400 (bad request) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "POST",
+			Method:      "PUT",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.CsvMimeType,
 			RequestBody: invalidActionsCsvContent,
@@ -255,10 +255,10 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 
 	// when
 	actionsPostContext := TestContext{
-		Name: "POST /model/actions request returns 200 (ok) response",
+		Name: "PUT /model/actions request returns 200 (ok) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
-			Method:      "POST",
+			Method:      "PUT",
 			TargetUrl:   baseUrl + "api/v1/model/actions",
 			ContentType: rest.CsvMimeType,
 			RequestBody: validRActionsCsvContent,

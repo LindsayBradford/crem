@@ -14,8 +14,8 @@ import (
 
 func (m *Mux) v1actionsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	case http.MethodPost:
-		m.v1PostActionsHandler(w, r)
+	case http.MethodPut:
+		m.v1PutActionsHandler(w, r)
 	case http.MethodGet:
 		m.v1GetActionsHandler(w, r)
 	default:
@@ -58,7 +58,7 @@ func (m *Mux) writeActiveActionResponse(w http.ResponseWriter) {
 	}
 }
 
-func (m *Mux) v1PostActionsHandler(w http.ResponseWriter, r *http.Request) {
+func (m *Mux) v1PutActionsHandler(w http.ResponseWriter, r *http.Request) {
 	if m.modelSolution == nil {
 		m.NotFoundError(w, r)
 		return
