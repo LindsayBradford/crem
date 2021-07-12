@@ -15,6 +15,8 @@ type Engine interface {
 	LogHandler() logging.Logger
 	SetScenario(scenarioFilePath string)
 	SetSolution(solutionFilePath string)
+	SetSolutionSummary(solutionSummaryFilePath string)
+
 	Run() error
 }
 
@@ -78,11 +80,16 @@ func (s *BaseEngine) SetSolution(solutionFilePath string) {
 	s.RestServer.SetSolution(solutionFilePath)
 }
 
+func (s *BaseEngine) SetSolutionSummary(solutionSummaryFilePath string) {
+	s.RestServer.SetSolutionSummary(solutionSummaryFilePath)
+}
+
 var NullEngine Engine = new(nullEngine)
 
 type nullEngine struct{}
 
-func (s *nullEngine) LogHandler() logging.Logger          { return loggers.NewNullLogger() }
-func (s *nullEngine) Run() error                          { return nil }
-func (s *nullEngine) SetScenario(scenarioFilePath string) {}
-func (s *nullEngine) SetSolution(solutionFilePath string) {}
+func (s *nullEngine) LogHandler() logging.Logger                        { return loggers.NewNullLogger() }
+func (s *nullEngine) Run() error                                        { return nil }
+func (s *nullEngine) SetScenario(scenarioFilePath string)               {}
+func (s *nullEngine) SetSolution(solutionFilePath string)               {}
+func (s *nullEngine) SetSolutionSummary(solutionSummaryFilePath string) {}

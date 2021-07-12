@@ -256,6 +256,8 @@ func (m *Mux) SetSolution(solutionFilePath string) {
 
 	requestTable, parseError := m.deriveSolutionTable(rawTableContent)
 	if parseError != nil {
+		wrappingError := errors.Wrap(parseError, "v1 model actions handler")
+		m.Logger().Error(wrappingError)
 		return
 	}
 

@@ -100,24 +100,33 @@ func (m *Mux) v1PostSolutionsHandler(w http.ResponseWriter, r *http.Request) {
 func (m *Mux) processRequestContentForSolutions(r *http.Request, w http.ResponseWriter) error {
 	rawTableContent := requestBodyToString(r)
 
-	var requestError error
-	m.solutionsTable, requestError = m.deriveSolutionsRequestTable(rawTableContent)
+	solutionsTable, requestError := m.deriveSolutionsRequestTable(rawTableContent)
 	if requestError != nil {
 		return requestError
 	}
 
-	const labelIndex = 0
+	verificationError := m.verifySolutionSummaryMatchesScenario(solutionsTable)
+	if verificationError != nil {
+		return verificationError
+	}
 
+	m.updateSolutionSummary(solutionsTable)
+	return nil
+}
+
+func (m *Mux) verifySolutionSummaryMatchesScenario(solutionSetTable dataset.HeadingsTable) error {
 	asIsModel := m.model.DeepClone()
 	asIsModel.Initialise(model.AsIs)
 
 	numberOfDecisionVariables := len(*asIsModel.DecisionVariables())
-	_, rowSize := m.solutionsTable.ColumnAndRowSize()
+	_, rowSize := solutionSetTable.ColumnAndRowSize()
+
+	const labelIndex = 0
 	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
-		if m.solutionsTable.CellString(labelIndex, rowIndex) == "As-Is" {
+		if solutionSetTable.CellString(labelIndex, rowIndex) == "As-Is" {
 			for colIndex := uint(1); colIndex <= uint(numberOfDecisionVariables); colIndex++ {
-				tableDecisionVariable := m.solutionsTable.Header()[colIndex]
-				tableValue := m.solutionsTable.CellFloat64(colIndex, rowIndex)
+				tableDecisionVariable := solutionSetTable.Header()[colIndex]
+				tableValue := solutionSetTable.CellFloat64(colIndex, rowIndex)
 
 				modelValue := asIsModel.DecisionVariable(tableDecisionVariable).Value()
 
@@ -127,7 +136,6 @@ func (m *Mux) processRequestContentForSolutions(r *http.Request, w http.Response
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -263,4 +271,28 @@ func (m *Mux) rememberSolutionsAttributeState(requestContent string) {
 	scenarioName := m.Attribute(scenarioNameKey).(string)
 	m.Logger().Info("Scenario [" + scenarioName + "] solutions dataset successfully retrieved")
 	m.ReplaceAttribute(solutionsTextKey, requestContent)
+}
+
+func (m *Mux) SetSolutionSummary(solutionSummaryFilePath string) {
+	rawTableContent := readFileAsText(solutionSummaryFilePath)
+
+	requestTable, parseError := m.deriveSolutionsRequestTable(rawTableContent)
+	if parseError != nil {
+		wrappingError := errors.Wrap(parseError, "v1 solution set handler")
+		m.Logger().Error(wrappingError)
+		return
+	}
+
+	verificationError := m.verifySolutionSummaryMatchesScenario(requestTable)
+	if verificationError != nil {
+		wrappingError := errors.Wrap(verificationError, "v1 solution set handler")
+		m.Logger().Error(wrappingError)
+		return
+	}
+
+	m.updateSolutionSummary(requestTable)
+}
+
+func (m *Mux) updateSolutionSummary(solutionSetTable dataset.HeadingsTable) {
+	m.solutionSetTable = solutionSetTable
 }

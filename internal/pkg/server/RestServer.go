@@ -109,3 +109,9 @@ func (s *RestServer) SetSolution(solutionFilePath string) {
 		engineApiMux.SetSolution(solutionFilePath)
 	}
 }
+
+func (s *RestServer) SetSolutionSummary(solutionSummaryFilePath string) {
+	if engineApiMux, isEngineApiMux := s.apiMux.(*engineApi.Mux); isEngineApiMux {
+		engineApiMux.SetSolutionSummary(solutionSummaryFilePath)
+	}
+}

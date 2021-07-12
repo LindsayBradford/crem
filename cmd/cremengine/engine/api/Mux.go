@@ -33,8 +33,8 @@ type Mux struct {
 	model                  *catchment.Model
 	modelSolution          *solution.Solution
 
-	modelPool      SolutionPool
-	solutionsTable dataset.HeadingsTable
+	solutionPool     SolutionPool
+	solutionSetTable dataset.HeadingsTable
 
 	jsonMarshaler json.Marshaler
 

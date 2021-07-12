@@ -31,11 +31,12 @@ func ParseArguments() *Arguments {
 }
 
 type Arguments struct {
-	Version          bool
-	Licence          bool
-	EngineConfigFile string
-	ScenarioFile     string
-	SolutionFile     string
+	Version             bool
+	Licence             bool
+	EngineConfigFile    string
+	ScenarioFile        string
+	SolutionFile        string
+	SolutionSummaryFile string
 }
 
 // THe define sets up the relevant command-line
@@ -78,6 +79,13 @@ func (args *Arguments) define() {
 		"file dictating scenario run-time management action state",
 	)
 
+	flag.StringVar(
+		&args.SolutionSummaryFile,
+		"	SolutionSummaryFile",
+		"",
+		"file detailing a set of solutions to a particular run of scenario",
+	)
+
 	flag.Usage = usageMessage
 
 	flag.Parse()
@@ -117,6 +125,10 @@ func (args *Arguments) process() {
 
 	if args.SolutionFile != "" {
 		validateFilePath(args.SolutionFile)
+	}
+
+	if args.SolutionSummaryFile != "" {
+		validateFilePath(args.SolutionSummaryFile)
 	}
 
 	validateArgInterdependence(args)
@@ -165,13 +177,14 @@ func Exit(exitValue interface{}) {
 
 func usageMessage() {
 	fmt.Printf("Usage of %s\n", GetVersionString())
-	fmt.Println("  --Help                          Prints this help message.")
-	fmt.Println("  --Version                       Prints the version number of this utility.")
-	fmt.Println("  --Licence                       Prints the copyright licence of this utility.")
-	fmt.Println("  --EngineConfigFile  <FilePath>  File describing the engine run-time behaviour.")
+	fmt.Println("  --Help                             Prints this help message.")
+	fmt.Println("  --Version                          Prints the version number of this utility.")
+	fmt.Println("  --Licence                          Prints the copyright licence of this utility.")
+	fmt.Println("  --EngineConfigFile  <FilePath>     File describing the engine run-time behaviour.")
 	fmt.Println()
-	fmt.Println("  --ScenarioFile  <FilePath>      File describing a scenario to run and its  run-time behaviour.")
-	fmt.Println("  --SolutionFile  <FilePath>      File describing a scenario run-time management action state.")
+	fmt.Println("  --ScenarioFile  <FilePath>         File describing a scenario to run and its  run-time behaviour.")
+	fmt.Println("  --SolutionFile  <FilePath>         File describing a scenario run-time management action state.")
+	fmt.Println("  --SolutionSummaryFile  <FilePath>  File describing a set of solutions to a particular run of scenario.")
 
 	Exit(0)
 }

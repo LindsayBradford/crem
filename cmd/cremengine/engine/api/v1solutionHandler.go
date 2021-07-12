@@ -25,7 +25,7 @@ func (m *Mux) v1GetSolutionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if m.solutionsTable == nil {
+	if m.solutionSetTable == nil {
 		m.Logger().Warn("Attempted to request solution [" + requestSuppliedModelLabel + "] with no solution set loaded")
 		m.NotFoundError(w, r)
 		return
@@ -39,10 +39,10 @@ func (m *Mux) v1GetSolutionHandler(w http.ResponseWriter, r *http.Request) {
 
 	modelLabel := SolutionPoolLabel(requestSuppliedModelLabel)
 
-	if !m.modelPool.HasSolution(modelLabel) {
+	if !m.solutionPool.HasSolution(modelLabel) {
 		m.Logger().Info("Loading solution [" + requestSuppliedModelLabel + "] into solution pool ")
 		detail := m.getSolutionDetail(requestSuppliedModelLabel)
-		m.modelPool.AddSolution(modelLabel, detail.encoding, detail.summary)
+		m.solutionPool.AddSolution(modelLabel, detail.encoding, detail.summary)
 	}
 
 	restResponse := new(rest.Response).
@@ -50,7 +50,7 @@ func (m *Mux) v1GetSolutionHandler(w http.ResponseWriter, r *http.Request) {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent(m.modelPool.Solution(modelLabel))
+		WithJsonContent(m.solutionPool.Solution(modelLabel))
 
 	scenarioName := m.Attribute(scenarioNameKey).(string)
 	m.Logger().Info("Responding with scenario [" + scenarioName + "] model [" + requestSuppliedModelLabel + "] state")
@@ -70,9 +70,9 @@ type solutionDetail struct {
 
 func (m *Mux) solutionSetTableContainsEntry(solutionLabel string) bool {
 	const labelIndex = 0
-	_, rowSize := m.solutionsTable.ColumnAndRowSize()
+	_, rowSize := m.solutionSetTable.ColumnAndRowSize()
 	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
-		if m.solutionsTable.CellString(labelIndex, rowIndex) == solutionLabel {
+		if m.solutionSetTable.CellString(labelIndex, rowIndex) == solutionLabel {
 			return true
 		}
 	}
@@ -85,13 +85,13 @@ func (m *Mux) getSolutionDetail(solutionLabel string) *solutionDetail {
 		encodingIndex = 6
 		summaryIndex  = 7
 	)
-	_, rowSize := m.solutionsTable.ColumnAndRowSize()
+	_, rowSize := m.solutionSetTable.ColumnAndRowSize()
 	for rowIndex := uint(1); rowIndex < rowSize; rowIndex++ {
-		if m.solutionsTable.CellString(labelIndex, rowIndex) == solutionLabel {
+		if m.solutionSetTable.CellString(labelIndex, rowIndex) == solutionLabel {
 			return &solutionDetail{
 				label:    solutionLabel,
-				encoding: m.solutionsTable.CellString(encodingIndex, rowIndex),
-				summary:  m.solutionsTable.CellString(summaryIndex, rowIndex),
+				encoding: m.solutionSetTable.CellString(encodingIndex, rowIndex),
+				summary:  m.solutionSetTable.CellString(summaryIndex, rowIndex),
 			}
 		}
 	}
