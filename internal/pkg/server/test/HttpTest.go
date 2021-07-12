@@ -22,16 +22,20 @@ type HttpTestRequestContext struct {
 }
 
 type JsonResponseContainer struct {
-	StatusCode int
-	JsonMap    map[string]interface{}
+	StatusCode  int
+	JsonMap     map[string]interface{}
+	RawResponse string
 }
 
 func (context *HttpTestRequestContext) BuildJsonResponse() JsonResponseContainer {
 	response := context.buildResponse()
 
+	responseAsJson, rawResponse := context.buildJsonMapFrom(response.Body)
+
 	return JsonResponseContainer{
-		StatusCode: response.StatusCode,
-		JsonMap:    context.buildJsonMapFrom(response.Body),
+		StatusCode:  response.StatusCode,
+		JsonMap:     responseAsJson,
+		RawResponse: rawResponse,
 	}
 }
 
@@ -49,16 +53,14 @@ func (context *HttpTestRequestContext) newRequest() *http.Request {
 	if context.ContentType != "" {
 		request.Header.Add(rest.ContentTypeHeaderKey, context.ContentType)
 	}
-
 	return request
-
 }
 
-func (context *HttpTestRequestContext) buildJsonMapFrom(responseBody io.ReadCloser) map[string]interface{} {
+func (context *HttpTestRequestContext) buildJsonMapFrom(responseBody io.ReadCloser) (map[string]interface{}, string) {
 	jsonMap := make(map[string]interface{})
 
 	responseBodyBytes, _ := ioutil.ReadAll(responseBody)
 	json.Unmarshal(responseBodyBytes, &jsonMap)
 
-	return jsonMap
+	return jsonMap, string(responseBodyBytes)
 }
