@@ -1,6 +1,6 @@
 // Copyright (c) 2019 Australian Rivers Institute.
 
-// attributes package offers up a flexible approach to attaching attributes that then be used to avoid
+// Attribs package offers up a flexible approach to attaching Attribs that then be used to avoid
 // the brittle parameter problem.
 package attributes
 
@@ -36,7 +36,16 @@ func (a Attributes) Add(name string, value interface{}) Attributes {
 }
 
 func (a Attributes) Join(attributes Attributes) Attributes {
-	return append(a, attributes...)
+	newAttributes := a
+	for _, attrib := range attributes {
+		if a.Has(attrib.Name) {
+			newAttributes = newAttributes.Replace(attrib.Name, attrib.Value)
+		} else {
+			newAttributes = newAttributes.Add(attrib.Name, attrib.Value)
+		}
+	}
+
+	return newAttributes
 }
 
 func (a Attributes) Rename(oldName string, newName string) Attributes {
@@ -46,6 +55,10 @@ func (a Attributes) Rename(oldName string, newName string) Attributes {
 		}
 	}
 	return a
+}
+
+func (a Attributes) Has(name string) bool {
+	return a.Value(name) != nil
 }
 
 func (a Attributes) Remove(name string) Attributes {
@@ -72,6 +85,19 @@ func (a Attributes) Replace(name string, value interface{}) Attributes {
 		}
 	}
 	return a
+}
+
+func (a Attributes) ReplaceAttributes(incomingAttributes Attributes) Attributes {
+	newAttributes := a
+	for _, attrib := range incomingAttributes {
+		if a.Has(attrib.Name) {
+			newAttributes = newAttributes.Replace(attrib.Name, attrib.Value)
+		} else {
+			newAttributes = newAttributes.Add(attrib.Name, attrib.Value)
+		}
+	}
+
+	return newAttributes
 }
 
 // NameValuePair is a struct allowing some Name as text to be associated with a matching Value of any type.
