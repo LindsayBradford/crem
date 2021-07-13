@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/pkg/errors"
@@ -75,6 +76,7 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 			encoding := entry.Value.(string)
 			m.Logger().Info("Re-initialising model with attribute-supp[ied alternate encoding [" + encoding + "]")
 			m.reInitialiseModelWithEncoding(encoding)
+			m.checkEncodingInSolutionSummary(encoding)
 		}
 	}
 
@@ -97,6 +99,38 @@ func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
 
 	m.model = toCatchmentModel(newModel)
 	m.updateModelSolution()
+}
+
+func (m *Mux) checkEncodingInSolutionSummary(encoding string) {
+	if m.solutionSetTable == nil {
+		return
+	}
+
+	colSize, rowSize := m.solutionSetTable.ColumnAndRowSize()
+	var (
+		labelIndex    = uint(0)
+		encodingIndex = colSize - 2
+		encodingFound = false
+	)
+
+	for rowIndex := uint(1); rowIndex < rowSize; rowIndex++ {
+		if encoding == m.solutionSetTable.CellString(encodingIndex, rowIndex) {
+			encodingFound = true
+			label := m.solutionSetTable.CellString(labelIndex, rowIndex)
+			msgText := fmt.Sprintf(
+				"New model encoding [%s] matches solution set member [%s]", encoding, label)
+			m.Logger().Info(msgText)
+		}
+	}
+
+	if encodingFound {
+		m.model.ReplaceAttribute("ParetoFrontMember", "Yes")
+	} else {
+		m.model.ReplaceAttribute("ParetoFrontMember", "No")
+		msgText := fmt.Sprintf(
+			"New model encoding [%s] matches no solution set member", encoding)
+		m.Logger().Info(msgText)
+	}
 }
 
 func (m *Mux) buildModelPatchResponse(w http.ResponseWriter) *rest.Response {

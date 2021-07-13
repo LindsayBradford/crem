@@ -139,6 +139,10 @@ func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uin
 			m.model.SetManagementAction(actionIndex, suppliedActionState)
 		}
 	}
+
+	compressedModel := modelCompressor.Compress(m.model)
+	newEncoding := compressedModel.Encoding()
+	m.checkEncodingInSolutionSummary(newEncoding)
 }
 
 func (m *Mux) deriveSuppliedActionState(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) bool {
