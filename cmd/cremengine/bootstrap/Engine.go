@@ -99,15 +99,17 @@ func deriveEngineBehaviour(args *commandline.Arguments) {
 func deriveInitialEngineState(args *commandline.Arguments) {
 	if args.ScenarioFile != "" {
 		myEngine.LogHandler().Info("Initialising engine with scenario [" + args.ScenarioFile + "]")
-
 		myEngine.SetScenario(args.ScenarioFile)
 	}
 	if args.SolutionFile != "" {
 		myEngine.LogHandler().Info("Initialising engine management actions with solution [" + args.SolutionFile + "]")
-
 		myEngine.SetSolution(args.SolutionFile)
 	}
 
+	if args.SolutionSummaryFile != "" {
+		myEngine.LogHandler().Info("Initialising engine solution summary set [" + args.SolutionSummaryFile + "]")
+		myEngine.SetSolutionSummary(args.SolutionSummaryFile)
+	}
 }
 
 func loadConfig(configFile string) *data.EngineConfig {

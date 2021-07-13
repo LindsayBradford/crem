@@ -81,7 +81,7 @@ func (args *Arguments) define() {
 
 	flag.StringVar(
 		&args.SolutionSummaryFile,
-		"	SolutionSummaryFile",
+		"SolutionSummaryFile",
 		"",
 		"file detailing a set of solutions to a particular run of scenario",
 	)
@@ -151,6 +151,11 @@ func validateArgInterdependence(args *Arguments) {
 		exitError := errors.Errorf("solution file [%s] needs a scenario file (--ScenarioFile flag) specified", args.SolutionFile)
 		Exit(exitError)
 	}
+
+	if args.SolutionSummaryFile != "" && args.ScenarioFile == "" {
+		exitError := errors.Errorf("solution summary file [%s] needs a scenario file (--ScenarioFile flag) specified", args.SolutionSummaryFile)
+		Exit(exitError)
+	}
 }
 
 func Exit(exitValue interface{}) {
@@ -184,7 +189,7 @@ func usageMessage() {
 	fmt.Println()
 	fmt.Println("  --ScenarioFile  <FilePath>         File describing a scenario to run and its  run-time behaviour.")
 	fmt.Println("  --SolutionFile  <FilePath>         File describing a scenario run-time management action state.")
-	fmt.Println("  --SolutionSummaryFile  <FilePath>  File describing a set of solutions to a particular run of scenario.")
+	fmt.Println("  --SolutionSummaryFile  <FilePath>  File describing a set of solutions to a particular run of supplied scenario.")
 
 	Exit(0)
 }

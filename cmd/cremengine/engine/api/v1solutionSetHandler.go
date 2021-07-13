@@ -274,6 +274,7 @@ func (m *Mux) rememberSolutionsAttributeState(requestContent string) {
 }
 
 func (m *Mux) SetSolutionSummary(solutionSummaryFilePath string) {
+	m.Logger().Info("Retrieving Solution Summary [" + solutionSummaryFilePath + "]")
 	rawTableContent := readFileAsText(solutionSummaryFilePath)
 
 	requestTable, parseError := m.deriveSolutionsRequestTable(rawTableContent)
@@ -291,6 +292,7 @@ func (m *Mux) SetSolutionSummary(solutionSummaryFilePath string) {
 	}
 
 	m.updateSolutionSummary(requestTable)
+	m.rememberSolutionsAttributeState(rawTableContent)
 }
 
 func (m *Mux) updateSolutionSummary(solutionSetTable dataset.HeadingsTable) {
