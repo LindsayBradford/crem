@@ -52,7 +52,9 @@ func (sp *SolutionPool) deriveSolutionFrom(model *catchment.Model) *solution.Sol
 func generateAsIsModel(referenceModel *catchment.Model) *catchment.Model {
 	asIsClone := referenceModel.DeepClone()
 	asIsClone.Initialise(model.AsIs)
-	return toCatchmentModel(asIsClone)
+	asIsCatchmentModel := toCatchmentModel(asIsClone)
+	asIsCatchmentModel.ReplaceAttribute("ParetoFrontMember", "No")
+	return asIsCatchmentModel
 }
 
 func toCatchmentModel(thisModel model.Model) *catchment.Model {
@@ -91,6 +93,7 @@ func (sp *SolutionPool) AddSolution(label SolutionPoolLabel, modelEncoding strin
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	newCatchmentModel := toCatchmentModel(newModel)
+	newCatchmentModel.ReplaceAttribute("ParetoFrontMember", "Yes")
 	newSolution := sp.deriveSolutionFrom(newCatchmentModel)
 	sp.cache[label] = NewSolutionContainer(newSolution, summary)
 }
