@@ -125,7 +125,7 @@ func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config 
 	m.model = modelAsCatchmentModel
 	m.model.Initialise(model.AsIs)
 	m.model.SetId(config.Scenario.Name)
-	m.model.ReplaceAttribute("ParetoFrontMember", "No")
+	m.deriveExtraModelAttributes()
 
 	m.solutionPool = NewSolutionPool(modelAsCatchmentModel)
 }

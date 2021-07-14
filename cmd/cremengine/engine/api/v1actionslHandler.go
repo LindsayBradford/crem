@@ -122,14 +122,38 @@ func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
 			m.processTableCell(headingsTable, colIndex, rowIndex)
 		}
 	}
-	m.checkModelInSolutionSummary()
+	m.deriveExtraModelAttributes()
 }
 
-func (m *Mux) checkModelInSolutionSummary() {
+func (m *Mux) deriveExtraModelAttributes() {
+	encodingOfModel := m.deriveModelActionEncoding()
+	m.checkEncodingInSolutionSummary(encodingOfModel)
+	m.deriveModelValidityAgainstScenario()
+}
+
+func (m *Mux) deriveModelActionEncoding() string {
 	compressedModel := modelCompressor.Compress(m.model)
 	encodingOfModel := compressedModel.Encoding()
 	m.model.ReplaceAttribute("Encoding", encodingOfModel)
-	m.checkEncodingInSolutionSummary(encodingOfModel)
+	return encodingOfModel
+}
+
+func (m *Mux) deriveModelValidityAgainstScenario() bool {
+	isValid, validationErrors := m.model.StateIsValid()
+	m.model.ReplaceAttribute("ValidAgainstScenario", isValid)
+	if !isValid {
+		msgText := fmt.Sprintf("New model is invalid against supplied scenario")
+		m.Logger().Info(msgText)
+		m.Logger().Info("Validation errors:" + validationErrors.Error())
+
+		m.model.ReplaceAttribute("ValidationErrors", validationErrors.Error())
+	} else {
+		msgText := fmt.Sprintf("New model is valid against supplied scenario")
+		m.Logger().Info(msgText)
+
+		m.model.RemoveAttribute("ValidationErrors")
+	}
+	return isValid
 }
 
 func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) {

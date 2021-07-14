@@ -151,7 +151,7 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 		return updateModelError
 	}
 
-	m.checkModelInSolutionSummary()
+	m.deriveExtraModelAttributes()
 	return nil
 }
 

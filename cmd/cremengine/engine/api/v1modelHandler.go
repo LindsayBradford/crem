@@ -91,7 +91,6 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 
 func (m *Mux) updateModelWithEncoding(encoding string) {
 	m.reInitialiseModelWithEncoding(encoding)
-	m.checkEncodingInSolutionSummary(encoding)
 	m.updateModelSolution()
 }
 
@@ -103,6 +102,7 @@ func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	m.model = toCatchmentModel(newModel)
+	m.deriveExtraModelAttributes()
 }
 
 func (m *Mux) checkEncodingInSolutionSummary(encoding string) {
