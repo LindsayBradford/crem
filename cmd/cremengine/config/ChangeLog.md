@@ -1,13 +1,16 @@
 # Change Log
 
-## Version 0.4 (TBD):
+## Version 0.4 (15 July 2021):
 ### New Features
 * Addition of new running engine api behaviour:
   * POST /api/v1/solutions                   -- Supplies a solution summary to the engine, which the engine then uses
   * GET  /api/v1/solutions                   -- Returns the current solution summary data loaded into the engine
   * GET  /api/v1/solutions/<solution-label>  -- Returns full model solution detail for a solution present in the solution summary.
   * PATCH /api/v1/model                      -- Allows attributes to be uploaded to the currently running model.
-    * A special attribute of 'Encoding' can be posted that will alter the model's management action state as per solution summaries.
+    * An engine-reserved attribute 'Encoding' can be supplied that alters the model's management action state as per solution summaries.
+    * An engine-reserved attribute 'ParetoFrontMember' reports whether the model is a member of the solution summary pareto front.
+    * An engine-reserved attribute 'ValidAgainstScenario' reports on whether the model is valid against its scenario. 
+    * An engine-reserved attribute 'ValidationErrors' reports why the model is invalid valid against its scenario.
 * Command-line now allows a solution summary file to be specified via the new --SolutionSummaryFile command-line argument.
 ### Bugs Fixed
 * POST /api/v1/model/actions is now a PUT operation to better match RESTful best-practices.

@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.18 (TBD):
+## Version 0.18 (15 July 2021):
 ### Bug Fixes
 * Fixed saving of solutions as-is solution accidentally triggering active actions to respect decision variable limits.
 
