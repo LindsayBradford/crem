@@ -37,7 +37,7 @@ func (m *Mux) v1GetSolutionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	restResponse := m.buildSolutionsGetResponse(w)
-	m.logScenarioGetResponse()
+	m.logSolutionsGetResponse()
 	writeError := restResponse.Write()
 
 	m.handleScenarioGetWriteError(writeError)
@@ -51,7 +51,7 @@ func (m *Mux) buildSolutionsGetResponse(w http.ResponseWriter) *rest.Response {
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithTomlContent(responseText)
+		WithCsvContent(responseText)
 	return restResponse
 }
 
@@ -86,8 +86,6 @@ func (m *Mux) v1PostSolutionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.processSolutionsPostText(r)
-
 	restResponse := m.buildSolutionsPostResponse(w)
 	writeError := restResponse.Write()
 
@@ -110,7 +108,7 @@ func (m *Mux) processRequestContentForSolutions(r *http.Request, w http.Response
 		return verificationError
 	}
 
-	m.updateSolutionSummary(solutionsTable)
+	m.updateSolutionSummary(solutionsTable, rawTableContent)
 	return nil
 }
 
@@ -261,15 +259,9 @@ func (m *Mux) buildSolutionsPostResponse(w http.ResponseWriter) *rest.Response {
 	return restResponse
 }
 
-func (m *Mux) processSolutionsPostText(r *http.Request) error {
-	requestContent := requestBodyToString(r)
-	m.rememberSolutionsAttributeState(requestContent)
-	return nil
-}
-
 func (m *Mux) rememberSolutionsAttributeState(requestContent string) {
 	scenarioName := m.Attribute(scenarioNameKey).(string)
-	m.Logger().Info("Scenario [" + scenarioName + "] solutions dataset successfully retrieved")
+	m.Logger().Info("Scenario [" + scenarioName + "] solutions dataset successfully cached")
 	m.ReplaceAttribute(solutionsTextKey, requestContent)
 }
 
@@ -291,10 +283,10 @@ func (m *Mux) SetSolutionSummary(solutionSummaryFilePath string) {
 		return
 	}
 
-	m.updateSolutionSummary(requestTable)
-	m.rememberSolutionsAttributeState(rawTableContent)
+	m.updateSolutionSummary(requestTable, rawTableContent)
 }
 
-func (m *Mux) updateSolutionSummary(solutionSetTable dataset.HeadingsTable) {
+func (m *Mux) updateSolutionSummary(solutionSetTable dataset.HeadingsTable, rawMessageContent string) {
+	m.rememberSolutionsAttributeState(rawMessageContent)
 	m.solutionSetTable = solutionSetTable
 }

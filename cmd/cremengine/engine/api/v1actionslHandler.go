@@ -122,6 +122,14 @@ func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
 			m.processTableCell(headingsTable, colIndex, rowIndex)
 		}
 	}
+	m.checkModelInSolutionSummary()
+}
+
+func (m *Mux) checkModelInSolutionSummary() {
+	compressedModel := modelCompressor.Compress(m.model)
+	encodingOfModel := compressedModel.Encoding()
+	m.model.ReplaceAttribute("Encoding", encodingOfModel)
+	m.checkEncodingInSolutionSummary(encodingOfModel)
 }
 
 func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) {
@@ -139,10 +147,6 @@ func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uin
 			m.model.SetManagementAction(actionIndex, suppliedActionState)
 		}
 	}
-
-	compressedModel := modelCompressor.Compress(m.model)
-	newEncoding := compressedModel.Encoding()
-	m.checkEncodingInSolutionSummary(newEncoding)
 }
 
 func (m *Mux) deriveSuppliedActionState(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) bool {

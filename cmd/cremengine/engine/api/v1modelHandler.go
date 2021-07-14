@@ -75,8 +75,7 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 		if entry.Name == "Encoding" {
 			encoding := entry.Value.(string)
 			m.Logger().Info("Re-initialising model with attribute-supp[ied alternate encoding [" + encoding + "]")
-			m.reInitialiseModelWithEncoding(encoding)
-			m.checkEncodingInSolutionSummary(encoding)
+			m.updateModelWithEncoding(encoding)
 		}
 	}
 
@@ -90,6 +89,12 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (m *Mux) updateModelWithEncoding(encoding string) {
+	m.reInitialiseModelWithEncoding(encoding)
+	m.checkEncodingInSolutionSummary(encoding)
+	m.updateModelSolution()
+}
+
 func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
 	newModel := m.model.DeepClone()
 
@@ -98,7 +103,6 @@ func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	m.model = toCatchmentModel(newModel)
-	m.updateModelSolution()
 }
 
 func (m *Mux) checkEncodingInSolutionSummary(encoding string) {
@@ -118,7 +122,7 @@ func (m *Mux) checkEncodingInSolutionSummary(encoding string) {
 			encodingFound = true
 			label := m.solutionSetTable.CellString(labelIndex, rowIndex)
 			msgText := fmt.Sprintf(
-				"New model encoding [%s] matches solution set member [%s]", encoding, label)
+				"New model's encoding [%s] matches pareto front solution set member [%s]", encoding, label)
 			m.Logger().Info(msgText)
 		}
 	}

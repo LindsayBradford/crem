@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
+	. "github.com/onsi/gomega"
 	"net/http"
 	"testing"
 )
@@ -148,7 +149,10 @@ func TestGetSolutionsCsvResource_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, postContext)
+	response := verifyResponseStatusCode(muxUnderTest, postContext)
+	g := NewGomegaWithT(t)
+
+	g.Expect(response.RawResponse).To(Equal(validSolutions))
 
 	muxUnderTest.Shutdown()
 }

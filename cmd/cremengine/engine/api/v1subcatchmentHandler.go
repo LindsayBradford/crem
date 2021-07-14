@@ -151,10 +151,7 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 		return updateModelError
 	}
 
-	compressedModel := modelCompressor.Compress(m.model)
-	newEncoding := compressedModel.Encoding()
-	m.checkEncodingInSolutionSummary(newEncoding)
-
+	m.checkModelInSolutionSummary()
 	return nil
 }
 
