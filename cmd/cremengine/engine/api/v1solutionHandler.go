@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const v1solutionHandler = "v1 solution handler"
+
 func (m *Mux) v1solutionHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -40,7 +42,7 @@ func (m *Mux) v1GetSolutionHandler(w http.ResponseWriter, r *http.Request) {
 	modelLabel := SolutionPoolLabel(requestSuppliedModelLabel)
 
 	if !m.solutionPool.HasSolution(modelLabel) {
-		m.Logger().Info("Loading solution [" + requestSuppliedModelLabel + "] into solution pool ")
+		m.Logger().Info("Loading solution [" + requestSuppliedModelLabel + "] into solution pool")
 		detail := m.getSolutionDetail(requestSuppliedModelLabel)
 		m.solutionPool.AddSolution(modelLabel, detail.encoding, detail.summary)
 	}
@@ -57,7 +59,7 @@ func (m *Mux) v1GetSolutionHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 models handler")
+		wrappingError := errors.Wrap(writeError, v1solutionHandler)
 		m.Logger().Error(wrappingError)
 	}
 }

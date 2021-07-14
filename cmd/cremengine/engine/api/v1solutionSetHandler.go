@@ -12,6 +12,9 @@ import (
 	"regexp"
 )
 
+const v1solutionSetHandler = "v1 solution set handler"
+const actionsEncodingPattern = "^[0-9A-Fa-f:]*$"
+
 func (m *Mux) v1solutionSetHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -62,7 +65,7 @@ func (m *Mux) logSolutionsGetResponse() {
 
 func (m *Mux) handleSolutionsGetWriteError(writeError error) {
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 solutions handler")
+		wrappingError := errors.Wrap(writeError, v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -90,7 +93,7 @@ func (m *Mux) v1PostSolutionsHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 solutions handler")
+		wrappingError := errors.Wrap(writeError, v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -143,14 +146,14 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 
 	tmpDataSet.ParseCsvTextIntoTable("requestContent", rawTableContent)
 	if tmpDataSet.Errors() != nil {
-		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 solutions handler")
+		wrappingError := errors.Wrap(tmpDataSet.Errors(), v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
 
 	contentTable, tableError := tmpDataSet.Table("requestContent")
 	if tableError != nil {
-		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 solutions handler")
+		wrappingError := errors.Wrap(tmpDataSet.Errors(), v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
@@ -210,7 +213,7 @@ func (m *Mux) deriveSolutionsRequestTable(rawTableContent string) (dataset.Headi
 					}
 				case "Actions":
 					actionsValue := contentTableWithHeadings.CellString(colIndex, rowIndex)
-					actionsPattern := regexp.MustCompile("^[0-9A-Fa-f:]*$")
+					actionsPattern := regexp.MustCompile(actionsEncodingPattern)
 					if actionsPattern.FindStringIndex(actionsValue) == nil {
 						msgText := fmt.Sprintf(
 							"Table management action cell [%d,%d] with value [%v] has invalid structure. Must be a ':' delimited Hexidecimal pattern'",
@@ -271,14 +274,14 @@ func (m *Mux) SetSolutionSummary(solutionSummaryFilePath string) {
 
 	requestTable, parseError := m.deriveSolutionsRequestTable(rawTableContent)
 	if parseError != nil {
-		wrappingError := errors.Wrap(parseError, "v1 solution set handler")
+		wrappingError := errors.Wrap(parseError, v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 		return
 	}
 
 	verificationError := m.verifySolutionSummaryMatchesScenario(requestTable)
 	if verificationError != nil {
-		wrappingError := errors.Wrap(verificationError, "v1 solution set handler")
+		wrappingError := errors.Wrap(verificationError, v1solutionSetHandler)
 		m.Logger().Error(wrappingError)
 		return
 	}

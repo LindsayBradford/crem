@@ -22,7 +22,7 @@ func TestModePool_New(t *testing.T) {
 	g.Expect(poolUnderTest.Solution(AsIs)).To(Not(BeNil()))
 
 	modelUnderTest.Initialise(model.AsIs)
-	modelUnderTest.ReplaceAttribute("ParetoFrontMember", "No")
+	modelUnderTest.ReplaceAttribute("ParetoFrontMember", false)
 	solutionUnderTest := poolUnderTest.deriveSolutionFrom(modelUnderTest)
 
 	poolAsIsSolution := poolUnderTest.Solution(AsIs)
@@ -38,7 +38,7 @@ func TestModePool_AddSolution(t *testing.T) {
 	referenceModel.SetManagementAction(0, true)
 	referenceModel.SetManagementAction(5, true)
 	referenceModel.SetManagementAction(7, true)
-	referenceModel.ReplaceAttribute("ParetoFrontMember", "Yes")
+	referenceModel.ReplaceAttribute("ParetoFrontMember", true)
 
 	expectedSolution := poolUnderTest.deriveSolutionFrom(referenceModel)
 

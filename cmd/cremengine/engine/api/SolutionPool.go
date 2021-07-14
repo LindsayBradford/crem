@@ -5,7 +5,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
-	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"time"
 )
 
@@ -45,25 +44,16 @@ func (sp *SolutionPool) assignAsIsSolutionFrom(referenceModel *catchment.Model) 
 	sp.cache[AsIs] = NewSolutionContainer(asIsSolution, "As-Is solution. No management actions active.")
 }
 
-func (sp *SolutionPool) deriveSolutionFrom(model *catchment.Model) *solution.Solution {
-	return sp.builder.WithId(model.Id()).ForModel(model).Build()
-}
-
 func generateAsIsModel(referenceModel *catchment.Model) *catchment.Model {
 	asIsClone := referenceModel.DeepClone()
 	asIsClone.Initialise(model.AsIs)
 	asIsCatchmentModel := toCatchmentModel(asIsClone)
-	asIsCatchmentModel.ReplaceAttribute("ParetoFrontMember", "No")
+	asIsCatchmentModel.ReplaceAttribute(ParetoFrontMember.String(), false)
 	return asIsCatchmentModel
 }
 
-func toCatchmentModel(thisModel model.Model) *catchment.Model {
-	catchmentModel, isCatchmentModel := thisModel.(*catchment.Model)
-	if isCatchmentModel {
-		return catchmentModel
-	}
-	assert.That(false).WithFailureMessage("Should not get here").Holds()
-	return nil
+func (sp *SolutionPool) deriveSolutionFrom(model *catchment.Model) *solution.Solution {
+	return sp.builder.WithId(model.Id()).ForModel(model).Build()
 }
 
 func (sp *SolutionPool) HasSolution(label SolutionPoolLabel) bool {
@@ -93,7 +83,7 @@ func (sp *SolutionPool) AddSolution(label SolutionPoolLabel, modelEncoding strin
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	newCatchmentModel := toCatchmentModel(newModel)
-	newCatchmentModel.ReplaceAttribute("ParetoFrontMember", "Yes")
+	newCatchmentModel.ReplaceAttribute(ParetoFrontMember.String(), true)
 	newSolution := sp.deriveSolutionFrom(newCatchmentModel)
 	sp.cache[label] = NewSolutionContainer(newSolution, summary)
 }

@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
@@ -17,6 +16,8 @@ import (
 const (
 	ActiveAction   = "Active"
 	InactiveAction = "Inactive"
+
+	v1subcatchmentHandler = "v1 subcatchment handler"
 )
 
 func (m *Mux) v1subcatchmentHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +69,7 @@ func (m *Mux) sendSubcatchmentStateResponse(w http.ResponseWriter, subCatchment 
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 subcatchment handler")
+		wrappingError := errors.Wrap(writeError, v1subcatchmentHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -118,7 +119,7 @@ func (m *Mux) v1PutSubcatchmentHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 POST subcatchment handler")
+		wrappingError := errors.Wrap(writeError, v1subcatchmentHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -138,7 +139,7 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 
 	unmnarshalError := json.Unmarshal(requestContent, &postedAttributes)
 	if unmnarshalError != nil {
-		return errors.Wrap(unmnarshalError, "v1 subcatchment handler")
+		return errors.Wrap(unmnarshalError, v1subcatchmentHandler)
 	}
 
 	syntaxCheckError := m.syntaxCheckPostedAttributes(postedAttributes)
@@ -155,25 +156,18 @@ func (m *Mux) processSubcatchmentPost(w http.ResponseWriter, r *http.Request, su
 	return nil
 }
 
-func (m *Mux) updateModelSolution() {
-	m.modelSolution = new(solution.SolutionBuilder).
-		WithId(m.model.Id()).
-		ForModel(m.model).
-		Build()
-}
-
 func (m *Mux) syntaxCheckPostedAttributes(postedAttributes attributes.Attributes) error {
 	// TODO:  Hardcoding these is a bad code smell.
 	for _, entry := range postedAttributes {
 		if entry.Name != "RiverBankRestoration" && entry.Name != "HillSlopeRestoration" &&
 			entry.Name != "GullyRestoration" && entry.Name != "WetlandsEstablishment" {
 			baseError := errors.New("Name [" + entry.Name + "] not one of [RiverBankRestoration, HillSlopeRestoration, GullyRestoration, WetlandsEstablishment]")
-			return errors.Wrap(baseError, "v1 POST subcatchment handler")
+			return errors.Wrap(baseError, v1subcatchmentHandler)
 		}
 
 		if entry.Value != InactiveAction && entry.Value != ActiveAction {
 			baseError := errors.New("For named action [" + entry.Name + "], value [" + entry.Value.(string) + "] not one of [Active,Inactive]")
-			return errors.Wrap(baseError, "v1 POST subcatchment handler")
+			return errors.Wrap(baseError, v1subcatchmentHandler)
 		}
 	}
 	return nil

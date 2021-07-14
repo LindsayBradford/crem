@@ -46,7 +46,6 @@ func (m *Mux) Initialise() *Mux {
 		scenarioPath         = "scenario"
 		solutionsPath        = "solutions"
 		modelPath            = "model"
-		modelsPath           = "models"
 		actionsPath          = "actions"
 		subcatchmentPath     = "subcatchment"
 		identityMatchingPath = "\\d+"

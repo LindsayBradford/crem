@@ -12,6 +12,8 @@ import (
 	"net/http"
 )
 
+const v1ModelActionsHandler = "v1 model actions handler"
+
 func (m *Mux) v1actionsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPut:
@@ -53,7 +55,7 @@ func (m *Mux) writeActiveActionResponse(w http.ResponseWriter) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model actions handler")
+		wrappingError := errors.Wrap(writeError, v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -78,7 +80,7 @@ func (m *Mux) v1PutActionsHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model actions handler")
+		wrappingError := errors.Wrap(writeError, v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 	}
 
@@ -125,37 +127,6 @@ func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
 	m.deriveExtraModelAttributes()
 }
 
-func (m *Mux) deriveExtraModelAttributes() {
-	encodingOfModel := m.deriveModelActionEncoding()
-	m.checkEncodingInSolutionSummary(encodingOfModel)
-	m.deriveModelValidityAgainstScenario()
-}
-
-func (m *Mux) deriveModelActionEncoding() string {
-	compressedModel := modelCompressor.Compress(m.model)
-	encodingOfModel := compressedModel.Encoding()
-	m.model.ReplaceAttribute("Encoding", encodingOfModel)
-	return encodingOfModel
-}
-
-func (m *Mux) deriveModelValidityAgainstScenario() bool {
-	isValid, validationErrors := m.model.StateIsValid()
-	m.model.ReplaceAttribute("ValidAgainstScenario", isValid)
-	if !isValid {
-		msgText := fmt.Sprintf("New model is invalid against supplied scenario")
-		m.Logger().Info(msgText)
-		m.Logger().Info("Validation errors:" + validationErrors.Error())
-
-		m.model.ReplaceAttribute("ValidationErrors", validationErrors.Error())
-	} else {
-		msgText := fmt.Sprintf("New model is valid against supplied scenario")
-		m.Logger().Info(msgText)
-
-		m.model.RemoveAttribute("ValidationErrors")
-	}
-	return isValid
-}
-
 func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uint, rowIndex uint) {
 	suppliedActionState := m.deriveSuppliedActionState(headingsTable, colIndex, rowIndex)
 	modelActions := m.model.ManagementActions()
@@ -200,27 +171,27 @@ func (m *Mux) deriveSolutionTable(rawTableContent string) (dataset.HeadingsTable
 
 	tmpDataSet.ParseCsvTextIntoTable("requestContent", rawTableContent)
 	if tmpDataSet.Errors() != nil {
-		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 model actions handler")
+		wrappingError := errors.Wrap(tmpDataSet.Errors(), v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
 
 	contentTable, tableError := tmpDataSet.Table("requestContent")
 	if tableError != nil {
-		wrappingError := errors.Wrap(tmpDataSet.Errors(), "v1 model actions handler")
+		wrappingError := errors.Wrap(tmpDataSet.Errors(), v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
 
 	if contentTable == nil {
-		wrappingError := errors.Wrap(errors.New("No CSV table content found"), "v1 model actions handler")
+		wrappingError := errors.Wrap(errors.New("No CSV table content found"), v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
 
 	headingsTable, hasHeadings := contentTable.(dataset.HeadingsTable)
 	if !hasHeadings {
-		wrappingError := errors.Wrap(errors.New("CSV table does not have a header row"), "v1 model actions handler")
+		wrappingError := errors.Wrap(errors.New("CSV table does not have a header row"), v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
@@ -228,7 +199,7 @@ func (m *Mux) deriveSolutionTable(rawTableContent string) (dataset.HeadingsTable
 	if headingsTable.Header()[0] != "SubCatchment" {
 		wrappingError := errors.Wrap(
 			errors.New("CSV table header column misses mandatory 'SubCatchment' first entry"),
-			"v1 model actions handler")
+			v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return nil, wrappingError
 	}
@@ -266,29 +237,12 @@ func (m *Mux) deriveSolutionTable(rawTableContent string) (dataset.HeadingsTable
 	return headingsTable, nil
 }
 
-func (m *Mux) requestContentTypeWasNotCsv(r *http.Request, w http.ResponseWriter) bool {
-	suppliedContentType := r.Header.Get(rest.ContentTypeHeaderKey)
-	if suppliedContentType != rest.CsvMimeType {
-		m.handleNonCsvContentResponse(r, w, suppliedContentType)
-		return true
-	}
-	return false
-}
-
-func (m *Mux) handleNonCsvContentResponse(r *http.Request, w http.ResponseWriter, suppliedContentType string) {
-	contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.CsvMimeType + "]")
-	wrappingError := errors.Wrap(contentTypeError, "v1 model actions handler")
-	m.Logger().Warn(wrappingError)
-
-	m.UnsupportedMediaTypeError(w, r)
-}
-
 func (m *Mux) SetSolution(solutionFilePath string) {
 	rawTableContent := readFileAsText(solutionFilePath)
 
 	requestTable, parseError := m.deriveSolutionTable(rawTableContent)
 	if parseError != nil {
-		wrappingError := errors.Wrap(parseError, "v1 model actions handler")
+		wrappingError := errors.Wrap(parseError, v1ModelActionsHandler)
 		m.Logger().Error(wrappingError)
 		return
 	}

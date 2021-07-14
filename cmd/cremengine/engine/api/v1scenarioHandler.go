@@ -7,9 +7,10 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
-	"io/ioutil"
 	"net/http"
 )
+
+const v1scenarioHandler = "v1 scenario handler"
 
 func (m *Mux) v1scenarioHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -54,7 +55,7 @@ func (m *Mux) logScenarioGetResponse() {
 
 func (m *Mux) handleScenarioGetWriteError(writeError error) {
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
+		wrappingError := errors.Wrap(writeError, v1scenarioHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -78,7 +79,7 @@ func (m *Mux) v1PostScenarioHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 scenario handler")
+		wrappingError := errors.Wrap(writeError, v1scenarioHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -109,7 +110,7 @@ func (m *Mux) processScenarioPostText(w http.ResponseWriter, r *http.Request) (*
 }
 
 func (m *Mux) handleScenarioRetrievalErrors(w http.ResponseWriter, r *http.Request, retrieveError error) {
-	wrappingError := errors.Wrap(retrieveError, "v1 POST scenario handler")
+	wrappingError := errors.Wrap(retrieveError, v1scenarioHandler)
 	m.Logger().Error(wrappingError)
 	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
 }
@@ -131,7 +132,7 @@ func (m *Mux) rememberModelState(modelAsCatchmentModel *catchment.Model, config 
 }
 
 func (m *Mux) handleModelInterpreterErrors(w http.ResponseWriter, r *http.Request, interpreterError error) {
-	wrappingError := errors.Wrap(interpreterError, "v1 POST scenario handler")
+	wrappingError := errors.Wrap(interpreterError, v1scenarioHandler)
 	m.Logger().Error(wrappingError)
 	m.RespondWithError(http.StatusBadRequest, wrappingError.Error(), w, r)
 }
@@ -157,23 +158,6 @@ func (m *Mux) buildScenarioPostResponse(w http.ResponseWriter) *rest.Response {
 
 	m.Logger().Info("Responding with acknowledgement of scenario configuration receipt")
 	return restResponse
-}
-
-func (m *Mux) requestContentTypeWasNotToml(r *http.Request, w http.ResponseWriter) bool {
-	suppliedContentType := r.Header.Get(rest.ContentTypeHeaderKey)
-	if suppliedContentType != rest.TomlMimeType {
-		m.handleNonTomlContentResponse(r, w, suppliedContentType)
-		return true
-	}
-	return false
-}
-
-func (m *Mux) handleNonTomlContentResponse(r *http.Request, w http.ResponseWriter, suppliedContentType string) {
-	contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.TomlMimeType + "]")
-	wrappingError := errors.Wrap(contentTypeError, "v1 POST scenario handler")
-	m.Logger().Warn(wrappingError)
-
-	m.MethodNotAllowedError(w, r)
 }
 
 func (m *Mux) SetScenario(scenarioFilePath string) {
@@ -202,11 +186,4 @@ func (m *Mux) SetScenario(scenarioFilePath string) {
 		WithId(m.model.Id()).
 		ForModel(m.model).
 		Build()
-}
-
-func readFileAsText(filePath string) string {
-	if b, err := ioutil.ReadFile(filePath); err == nil {
-		return string(b)
-	}
-	return "error reading file"
 }

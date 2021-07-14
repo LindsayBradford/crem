@@ -2,12 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/pkg/errors"
 	"net/http"
 )
+
+const v1modelHandler = "v1 model handler"
 
 func (m *Mux) v1modelHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
@@ -39,7 +40,7 @@ func (m *Mux) v1GetModelHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model handler")
+		wrappingError := errors.Wrap(writeError, v1modelHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -60,7 +61,7 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 	parseError := json.Unmarshal(rawRequestContent, requestAttributes)
 
 	if parseError != nil {
-		wrappingError := errors.Wrap(parseError, "v1 model handler")
+		wrappingError := errors.Wrap(parseError, v1modelHandler)
 		m.Logger().Error(wrappingError)
 		m.Logger().Error("Parsing PATCH message content for model failed")
 
@@ -84,7 +85,7 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 	writeError := restResponse.Write()
 
 	if writeError != nil {
-		wrappingError := errors.Wrap(writeError, "v1 model handler")
+		wrappingError := errors.Wrap(writeError, v1modelHandler)
 		m.Logger().Error(wrappingError)
 	}
 }
@@ -105,38 +106,6 @@ func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
 	m.deriveExtraModelAttributes()
 }
 
-func (m *Mux) checkEncodingInSolutionSummary(encoding string) {
-	if m.solutionSetTable == nil {
-		return
-	}
-
-	colSize, rowSize := m.solutionSetTable.ColumnAndRowSize()
-	var (
-		labelIndex    = uint(0)
-		encodingIndex = colSize - 2
-		encodingFound = false
-	)
-
-	for rowIndex := uint(1); rowIndex < rowSize; rowIndex++ {
-		if encoding == m.solutionSetTable.CellString(encodingIndex, rowIndex) {
-			encodingFound = true
-			label := m.solutionSetTable.CellString(labelIndex, rowIndex)
-			msgText := fmt.Sprintf(
-				"New model's encoding [%s] matches pareto front solution set member [%s]", encoding, label)
-			m.Logger().Info(msgText)
-		}
-	}
-
-	if encodingFound {
-		m.model.ReplaceAttribute("ParetoFrontMember", "Yes")
-	} else {
-		m.model.ReplaceAttribute("ParetoFrontMember", "No")
-		msgText := fmt.Sprintf(
-			"New model encoding [%s] matches no solution set member", encoding)
-		m.Logger().Info(msgText)
-	}
-}
-
 func (m *Mux) buildModelPatchResponse(w http.ResponseWriter) *rest.Response {
 	restResponse := new(rest.Response).
 		Initialise().
@@ -154,21 +123,4 @@ func (m *Mux) buildModelPatchResponse(w http.ResponseWriter) *rest.Response {
 	m.Logger().Info("Responding with acknowledgement of model patch")
 
 	return restResponse
-}
-
-func (m *Mux) requestContentTypeWasNotJson(r *http.Request, w http.ResponseWriter) bool {
-	suppliedContentType := r.Header.Get(rest.ContentTypeHeaderKey)
-	if suppliedContentType != rest.JsonMimeType {
-		m.handleNonJsonContentResponse(r, w, suppliedContentType)
-		return true
-	}
-	return false
-}
-
-func (m *Mux) handleNonJsonContentResponse(r *http.Request, w http.ResponseWriter, suppliedContentType string) {
-	contentTypeError := errors.New("Request content-type of [" + suppliedContentType + "] was not the expected [" + rest.JsonMimeType + "]")
-	wrappingError := errors.Wrap(contentTypeError, "v1 model handler")
-	m.Logger().Error(wrappingError)
-
-	m.UnsupportedMediaTypeError(w, r)
 }
