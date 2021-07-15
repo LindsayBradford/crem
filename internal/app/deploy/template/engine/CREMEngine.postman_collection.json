@@ -134,7 +134,7 @@
 			"name": "Public API",
 			"item": [
 				{
-					"name": "Scenarios",
+					"name": "Scenario",
 					"item": [
 						{
 							"name": "Upload valid scenario",
@@ -152,7 +152,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "[Scenario]\r\nName = \"Kirkpatrick\"\r\nOutputPath=\"testdata/solutions\"\r\n#CpuProfilePath=\"testdata/profile.pprof\"\r\nOutputType=\"CSV\"  # \"CSV\" (default) | \"JSON\" | \"EXCEL\"\r\n[Scenario.Reporting]\r\nReportEveryNumberOfIterations = 1\r\nCheckingLoopInvariant = true\r\n[Scenario.Reporting.LogLevelDestinations]\r\nDebugging = \"Discarded\"   # \"Discarded\"  (Default) | \"StandardOutput\" | \"StandardError\"\r\nAnnealer = \"StandardOutput\"\r\nModel = \"StandardOutput\"\r\n\r\n[Annealer]\r\nType=\"Kirkpatrick\"\r\n[Annealer.Parameters]\r\nDecisionVariable = \"SedimentProduction\"\r\nOptimisationDirection = \"Minimising\"\r\nStartingTemperature = 1_000.0 #10\r\nCoolingFactor =  0.999  # 0.99\r\nMaximumIterations = 20\r\n\r\n[Model]\r\nType = \"CatchmentModel\"\r\n[Model.Parameters]\r\nBankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)\r\nWaterDensity = 1.0                  # 1 t/m^3 (default)\r\nLocalAcceleration = 9.81            # 9.81 m/s^2 (default)\r\nGullyCompensationFactor = 0.5       # 0.5 (default)\r\nSedimentDensity = 1.5               # (1.5 t/m^3 default)\r\nSuspendedSedimentProportion = 0.5   # 0.5 (default)\r\nDataSourcePath = \"../explorer/input/Laidley_data_v1_8_3.xlsx\"\r\n"
+									"raw": "[Scenario]\r\nName = \"Kirkpatrick\"\r\nOutputPath=\"testdata/solutions\"\r\n#CpuProfilePath=\"testdata/profile.pprof\"\r\nOutputType=\"CSV\"  # \"CSV\" (default) | \"JSON\" | \"EXCEL\"\r\n[Scenario.Reporting]\r\nReportEveryNumberOfIterations = 1\r\nCheckingLoopInvariant = true\r\n[Scenario.Reporting.LogLevelDestinations]\r\nDebugging = \"Discarded\"   # \"Discarded\"  (Default) | \"StandardOutput\" | \"StandardError\"\r\nAnnealer = \"StandardOutput\"\r\nModel = \"StandardOutput\"\r\n\r\n[Annealer]\r\nType=\"Kirkpatrick\"\r\n[Annealer.Parameters]\r\nDecisionVariable = \"SedimentProduction\"\r\nOptimisationDirection = \"Minimising\"\r\nStartingTemperature = 1_000.0 #10\r\nCoolingFactor =  0.999  # 0.99\r\nMaximumIterations = 20\r\n\r\n[Model]\r\nType = \"CatchmentModel\"\r\n[Model.Parameters]\r\nBankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)\r\nWaterDensity = 1.0                  # 1 t/m^3 (default)\r\nLocalAcceleration = 9.81            # 9.81 m/s^2 (default)\r\nGullyCompensationFactor = 0.5       # 0.5 (default)\r\nSedimentDensity = 1.5               # (1.5 t/m^3 default)\r\nSuspendedSedimentProportion = 0.5   # 0.5 (default)\r\nDataSourcePath = \"../explorer/input/Laidley_data_v1_8_4.xlsx\"\r\n"
 								},
 								"url": {
 									"raw": "http://{{CremEngineApiDomain}}/api/v1/scenario",
@@ -281,7 +281,7 @@
 										}
 									],
 									"cookie": [],
-									"body": "[Scenario]\r\nName = \"Kirkpatrick\"\r\nOutputPath=\"testdata/solutions\"\r\n#CpuProfilePath=\"testdata/profile.pprof\"\r\nOutputType=\"CSV\"  # \"CSV\" (default) | \"JSON\" | \"EXCEL\"\r\n[Scenario.Reporting]\r\nReportEveryNumberOfIterations = 1\r\nCheckingLoopInvariant = true\r\n[Scenario.Reporting.LogLevelDestinations]\r\nDebugging = \"Discarded\"   # \"Discarded\"  (Default) | \"StandardOutput\" | \"StandardError\"\r\nAnnealer = \"StandardOutput\"\r\nModel = \"StandardOutput\"\r\n\r\n[Annealer]\r\nType=\"Kirkpatrick\"\r\n[Annealer.Parameters]\r\nDecisionVariable = \"SedimentProduction\"\r\nOptimisationDirection = \"Minimising\"\r\nStartingTemperature = 1_000.0 #10\r\nCoolingFactor =  0.999  # 0.99\r\nMaximumIterations = 20\r\n\r\n[Model]\r\nType = \"CatchmentModel\"\r\n[Model.Parameters]\r\nBankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)\r\nWaterDensity = 1.0                  # 1 t/m^3 (default)\r\nLocalAcceleration = 9.81            # 9.81 m/s^2 (default)\r\nGullyCompensationFactor = 0.5       # 0.5 (default)\r\nSedimentDensity = 1.5               # (1.5 t/m^3 default)\r\nSuspendedSedimentProportion = 0.5   # 0.5 (default)\r\nDataSourcePath = \"../explorer/input/Laidley_data_v1_8_3.xlsx\"\r\n"
+									"body": "[Scenario]\r\nName = \"Kirkpatrick\"\r\nOutputPath=\"testdata/solutions\"\r\n#CpuProfilePath=\"testdata/profile.pprof\"\r\nOutputType=\"CSV\"  # \"CSV\" (default) | \"JSON\" | \"EXCEL\"\r\n[Scenario.Reporting]\r\nReportEveryNumberOfIterations = 1\r\nCheckingLoopInvariant = true\r\n[Scenario.Reporting.LogLevelDestinations]\r\nDebugging = \"Discarded\"   # \"Discarded\"  (Default) | \"StandardOutput\" | \"StandardError\"\r\nAnnealer = \"StandardOutput\"\r\nModel = \"StandardOutput\"\r\n\r\n[Annealer]\r\nType=\"Kirkpatrick\"\r\n[Annealer.Parameters]\r\nDecisionVariable = \"SedimentProduction\"\r\nOptimisationDirection = \"Minimising\"\r\nStartingTemperature = 1_000.0 #10\r\nCoolingFactor =  0.999  # 0.99\r\nMaximumIterations = 20\r\n\r\n[Model]\r\nType = \"CatchmentModel\"\r\n[Model.Parameters]\r\nBankErosionFudgeFactor = 0.0005     # 5 * 10^(-4) (default)  -- Min = 10^(-4), Max = 5*10^(-4)\r\nWaterDensity = 1.0                  # 1 t/m^3 (default)\r\nLocalAcceleration = 9.81            # 9.81 m/s^2 (default)\r\nGullyCompensationFactor = 0.5       # 0.5 (default)\r\nSedimentDensity = 1.5               # (1.5 t/m^3 default)\r\nSuspendedSedimentProportion = 0.5   # 0.5 (default)\r\nDataSourcePath = \"../explorer/input/Laidley_data_v1_8_4.xlsx\"\r\n"
 								}
 							]
 						},
@@ -370,7 +370,222 @@
 					]
 				},
 				{
-					"name": "Models",
+					"name": "Solutions",
+					"item": [
+						{
+							"name": "Upload solutions (Valid)",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"content-type": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "text/csv"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, Actions, Summary\r\nAs-Is, 171.441, 0.000, 0.000, 73.281, 17105.029, 0, As-is state; zero active management actions\r\n1-of-4, 9.340, 10584302.000, 127494.000, 0.431, 213.134, 1EFB, Pareto front member 1 of 4\r\n2-of-4, 8.540, 10920590.000, 128515.000, 0.431, 213.132, 1FFB, Pareto front member 2 of 4\r\n3-of-4, 8.124, 11645413.000, 134237.000, 0.428, 213.102, 1FFF, Pareto front member 3 of 4\r\n4-of-4, 8.924, 11309125.000, 133216.000, 0.428, 213.104, 1EFF, Pareto front member 4 of 4"
+								},
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/solutions",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Upload solutions (Valid)",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "text/csv"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, Actions, Summary\r\nAs-Is, 171.441, 0.000, 0.000, 73.281, 17105.029, 0, As-is state; zero active management actions\r\n1-of-4, 9.340, 10584302.000, 127494.000, 0.431, 213.134, 1EFB, Pareto front member 1 of 4\r\n2-of-4, 8.540, 10920590.000, 128515.000, 0.431, 213.132, 1FFB, Pareto front member 2 of 4\r\n3-of-4, 8.124, 11645413.000, 134237.000, 0.428, 213.102, 1FFF, Pareto front member 3 of 4\r\n4-of-4, 8.924, 11309125.000, 133216.000, 0.428, 213.104, 1EFF, Pareto front member 4 of 4\r\n"
+										},
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/solutions",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"solutions"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 14 Jul 2021 00:20:39 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "128"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Scenario solutions set successfully posted\",\n    \"Time\": \"2021-07-14T10:20:39.002031+10:00\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get solutions (Missimg)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/solutions",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get solutions (Missimg)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/solutions",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"solutions"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 06 Jul 2021 03:49:48 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "108"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Type\": \"ERROR\",\n    \"Message\": \"HTTP Resource not found\",\n    \"Time\": \"2021-07-06T13:49:48.2079395+10:00\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get solutions (Valid)",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/model",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"model"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get solutions (Valid)",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/solutions",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"solutions"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "plain",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "text/csv"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 14 Jul 2021 01:25:56 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "584"
+										}
+									],
+									"cookie": [],
+									"body": "Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, Actions, Summary\r\nAs-Is, 171.441, 0.000, 0.000, 73.281, 17105.029, 0, As-is state; zero active management actions\r\n1-of-4, 9.340, 10584302.000, 127494.000, 0.431, 213.134, 1EFB, Pareto front member 1 of 4\r\n2-of-4, 8.540, 10920590.000, 128515.000, 0.431, 213.132, 1FFB, Pareto front member 2 of 4\r\n3-of-4, 8.124, 11645413.000, 134237.000, 0.428, 213.102, 1FFF, Pareto front member 3 of 4\r\n4-of-4, 8.924, 11309125.000, 133216.000, 0.428, 213.104, 1EFF, Pareto front member 4 of 4"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Model",
 					"item": [
 						{
 							"name": "Get current model",
@@ -434,6 +649,87 @@
 									"body": "{\n    \"Id\": \"Kirkpatrick\",\n    \"DecisionVariables\": [\n        {\n            \"Name\": \"DissolvedNitrogen\",\n            \"Measure\": \"Tonnes per Year (t/y)\",\n            \"Value\": \"171.441\",\n            \"ValuePerPlanningUnit\": [\n                {\n                    \"PlanningUnit\": \"1\",\n                    \"Value\": \"0.839\"\n                },\n                {\n                    \"PlanningUnit\": \"2\",\n                    \"Value\": \"1.409\"\n                },\n                {\n                    \"PlanningUnit\": \"3\",\n                    \"Value\": \"1.727\"\n                },\n                {\n                    \"PlanningUnit\": \"4\",\n                    \"Value\": \"0.218\"\n                },\n                {\n                    \"PlanningUnit\": \"5\",\n                    \"Value\": \"1.875\"\n                },\n                {\n                    \"PlanningUnit\": \"6\",\n                    \"Value\": \"1.975\"\n                },\n                {\n                    \"PlanningUnit\": \"8\",\n                    \"Value\": \"1.919\"\n                },\n                {\n                    \"PlanningUnit\": \"9\",\n                    \"Value\": \"1.393\"\n                },\n                {\n                    \"PlanningUnit\": \"10\",\n                    \"Value\": \"0.953\"\n                },\n                {\n                    \"PlanningUnit\": \"11\",\n                    \"Value\": \"2.714\"\n                },\n                {\n                    \"PlanningUnit\": \"12\",\n                    \"Value\": \"0.585\"\n                },\n                {\n                    \"PlanningUnit\": \"13\",\n                    \"Value\": \"1.262\"\n                },\n                {\n                    \"PlanningUnit\": \"14\",\n                    \"Value\": \"0.877\"\n                },\n                {\n                    \"PlanningUnit\": \"15\",\n                    \"Value\": \"0.002\"\n                },\n                {\n                    \"PlanningUnit\": \"16\",\n                    \"Value\": \"0.242\"\n                },\n                {\n                    \"PlanningUnit\": \"17\",\n                    \"Value\": \"0.721\"\n                },\n                {\n                    \"PlanningUnit\": \"18\",\n                    \"Value\": \"2.749\"\n                },\n                {\n                    \"PlanningUnit\": \"19\",\n                    \"Value\": \"1.420\"\n                },\n                {\n                    \"PlanningUnit\": \"20\",\n                    \"Value\": \"1.153\"\n                },\n                {\n                    \"PlanningUnit\": \"21\",\n                    \"Value\": \"1.545\"\n                },\n                {\n                    \"PlanningUnit\": \"22\",\n                    \"Value\": \"2.372\"\n                },\n                {\n                    \"PlanningUnit\": \"23\",\n                    \"Value\": \"0.625\"\n                },\n                {\n                    \"PlanningUnit\": \"24\",\n                    \"Value\": \"2.469\"\n                },\n                {\n                    \"PlanningUnit\": \"25\",\n                    \"Value\": \"4.860\"\n                },\n                {\n                    \"PlanningUnit\": \"26\",\n                    \"Value\": \"4.236\"\n                },\n                {\n                    \"PlanningUnit\": \"27\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"28\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"29\",\n                    \"Value\": \"3.392\"\n                },\n                {\n                    \"PlanningUnit\": \"30\",\n                    \"Value\": \"0.035\"\n                },\n                {\n                    \"PlanningUnit\": \"31\",\n                    \"Value\": \"0.662\"\n                },\n                {\n                    \"PlanningUnit\": \"32\",\n                    \"Value\": \"0.468\"\n                },\n                {\n                    \"PlanningUnit\": \"33\",\n                    \"Value\": \"1.732\"\n                },\n                {\n                    \"PlanningUnit\": \"35\",\n                    \"Value\": \"2.699\"\n                },\n                {\n                    \"PlanningUnit\": \"36\",\n                    \"Value\": \"1.149\"\n                },\n                {\n                    \"PlanningUnit\": \"37\",\n                    \"Value\": \"1.968\"\n                },\n                {\n                    \"PlanningUnit\": \"38\",\n                    \"Value\": \"1.734\"\n                },\n                {\n                    \"PlanningUnit\": \"39\",\n                    \"Value\": \"1.925\"\n                },\n                {\n                    \"PlanningUnit\": \"40\",\n                    \"Value\": \"0.234\"\n                },\n                {\n                    \"PlanningUnit\": \"41\",\n                    \"Value\": \"0.784\"\n                },\n                {\n                    \"PlanningUnit\": \"42\",\n                    \"Value\": \"0.634\"\n                },\n                {\n                    \"PlanningUnit\": \"43\",\n                    \"Value\": \"0.158\"\n                },\n                {\n                    \"PlanningUnit\": \"44\",\n                    \"Value\": \"1.346\"\n                },\n                {\n                    \"PlanningUnit\": \"45\",\n                    \"Value\": \"5.309\"\n                },\n                {\n                    \"PlanningUnit\": \"46\",\n                    \"Value\": \"0.672\"\n                },\n                {\n                    \"PlanningUnit\": \"47\",\n                    \"Value\": \"0.006\"\n                },\n                {\n                    \"PlanningUnit\": \"48\",\n                    \"Value\": \"2.151\"\n                },\n                {\n                    \"PlanningUnit\": \"49\",\n                    \"Value\": \"1.541\"\n                },\n                {\n                    \"PlanningUnit\": \"50\",\n                    \"Value\": \"0.546\"\n                },\n                {\n                    \"PlanningUnit\": \"51\",\n                    \"Value\": \"1.696\"\n                },\n                {\n                    \"PlanningUnit\": \"52\",\n                    \"Value\": \"0.818\"\n                },\n                {\n                    \"PlanningUnit\": \"53\",\n                    \"Value\": \"1.547\"\n                },\n                {\n                    \"PlanningUnit\": \"54\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"55\",\n                    \"Value\": \"2.212\"\n                },\n                {\n                    \"PlanningUnit\": \"56\",\n                    \"Value\": \"1.870\"\n                },\n                {\n                    \"PlanningUnit\": \"57\",\n                    \"Value\": \"1.494\"\n                },\n                {\n                    \"PlanningUnit\": \"58\",\n                    \"Value\": \"1.601\"\n                },\n                {\n                    \"PlanningUnit\": \"59\",\n                    \"Value\": \"0.030\"\n                },\n                {\n                    \"PlanningUnit\": \"60\",\n                    \"Value\": \"1.446\"\n                },\n                {\n                    \"PlanningUnit\": \"61\",\n                    \"Value\": \"0.126\"\n                },\n                {\n                    \"PlanningUnit\": \"62\",\n                    \"Value\": \"1.861\"\n                },\n                {\n                    \"PlanningUnit\": \"63\",\n                    \"Value\": \"2.806\"\n                },\n                {\n                    \"PlanningUnit\": \"64\",\n                    \"Value\": \"0.761\"\n                },\n                {\n                    \"PlanningUnit\": \"65\",\n                    \"Value\": \"1.180\"\n                },\n                {\n                    \"PlanningUnit\": \"66\",\n                    \"Value\": \"0.044\"\n                },\n                {\n                    \"PlanningUnit\": \"67\",\n                    \"Value\": \"1.722\"\n                },\n                {\n                    \"PlanningUnit\": \"68\",\n                    \"Value\": \"1.508\"\n                },\n                {\n                    \"PlanningUnit\": \"69\",\n                    \"Value\": \"0.060\"\n                },\n                {\n                    \"PlanningUnit\": \"70\",\n                    \"Value\": \"0.287\"\n                },\n                {\n                    \"PlanningUnit\": \"71\",\n                    \"Value\": \"0.561\"\n                },\n                {\n                    \"PlanningUnit\": \"72\",\n                    \"Value\": \"1.132\"\n                },\n                {\n                    \"PlanningUnit\": \"73\",\n                    \"Value\": \"1.786\"\n                },\n                {\n                    \"PlanningUnit\": \"74\",\n                    \"Value\": \"5.297\"\n                },\n                {\n                    \"PlanningUnit\": \"76\",\n                    \"Value\": \"1.251\"\n                },\n                {\n                    \"PlanningUnit\": \"77\",\n                    \"Value\": \"3.645\"\n                },\n                {\n                    \"PlanningUnit\": \"78\",\n                    \"Value\": \"0.069\"\n                },\n                {\n                    \"PlanningUnit\": \"79\",\n                    \"Value\": \"1.019\"\n                },\n                {\n                    \"PlanningUnit\": \"80\",\n                    \"Value\": \"1.386\"\n                },\n                {\n                    \"PlanningUnit\": \"81\",\n                    \"Value\": \"6.093\"\n                },\n                {\n                    \"PlanningUnit\": \"82\",\n                    \"Value\": \"1.345\"\n                },\n                {\n                    \"PlanningUnit\": \"83\",\n                    \"Value\": \"0.043\"\n                },\n                {\n                    \"PlanningUnit\": \"84\",\n                    \"Value\": \"2.141\"\n                },\n                {\n                    \"PlanningUnit\": \"85\",\n                    \"Value\": \"1.093\"\n                },\n                {\n                    \"PlanningUnit\": \"86\",\n                    \"Value\": \"1.893\"\n                },\n                {\n                    \"PlanningUnit\": \"87\",\n                    \"Value\": \"0.972\"\n                },\n                {\n                    \"PlanningUnit\": \"88\",\n                    \"Value\": \"0.847\"\n                },\n                {\n                    \"PlanningUnit\": \"89\",\n                    \"Value\": \"0.059\"\n                },\n                {\n                    \"PlanningUnit\": \"90\",\n                    \"Value\": \"1.280\"\n                },\n                {\n                    \"PlanningUnit\": \"91\",\n                    \"Value\": \"0.224\"\n                },\n                {\n                    \"PlanningUnit\": \"92\",\n                    \"Value\": \"2.538\"\n                },\n                {\n                    \"PlanningUnit\": \"93\",\n                    \"Value\": \"1.672\"\n                },\n                {\n                    \"PlanningUnit\": \"94\",\n                    \"Value\": \"0.521\"\n                },\n                {\n                    \"PlanningUnit\": \"95\",\n                    \"Value\": \"0.690\"\n                },\n                {\n                    \"PlanningUnit\": \"96\",\n                    \"Value\": \"1.243\"\n                },\n                {\n                    \"PlanningUnit\": \"97\",\n                    \"Value\": \"0.036\"\n                },\n                {\n                    \"PlanningUnit\": \"98\",\n                    \"Value\": \"1.238\"\n                },\n                {\n                    \"PlanningUnit\": \"99\",\n                    \"Value\": \"0.121\"\n                },\n                {\n                    \"PlanningUnit\": \"100\",\n                    \"Value\": \"0.679\"\n                },\n                {\n                    \"PlanningUnit\": \"101\",\n                    \"Value\": \"0.344\"\n                },\n                {\n                    \"PlanningUnit\": \"102\",\n                    \"Value\": \"1.891\"\n                },\n                {\n                    \"PlanningUnit\": \"103\",\n                    \"Value\": \"1.363\"\n                },\n                {\n                    \"PlanningUnit\": \"104\",\n                    \"Value\": \"2.050\"\n                },\n                {\n                    \"PlanningUnit\": \"105\",\n                    \"Value\": \"0.222\"\n                },\n                {\n                    \"PlanningUnit\": \"106\",\n                    \"Value\": \"0.060\"\n                },\n                {\n                    \"PlanningUnit\": \"107\",\n                    \"Value\": \"0.695\"\n                },\n                {\n                    \"PlanningUnit\": \"108\",\n                    \"Value\": \"0.849\"\n                },\n                {\n                    \"PlanningUnit\": \"109\",\n                    \"Value\": \"1.063\"\n                },\n                {\n                    \"PlanningUnit\": \"110\",\n                    \"Value\": \"0.474\"\n                },\n                {\n                    \"PlanningUnit\": \"111\",\n                    \"Value\": \"1.275\"\n                },\n                {\n                    \"PlanningUnit\": \"112\",\n                    \"Value\": \"0.668\"\n                },\n                {\n                    \"PlanningUnit\": \"113\",\n                    \"Value\": \"1.395\"\n                },\n                {\n                    \"PlanningUnit\": \"114\",\n                    \"Value\": \"1.874\"\n                },\n                {\n                    \"PlanningUnit\": \"115\",\n                    \"Value\": \"0.725\"\n                },\n                {\n                    \"PlanningUnit\": \"116\",\n                    \"Value\": \"0.673\"\n                },\n                {\n                    \"PlanningUnit\": \"117\",\n                    \"Value\": \"0.987\"\n                },\n                {\n                    \"PlanningUnit\": \"118\",\n                    \"Value\": \"0.771\"\n                },\n                {\n                    \"PlanningUnit\": \"119\",\n                    \"Value\": \"1.504\"\n                },\n                {\n                    \"PlanningUnit\": \"120\",\n                    \"Value\": \"2.860\"\n                },\n                {\n                    \"PlanningUnit\": \"121\",\n                    \"Value\": \"0.461\"\n                },\n                {\n                    \"PlanningUnit\": \"122\",\n                    \"Value\": \"0.564\"\n                },\n                {\n                    \"PlanningUnit\": \"123\",\n                    \"Value\": \"1.997\"\n                },\n                {\n                    \"PlanningUnit\": \"124\",\n                    \"Value\": \"1.546\"\n                },\n                {\n                    \"PlanningUnit\": \"125\",\n                    \"Value\": \"2.322\"\n                },\n                {\n                    \"PlanningUnit\": \"126\",\n                    \"Value\": \"0.365\"\n                },\n                {\n                    \"PlanningUnit\": \"127\",\n                    \"Value\": \"0.710\"\n                },\n                {\n                    \"PlanningUnit\": \"128\",\n                    \"Value\": \"0.202\"\n                },\n                {\n                    \"PlanningUnit\": \"129\",\n                    \"Value\": \"0.679\"\n                },\n                {\n                    \"PlanningUnit\": \"130\",\n                    \"Value\": \"1.126\"\n                },\n                {\n                    \"PlanningUnit\": \"131\",\n                    \"Value\": \"0.769\"\n                },\n                {\n                    \"PlanningUnit\": \"132\",\n                    \"Value\": \"0.169\"\n                },\n                {\n                    \"PlanningUnit\": \"133\",\n                    \"Value\": \"0.791\"\n                },\n                {\n                    \"PlanningUnit\": \"134\",\n                    \"Value\": \"0.213\"\n                },\n                {\n                    \"PlanningUnit\": \"135\",\n                    \"Value\": \"0.010\"\n                },\n                {\n                    \"PlanningUnit\": \"136\",\n                    \"Value\": \"0.467\"\n                },\n                {\n                    \"PlanningUnit\": \"137\",\n                    \"Value\": \"0.701\"\n                },\n                {\n                    \"PlanningUnit\": \"138\",\n                    \"Value\": \"0.402\"\n                },\n                {\n                    \"PlanningUnit\": \"139\",\n                    \"Value\": \"0.329\"\n                },\n                {\n                    \"PlanningUnit\": \"140\",\n                    \"Value\": \"0.703\"\n                },\n                {\n                    \"PlanningUnit\": \"141\",\n                    \"Value\": \"0.491\"\n                },\n                {\n                    \"PlanningUnit\": \"142\",\n                    \"Value\": \"0.953\"\n                },\n                {\n                    \"PlanningUnit\": \"143\",\n                    \"Value\": \"0.479\"\n                }\n            ]\n        },\n        {\n            \"Name\": \"ImplementationCost\",\n            \"Measure\": \"Dollars ($)\",\n            \"Value\": \"0.00\"\n        },\n        {\n            \"Name\": \"OpportunityCost\",\n            \"Measure\": \"Dollars ($)\",\n            \"Value\": \"0.00\"\n        },\n        {\n            \"Name\": \"ParticulateNitrogen\",\n            \"Measure\": \"Tonnes per Year (t/y)\",\n            \"Value\": \"73.281\",\n            \"ValuePerPlanningUnit\": [\n                {\n                    \"PlanningUnit\": \"1\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"5\",\n                    \"Value\": \"0.003\"\n                },\n                {\n                    \"PlanningUnit\": \"6\",\n                    \"Value\": \"0.149\"\n                },\n                {\n                    \"PlanningUnit\": \"8\",\n                    \"Value\": \"0.006\"\n                },\n                {\n                    \"PlanningUnit\": \"9\",\n                    \"Value\": \"0.120\"\n                },\n                {\n                    \"PlanningUnit\": \"17\",\n                    \"Value\": \"0.037\"\n                },\n                {\n                    \"PlanningUnit\": \"18\",\n                    \"Value\": \"2.291\"\n                },\n                {\n                    \"PlanningUnit\": \"19\",\n                    \"Value\": \"0.022\"\n                },\n                {\n                    \"PlanningUnit\": \"24\",\n                    \"Value\": \"0.390\"\n                },\n                {\n                    \"PlanningUnit\": \"25\",\n                    \"Value\": \"4.430\"\n                },\n                {\n                    \"PlanningUnit\": \"26\",\n                    \"Value\": \"0.205\"\n                },\n                {\n                    \"PlanningUnit\": \"29\",\n                    \"Value\": \"5.082\"\n                },\n                {\n                    \"PlanningUnit\": \"30\",\n                    \"Value\": \"0.003\"\n                },\n                {\n                    \"PlanningUnit\": \"31\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"32\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"33\",\n                    \"Value\": \"0.004\"\n                },\n                {\n                    \"PlanningUnit\": \"35\",\n                    \"Value\": \"0.080\"\n                },\n                {\n                    \"PlanningUnit\": \"36\",\n                    \"Value\": \"0.035\"\n                },\n                {\n                    \"PlanningUnit\": \"37\",\n                    \"Value\": \"0.048\"\n                },\n                {\n                    \"PlanningUnit\": \"38\",\n                    \"Value\": \"0.550\"\n                },\n                {\n                    \"PlanningUnit\": \"39\",\n                    \"Value\": \"0.713\"\n                },\n                {\n                    \"PlanningUnit\": \"40\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"41\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"42\",\n                    \"Value\": \"0.040\"\n                },\n                {\n                    \"PlanningUnit\": \"43\",\n                    \"Value\": \"0.019\"\n                },\n                {\n                    \"PlanningUnit\": \"45\",\n                    \"Value\": \"0.560\"\n                },\n                {\n                    \"PlanningUnit\": \"46\",\n                    \"Value\": \"0.138\"\n                },\n                {\n                    \"PlanningUnit\": \"48\",\n                    \"Value\": \"0.092\"\n                },\n                {\n                    \"PlanningUnit\": \"49\",\n                    \"Value\": \"0.933\"\n                },\n                {\n                    \"PlanningUnit\": \"50\",\n                    \"Value\": \"0.094\"\n                },\n                {\n                    \"PlanningUnit\": \"51\",\n                    \"Value\": \"0.050\"\n                },\n                {\n                    \"PlanningUnit\": \"52\",\n                    \"Value\": \"0.033\"\n                },\n                {\n                    \"PlanningUnit\": \"53\",\n                    \"Value\": \"1.549\"\n                },\n                {\n                    \"PlanningUnit\": \"55\",\n                    \"Value\": \"0.054\"\n                },\n                {\n                    \"PlanningUnit\": \"56\",\n                    \"Value\": \"2.868\"\n                },\n                {\n                    \"PlanningUnit\": \"57\",\n                    \"Value\": \"0.247\"\n                },\n                {\n                    \"PlanningUnit\": \"58\",\n                    \"Value\": \"0.571\"\n                },\n                {\n                    \"PlanningUnit\": \"59\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"60\",\n                    \"Value\": \"1.852\"\n                },\n                {\n                    \"PlanningUnit\": \"61\",\n                    \"Value\": \"0.013\"\n                },\n                {\n                    \"PlanningUnit\": \"62\",\n                    \"Value\": \"0.575\"\n                },\n                {\n                    \"PlanningUnit\": \"63\",\n                    \"Value\": \"1.922\"\n                },\n                {\n                    \"PlanningUnit\": \"64\",\n                    \"Value\": \"0.010\"\n                },\n                {\n                    \"PlanningUnit\": \"65\",\n                    \"Value\": \"0.112\"\n                },\n                {\n                    \"PlanningUnit\": \"66\",\n                    \"Value\": \"0.028\"\n                },\n                {\n                    \"PlanningUnit\": \"67\",\n                    \"Value\": \"0.664\"\n                },\n                {\n                    \"PlanningUnit\": \"68\",\n                    \"Value\": \"0.099\"\n                },\n                {\n                    \"PlanningUnit\": \"70\",\n                    \"Value\": \"0.107\"\n                },\n                {\n                    \"PlanningUnit\": \"71\",\n                    \"Value\": \"0.220\"\n                },\n                {\n                    \"PlanningUnit\": \"72\",\n                    \"Value\": \"0.711\"\n                },\n                {\n                    \"PlanningUnit\": \"73\",\n                    \"Value\": \"1.989\"\n                },\n                {\n                    \"PlanningUnit\": \"74\",\n                    \"Value\": \"0.785\"\n                },\n                {\n                    \"PlanningUnit\": \"76\",\n                    \"Value\": \"0.180\"\n                },\n                {\n                    \"PlanningUnit\": \"77\",\n                    \"Value\": \"3.634\"\n                },\n                {\n                    \"PlanningUnit\": \"78\",\n                    \"Value\": \"0.023\"\n                },\n                {\n                    \"PlanningUnit\": \"79\",\n                    \"Value\": \"0.184\"\n                },\n                {\n                    \"PlanningUnit\": \"80\",\n                    \"Value\": \"0.711\"\n                },\n                {\n                    \"PlanningUnit\": \"81\",\n                    \"Value\": \"5.085\"\n                },\n                {\n                    \"PlanningUnit\": \"82\",\n                    \"Value\": \"0.641\"\n                },\n                {\n                    \"PlanningUnit\": \"83\",\n                    \"Value\": \"0.003\"\n                },\n                {\n                    \"PlanningUnit\": \"84\",\n                    \"Value\": \"1.538\"\n                },\n                {\n                    \"PlanningUnit\": \"85\",\n                    \"Value\": \"0.526\"\n                },\n                {\n                    \"PlanningUnit\": \"86\",\n                    \"Value\": \"0.201\"\n                },\n                {\n                    \"PlanningUnit\": \"87\",\n                    \"Value\": \"0.259\"\n                },\n                {\n                    \"PlanningUnit\": \"88\",\n                    \"Value\": \"0.204\"\n                },\n                {\n                    \"PlanningUnit\": \"89\",\n                    \"Value\": \"0.010\"\n                },\n                {\n                    \"PlanningUnit\": \"90\",\n                    \"Value\": \"0.251\"\n                },\n                {\n                    \"PlanningUnit\": \"92\",\n                    \"Value\": \"2.023\"\n                },\n                {\n                    \"PlanningUnit\": \"93\",\n                    \"Value\": \"0.162\"\n                },\n                {\n                    \"PlanningUnit\": \"94\",\n                    \"Value\": \"0.240\"\n                },\n                {\n                    \"PlanningUnit\": \"95\",\n                    \"Value\": \"0.329\"\n                },\n                {\n                    \"PlanningUnit\": \"96\",\n                    \"Value\": \"0.334\"\n                },\n                {\n                    \"PlanningUnit\": \"97\",\n                    \"Value\": \"0.012\"\n                },\n                {\n                    \"PlanningUnit\": \"98\",\n                    \"Value\": \"0.655\"\n                },\n                {\n                    \"PlanningUnit\": \"99\",\n                    \"Value\": \"0.020\"\n                },\n                {\n                    \"PlanningUnit\": \"100\",\n                    \"Value\": \"0.411\"\n                },\n                {\n                    \"PlanningUnit\": \"101\",\n                    \"Value\": \"0.682\"\n                },\n                {\n                    \"PlanningUnit\": \"102\",\n                    \"Value\": \"0.417\"\n                },\n                {\n                    \"PlanningUnit\": \"103\",\n                    \"Value\": \"1.276\"\n                },\n                {\n                    \"PlanningUnit\": \"104\",\n                    \"Value\": \"1.684\"\n                },\n                {\n                    \"PlanningUnit\": \"105\",\n                    \"Value\": \"0.064\"\n                },\n                {\n                    \"PlanningUnit\": \"106\",\n                    \"Value\": \"0.009\"\n                },\n                {\n                    \"PlanningUnit\": \"107\",\n                    \"Value\": \"0.622\"\n                },\n                {\n                    \"PlanningUnit\": \"108\",\n                    \"Value\": \"0.240\"\n                },\n                {\n                    \"PlanningUnit\": \"109\",\n                    \"Value\": \"0.630\"\n                },\n                {\n                    \"PlanningUnit\": \"110\",\n                    \"Value\": \"0.182\"\n                },\n                {\n                    \"PlanningUnit\": \"111\",\n                    \"Value\": \"1.021\"\n                },\n                {\n                    \"PlanningUnit\": \"112\",\n                    \"Value\": \"0.404\"\n                },\n                {\n                    \"PlanningUnit\": \"113\",\n                    \"Value\": \"0.635\"\n                },\n                {\n                    \"PlanningUnit\": \"114\",\n                    \"Value\": \"0.571\"\n                },\n                {\n                    \"PlanningUnit\": \"115\",\n                    \"Value\": \"0.030\"\n                },\n                {\n                    \"PlanningUnit\": \"116\",\n                    \"Value\": \"0.466\"\n                },\n                {\n                    \"PlanningUnit\": \"117\",\n                    \"Value\": \"0.214\"\n                },\n                {\n                    \"PlanningUnit\": \"118\",\n                    \"Value\": \"0.570\"\n                },\n                {\n                    \"PlanningUnit\": \"119\",\n                    \"Value\": \"0.745\"\n                },\n                {\n                    \"PlanningUnit\": \"120\",\n                    \"Value\": \"1.735\"\n                },\n                {\n                    \"PlanningUnit\": \"121\",\n                    \"Value\": \"0.204\"\n                },\n                {\n                    \"PlanningUnit\": \"122\",\n                    \"Value\": \"0.459\"\n                },\n                {\n                    \"PlanningUnit\": \"123\",\n                    \"Value\": \"1.230\"\n                },\n                {\n                    \"PlanningUnit\": \"124\",\n                    \"Value\": \"1.084\"\n                },\n                {\n                    \"PlanningUnit\": \"125\",\n                    \"Value\": \"1.424\"\n                },\n                {\n                    \"PlanningUnit\": \"126\",\n                    \"Value\": \"0.448\"\n                },\n                {\n                    \"PlanningUnit\": \"127\",\n                    \"Value\": \"0.650\"\n                },\n                {\n                    \"PlanningUnit\": \"128\",\n                    \"Value\": \"0.110\"\n                },\n                {\n                    \"PlanningUnit\": \"129\",\n                    \"Value\": \"0.515\"\n                },\n                {\n                    \"PlanningUnit\": \"130\",\n                    \"Value\": \"1.199\"\n                },\n                {\n                    \"PlanningUnit\": \"131\",\n                    \"Value\": \"0.588\"\n                },\n                {\n                    \"PlanningUnit\": \"132\",\n                    \"Value\": \"0.154\"\n                },\n                {\n                    \"PlanningUnit\": \"133\",\n                    \"Value\": \"0.535\"\n                },\n                {\n                    \"PlanningUnit\": \"134\",\n                    \"Value\": \"0.153\"\n                },\n                {\n                    \"PlanningUnit\": \"135\",\n                    \"Value\": \"0.009\"\n                },\n                {\n                    \"PlanningUnit\": \"136\",\n                    \"Value\": \"0.438\"\n                },\n                {\n                    \"PlanningUnit\": \"137\",\n                    \"Value\": \"0.753\"\n                },\n                {\n                    \"PlanningUnit\": \"138\",\n                    \"Value\": \"0.319\"\n                },\n                {\n                    \"PlanningUnit\": \"139\",\n                    \"Value\": \"0.241\"\n                },\n                {\n                    \"PlanningUnit\": \"140\",\n                    \"Value\": \"0.558\"\n                },\n                {\n                    \"PlanningUnit\": \"141\",\n                    \"Value\": \"0.477\"\n                },\n                {\n                    \"PlanningUnit\": \"142\",\n                    \"Value\": \"1.091\"\n                },\n                {\n                    \"PlanningUnit\": \"143\",\n                    \"Value\": \"0.288\"\n                }\n            ]\n        },\n        {\n            \"Name\": \"SedimentProduction\",\n            \"Measure\": \"Tonnes per Year (t/y)\",\n            \"Value\": \"17,105.029\",\n            \"ValuePerPlanningUnit\": [\n                {\n                    \"PlanningUnit\": \"1\",\n                    \"Value\": \"0.721\"\n                },\n                {\n                    \"PlanningUnit\": \"2\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"4\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"5\",\n                    \"Value\": \"0.065\"\n                },\n                {\n                    \"PlanningUnit\": \"6\",\n                    \"Value\": \"12.352\"\n                },\n                {\n                    \"PlanningUnit\": \"7\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"8\",\n                    \"Value\": \"0.107\"\n                },\n                {\n                    \"PlanningUnit\": \"9\",\n                    \"Value\": \"3.789\"\n                },\n                {\n                    \"PlanningUnit\": \"10\",\n                    \"Value\": \"0.020\"\n                },\n                {\n                    \"PlanningUnit\": \"11\",\n                    \"Value\": \"0.001\"\n                },\n                {\n                    \"PlanningUnit\": \"12\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"14\",\n                    \"Value\": \"0.008\"\n                },\n                {\n                    \"PlanningUnit\": \"15\",\n                    \"Value\": \"0.069\"\n                },\n                {\n                    \"PlanningUnit\": \"16\",\n                    \"Value\": \"0.148\"\n                },\n                {\n                    \"PlanningUnit\": \"17\",\n                    \"Value\": \"14.908\"\n                },\n                {\n                    \"PlanningUnit\": \"18\",\n                    \"Value\": \"1,107.913\"\n                },\n                {\n                    \"PlanningUnit\": \"19\",\n                    \"Value\": \"0.459\"\n                },\n                {\n                    \"PlanningUnit\": \"20\",\n                    \"Value\": \"0.004\"\n                },\n                {\n                    \"PlanningUnit\": \"23\",\n                    \"Value\": \"0.019\"\n                },\n                {\n                    \"PlanningUnit\": \"24\",\n                    \"Value\": \"193.723\"\n                },\n                {\n                    \"PlanningUnit\": \"25\",\n                    \"Value\": \"2,002.060\"\n                },\n                {\n                    \"PlanningUnit\": \"26\",\n                    \"Value\": \"3.412\"\n                },\n                {\n                    \"PlanningUnit\": \"27\",\n                    \"Value\": \"0.015\"\n                },\n                {\n                    \"PlanningUnit\": \"29\",\n                    \"Value\": \"2,403.484\"\n                },\n                {\n                    \"PlanningUnit\": \"30\",\n                    \"Value\": \"0.007\"\n                },\n                {\n                    \"PlanningUnit\": \"31\",\n                    \"Value\": \"0.609\"\n                },\n                {\n                    \"PlanningUnit\": \"32\",\n                    \"Value\": \"0.386\"\n                },\n                {\n                    \"PlanningUnit\": \"33\",\n                    \"Value\": \"0.075\"\n                },\n                {\n                    \"PlanningUnit\": \"34\",\n                    \"Value\": \"0.164\"\n                },\n                {\n                    \"PlanningUnit\": \"35\",\n                    \"Value\": \"7.101\"\n                },\n                {\n                    \"PlanningUnit\": \"36\",\n                    \"Value\": \"2.397\"\n                },\n                {\n                    \"PlanningUnit\": \"37\",\n                    \"Value\": \"0.925\"\n                },\n                {\n                    \"PlanningUnit\": \"38\",\n                    \"Value\": \"121.921\"\n                },\n                {\n                    \"PlanningUnit\": \"39\",\n                    \"Value\": \"134.897\"\n                },\n                {\n                    \"PlanningUnit\": \"40\",\n                    \"Value\": \"0.049\"\n                },\n                {\n                    \"PlanningUnit\": \"41\",\n                    \"Value\": \"0.223\"\n                },\n                {\n                    \"PlanningUnit\": \"42\",\n                    \"Value\": \"1.829\"\n                },\n                {\n                    \"PlanningUnit\": \"43\",\n                    \"Value\": \"1.392\"\n                },\n                {\n                    \"PlanningUnit\": \"44\",\n                    \"Value\": \"0.022\"\n                },\n                {\n                    \"PlanningUnit\": \"45\",\n                    \"Value\": \"55.640\"\n                },\n                {\n                    \"PlanningUnit\": \"46\",\n                    \"Value\": \"31.756\"\n                },\n                {\n                    \"PlanningUnit\": \"47\",\n                    \"Value\": \"0.015\"\n                },\n                {\n                    \"PlanningUnit\": \"48\",\n                    \"Value\": \"7.284\"\n                },\n                {\n                    \"PlanningUnit\": \"49\",\n                    \"Value\": \"212.748\"\n                },\n                {\n                    \"PlanningUnit\": \"50\",\n                    \"Value\": \"11.425\"\n                },\n                {\n                    \"PlanningUnit\": \"51\",\n                    \"Value\": \"4.328\"\n                },\n                {\n                    \"PlanningUnit\": \"52\",\n                    \"Value\": \"0.472\"\n                },\n                {\n                    \"PlanningUnit\": \"53\",\n                    \"Value\": \"781.451\"\n                },\n                {\n                    \"PlanningUnit\": \"54\",\n                    \"Value\": \"0.004\"\n                },\n                {\n                    \"PlanningUnit\": \"55\",\n                    \"Value\": \"6.390\"\n                },\n                {\n                    \"PlanningUnit\": \"56\",\n                    \"Value\": \"932.704\"\n                },\n                {\n                    \"PlanningUnit\": \"57\",\n                    \"Value\": \"14.628\"\n                },\n                {\n                    \"PlanningUnit\": \"58\",\n                    \"Value\": \"185.357\"\n                },\n                {\n                    \"PlanningUnit\": \"59\",\n                    \"Value\": \"0.130\"\n                },\n                {\n                    \"PlanningUnit\": \"60\",\n                    \"Value\": \"796.707\"\n                },\n                {\n                    \"PlanningUnit\": \"61\",\n                    \"Value\": \"1.874\"\n                },\n                {\n                    \"PlanningUnit\": \"62\",\n                    \"Value\": \"141.585\"\n                },\n                {\n                    \"PlanningUnit\": \"63\",\n                    \"Value\": \"710.845\"\n                },\n                {\n                    \"PlanningUnit\": \"64\",\n                    \"Value\": \"0.670\"\n                },\n                {\n                    \"PlanningUnit\": \"65\",\n                    \"Value\": \"14.745\"\n                },\n                {\n                    \"PlanningUnit\": \"66\",\n                    \"Value\": \"7.413\"\n                },\n                {\n                    \"PlanningUnit\": \"67\",\n                    \"Value\": \"121.011\"\n                },\n                {\n                    \"PlanningUnit\": \"68\",\n                    \"Value\": \"5.984\"\n                },\n                {\n                    \"PlanningUnit\": \"69\",\n                    \"Value\": \"0.011\"\n                },\n                {\n                    \"PlanningUnit\": \"70\",\n                    \"Value\": \"28.647\"\n                },\n                {\n                    \"PlanningUnit\": \"71\",\n                    \"Value\": \"48.714\"\n                },\n                {\n                    \"PlanningUnit\": \"72\",\n                    \"Value\": \"110.985\"\n                },\n                {\n                    \"PlanningUnit\": \"73\",\n                    \"Value\": \"505.563\"\n                },\n                {\n                    \"PlanningUnit\": \"74\",\n                    \"Value\": \"272.174\"\n                },\n                {\n                    \"PlanningUnit\": \"76\",\n                    \"Value\": \"11.912\"\n                },\n                {\n                    \"PlanningUnit\": \"77\",\n                    \"Value\": \"725.157\"\n                },\n                {\n                    \"PlanningUnit\": \"78\",\n                    \"Value\": \"11.043\"\n                },\n                {\n                    \"PlanningUnit\": \"79\",\n                    \"Value\": \"15.445\"\n                },\n                {\n                    \"PlanningUnit\": \"80\",\n                    \"Value\": \"147.623\"\n                },\n                {\n                    \"PlanningUnit\": \"81\",\n                    \"Value\": \"786.495\"\n                },\n                {\n                    \"PlanningUnit\": \"82\",\n                    \"Value\": \"115.102\"\n                },\n                {\n                    \"PlanningUnit\": \"83\",\n                    \"Value\": \"1.614\"\n                },\n                {\n                    \"PlanningUnit\": \"84\",\n                    \"Value\": \"476.867\"\n                },\n                {\n                    \"PlanningUnit\": \"85\",\n                    \"Value\": \"100.977\"\n                },\n                {\n                    \"PlanningUnit\": \"86\",\n                    \"Value\": \"14.593\"\n                },\n                {\n                    \"PlanningUnit\": \"87\",\n                    \"Value\": \"19.729\"\n                },\n                {\n                    \"PlanningUnit\": \"88\",\n                    \"Value\": \"34.445\"\n                },\n                {\n                    \"PlanningUnit\": \"89\",\n                    \"Value\": \"0.313\"\n                },\n                {\n                    \"PlanningUnit\": \"90\",\n                    \"Value\": \"21.302\"\n                },\n                {\n                    \"PlanningUnit\": \"91\",\n                    \"Value\": \"0.121\"\n                },\n                {\n                    \"PlanningUnit\": \"92\",\n                    \"Value\": \"285.296\"\n                },\n                {\n                    \"PlanningUnit\": \"93\",\n                    \"Value\": \"21.929\"\n                },\n                {\n                    \"PlanningUnit\": \"94\",\n                    \"Value\": \"39.399\"\n                },\n                {\n                    \"PlanningUnit\": \"95\",\n                    \"Value\": \"48.853\"\n                },\n                {\n                    \"PlanningUnit\": \"96\",\n                    \"Value\": \"45.952\"\n                },\n                {\n                    \"PlanningUnit\": \"97\",\n                    \"Value\": \"7.710\"\n                },\n                {\n                    \"PlanningUnit\": \"98\",\n                    \"Value\": \"89.899\"\n                },\n                {\n                    \"PlanningUnit\": \"99\",\n                    \"Value\": \"6.632\"\n                },\n                {\n                    \"PlanningUnit\": \"100\",\n                    \"Value\": \"56.408\"\n                },\n                {\n                    \"PlanningUnit\": \"101\",\n                    \"Value\": \"137.353\"\n                },\n                {\n                    \"PlanningUnit\": \"102\",\n                    \"Value\": \"51.099\"\n                },\n                {\n                    \"PlanningUnit\": \"103\",\n                    \"Value\": \"155.803\"\n                },\n                {\n                    \"PlanningUnit\": \"104\",\n                    \"Value\": \"176.159\"\n                },\n                {\n                    \"PlanningUnit\": \"105\",\n                    \"Value\": \"8.108\"\n                },\n                {\n                    \"PlanningUnit\": \"106\",\n                    \"Value\": \"3.352\"\n                },\n                {\n                    \"PlanningUnit\": \"107\",\n                    \"Value\": \"196.492\"\n                },\n                {\n                    \"PlanningUnit\": \"108\",\n                    \"Value\": \"39.107\"\n                },\n                {\n                    \"PlanningUnit\": \"109\",\n                    \"Value\": \"66.050\"\n                },\n                {\n                    \"PlanningUnit\": \"110\",\n                    \"Value\": \"32.312\"\n                },\n                {\n                    \"PlanningUnit\": \"111\",\n                    \"Value\": \"110.145\"\n                },\n                {\n                    \"PlanningUnit\": \"112\",\n                    \"Value\": \"199.245\"\n                },\n                {\n                    \"PlanningUnit\": \"113\",\n                    \"Value\": \"84.493\"\n                },\n                {\n                    \"PlanningUnit\": \"114\",\n                    \"Value\": \"69.059\"\n                },\n                {\n                    \"PlanningUnit\": \"115\",\n                    \"Value\": \"3.238\"\n                },\n                {\n                    \"PlanningUnit\": \"116\",\n                    \"Value\": \"51.226\"\n                },\n                {\n                    \"PlanningUnit\": \"117\",\n                    \"Value\": \"34.455\"\n                },\n                {\n                    \"PlanningUnit\": \"118\",\n                    \"Value\": \"54.031\"\n                },\n                {\n                    \"PlanningUnit\": \"119\",\n                    \"Value\": \"69.628\"\n                },\n                {\n                    \"PlanningUnit\": \"120\",\n                    \"Value\": \"184.853\"\n                },\n                {\n                    \"PlanningUnit\": \"121\",\n                    \"Value\": \"33.901\"\n                },\n                {\n                    \"PlanningUnit\": \"122\",\n                    \"Value\": \"66.258\"\n                },\n                {\n                    \"PlanningUnit\": \"123\",\n                    \"Value\": \"185.016\"\n                },\n                {\n                    \"PlanningUnit\": \"124\",\n                    \"Value\": \"94.860\"\n                },\n                {\n                    \"PlanningUnit\": \"125\",\n                    \"Value\": \"201.611\"\n                },\n                {\n                    \"PlanningUnit\": \"126\",\n                    \"Value\": \"52.684\"\n                },\n                {\n                    \"PlanningUnit\": \"127\",\n                    \"Value\": \"16.414\"\n                },\n                {\n                    \"PlanningUnit\": \"128\",\n                    \"Value\": \"15.412\"\n                },\n                {\n                    \"PlanningUnit\": \"129\",\n                    \"Value\": \"50.004\"\n                },\n                {\n                    \"PlanningUnit\": \"130\",\n                    \"Value\": \"213.180\"\n                },\n                {\n                    \"PlanningUnit\": \"131\",\n                    \"Value\": \"59.448\"\n                },\n                {\n                    \"PlanningUnit\": \"132\",\n                    \"Value\": \"26.603\"\n                },\n                {\n                    \"PlanningUnit\": \"133\",\n                    \"Value\": \"25.545\"\n                },\n                {\n                    \"PlanningUnit\": \"134\",\n                    \"Value\": \"14.532\"\n                },\n                {\n                    \"PlanningUnit\": \"135\",\n                    \"Value\": \"1.458\"\n                },\n                {\n                    \"PlanningUnit\": \"136\",\n                    \"Value\": \"47.424\"\n                },\n                {\n                    \"PlanningUnit\": \"137\",\n                    \"Value\": \"70.508\"\n                },\n                {\n                    \"PlanningUnit\": \"138\",\n                    \"Value\": \"23.031\"\n                },\n                {\n                    \"PlanningUnit\": \"139\",\n                    \"Value\": \"3.558\"\n                },\n                {\n                    \"PlanningUnit\": \"140\",\n                    \"Value\": \"18.873\"\n                },\n                {\n                    \"PlanningUnit\": \"141\",\n                    \"Value\": \"31.031\"\n                },\n                {\n                    \"PlanningUnit\": \"142\",\n                    \"Value\": \"7.828\"\n                },\n                {\n                    \"PlanningUnit\": \"143\",\n                    \"Value\": \"8.282\"\n                }\n            ]\n        }\n    ],\n    \"ActiveManagementActions\": {}\n}"
 								}
 							]
+						},
+						{
+							"name": "Patch model (Valid)",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n    {\r\n        \"Name\": \"Summary\",\r\n        \"Value\": \"solution summary\"\r\n    },\r\n    {\r\n        \"Name\": \"Encoding\",\r\n        \"Value\": \"2000000000010000:20000000010000:40000040000000:40020000200000:0\"\r\n    }\r\n]",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/model",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"model"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Patch model (Valid)",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "[\r\n    {\r\n        \"Name\": \"Summary\",\r\n        \"Value\": \"solution summary\"\r\n    },\r\n    {\r\n        \"Name\": \"Encoding\",\r\n        \"Value\": \"2000000000010000:20000000010000:40000040000000:40020000200000:0\"\r\n    }\r\n]",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/model",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"model"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 13 Jul 2021 23:47:51 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "122"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Model resource successfully patched\",\n    \"Time\": \"2021-07-14T09:47:51.4784222+10:00\"\n}"
+								}
+							]
 						}
 					]
 				},
@@ -446,7 +742,7 @@
 								"disabledSystemHeaders": {}
 							},
 							"request": {
-								"method": "POST",
+								"method": "PUT",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -476,7 +772,7 @@
 								{
 									"name": "Upload invalid model actions",
 									"originalRequest": {
-										"method": "POST",
+										"method": "PUT",
 										"header": [
 											{
 												"key": "Content-Type",
@@ -502,8 +798,8 @@
 											]
 										}
 									},
-									"status": "Method Not Allowed",
-									"code": 405,
+									"status": "Unsupported Media Type",
+									"code": 415,
 									"_postman_previewlanguage": "json",
 									"header": [
 										{
@@ -512,15 +808,15 @@
 										},
 										{
 											"key": "Date",
-											"value": "Tue, 20 Apr 2021 05:28:25 GMT"
+											"value": "Wed, 14 Jul 2021 01:32:01 GMT"
 										},
 										{
 											"key": "Content-Length",
-											"value": "108"
+											"value": "112"
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"Type\": \"ERROR\",\n    \"Message\": \"HTTP Method not allowed\",\n    \"Time\": \"2021-04-20T15:28:25.8998912+10:00\"\n}"
+									"body": "{\n    \"Type\": \"ERROR\",\n    \"Message\": \"HTTP Unsupported Media Type\",\n    \"Time\": \"2021-07-14T11:32:01.5451037+10:00\"\n}"
 								}
 							]
 						},
@@ -532,7 +828,7 @@
 								}
 							},
 							"request": {
-								"method": "POST",
+								"method": "PUT",
 								"header": [
 									{
 										"key": "Content-Type",
@@ -562,7 +858,7 @@
 								{
 									"name": "Upload model actions",
 									"originalRequest": {
-										"method": "POST",
+										"method": "PUT",
 										"header": [
 											{
 												"key": "Content-Type",
@@ -602,7 +898,7 @@
 										},
 										{
 											"key": "Date",
-											"value": "Tue, 20 Apr 2021 05:30:09 GMT"
+											"value": "Wed, 14 Jul 2021 01:29:33 GMT"
 										},
 										{
 											"key": "Content-Length",
@@ -610,7 +906,97 @@
 										}
 									],
 									"cookie": [],
-									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Management actions state change successfully applied\",\n    \"Time\": \"2021-04-20T15:30:09.1239508+10:00\"\n}"
+									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Management actions state change successfully applied\",\n    \"Time\": \"2021-07-14T11:29:33.4987077+10:00\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Upload model actions Copy",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"content-type": true
+								}
+							},
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "text/csv"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "SubCatchment, GullyRestoration, HillSlopeRestoration, RiverBankRestoration, WetlandsEstablishment\r\n17, 0, 0, 0, 0\r\n18, 0, 0, 1, 0\r\n19, 0, 0, 1, 0\r\n20, 0, 0, 0, 0\r\n21, 0, 0, 0, 0\r\n22, 0, 0, 0, 0\r\n23, 0, 0, 0, 0\r\n"
+								},
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/model/actions",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"model",
+										"actions"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Upload model actions",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "text/csv"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "SubCatchment, GullyRestoration, HillSlopeRestoration, RiverBankRestoration, WetlandsEstablishment\r\n17, 0, 0, 0, 0\r\n18, 0, 0, 1, 0\r\n19, 0, 0, 1, 0\r\n20, 0, 0, 0, 0\r\n21, 0, 0, 0, 0\r\n22, 0, 0, 0, 0\r\n23, 0, 0, 0, 0\r\n"
+										},
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/model/actions",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"model",
+												"actions"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Wed, 14 Jul 2021 01:29:33 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "139"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Management actions state change successfully applied\",\n    \"Time\": \"2021-07-14T11:29:33.4987077+10:00\"\n}"
 								}
 							]
 						},
@@ -838,7 +1224,164 @@
 							]
 						},
 						{
+							"name": "GET V1 Model Subcatcment 21",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/model/subcatchment/21",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"model",
+										"subcatchment",
+										"21"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "GET V1 Model Subcatcment 18",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/model/subcatchment/{{ValidSubcatchmentId}}",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"model",
+												"subcatchment",
+												"{{ValidSubcatchmentId}}"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 20 Apr 2021 05:42:25 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "203"
+										}
+									],
+									"cookie": [],
+									"body": "[\n    {\n        \"Name\": \"RiverBankRestoration\",\n        \"Value\": \"Active\"\n    },\n    {\n        \"Name\": \"GullyRestoration\",\n        \"Value\": \"Inactive\"\n    },\n    {\n        \"Name\": \"HillSlopeRestoration\",\n        \"Value\": \"Inactive\"\n    }\n]"
+								}
+							]
+						},
+						{
 							"name": "POST V1 Model Subcatchment 18 (Valid)",
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/toml"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "[\r\n  {\r\n    \"Name\": \"RiverBankRestoration\",\r\n    \"Value\": \"Active\"\r\n  },\r\n  {\r\n    \"Name\": \"GullyRestoration\",\r\n    \"Value\": \"Active\"\r\n  }\r\n]"
+								},
+								"url": {
+									"raw": "http://{{CremEngineApiDomain}}/api/v1/model/subcatchment/{{ValidSubcatchmentId}}",
+									"protocol": "http",
+									"host": [
+										"{{CremEngineApiDomain}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"model",
+										"subcatchment",
+										"{{ValidSubcatchmentId}}"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "POST V1 Model Subcatchment 18 (Valid)",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"type": "text",
+												"value": "application/toml"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "[\r\n  {\r\n    \"Name\": \"RiverBankRestoration\",\r\n    \"Value\": \"Active\"\r\n  },\r\n  {\r\n    \"Name\": \"GullyRestoration\",\r\n    \"Value\": \"Active\"\r\n  }\r\n]"
+										},
+										"url": {
+											"raw": "http://{{CremEngineApiDomain}}/api/v1/model/subcatchment/{{ValidSubcatchmentId}}",
+											"protocol": "http",
+											"host": [
+												"{{CremEngineApiDomain}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"model",
+												"subcatchment",
+												"{{ValidSubcatchmentId}}"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Cache-Control",
+											"value": "max-age=0"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 20 Apr 2021 05:43:24 GMT"
+										},
+										{
+											"key": "Content-Length",
+											"value": "133"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"Type\": \"SUCCESS\",\n    \"Message\": \"Subcatchment state change successfully applied\",\n    \"Time\": \"2021-04-20T15:43:24.0460773+10:00\"\n}"
+								}
+							]
+						},
+						{
+							"name": "POST V1 Model Subcatchment 21 (Valid)",
 							"protocolProfileBehavior": {
 								"disabledSystemHeaders": {}
 							},

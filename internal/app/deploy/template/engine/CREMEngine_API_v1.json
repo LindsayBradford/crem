@@ -121,6 +121,133 @@
                 }
             }
         },
+        "/api/v1/solutions": {
+            "post": {
+                "summary": "Upload a new solution summary to the engine for a given scenario",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/toml": {}
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Confirmation that the posted solution summary wsa acceppted as valid aod stored for the engine scenario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the posted solution summary was somehow invalid, and will not be used as in the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Notification that the posted solution summary data cannot be processed due to pre-requisites not being met",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Notification that the posted solution summary data was not the expected mime-type of text/csv",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "description": "The soulution summary data recivied via a successful POSt operation",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The soulution summary data recivied via a successful POSt operation",
+                        "content": {
+                            "tesxt/csv": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the posted solution summary data was somehow invalid, and will not be used in the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/solutions/{solutionId}": {
+            "get": {
+                "description": "The soulution summary data recivied via a successful POSt operation",
+                "tags": [
+                    "scenario",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's catchment model",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CatchmentModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification that the subcatchment specified doesn't exist in the engine's solution sumamry",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [ {
+                "name": "solutionId",
+                "in": "path",
+                "description": "ID of solution to retrieve",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "pattern": "[\\w\\-]+"
+                }
+            } ]
+        },
         "/api/v1/model": {
             "get": {
                 "summary": "Details on the current state of the engine's catchment model",
@@ -135,6 +262,55 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/CatchmentModel"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Updates attributes of the model",
+                "tags": [
+                    "model",
+                    "API"
+                ],
+                "requestBody": {
+                    "content": {
+                        "text/json": {
+                            "schema": {
+                                    "$ref": "#/components/schemas/Attribution"
+                            }
+                        } 
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "The current state of the engine's catchment model",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Notification that the attribute data was somehow invalid, and will not be used to alter the maodel",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    },
+                    "415": {
+                        "description": "Notification that the attribute data was not the expected mime-type of text/json",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
                                 }
                             }
                         }
@@ -163,7 +339,7 @@
                     }
                 }
             },
-            "post": {
+            "put": {
                 "summary": "Upload a new combination of active managemnet actions for an active scenarion in the engine",
                 "tags": [
                     "scenario",
@@ -215,11 +391,21 @@
                                 }
                             }
                         }
+                    },
+                    "415": {
+                        "description": "Notification that the posted scenario data was not the expected mime-type of text/csv",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
                     }
                 }
             }
         },
-        "/api/v1/model/subcatchment/{{subcatchmentId}}": {
+        "/api/v1/model/subcatchment/{subcatchmentId}": {
             "get": {
                 "summary": "Details on the current state of the engine's catchment model's selected subcaatchment",
                 "tags": [
@@ -251,7 +437,7 @@
                     }
                 }
             },
-            "post": {
+            "put": {
                 "summary": "Upload a new combination of active managemnet actions for an active scenarion in the engine",
                 "tags": [
                     "scenario",
@@ -299,7 +485,18 @@
                         }
                     }
                 }
-            }
+            },
+            "parameters": [ {
+                "name": "subcatchmentId",
+                "in": "path",
+                "description": "ID of subcatchment to use",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "pattern": "^/d+$"
+
+                }
+            } ]
         }
     },
     "components": {
@@ -340,7 +537,8 @@
                 "required": [
                     "Id",
                     "DecisionVariables",
-                    "ActiveManagementActions"
+                    "ActiveManagementActions",
+                    "Attributes"
                 ],
                 "properties": {
                     "Id": {
@@ -354,6 +552,9 @@
                     },
                     "ActievManagementActions": {
                         "$ref": "#/components/schemas/ActiveManagementActionsMap"
+                    },
+                    "Attributes": {
+                        "$ref": "#/components/schemas/Attribution"
                     }
                 }
             },
@@ -452,7 +653,30 @@
                         "enum": ["Active", "Inactive"]
                     }
                 }
+            },
+            "Attribution": { 
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/Attribute"
+                }
+            },
+            "Attribute": {
+                "type": "object",
+                "required": [
+                    "Name",
+                    "Value"
+                ],
+                "properties": {
+                    "Name": {
+                        "type": "string"                 
+                    },
+                    "Value": {
+                        "type": "string"
+                    }
+                }
             }
         }
-    }
+    },
+    "security": []
 }
+ 

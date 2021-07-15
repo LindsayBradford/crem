@@ -80,7 +80,7 @@ func TestModelActionsRequestNoScenario_NotFoundResponse(t *testing.T) {
 
 	// when
 	context := TestContext{
-		Name: "PUT /model/actions request returns 501 (not implemented) response",
+		Name: "PUT /model/actions request returns 404 (not found) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
