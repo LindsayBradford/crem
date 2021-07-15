@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.5 (TBD):
+* Updated to contain CREMEngine 0.5. See its changelog for specific changes.
+
 ## Version 0.4 (15 July 2021):
 * Updated to contain CREMExplorer 0.18. See its changelog for specific changes.
 * Updated to contain CREMEngine 0.4. See its changelog for specific changes.
