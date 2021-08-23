@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.19 (23 August 2021):
+### New Features
+* Now deploys with Laidley_data_v1_8_5.xlsx (containing updated economics data)
+
 ## Version 0.18 (15 July 2021):
 ### Bug Fixes
 * Fixed saving of solutions as-is solution accidentally triggering active actions to respect decision variable limits.
