@@ -76,7 +76,14 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 		if entry.Name == "Encoding" {
 			encoding := entry.Value.(string)
 			m.Logger().Info("Re-initialising model with attribute-supp[ied alternate encoding [" + encoding + "]")
-			m.updateModelWithEncoding(encoding)
+			updateError := m.updateModelWithEncoding(encoding)
+
+			if updateError != nil {
+				wrappingError := errors.Wrap(updateError, v1modelHandler)
+				m.Logger().Error(wrappingError)
+				m.RespondWithError(http.StatusBadRequest, updateError.Error(), w, r)
+				return
+			}
 		}
 	}
 
@@ -90,20 +97,38 @@ func (m *Mux) v1PatchModelHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (m *Mux) updateModelWithEncoding(encoding string) {
-	m.reInitialiseModelWithEncoding(encoding)
+func (m *Mux) updateModelWithEncoding(encoding string) error {
+	encodingError := m.reInitialiseModelWithEncoding(encoding)
+	if encodingError != nil {
+		return encodingError
+	}
 	m.updateModelSolution()
+
+	return nil
 }
 
-func (m *Mux) reInitialiseModelWithEncoding(encoding string) {
+func (m *Mux) reInitialiseModelWithEncoding(encoding string) error {
 	newModel := m.model.DeepClone()
 
 	compressedModel := modelCompressor.Compress(newModel)
-	compressedModel.Decode(encoding)
+	decodingError := compressedModel.Decode(encoding)
+
+	if decodingError != nil {
+		wrappingError := errors.Wrap(decodingError, v1modelHandler)
+		m.Logger().Warn(wrappingError)
+
+		wrappingError = errors.Wrap(errors.New("Leaving model in current state"), v1modelHandler)
+		m.Logger().Warn(wrappingError)
+
+		return decodingError
+	}
+
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	m.model = toCatchmentModel(newModel)
 	m.deriveExtraModelAttributes()
+
+	return nil
 }
 
 func (m *Mux) buildModelPatchResponse(w http.ResponseWriter) *rest.Response {

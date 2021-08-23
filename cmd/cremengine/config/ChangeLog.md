@@ -1,6 +1,8 @@
 # Change Log
 
 ## Version 0.5 (TBD):
+### Bugs Fixed
+* Fixed bug in model PATCH parser, where bad encodings were not reporting errors in the message responses.
 
 ## Version 0.4 (15 July 2021):
 ### New Features

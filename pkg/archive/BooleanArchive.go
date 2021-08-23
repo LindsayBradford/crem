@@ -166,7 +166,8 @@ func (a *BooleanArchive) parseEntriesIntoArrayValues(entries []string) error {
 func (a *BooleanArchive) deriveStringEncodingsOfArrayEntries(encoding string) ([]string, error) {
 	entries := strings2.Split(encoding, ":")
 	if len(entries) != a.ArchiveLen() {
-		return nil, errors.New("wrong number of encoding entries")
+		errorString := fmt.Sprintf("Wrong number of entries in encoding [%s]. Expected %d entries.", encoding, a.ArchiveLen())
+		return nil, errors.New(errorString)
 	}
 	return entries, nil
 }
