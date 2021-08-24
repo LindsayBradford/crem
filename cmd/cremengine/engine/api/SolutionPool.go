@@ -83,7 +83,12 @@ func (sp *SolutionPool) AddSolution(label SolutionPoolLabel, modelEncoding strin
 	modelCompressor.Decompress(compressedModel, newModel)
 
 	newCatchmentModel := toCatchmentModel(newModel)
+
 	newCatchmentModel.ReplaceAttribute(ParetoFrontMember.String(), true)
+	newCatchmentModel.ReplaceAttribute(ValidAgainstScenario.String(), true)
+	newCatchmentModel.ReplaceAttribute(Encoding.String(), modelEncoding)
+	newCatchmentModel.ReplaceAttribute(Summary.String(), summary)
+
 	newSolution := sp.deriveSolutionFrom(newCatchmentModel)
 	sp.cache[label] = NewSolutionContainer(newSolution, summary)
 }

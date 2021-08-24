@@ -26,6 +26,7 @@ const (
 	ParetoFrontMember    ModelAttribute = "ParetoFrontMember"
 	ValidAgainstScenario ModelAttribute = "ValidAgainstScenario"
 	ValidationErrors     ModelAttribute = "ValidationErrors"
+	Summary              ModelAttribute = "Summary"
 )
 
 func (m *Mux) deriveExtraModelAttributes() {

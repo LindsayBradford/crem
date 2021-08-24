@@ -1,8 +1,11 @@
 # Change Log
 
 ## Version 0.5 (TBD):
+### New Features
+* Warnings are now posted to the log for attempting to activate management actions via CSV tables that aren't supported.
 ### Bugs Fixed
 * Fixed bug in model PATCH parser, where bad encodings were not reporting errors in the message responses.
+* Fixed bug where key attributes were missing on solution GET responses after a successful solution set upload
 
 ## Version 0.4 (15 July 2021):
 ### New Features

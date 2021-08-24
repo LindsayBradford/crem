@@ -118,6 +118,8 @@ func (m *Mux) processRequestContentForActiveActions(r *http.Request, w http.Resp
 }
 
 func (m *Mux) processRequestTable(headingsTable dataset.HeadingsTable) {
+	m.Logger().Info("Processing supplied management action CSV table")
+
 	colSize, rowSize := headingsTable.ColumnAndRowSize()
 	for rowIndex := uint(0); rowIndex < rowSize; rowIndex++ {
 		for colIndex := uint(1); colIndex < colSize; colIndex++ {
@@ -131,16 +133,26 @@ func (m *Mux) processTableCell(headingsTable dataset.HeadingsTable, colIndex uin
 	suppliedActionState := m.deriveSuppliedActionState(headingsTable, colIndex, rowIndex)
 	modelActions := m.model.ManagementActions()
 
+	actionFound := false
+	rawPlanningUnit := float64(0)
+	rawType := ""
+
 	for actionIndex := 0; actionIndex < len(modelActions); actionIndex++ {
 		currentAction := modelActions[actionIndex]
 
-		rawPlanningUnit := headingsTable.CellFloat64(0, rowIndex)
-		rawType := headingsTable.Header()[colIndex]
+		rawPlanningUnit = headingsTable.CellFloat64(0, rowIndex)
+		rawType = headingsTable.Header()[colIndex]
 
 		if currentAction.PlanningUnit() == planningunit.Id(rawPlanningUnit) &&
 			string(currentAction.Type()) == rawType {
 			m.model.SetManagementAction(actionIndex, suppliedActionState)
+			actionFound = true
 		}
+	}
+
+	if suppliedActionState == true && !actionFound {
+		actionMsg := fmt.Sprintf("Management action entry [%d,%d] has no corresponding [%s] action at planning unit [%0.0f] to activate. Ignoring", colIndex, rowIndex, rawType, rawPlanningUnit)
+		m.Logger().Warn(actionMsg)
 	}
 }
 

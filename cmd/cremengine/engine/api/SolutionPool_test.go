@@ -39,6 +39,9 @@ func TestModePool_AddSolution(t *testing.T) {
 	referenceModel.SetManagementAction(5, true)
 	referenceModel.SetManagementAction(7, true)
 	referenceModel.ReplaceAttribute("ParetoFrontMember", true)
+	referenceModel.ReplaceAttribute("ValidAgainstScenario", true)
+	referenceModel.ReplaceAttribute("Encoding", "A1")
+	referenceModel.ReplaceAttribute("Summary", "a test solution")
 
 	expectedSolution := poolUnderTest.deriveSolutionFrom(referenceModel)
 
@@ -46,9 +49,10 @@ func TestModePool_AddSolution(t *testing.T) {
 	expectedSummary := "a test solution"
 
 	poolUnderTest.AddSolution(labelUnderTest, "A1", expectedSummary) // A1 = 100001010000 binary
+	pooledSolution := poolUnderTest.Solution(labelUnderTest)
 
 	g.Expect(poolUnderTest.Summary(labelUnderTest)).To(Equal(expectedSummary))
-	g.Expect(poolUnderTest.Solution(labelUnderTest)).To(Equal(expectedSolution))
+	g.Expect(pooledSolution).To(Equal(expectedSolution))
 }
 
 func TestModeContainer_New(t *testing.T) {
