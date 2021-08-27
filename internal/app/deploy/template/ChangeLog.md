@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.5 (TBD):
+## Version 0.5 (27 August 2021):
 * Now ships with and uses Laidley Data version 1.8.5, containing updated economics data.
 * Updated to contain CREMExplorer 0.19. See its changelog for specific changes.
 * Updated to contain CREMEngine 0.5. See its changelog for specific changes.

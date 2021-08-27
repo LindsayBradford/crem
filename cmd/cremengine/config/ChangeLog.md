@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.5 (TBD):
+## Version 0.5 (27/08/2021):
 ### New Features
 * Warnings are now posted to the log for attempting to activate management actions via CSV tables that aren't supported.
 ### Bugs Fixed
