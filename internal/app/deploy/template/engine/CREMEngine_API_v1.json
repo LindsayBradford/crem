@@ -497,6 +497,50 @@
 
                 }
             } ]
+        },
+        "/api/v1/model/subcatchment/{subcatchmentId}/applicableActions": {
+            "get": {
+                "summary": "A list of the management actions applicable to the engine's catchment model's selected subcaatchment",
+                "tags": [
+                    "model",
+                    "actions",
+                    "subcatchment",
+                    "API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The list of applicable management actions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApplicableActiveManagementActionsModel"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Notification that the subcatchment specified doesn't exist for the current mudel running in the engine",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSummary"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "parameters": [ {
+                "name": "subcatchmentId",
+                "in": "path",
+                "description": "ID of subcatchment to use",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "pattern": "^/d+$"
+
+                }
+            } ]
         }
     },
     "components": {
@@ -618,6 +662,16 @@
                     "type": "array",
                     "items": {
                         "enum": ["RiverBankRestoration", "GullyRepair", "HillSlopeRestoration", "WetlandsEstablishment"]
+                    }
+                }
+            },
+            "ApplicableActiveManagementActionsModel": {
+                "required": [
+                    "ApplicableActions"
+                ],
+                "properties": {
+                    "ActievManagementActions": {
+                        "$ref": "#/components/schemas/ManagementActionArray"
                     }
                 }
             },

@@ -1,7 +1,5 @@
 # Change Log
 
-## Version 0.20 (TBD):
-
 ## Version 0.19 (27 August 2021):
 ### New Features
 * Now deploys with Laidley_data_v1_8_5.xlsx (containing updated economics data)

@@ -1,6 +1,9 @@
 # Change Log
 
-## Version 0.6 (TBD):
+## Version 0.6 (22 September 2021):
+### New Features
+* Addition of new running engine api behaviour:
+  * GET  /api/v1/model/subcatchment/[0-9]*/applicableActions -- Returns the mgt actions that can be applied for the given model's subcatchment
 
 ## Version 0.5 (27/08/2021):
 ### New Features
