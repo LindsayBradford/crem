@@ -2,11 +2,12 @@ package api
 
 import (
 	_ "embed"
+	"net/http"
+	"testing"
+
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	httptest "github.com/LindsayBradford/crem/internal/pkg/server/test"
 	. "github.com/onsi/gomega"
-	"net/http"
-	"testing"
 )
 
 //go:embed testdata/InvalidActiveActions.csv
@@ -14,6 +15,10 @@ var invalidActionsCsvContent string
 
 //go:embed testdata/ValidActiveActions.csv
 var validRActionsCsvContent string
+
+const (
+	activeActionsPath = "active"
+)
 
 func TestFirstActionsGetRequest_NotFoundResponse(t *testing.T) {
 	// given
@@ -25,7 +30,7 @@ func TestFirstActionsGetRequest_NotFoundResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "GET",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			RequestBody: "here is some text",
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
@@ -63,7 +68,7 @@ func TestGetValidModelActionsResource_OkResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "GET",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			RequestBody: "here is some text",
 		},
 		ExpectedResponseStatus: http.StatusOK,
@@ -84,7 +89,7 @@ func TestModelActionsRequestNoScenario_NotFoundResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			RequestBody: "here is some text",
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
@@ -105,7 +110,7 @@ func TestModelActionsPutRequest_NotAllowedResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "POST",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			RequestBody: "here is some text",
 		},
 		ExpectedResponseStatus: http.StatusMethodNotAllowed,
@@ -141,7 +146,7 @@ func TestModelActionsRequestNotCsv_NotFoundResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			ContentType: rest.TomlMimeType,
 			RequestBody: "This is not the expected CSV mime type",
 		},
@@ -179,7 +184,7 @@ func TestModelActionsRequest_BadCsvContent_BadContentResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			ContentType: rest.CsvMimeType,
 			RequestBody: "This text is pretending to be CSV text.",
 		},
@@ -218,7 +223,7 @@ func TestModelActionsRequest_BadCsvCells_BadContentResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			ContentType: rest.CsvMimeType,
 			RequestBody: invalidActionsCsvContent,
 		},
@@ -259,7 +264,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:      "PUT",
-			TargetUrl:   baseUrl + "api/v1/model/actions",
+			TargetUrl:   baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 			ContentType: rest.CsvMimeType,
 			RequestBody: validRActionsCsvContent,
 		},
@@ -278,7 +283,7 @@ func TestModelActionsRequest_GoodCsvContent_OkResponse(t *testing.T) {
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:    "GET",
-			TargetUrl: baseUrl + "api/v1/model/actions",
+			TargetUrl: baseActionsUrl + rest.UrlPathSeparator + activeActionsPath,
 		},
 		ExpectedResponseStatus: http.StatusOK,
 	}

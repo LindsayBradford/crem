@@ -1,13 +1,34 @@
 # Change Log
 
-## Version 0.6 (22 September 2021):
+## Version 0.6 (24 September 2021):
+
 ### New Features
+
+* Removal of running engine api behaviour:
+  * GET /api/v1/model/subcatchment/[0-9]*/applicableActions -- Returns the mgt actions that can be applied for the given
+    model's subcatchment
+  * GET /api/v1/model/actions -- Returns the active management actions of the current running model
+  * POST /api/v1/model/actions -- Supplies a solution of active management actions to the current running model
 * Addition of new running engine api behaviour:
-  * GET  /api/v1/model/subcatchment/[0-9]*/applicableActions -- Returns the mgt actions that can be applied for the given model's subcatchment
+  * GET /api/v1/model/actions/applicable -- Returns the mgt actions that can be applied for the given model, broken down
+    by subcatchment
+  * GET /api/v1/model/actions/active -- Returns the active management actions of the current running model
+  * PUT /api/v1/model/actions/active -- Supplies a solution of active management actions to the current running model
+
+## Version 0.6 (22 September 2021):
+
+### New Features
+
+* Addition of new running engine api behaviour:
+  * GET /api/v1/model/subcatchment/[0-9]*/applicableActions -- Returns the mgt actions that can be applied for the given
+    model's subcatchment
 
 ## Version 0.5 (27/08/2021):
+
 ### New Features
+
 * Warnings are now posted to the log for attempting to activate management actions via CSV tables that aren't supported.
+
 ### Bugs Fixed
 * Fixed bug in model PATCH parser, where bad encodings were not reporting errors in the message responses.
 * Fixed bug where key attributes were missing on solution GET responses after a successful solution set upload

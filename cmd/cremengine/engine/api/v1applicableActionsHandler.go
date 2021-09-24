@@ -2,15 +2,16 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+
+	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/model/planningunit"
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/pkg/errors"
-	"net/http"
-	"strings"
 )
 
 const (
-	v1ApplicableActionsHandler = "v1 subcatchment applicable actions handler"
+	v1ApplicableActionsHandler = "v1 applicable actions handler"
 )
 
 func (m *Mux) v1ApplicableActionsHandler(w http.ResponseWriter, r *http.Request) {
@@ -23,46 +24,30 @@ func (m *Mux) v1ApplicableActionsHandler(w http.ResponseWriter, r *http.Request)
 }
 
 func (m *Mux) v1GetApplicableActionsHandler(w http.ResponseWriter, r *http.Request) {
-	deriveRequestSuppliedSubCatchment := func(r *http.Request) string {
-		pathElements := strings.Split(r.URL.Path, rest.UrlPathSeparator)
-		lastElementIndex := len(pathElements) - 2
-		subCatchmentAsString := pathElements[lastElementIndex]
-		return subCatchmentAsString
-	}
-
-	requestSuppliedSubCatchment := deriveRequestSuppliedSubCatchment(r)
-
 	if m.modelSolution == nil {
-		m.Logger().Warn("Attempted to request subcatchment [" + requestSuppliedSubCatchment + "] state with no model present")
 		m.NotFoundError(w, r)
 		return
 	}
 
-	subCatchment := toPlanningUnitId(requestSuppliedSubCatchment)
+	m.logApplicableActionsMessage()
+	m.sendApplicableActionsResponse(w)
+}
 
-	if !m.modelContains(subCatchment) {
-		m.Logger().Warn("Attempted to request subcatchment [" + requestSuppliedSubCatchment + "] state not offered by the model")
-		m.NotFoundError(w, r)
-		return
+type applicableActionsWrapper struct {
+	ApplicableActions map[planningunit.Id]solution.ManagementActions
+}
+
+func (m *Mux) sendApplicableActionsResponse(w http.ResponseWriter) {
+	applicableActions := applicableActionsWrapper{
+		ApplicableActions: m.deriveApplicableActions(),
 	}
-
-	m.respondWithApplicableActions(w, subCatchment)
-}
-
-func (m *Mux) respondWithApplicableActions(w http.ResponseWriter, subCatchment planningunit.Id) {
-	m.logApplicableActionsMessage(subCatchment)
-	m.sendSubcatchmentApplicableActionsResponse(w, subCatchment)
-}
-
-func (m *Mux) sendSubcatchmentApplicableActionsResponse(w http.ResponseWriter, subCatchment planningunit.Id) {
-	responseActions := m.deriveApplicableActionsFor(subCatchment)
 
 	restResponse := new(rest.Response).
 		Initialise().
 		WithWriter(w).
 		WithResponseCode(http.StatusOK).
 		WithCacheControlMaxAge(m.CacheMaxAge()).
-		WithJsonContent(responseActions)
+		WithJsonContent(applicableActions)
 
 	writeError := restResponse.Write()
 
@@ -72,9 +57,9 @@ func (m *Mux) sendSubcatchmentApplicableActionsResponse(w http.ResponseWriter, s
 	}
 }
 
-func (m *Mux) logApplicableActionsMessage(subCatchment planningunit.Id) {
+func (m *Mux) logApplicableActionsMessage() {
 	scenarioName := m.Attribute(scenarioNameKey).(string)
-	responseMessage := fmt.Sprintf("Responding with model [%s] subcatchment [%d] applicable actions ", scenarioName, subCatchment)
+	responseMessage := fmt.Sprintf("Responding with model [%s] applicable actions ", scenarioName)
 	m.Logger().Info(responseMessage)
 }
 
@@ -82,23 +67,27 @@ type ActionsArray struct {
 	ApplicableActions []string
 }
 
-func (m *Mux) deriveApplicableActionsFor(subCatchment planningunit.Id) ActionsArray {
-	actionsFound := m.derivedActionsFromModel(subCatchment)
-	returnActions := ActionsArray{ApplicableActions: actionsFound}
-	return returnActions
+func (m *Mux) deriveApplicableActions() map[planningunit.Id]solution.ManagementActions {
+	actionsMap := map[planningunit.Id]solution.ManagementActions{}
+
+	for _, planningUnit := range m.modelSolution.PlanningUnits {
+		actionsMap[planningUnit] = m.deriveApplicableActionsFor(planningUnit)
+	}
+
+	return actionsMap
 }
 
-func (m *Mux) derivedActionsFromModel(subCatchment planningunit.Id) []string {
+func (m *Mux) deriveApplicableActionsFor(subCatchment planningunit.Id) solution.ManagementActions {
 	activeActions := m.modelSolution.ActiveManagementActions[subCatchment]
 	inactiveActions := m.modelSolution.InactiveManagementActions[subCatchment]
 
-	actionsFound := make([]string, 0)
+	actionsFound := make(solution.ManagementActions, 0)
 
 	for _, action := range activeActions {
-		actionsFound = append(actionsFound, string(action))
+		actionsFound = append(actionsFound, action)
 	}
 	for _, action := range inactiveActions {
-		actionsFound = append(actionsFound, string(action))
+		actionsFound = append(actionsFound, action)
 	}
 	return actionsFound
 }

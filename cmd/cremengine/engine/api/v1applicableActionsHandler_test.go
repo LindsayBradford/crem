@@ -10,70 +10,29 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const applicableActionsPath = "applicableActions"
+const (
+	baseActionsUrl        = baseUrl + "api/v1/model/actions"
+	applicableActionsPath = "applicable"
+)
 
 func TestFirstApplicableActionsGetRequest_NotFoundResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
-	subcatchmentUrlUnderTest := baseSubcatchmentUrl + rest.UrlPathSeparator + validSubcatchment + rest.UrlPathSeparator + applicableActionsPath
+	actionsUrlUnderTest := baseActionsUrl + rest.UrlPathSeparator + applicableActionsPath
 
 	// when
 	context := TestContext{
-		Name: http.MethodGet + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
+		Name: http.MethodGet + " " + actionsUrlUnderTest + " request returns 404 (not found) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:    http.MethodGet,
-			TargetUrl: subcatchmentUrlUnderTest,
+			TargetUrl: actionsUrlUnderTest,
 		},
 		ExpectedResponseStatus: http.StatusNotFound,
 	}
 
 	// then
 	verifyResponseStatusCode(muxUnderTest, context)
-	muxUnderTest.Shutdown()
-}
-
-func TestMissingApplicableActionsGetRequest_NotFoundResponse(t *testing.T) {
-	// given
-	muxUnderTest := buildMuxUnderTest()
-	buildValidScenario(t, muxUnderTest)
-
-	// when
-	subcatchmentUrlUnderTest := baseSubcatchmentUrl + "/1" + rest.UrlPathSeparator + applicableActionsPath
-	getContext := TestContext{
-		Name: http.MethodGet + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
-		T:    t,
-		Request: httptest.HttpTestRequestContext{
-			Method:    http.MethodGet,
-			TargetUrl: subcatchmentUrlUnderTest,
-		},
-		ExpectedResponseStatus: http.StatusNotFound,
-	}
-
-	// then
-	verifyResponseStatusCode(muxUnderTest, getContext)
-	muxUnderTest.Shutdown()
-}
-
-func TestInvalidApplicableActionsGetRequest_NotFoundResponse(t *testing.T) {
-	// given
-	muxUnderTest := buildMuxUnderTest()
-	buildValidScenario(t, muxUnderTest)
-
-	// when
-	subcatchmentUrlUnderTest := baseSubcatchmentUrl + "/nope" + rest.UrlPathSeparator + applicableActionsPath
-	getContext := TestContext{
-		Name: http.MethodGet + " " + subcatchmentUrlUnderTest + " request returns 404 (not found) response",
-		T:    t,
-		Request: httptest.HttpTestRequestContext{
-			Method:    http.MethodGet,
-			TargetUrl: subcatchmentUrlUnderTest,
-		},
-		ExpectedResponseStatus: http.StatusNotFound,
-	}
-
-	// then
-	verifyResponseStatusCode(muxUnderTest, getContext)
 	muxUnderTest.Shutdown()
 }
 
@@ -84,13 +43,15 @@ func TestGetApplicableActionsResource_OkResponse(t *testing.T) {
 	muxUnderTest := buildMuxUnderTest()
 	buildValidScenario(t, muxUnderTest)
 
+	actionsUrlUnderTest := baseActionsUrl + rest.UrlPathSeparator + applicableActionsPath
+
 	// when
 	getContext := TestContext{
-		Name: http.MethodGet + " " + validSubcatchmentUrl + " request returns 200 (ok) response",
+		Name: http.MethodGet + " " + actionsUrlUnderTest + " request returns 200 (ok) response",
 		T:    t,
 		Request: httptest.HttpTestRequestContext{
 			Method:    http.MethodGet,
-			TargetUrl: validSubcatchmentUrl + rest.UrlPathSeparator + applicableActionsPath,
+			TargetUrl: actionsUrlUnderTest,
 		},
 		ExpectedResponseStatus: http.StatusOK,
 	}
@@ -104,7 +65,22 @@ func TestGetApplicableActionsResource_OkResponse(t *testing.T) {
 	if _, keyFound := jsonResponse["ApplicableActions"]; !keyFound {
 		g.Expect(false).To(BeTrue(), "Missing expected [ApplicableActions] json name")
 	}
-	g.Expect(jsonResponse["ApplicableActions"]).To(ConsistOf("GullyRestoration", "RiverBankRestoration"))
+	rawActions := jsonResponse["ApplicableActions"]
+	if actionsMap, isMap := rawActions.(map[string]interface{}); isMap {
+		g.Expect(len(actionsMap)).To(BeNumerically("==", 7))
+
+		pu20actions := actionsMap["20"]
+		if actionsArray, isArray := pu20actions.([]string); isArray {
+			g.Expect(len(actionsArray)).To(BeNumerically("==", 1))
+			g.Expect(pu20actions).To(ConsistOf("RiverBankRestoration"))
+		}
+
+		pu22actions := actionsMap["22"]
+		if actionsArray, isArray := pu22actions.([]string); isArray {
+			g.Expect(len(actionsArray)).To(BeNumerically("==", 2))
+			g.Expect(pu20actions).To(ConsistOf("RiverBankRestoration", "WetlandsEstablishment"))
+		}
+	}
 
 	muxUnderTest.Shutdown()
 }

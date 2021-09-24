@@ -2,6 +2,8 @@ package api
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/dataset/csv"
@@ -9,12 +11,11 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	compositeErrors "github.com/LindsayBradford/crem/pkg/errors"
 	"github.com/pkg/errors"
-	"net/http"
 )
 
-const v1ModelActionsHandler = "v1 model actions handler"
+const v1ModelActionsHandler = "v1 model active actions handler"
 
-func (m *Mux) v1actionsHandler(w http.ResponseWriter, r *http.Request) {
+func (m *Mux) v1activeActionsHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPut:
 		m.v1PutActionsHandler(w, r)
@@ -25,7 +26,7 @@ func (m *Mux) v1actionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type actionsWrapper struct {
+type activeActionsWrapper struct {
 	ActiveManagementActions map[planningunit.Id]solution.ManagementActions
 }
 
@@ -39,7 +40,7 @@ func (m *Mux) v1GetActionsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Mux) writeActiveActionResponse(w http.ResponseWriter) {
-	activeActions := actionsWrapper{
+	activeActions := activeActionsWrapper{
 		ActiveManagementActions: m.modelSolution.ActiveManagementActions,
 	}
 

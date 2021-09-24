@@ -3,6 +3,9 @@
 package api
 
 import (
+	"io/ioutil"
+	"net/http"
+
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution/encoding/json"
 	"github.com/LindsayBradford/crem/internal/pkg/config/interpreter"
@@ -12,8 +15,6 @@ import (
 	"github.com/LindsayBradford/crem/internal/pkg/server/rest"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"github.com/LindsayBradford/crem/pkg/threading"
-	"io/ioutil"
-	"net/http"
 )
 
 const (
@@ -47,6 +48,8 @@ func (m *Mux) Initialise() *Mux {
 		solutionsPath        = "solutions"
 		modelPath            = "model"
 		actionsPath          = "actions"
+		activePath           = "active"
+		applicablePath       = "applicable"
 		subcatchmentPath     = "subcatchment"
 		identityMatchingPath = "\\d+"
 		solutionLabelPath    = "[\\w\\-]+"
@@ -60,7 +63,8 @@ func (m *Mux) Initialise() *Mux {
 	m.AddHandler(buildV1ApiPath(solutionsPath), m.v1solutionSetHandler)
 	m.AddHandler(buildV1ApiPath(solutionsPath, solutionLabelPath), m.v1solutionHandler)
 	m.AddHandler(buildV1ApiPath(modelPath), m.v1modelHandler)
-	m.AddHandler(buildV1ApiPath(modelPath, actionsPath), m.v1actionsHandler)
+	m.AddHandler(buildV1ApiPath(modelPath, actionsPath, applicablePath), m.v1ApplicableActionsHandler)
+	m.AddHandler(buildV1ApiPath(modelPath, actionsPath, activePath), m.v1activeActionsHandler)
 	m.AddHandler(buildV1ApiPath(modelPath, subcatchmentPath, identityMatchingPath), m.v1subcatchmentHandler)
 
 	return m
