@@ -19,7 +19,7 @@ def deriveConfiguration():
 
     targetTemplateDir = './template'
     return {
-        'versionNumber': 'v0.5',
+        'versionNumber': 'v0.7',
         
         'baseArchiveName': baseArchiveName,
         'explorerSourceDir': explorerSourceDir,

@@ -318,26 +318,36 @@
                 }
             }
         },    
-        "/api/v1/model/actions": {
-            "get": {
-                "summary": "Details on the current state of the engine's catchment model",
-                "tags": [
-                    "model",
-                    "actions",
-                    "API"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "The current state of the engine's catchment model's active management actions",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ActiveManagementActionsModel"
-                                }
-                            }
-                        }
+        "/api/v1/model/actions/active": {
+          "get": {
+            "summary": "Details on the current state of the engine's catchment model",
+            "tags": [
+              "model",
+              "actions",
+              "API"
+            ],
+            "responses": {
+              "200": {
+                "description": "The current state of the engine's catchment model's active management actions",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ActiveManagementActionsModel"
                     }
+                  }
                 }
+              },
+              "404": {
+                "description": "Notification that there are no active management actions when no model is running",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ResponseSummary"
+                    }
+                  }
+                }
+              }
+            }
             },
             "put": {
                 "summary": "Upload a new combination of active managemnet actions for an active scenarion in the engine",
@@ -392,22 +402,55 @@
                             }
                         }
                     },
-                    "415": {
-                        "description": "Notification that the posted scenario data was not the expected mime-type of text/csv",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ResponseSummary"
-                                }
-                            }
+                  "415": {
+                    "description": "Notification that the posted scenario data was not the expected mime-type of text/csv",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/ResponseSummary"
                         }
+                      }
                     }
+                  }
                 }
             }
         },
-        "/api/v1/model/subcatchment/{subcatchmentId}": {
-            "get": {
-                "summary": "Details on the current state of the engine's catchment model's selected subcaatchment",
+      "/api/v1/model/actions/applicable": {
+        "get": {
+          "summary": "A list of the management actions applicable to the engine's catchment model per subcatchment",
+          "tags": [
+            "model",
+            "actions",
+            "subcatchment",
+            "API"
+          ],
+          "responses": {
+            "200": {
+              "description": "The list of applicable management actions per subcatchment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ApplicableManagementActionsModel"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Notification that there are no active management actions when no model is running",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ResponseSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/model/subcatchment/{subcatchmentId}": {
+        "get": {
+          "summary": "Details on the current state of the engine's catchment model's selected subcaatchment",
                 "tags": [
                     "model",
                     "actions",
@@ -601,17 +644,17 @@
                     }
                 }
             },
-            "ActiveManagementActionsMap": {
-                "type": "object",
-                "properties": {
-                    "itemType": {
-                        "$ref": "#/components/schemas/ManagementActionArray"
-                    },
-                    "itemCount": {
-                        "$ref": "#/components/schemas/ManagementActionArray"
-                    }
-                }
-            },
+          "ManagementActionsMap": {
+            "type": "object",
+            "properties": {
+              "itemType": {
+                "$ref": "#/components/schemas/ManagementActionArray"
+              },
+              "itemCount": {
+                "$ref": "#/components/schemas/ManagementActionArray"
+              }
+            }
+          },
             "ManagementActionArray": {
                 "type": "object",
                 "additionalProperties": {
@@ -621,13 +664,23 @@
                     }
                 }
             },
+          "ApplicableManagementActionsModel": {
+            "required": [
+              "ApplicableActions"
+            ],
+            "properties": {
+              "ActievManagementActions": {
+                "$ref": "#/components/schemas/ManagementActionsMap"
+              }
+            }
+          },
             "ActiveManagementActionsModel": {
                 "required": [
                     "ActiveManagementActions"
                 ],
                 "properties": {
                     "ActievManagementActions": {
-                        "$ref": "#/components/schemas/ActiveManagementActionsMap"
+                      "$ref": "#/components/schemas/ManagementActionsMap"
                     }
                 }
             },
