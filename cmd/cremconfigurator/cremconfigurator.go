@@ -25,10 +25,9 @@ func createApp() fyne.App {
 func createWindow(app fyne.App) fyne.Window {
 	w := app.NewWindow("CREM Configurator")
 	messageLabel := widget.NewLabel("Generating CREM Explorer configuration...")
-
-	scenarioItem := widget.NewAccordionItem("[Scencario]", buildScenarioContainer())
-	annealerItem := widget.NewAccordionItem("[Annealer]", buildAnnealerContainer())
-	modelItem := widget.NewAccordionItem("[Model]", buildModelContainer())
+	scenarioItem := widget.NewAccordionItem("Scencario", buildScenarioContainer())
+	annealerItem := widget.NewAccordionItem("Annealer", buildAnnealerContainer())
+	modelItem := widget.NewAccordionItem("Model", buildModelContainer())
 
 	scopeAccordian := widget.NewAccordion(scenarioItem, annealerItem, modelItem)
 	scopeAccordian.MultiOpen = true
@@ -55,21 +54,26 @@ func createWindow(app fyne.App) fyne.Window {
 }
 
 func buildScenarioContainer() *fyne.Container {
-	nameLabel := widget.NewLabel("     [Scenario.Name]")
+	nameLabel := widget.NewLabel("     Name")
+	nameLabel.Alignment = fyne.TextAlignTrailing
+
 	nameEntry := widget.NewEntry()
 
 	name := container.New(layout.NewFormLayout(),
 		nameLabel, nameEntry,
 	)
 
-	runNumberLabel := widget.NewLabel("     [Scenario.RunNumber]")
+	runNumberLabel := widget.NewLabel("     Run Number")
+	nameLabel.Alignment = fyne.TextAlignTrailing
 	runNumberEntry := widget.NewEntry()
 
 	runNumber := container.New(layout.NewFormLayout(),
 		runNumberLabel, runNumberEntry,
 	)
 
-	maxConcurrentRunNumberLabel := widget.NewLabel("     [Scenario.MaximumConcurrentRunNumber]")
+	maxConcurrentRunNumberLabel := widget.NewLabel("     Maximum concurrent run number")
+	nameLabel.Alignment = fyne.TextAlignTrailing
+
 	maxConcurrentRunNumberEntry := widget.NewEntry()
 
 	concurrentRunNumbers := container.New(layout.NewFormLayout(),
@@ -89,14 +93,14 @@ func buildScenarioContainer() *fyne.Container {
 		baseNumbers,
 	)
 
-	outputPathLabel := widget.NewLabel("     [Scenario.OutputPath]")
+	outputPathLabel := widget.NewLabel("     Output Path")
 	outputPathEntry := widget.NewEntry()
 
 	outputPath := container.New(layout.NewFormLayout(),
 		outputPathLabel, outputPathEntry,
 	)
 
-	outputTypeLabel := widget.NewLabel("     [Scenario.OutputType]")
+	outputTypeLabel := widget.NewLabel("     Output Type")
 	var outputTypes = []string{"CSV", "Excel", "JSON"}
 	outputTypeSelect := widget.NewSelect(outputTypes, func(selected string) {})
 
@@ -104,7 +108,7 @@ func buildScenarioContainer() *fyne.Container {
 		outputTypeLabel, outputTypeSelect,
 	)
 
-	outputLevelLabel := widget.NewLabel("     [Scenario.OutputLevel]")
+	outputLevelLabel := widget.NewLabel("     OutputLevel")
 	var outputLevels = []string{"Summary", "Detail"}
 	outputLevelSelect := widget.NewSelect(outputLevels, func(selected string) {})
 
@@ -129,27 +133,35 @@ func buildScenarioContainer() *fyne.Container {
 		base,
 		widget.NewSeparator(),
 		output,
+		widget.NewSeparator(),
 	)
 
 	return l
 }
 
 func buildAnnealerContainer() *fyne.Container {
-	typeLabel := widget.NewLabel("     [Annealer.Type] ")
+	typeLabel := widget.NewLabel("     Type ")
 	var annealerTypes = []string{"Simple", "Suppapitnarm", "AveragedSuppapitnarm"}
 	typeEntry := widget.NewSelect(annealerTypes, func(selected string) {})
 
-	f := container.New(layout.NewFormLayout(), typeLabel, typeEntry)
+	c := container.NewVBox(
+		container.New(layout.NewFormLayout(), typeLabel, typeEntry),
+		widget.NewSeparator(),
+	)
 
-	return f
+	return c
 }
 
 func buildModelContainer() *fyne.Container {
-	typeLabel := widget.NewLabel("     [Model.Type]     ")
+	typeLabel := widget.NewLabel("     Type     ")
 	var modelTypes = []string{"CatchmentModel"}
 	typeEntry := widget.NewSelect(modelTypes, func(selected string) {})
 
-	f := container.New(layout.NewFormLayout(), typeLabel, typeEntry)
+	c := container.NewVBox(
+		container.New(layout.NewFormLayout(), typeLabel, typeEntry),
+		widget.NewSeparator(),
+		widget.NewSeparator(),
+	)
 
-	return f
+	return c
 }
