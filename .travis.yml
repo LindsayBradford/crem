@@ -3,3 +3,11 @@ sudo: required
 
 go:
   - tip
+
+compiler:
+  - gcc
+
+# blocklist
+#branches:
+#  except:
+#    - experimental
