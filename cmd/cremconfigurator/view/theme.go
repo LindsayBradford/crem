@@ -1,4 +1,4 @@
-package theme
+package view
 
 import (
 	"fyne.io/fyne/v2"

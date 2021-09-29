@@ -1,4 +1,6 @@
+//go:build windows
 // +build windows
+
 // Copyright (c) 2018 Australian Rivers Institute.
 
 package main
