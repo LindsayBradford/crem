@@ -7,7 +7,7 @@ go:
 compiler:
   - gcc
 
-# blocklist
-#branches:
-#  except:
-#    - experimental
+ blocklist
+branches:
+  except:
+    - experimental
