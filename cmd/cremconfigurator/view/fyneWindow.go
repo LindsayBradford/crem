@@ -2,28 +2,18 @@ package view
 
 import (
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/LindsayBradford/crem/cmd/cremconfigurator/mvp"
 )
 
-func BuildWindow() fyne.Window {
-	app := createApp()
-	window := newWindow(app)
-	return window
-}
+func (v *FyneView) createWindow() {
+	v.window = v.app.NewWindow("CREM Configurator")
 
-func createApp() fyne.App {
-	a := app.New()
-	a.Settings().SetTheme(&Crem{})
-	return a
-}
-
-func newWindow(app fyne.App) fyne.Window {
-	w := app.NewWindow("CREM Configurator")
 	messageLabel := widget.NewLabel("Generating CREM Explorer configuration...")
 	scenarioItem := widget.NewAccordionItem("Scencario", buildScenarioContainer())
+
 	annealerItem := widget.NewAccordionItem("Annealer", buildAnnealerContainer())
 	modelItem := widget.NewAccordionItem("Model", buildModelContainer())
 
@@ -35,11 +25,12 @@ func newWindow(app fyne.App) fyne.Window {
 		widget.NewButton("Generate Configuration",
 			func() {
 				messageLabel.SetText("Configuration Generated")
+				v.raiseEvent(mvp.GenerationRequested)
 			}),
 		layout.NewSpacer(),
 	)
 
-	w.SetContent(
+	v.window.SetContent(
 		container.NewVBox(
 			scopeAccordian,
 			layout.NewSpacer(),
@@ -47,8 +38,6 @@ func newWindow(app fyne.App) fyne.Window {
 			layout.NewSpacer(),
 			messageLabel,
 		))
-
-	return w
 }
 
 func buildScenarioContainer() *fyne.Container {

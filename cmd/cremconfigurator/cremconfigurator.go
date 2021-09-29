@@ -6,10 +6,15 @@
 package main
 
 import (
+	"github.com/LindsayBradford/crem/cmd/cremconfigurator/presenter"
 	"github.com/LindsayBradford/crem/cmd/cremconfigurator/view"
 )
 
 func main() {
-	window := view.BuildWindow()
-	window.ShowAndRun()
+	view := view.New()
+	presenter := presenter.New()
+
+	view.AddObserver(presenter)
+
+	view.Show()
 }
