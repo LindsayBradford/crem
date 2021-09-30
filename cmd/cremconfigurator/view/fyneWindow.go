@@ -11,40 +11,54 @@ import (
 func (v *FyneView) createWindow() {
 	v.window = v.app.NewWindow("CREM Configurator")
 
-	messageLabel := widget.NewLabel("Generating CREM Explorer configuration...")
-	scenarioItem := widget.NewAccordionItem("Scencario", buildScenarioContainer())
+	v.window.SetContent(
+		container.NewVBox(
+			v.createScopeAccordion(),
+			layout.NewSpacer(),
+			v.createBottomContainer(),
+		))
+}
 
-	annealerItem := widget.NewAccordionItem("Annealer", buildAnnealerContainer())
-	modelItem := widget.NewAccordionItem("Model", buildModelContainer())
+func (v *FyneView) createBottomContainer() *fyne.Container {
+	v.messageBar = widget.NewLabel("CREM Configurator: The CREM configuration tool")
 
-	scopeAccordian := widget.NewAccordion(scenarioItem, annealerItem, modelItem)
-	scopeAccordian.MultiOpen = true
+	bottomContainer := container.NewVBox(
+		v.createGenerateButtonContainer(),
+		layout.NewSpacer(),
+		v.messageBar,
+	)
 
-	generate := container.NewHBox(
+	return bottomContainer
+}
+
+func (v *FyneView) createGenerateButtonContainer() *fyne.Container {
+	buttonContainer := container.NewHBox(
 		layout.NewSpacer(),
 		widget.NewButton("Generate Configuration",
 			func() {
-				messageLabel.SetText("Configuration Generated")
-				v.raiseEvent(mvp.GenerationRequested)
+				buttonEvent := mvp.ViewEvent{Type: mvp.GenerationRequested}
+				v.raiseEvent(buttonEvent)
 			}),
 		layout.NewSpacer(),
 	)
+	return buttonContainer
+}
 
-	v.window.SetContent(
-		container.NewVBox(
-			scopeAccordian,
-			layout.NewSpacer(),
-			generate,
-			layout.NewSpacer(),
-			messageLabel,
-		))
+func (v *FyneView) createScopeAccordion() *widget.Accordion {
+	scenarioItem := widget.NewAccordionItem("Scencario", buildScenarioContainer())
+	annealerItem := widget.NewAccordionItem("Annealer", buildAnnealerContainer())
+	modelItem := widget.NewAccordionItem("Model", buildModelContainer())
+
+	accordion := widget.NewAccordion(scenarioItem, annealerItem, modelItem)
+	//scopeAccordion.MultiOpen = true
+	return accordion
 }
 
 func buildScenarioContainer() *fyne.Container {
 	nameLabel := widget.NewLabel("     Name")
 	nameLabel.Alignment = fyne.TextAlignTrailing
 
-	nameEntry := widget.NewEntry()
+	nameEntry := NewCremEntry("Scenario.Name")
 
 	name := container.New(layout.NewFormLayout(),
 		nameLabel, nameEntry,
@@ -52,7 +66,8 @@ func buildScenarioContainer() *fyne.Container {
 
 	runNumberLabel := widget.NewLabel("     Run Number")
 	nameLabel.Alignment = fyne.TextAlignTrailing
-	runNumberEntry := widget.NewEntry()
+
+	runNumberEntry := NewCremEntry("Scenario.RunNumber")
 
 	runNumber := container.New(layout.NewFormLayout(),
 		runNumberLabel, runNumberEntry,
@@ -61,7 +76,7 @@ func buildScenarioContainer() *fyne.Container {
 	maxConcurrentRunNumberLabel := widget.NewLabel("     Maximum concurrent run number")
 	nameLabel.Alignment = fyne.TextAlignTrailing
 
-	maxConcurrentRunNumberEntry := widget.NewEntry()
+	maxConcurrentRunNumberEntry := NewCremEntry("Scenario.MaxConcurrentRunNumber")
 
 	concurrentRunNumbers := container.New(layout.NewFormLayout(),
 		maxConcurrentRunNumberLabel, maxConcurrentRunNumberEntry,
@@ -81,7 +96,7 @@ func buildScenarioContainer() *fyne.Container {
 	)
 
 	outputPathLabel := widget.NewLabel("     Output Path")
-	outputPathEntry := widget.NewEntry()
+	outputPathEntry := NewCremEntry("Scenario.OutputPath")
 
 	outputPath := container.New(layout.NewFormLayout(),
 		outputPathLabel, outputPathEntry,

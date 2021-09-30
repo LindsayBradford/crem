@@ -16,5 +16,14 @@ func (v *implementation) build() *implementation {
 }
 
 func (v *implementation) EventRaised(ve mvp.ViewEvent) {
-	fmt.Printf("Event [%d] raised\n", ve)
+	switch ve.Type {
+	case mvp.FocusGained:
+		message := fmt.Sprintf("Event [%s] raised on field [%v] from view [%s]", ve.Type.String(), ve.Context, ve.View.Id())
+		fmt.Println(message)
+		//ve.View.SetMessage(message)
+	default:
+		message := fmt.Sprintf("Event [%s] raised from view [%s]", ve.Type.String(), ve.View.Id())
+		fmt.Println(message)
+		//ve.View.SetMessage(message)
+	}
 }
