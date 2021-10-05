@@ -4,7 +4,7 @@ module github.com/LindsayBradford/crem
 
 // 	To sync the vendor directory, run:  go mod vendor
 
-go 1.16
+go 1.17
 
 require (
 	github.com/BurntSushi/toml v0.3.1
@@ -14,4 +14,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/text v0.3.3
+)
+
+require (
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

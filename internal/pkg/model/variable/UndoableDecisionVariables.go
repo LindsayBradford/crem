@@ -20,7 +20,7 @@ func (vs *UndoableDecisionVariables) Add(newVariables ...UndoableDecisionVariabl
 	*vs = append(*vs, newVariables...)
 }
 
-// NewForName creates and adds to its colle ction, a new BaseInductiveDecisionVariable with the supplied name.
+// NewForName creates and adds to its collection, a new BaseInductiveDecisionVariable with the supplied name.
 func (vs *UndoableDecisionVariables) NewForName(name string) {
 	newVariable := new(SimpleUndoableDecisionVariable)
 	newVariable.SetName(name)
