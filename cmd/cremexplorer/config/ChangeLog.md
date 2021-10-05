@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.20 (06 October 2021):
+### New Features
+* Catchment model now offers up a new decision variable 'TotalNitrogenProduction', summing the particulate and dissolved.
+
 ## Version 0.19 (27 August 2021):
 ### New Features
 * Now deploys with Laidley_data_v1_8_5.xlsx (containing updated economics data)

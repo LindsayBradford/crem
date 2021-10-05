@@ -134,7 +134,7 @@ func (s *Solution) checkForMismatchedDecisionVariableValues(other *Solution, err
 		for _, otherVariable := range other.DecisionVariables {
 			if myVariable.Name == otherVariable.Name {
 				if myVariable.Value != otherVariable.Value {
-					variableError := fmt.Sprintf("variableOld [%s] has mismatching values [%f, %f]", myVariable.Name, myVariable.Value, otherVariable.Value)
+					variableError := fmt.Sprintf("variable [%s] has mismatching values [%f, %f]", myVariable.Name, myVariable.Value, otherVariable.Value)
 					errors.AddMessage(variableError)
 				}
 			}
@@ -150,7 +150,7 @@ func (s *Solution) checkDecisionVariablesAreSumOfPlanningUnits(other *Solution, 
 		}
 		precisionOfVariable := math.DerivePrecision(myVariable.Value)
 		if myVariable.Value != math.RoundFloat(planningUnitValues, precisionOfVariable) {
-			variableError := fmt.Sprintf("variableOld [%s] has value [%f], but sum of planning units is [%f]", myVariable.Name, myVariable.Value, planningUnitValues)
+			variableError := fmt.Sprintf("variable [%s] has value [%f], but sum of planning units is [%f]", myVariable.Name, myVariable.Value, planningUnitValues)
 			errors.AddMessage(variableError)
 		}
 	}

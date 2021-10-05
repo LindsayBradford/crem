@@ -1,10 +1,10 @@
-Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, Actions, Summary
-As-Is, 13.682, 0.000, 0.000, 1.822, 1059.911, 0, As-is state; zero active management actions
-1-of-8, 18.377, 101198.000, 4982.000, 2.347, 1122.881, 40, Pareto front member 1 of 8
-2-of-8, 17.573, 605320.000, 6003.000, 0.952, 287.262, 148, Pareto front member 2 of 8
-3-of-8, 17.458, 432459.000, 5680.000, 2.333, 1122.853, C0, Pareto front member 3 of 8
-4-of-8, 17.394, 683983.000, 11129.000, 0.936, 286.851, CA, Pareto front member 4 of 8
-5-of-8, 17.573, 620466.000, 6003.000, 0.928, 275.682, 149, Pareto front member 5 of 8
-6-of-8, 17.458, 447605.000, 5680.000, 2.309, 1111.273, C1, Pareto front member 6 of 8
-7-of-8, 17.398, 531295.000, 11129.000, 2.308, 1110.888, C3, Pareto front member 7 of 8
-8-of-8, 17.394, 699129.000, 11129.000, 0.913, 275.271, CB, Pareto front member 8 of 8
+Solution, DissolvedNitrogen, ImplementationCost, OpportunityCost, ParticulateNitrogen, SedimentProduction, TotalNitrogen, Actions, Summary
+As-Is, 13.682, 0.000, 0.000, 1.822, 1059.911, 15.504, 0, As-is state; zero active management actions
+1-of-8, 18.377, 101198.000, 4982.000, 2.347, 1122.881, 0, 40, Pareto front member 1 of 8
+2-of-8, 17.573, 605320.000, 6003.000, 0.952, 287.262, 0, 148, Pareto front member 2 of 8
+3-of-8, 17.458, 432459.000, 5680.000, 2.333, 1122.853, 0, C0, Pareto front member 3 of 8
+4-of-8, 17.394, 683983.000, 11129.000, 0.936, 286.851, 0, CA, Pareto front member 4 of 8
+5-of-8, 17.573, 620466.000, 6003.000, 0.928, 275.682, 0, 149, Pareto front member 5 of 8
+6-of-8, 17.458, 447605.000, 5680.000, 2.309, 1111.273, 0, C1, Pareto front member 6 of 8
+7-of-8, 17.398, 531295.000, 11129.000, 2.308, 1110.888, 0, C3, Pareto front member 7 of 8
+8-of-8, 17.394, 699129.000, 11129.000, 0.913, 275.271, 0, CB, Pareto front member 8 of 8

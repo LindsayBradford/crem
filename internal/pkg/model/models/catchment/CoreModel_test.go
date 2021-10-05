@@ -5,8 +5,10 @@ package catchment
 import (
 	model2 "github.com/LindsayBradford/crem/internal/pkg/model"
 	"github.com/LindsayBradford/crem/internal/pkg/model/archive"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/dissolvednitrogen"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/particulatenitrogen"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/totalnitrogen"
 	"testing"
 
 	"github.com/LindsayBradford/crem/internal/pkg/annealing/solution"
@@ -380,6 +382,78 @@ func TestCoreModel_ParticulateNitrogen_HillSlopeRiverbankDependency_NoRoundingEr
 	g.Expect(planningUnitEntry.Value).To(BeNumerically(equalTo, 0.404))
 
 	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
+}
+
+func TestCoreModel_TotalNitrogen_NoRoundingErrors(t *testing.T) {
+	// given
+	g := NewGomegaWithT(t)
+	const planningUnitUnderTest = 18
+	const wetlandsPlanningUnitUnderTest = 21
+
+	modelUnderTest := buildTestingModel(g)
+	builder := new(solution.SolutionBuilder).
+		WithId("testingBuilder").
+		ForModel(modelUnderTest)
+
+	solution := builder.Build()
+
+	g.Expect(solution).To(Not(BeNil()))
+
+	// when
+
+	planningUnit := planningunit.Id(planningUnitUnderTest)
+	wetlandsPlanningUnit := planningunit.Id(wetlandsPlanningUnitUnderTest)
+
+	for index := 0; index < 1_000; index++ {
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.RiverBankRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(planningUnit, actions.HillSlopeRestorationType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(wetlandsPlanningUnit, actions.WetlandsEstablishmentType)
+		modelUnderTest.AcceptChange()
+
+		modelUnderTest.ToggleAction(wetlandsPlanningUnit, actions.WetlandsEstablishmentType)
+		modelUnderTest.AcceptChange()
+	}
+	// then
+	newSolution := builder.Build()
+
+	g.Expect(newSolution).To(Not(BeNil()))
+
+	variableUnderTest := solutionVariable(solution, totalnitrogen.VariableName)
+	baseParticulateVariable := solutionVariable(solution, particulatenitrogen.VariableName)
+	baseDissolvedVariable := solutionVariable(solution, dissolvednitrogen.VariableName)
+
+	g.Expect(variableUnderTest.Value).To(BeNumerically("==", baseParticulateVariable.Value+baseDissolvedVariable.Value))
+
+	for _, planningUnitValue := range variableUnderTest.ValuePerPlanningUnit {
+		actualValue := planningUnitValue
+
+		expectedParticulateValue := float64(0)
+		for _, particulateValue := range baseParticulateVariable.ValuePerPlanningUnit {
+			if particulateValue.PlanningUnit == actualValue.PlanningUnit {
+				expectedParticulateValue = particulateValue.Value
+			}
+		}
+
+		expectedDissolvedValue := float64(0)
+		for _, dissolvedValue := range baseDissolvedVariable.ValuePerPlanningUnit {
+			if dissolvedValue.PlanningUnit == actualValue.PlanningUnit {
+				expectedDissolvedValue = dissolvedValue.Value
+			}
+		}
+
+		expectedValue := math.RoundFloat(expectedParticulateValue+expectedDissolvedValue, 3)
+		g.Expect(actualValue.Value).To(BeNumerically("==", expectedValue))
+	}
 }
 
 func verifyPlanningUnitValues(g *GomegaWithT, solution *solution.Solution, variableName string, expectedValue float64) {

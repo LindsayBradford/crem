@@ -13,6 +13,7 @@ type PlanningUnitDecisionVariable interface {
 	DecisionVariable
 	ValuesPerPlanningUnit() PlanningUnitValueMap
 	SetPlanningUnitValue(planningUnit planningunit.Id, newValue float64)
+	PlanningUnitValue(planningUnit planningunit.Id) float64
 }
 
 func NewPerPlanningUnitDecisionVariable() *PerPlanningUnitDecisionVariable {

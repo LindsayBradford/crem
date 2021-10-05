@@ -8,6 +8,7 @@ import (
 	catchmentDataSet "github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/dataset"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/dissolvednitrogen"
 	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/opportunitycost"
+	"github.com/LindsayBradford/crem/internal/pkg/model/models/catchment/variables/totalnitrogen"
 	assert "github.com/LindsayBradford/crem/pkg/assert/debug"
 	"github.com/LindsayBradford/crem/pkg/attributes"
 	"math"
@@ -181,6 +182,16 @@ func (m *CoreModel) buildDecisionVariables() {
 		dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumDissolvedNitrogenProduction))
 	}
 
+	totalNitrogen := new(totalnitrogen.TotalNitrogenProduction).
+		WithBaseNitrogenVariables(particulateNitrogen, dissolvedNitrogen).
+		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
+		WithObservers(m)
+
+	// TODO: introduce MaximunTotalNitrogenProduction limiter
+	//if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
+	//	dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumDissolvedNitrogenProduction))
+	//}
+
 	implementationCost := new(implementationcost.ImplementationCost).
 		Initialise().WithObservers(m)
 
@@ -197,7 +208,8 @@ func (m *CoreModel) buildDecisionVariables() {
 
 	m.ContainedDecisionVariables.Initialise()
 	m.ContainedDecisionVariables.Add(
-		sedimentProduction, particulateNitrogen, dissolvedNitrogen,
+		sedimentProduction,
+		particulateNitrogen, dissolvedNitrogen, totalNitrogen,
 		implementationCost, opportunityCost,
 	)
 }

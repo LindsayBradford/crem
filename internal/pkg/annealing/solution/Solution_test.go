@@ -119,7 +119,7 @@ func TestSolution_MatchErrors_VariableValuesMismatch(t *testing.T) {
 	}
 
 	const expectedErrors = 1
-	const expectedErrorMsg = "variableOld [mismatchingValues] has mismatching values"
+	const expectedErrorMsg = "variable [mismatchingValues] has mismatching values"
 
 	matchErrors := solutionUnderTest.MatchErrors(mismatchedSolution)
 

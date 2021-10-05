@@ -66,7 +66,8 @@ func TestGetValidModelResource_OkResponse(t *testing.T) {
 	}
 
 	// then
-	verifyResponseStatusCode(muxUnderTest, getContext)
+	response := verifyResponseStatusCode(muxUnderTest, getContext)
+	t.Log(response.RawResponse)
 	muxUnderTest.Shutdown()
 }
 
@@ -209,7 +210,7 @@ func TestModePatchRequest_NotJsonBody_BadRequestResponse(t *testing.T) {
 	muxUnderTest.Shutdown()
 }
 
-func TestModePatchRequest_ValidJsonBody_OkResponse(t *testing.T) {
+func TestModelPatchRequest_ValidJsonBody_OkResponse(t *testing.T) {
 	// given
 	muxUnderTest := buildMuxUnderTest()
 
@@ -293,6 +294,13 @@ func TestModePatchRequest_ValidJsonBody_OkResponse(t *testing.T) {
 	expectedSolutionAsString := string(contentAsJsonBytes)
 
 	g := NewGomegaWithT(t)
+	if response.RawResponse != expectedSolutionAsString {
+		t.Log("-----")
+		t.Log(response.RawResponse)
+		t.Log("-----")
+		t.Log(expectedSolutionAsString)
+		t.Log("-----")
+	}
 	g.Expect(response.RawResponse).To(Equal(expectedSolutionAsString))
 
 	muxUnderTest.Shutdown()
