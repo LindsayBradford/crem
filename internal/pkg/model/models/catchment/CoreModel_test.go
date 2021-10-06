@@ -682,6 +682,7 @@ func verifyActionToggle(t *testing.T, modelUnderTest *CoreModel, planningUnit pl
 
 	modelUnderTest.ToggleAction(planningUnit, actionType)
 	modelUnderTest.AcceptChange()
+
 	modelUnderTest.ToggleAction(planningUnit, actionType)
 	modelUnderTest.AcceptChange()
 

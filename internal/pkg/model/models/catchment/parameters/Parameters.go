@@ -40,6 +40,7 @@ const (
 	MaximumOpportunityCost               = "MaximumOpportunityCost"
 	MaximumParticulateNitrogenProduction = "MaximumParticulateNitrogenProduction"
 	MaximumDissolvedNitrogenProduction   = "MaximumDissolvedNitrogenProduction"
+	MaximumTotalNitrogenProduction       = "MaximumTotalNitrogenProduction"
 )
 
 func ParameterSpecifications() *Specifications {
@@ -125,6 +126,12 @@ func ParameterSpecifications() *Specifications {
 	).Add(
 		Specification{
 			Key:        MaximumDissolvedNitrogenProduction,
+			Validator:  IsNonNegativeDecimal,
+			IsOptional: true,
+		},
+	).Add(
+		Specification{
+			Key:        MaximumTotalNitrogenProduction,
 			Validator:  IsNonNegativeDecimal,
 			IsOptional: true,
 		},

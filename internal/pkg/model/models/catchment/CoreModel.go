@@ -102,6 +102,9 @@ func (m *CoreModel) validateModelParameters() {
 	if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
 		boundVariableNumber++
 	}
+	if m.parameters.HasEntry(parameters.MaximumTotalNitrogenProduction) {
+		boundVariableNumber++
+	}
 	if m.parameters.HasEntry(parameters.MaximumImplementationCost) {
 		boundVariableNumber++
 	}
@@ -110,9 +113,11 @@ func (m *CoreModel) validateModelParameters() {
 	}
 
 	if boundVariableNumber > 1 {
-		errorText := fmt.Sprintf("Only one of [%s], [%s], [%s] or [%s] allowed as variable limit.",
+		errorText := fmt.Sprintf("Only one of [%s], [%s], [%s], [%s], [%s] or [%s] allowed as variable limit.",
 			parameters.MaximumSedimentProduction,
 			parameters.MaximumParticulateNitrogenProduction,
+			parameters.MaximumDissolvedNitrogenProduction,
+			parameters.MaximumTotalNitrogenProduction,
 			parameters.MaximumImplementationCost,
 			parameters.MaximumOpportunityCost,
 		)
@@ -187,10 +192,9 @@ func (m *CoreModel) buildDecisionVariables() {
 		Initialise(m.planningUnitTable, m.actionsTable, m.parameters).
 		WithObservers(m)
 
-	// TODO: introduce MaximunTotalNitrogenProduction limiter
-	//if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
-	//	dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumDissolvedNitrogenProduction))
-	//}
+	if m.parameters.HasEntry(parameters.MaximumTotalNitrogenProduction) {
+		dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumTotalNitrogenProduction))
+	}
 
 	implementationCost := new(implementationcost.ImplementationCost).
 		Initialise().WithObservers(m)
@@ -271,7 +275,10 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 	observers := make([]action.Observer, 0)
 	observers = append(observers, m)
 
-	for _, variable := range *m.DecisionVariables() {
+	// Order of variable creation is crucial here for having downstream dependent observers
+	// trigger once upstream variables have processed an action.
+	derefencedVars := &m.ContainedDecisionVariables
+	for _, variable := range derefencedVars.UndoableDecisionVariables {
 		if variableAsObserver, isObserver := variable.(action.Observer); isObserver {
 			observers = append(observers, variableAsObserver)
 		}
@@ -314,6 +321,9 @@ func (m *CoreModel) InitialiseActions(initialisationType model.InitialisationTyp
 	} else if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
 		m.note("Randomly initialising for Maximum dissolved nitrogen production limit.")
 		m.InitialiseAllActionsToActive()
+	} else if m.parameters.HasEntry(parameters.MaximumTotalNitrogenProduction) {
+		m.note("Randomly initialising for Maximum total nitrogen production limit.")
+		m.InitialiseAllActionsToActive()
 	}
 
 	m.initialising = false
@@ -338,6 +348,9 @@ func (m *CoreModel) Randomize() {
 		m.RandomlyValidlyDeactivateActions()
 	} else if m.parameters.HasEntry(parameters.MaximumDissolvedNitrogenProduction) {
 		m.note("Randomly initialising for Maximum dissolved nitrogen production limit.")
+		m.RandomlyValidlyDeactivateActions()
+	} else if m.parameters.HasEntry(parameters.MaximumTotalNitrogenProduction) {
+		m.note("Randomly initialising for Maximum total nitrogen production limit.")
 		m.RandomlyValidlyDeactivateActions()
 	} else {
 		m.note("Randomly initialising for unbounded (no limits).")

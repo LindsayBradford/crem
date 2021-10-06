@@ -44,6 +44,8 @@ type TotalNitrogenProduction struct {
 
 	particulateNitrogen *particulatenitrogen.ParticulateNitrogenProduction
 	dissolvedNitrogen   *dissolvednitrogen.DissolvedNitrogenProduction
+
+	LastUpdated string
 }
 
 func (tn *TotalNitrogenProduction) WithBaseNitrogenVariables(particulate *particulatenitrogen.ParticulateNitrogenProduction, dissolved *dissolvednitrogen.DissolvedNitrogenProduction) *TotalNitrogenProduction {
@@ -123,8 +125,10 @@ func (tn *TotalNitrogenProduction) ObserveActionInitialising(action action.Manag
 func (tn *TotalNitrogenProduction) observeAction(action action.ManagementAction) {
 	tn.actionObserved = action
 
+	// why is this only intermittently working?
 	particulateChange := math.RoundFloat(tn.particulateNitrogen.DifferenceInValues(), int(tn.Precision()))
 	dissolvedChange := math.RoundFloat(tn.dissolvedNitrogen.DifferenceInValues(), int(tn.Precision()))
+
 	roundedChange := math.RoundFloat(particulateChange+dissolvedChange, int(tn.Precision()))
 
 	tn.command = new(variable.ChangePerPlanningUnitDecisionVariableCommand).
