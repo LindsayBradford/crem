@@ -71,7 +71,7 @@ func (c *ContainedModel) SetModel(model Model) {
 }
 
 type DecisionVariableContainer interface {
-	DecisionVariables() *variable.DecisionVariableMap
+	NameMappedVariables() *variable.DecisionVariableMap
 
 	DecisionVariable(name string) variable.DecisionVariable
 	OffersDecisionVariable(name string) bool
@@ -107,7 +107,7 @@ func (nm *nullModel) ChangeIsValid() (bool, *errors.CompositeError) { return tru
 func (nm *nullModel) AcceptChange()                                 {}
 func (nm *nullModel) RevertChange()                                 {}
 
-func (nm *nullModel) DecisionVariables() *variable.DecisionVariableMap { return nil }
+func (nm *nullModel) NameMappedVariables() *variable.DecisionVariableMap { return nil }
 func (nm *nullModel) DecisionVariable(name string) variable.DecisionVariable {
 	newVariable := variable.NewSimpleDecisionVariable(name)
 	return newVariable

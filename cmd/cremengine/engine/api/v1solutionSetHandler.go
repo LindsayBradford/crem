@@ -119,7 +119,7 @@ func (m *Mux) verifySolutionSummaryMatchesScenario(solutionSetTable dataset.Head
 	asIsModel := m.model.DeepClone()
 	asIsModel.Initialise(model.AsIs)
 
-	numberOfDecisionVariables := len(*asIsModel.DecisionVariables())
+	numberOfDecisionVariables := len(*asIsModel.NameMappedVariables())
 	_, rowSize := solutionSetTable.ColumnAndRowSize()
 
 	const labelIndex = 0

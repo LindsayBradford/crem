@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DecisionVariablesTableName = "DecisionVariables"
+	DecisionVariablesTableName = "NameMappedVariables"
 	ManagementActionsTableName = "ManagementActions"
 )
 

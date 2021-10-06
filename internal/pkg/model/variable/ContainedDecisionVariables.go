@@ -14,12 +14,16 @@ func (c *ContainedDecisionVariables) Initialise() {
 	c.UndoableDecisionVariables = NewUndoableDecisionVariables()
 }
 
-func (c *ContainedDecisionVariables) DecisionVariables() *DecisionVariableMap {
+func (c *ContainedDecisionVariables) NameMappedVariables() *DecisionVariableMap {
 	variableMap := make(DecisionVariableMap, 0)
 	for _, variable := range c.UndoableDecisionVariables {
 		variableMap[variable.Name()] = variable
 	}
 	return &variableMap
+}
+
+func (c *ContainedDecisionVariables) CreationOrderedVariables() UndoableDecisionVariables {
+	return c.UndoableDecisionVariables
 }
 
 func (c *ContainedDecisionVariables) DecisionVariableNames() []string {

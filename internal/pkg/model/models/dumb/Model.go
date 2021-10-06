@@ -142,7 +142,7 @@ func (m *Model) DeepClone() model.Model {
 	return &clone
 }
 
-func (m *Model) DecisionVariables() *variable.DecisionVariableMap {
+func (m *Model) NameMappedVariables() *variable.DecisionVariableMap {
 	varMap := make(variable.DecisionVariableMap, 1)
 	varMap["ObjectiveValue"] = m.variable
 	return &varMap
@@ -190,7 +190,7 @@ func (m *Model) checkActions(otherModel model.Model) bool {
 }
 
 func (m *Model) checkVariables(otherModel model.Model) bool {
-	myDecisionVariables := *m.DecisionVariables()
+	myDecisionVariables := *m.NameMappedVariables()
 	for _, variable := range myDecisionVariables {
 		otherVariable := otherModel.DecisionVariable(variable.Name())
 		if variable.Value() != otherVariable.Value() {

@@ -106,7 +106,7 @@ func (m *Model) buildDecisionVariables() {
 		objectiveOne, objectiveTwo, objectiveThree,
 	)
 
-	sortedKeys := m.ContainedDecisionVariables.DecisionVariables().SortedKeys()
+	sortedKeys := m.ContainedDecisionVariables.NameMappedVariables().SortedKeys()
 
 	for _, value := range sortedKeys {
 		variable := m.ContainedDecisionVariables.Variable(value)
@@ -277,7 +277,7 @@ func (m *Model) checkActions(otherModel model.Model) bool {
 }
 
 func (m *Model) checkVariables(otherModel model.Model) bool {
-	myDecisionVariables := *m.DecisionVariables()
+	myDecisionVariables := *m.NameMappedVariables()
 	for _, variable := range myDecisionVariables {
 		otherVariable := otherModel.DecisionVariable(variable.Name())
 		if variable.Value() != otherVariable.Value() {

@@ -47,13 +47,13 @@ func (sb *SolutionBuilder) transferAttributes() {
 }
 
 func (sb *SolutionBuilder) addDecisionVariables() {
-	if sb.model.DecisionVariables() == nil {
+	if sb.model.NameMappedVariables() == nil {
 		return
 	}
 
 	solutionVariables := make(variable.EncodeableDecisionVariables, 0)
 
-	for _, rawVariable := range *sb.model.DecisionVariables() {
+	for _, rawVariable := range *sb.model.NameMappedVariables() {
 		solutionVariables = append(solutionVariables, variable.MakeEncodeable(rawVariable))
 	}
 

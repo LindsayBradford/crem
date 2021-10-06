@@ -85,7 +85,7 @@ func (e Encoder) encodeMarshaled(marshaledSolution []byte, outputPath string) er
 }
 
 func (e Encoder) deriveDecisionVariableOutputPath(solution *solution.Solution) (outputPath string) {
-	return e.deriveOutputPath(solution, "DecisionVariables")
+	return e.deriveOutputPath(solution, "NameMappedVariables")
 }
 
 func (e Encoder) deriveManagementActionOutputPath(solution *solution.Solution) (outputPath string) {

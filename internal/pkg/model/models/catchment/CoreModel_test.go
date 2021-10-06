@@ -44,7 +44,7 @@ func TestCoreModel_NewCoreModel(t *testing.T) {
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 
-	actualVariables := model.DecisionVariables()
+	actualVariables := model.NameMappedVariables()
 	expectedVariableNumber := 0
 
 	g.Expect(len(*actualVariables)).To(BeNumerically(equalTo, expectedVariableNumber))
@@ -73,7 +73,7 @@ func TestCoreModel_Initialise_ValidDataSet_NoErrors(t *testing.T) {
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 
-	actualVariables := *model.DecisionVariables()
+	actualVariables := *model.NameMappedVariables()
 
 	g.Expect(actualVariables).To(HaveKey(implementationcost.VariableName))
 	g.Expect(actualVariables[implementationcost.VariableName].Value()).To(BeNumerically(equalTo, 0))
@@ -101,7 +101,7 @@ func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
 	model.SetManagementAction(0, true)
 	model.AcceptAll()
 
-	originalActions := *model.DecisionVariables()
+	originalActions := *model.NameMappedVariables()
 
 	g.Expect(originalActions).To(HaveKey(implementationcost.VariableName))
 	g.Expect(originalActions[implementationcost.VariableName].Value()).To(BeNumerically(">", 0))
@@ -114,7 +114,7 @@ func TestCoreModel_InitialiseAndClone_ValidDataSet_NoErrors(t *testing.T) {
 
 	g.Expect(len(actualActions)).To(BeNumerically(equalTo, expectedActionNumber))
 
-	actualVariables := *copiedModel.DecisionVariables()
+	actualVariables := *copiedModel.NameMappedVariables()
 
 	g.Expect(actualVariables).To(HaveKey(implementationcost.VariableName))
 	g.Expect(actualVariables[implementationcost.VariableName].Value()).To(BeNumerically(equalTo, 0))

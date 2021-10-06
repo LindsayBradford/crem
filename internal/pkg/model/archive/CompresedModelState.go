@@ -21,7 +21,7 @@ func (c *CompressedModelState) MatchesStateOf(model model.Model) bool {
 }
 
 func (c *CompressedModelState) variablesMatch(model model.Model) bool {
-	variableKeys := model.DecisionVariables().SortedKeys()
+	variableKeys := model.NameMappedVariables().SortedKeys()
 	for index := range variableKeys {
 		if !c.variableValuesMatch(index, model, variableKeys) {
 			return false

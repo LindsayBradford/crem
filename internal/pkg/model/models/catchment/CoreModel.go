@@ -277,8 +277,7 @@ func (m *CoreModel) buildActionObservers() []action.Observer {
 
 	// Order of variable creation is crucial here for having downstream dependent observers
 	// trigger once upstream variables have processed an action.
-	derefencedVars := &m.ContainedDecisionVariables
-	for _, variable := range derefencedVars.UndoableDecisionVariables {
+	for _, variable := range m.ContainedDecisionVariables.CreationOrderedVariables() {
 		if variableAsObserver, isObserver := variable.(action.Observer); isObserver {
 			observers = append(observers, variableAsObserver)
 		}
@@ -694,7 +693,7 @@ func (m *CoreModel) checkActions(otherModel model.Model) bool {
 }
 
 func (m *CoreModel) checkVariables(otherModel model.Model) bool {
-	myDecisionVariables := *m.DecisionVariables()
+	myDecisionVariables := *m.NameMappedVariables()
 	for _, variable := range myDecisionVariables {
 		otherVariable := otherModel.DecisionVariable(variable.Name())
 		if variable.Value() != otherVariable.Value() {
