@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 0.20 (06 October 2021):
+## Version 0.20 (07 October 2021):
 ### New Features
 * Catchment model now offers up a new decision variable 'TotalNitrogenProduction', summing the particulate and dissolved.
 

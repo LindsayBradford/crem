@@ -1,15 +1,16 @@
 # Change Log
 
-## Version 0.7 (24 September 2021):
+## Version 0.8 (08 October 2021):
+* Updated to contain CREMExplorer 0.20. See its changelog for specific changes.
+* Updated to contain CREMEngine 0.8. See its changelog for specific changes.
 
+## Version 0.7 (24 September 2021):
 * Updated to contain CREMEngine 0.7. See its changelog for specific changes.
 
 ## Version 0.6 (22 September 2021):
-
 * Updated to contain CREMEngine 0.6. See its changelog for specific changes.
 
 ## Version 0.5 (27 August 2021):
-
 * Now ships with and uses Laidley Data version 1.8.5, containing updated economics data.
 * Updated to contain CREMExplorer 0.19. See its changelog for specific changes.
 * Updated to contain CREMEngine 0.5. See its changelog for specific changes.
