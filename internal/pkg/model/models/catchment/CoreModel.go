@@ -193,7 +193,7 @@ func (m *CoreModel) buildDecisionVariables() {
 		WithObservers(m)
 
 	if m.parameters.HasEntry(parameters.MaximumTotalNitrogenProduction) {
-		dissolvedNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumTotalNitrogenProduction))
+		totalNitrogen.SetMaximum(m.parameters.GetFloat64(parameters.MaximumTotalNitrogenProduction))
 	}
 
 	implementationCost := new(implementationcost.ImplementationCost).
