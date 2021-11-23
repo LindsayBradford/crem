@@ -42,6 +42,8 @@ func vectorLengthsMatch(firstVector *Float64Vector, secondVector *Float64Vector)
 }
 
 func (v *Float64Vector) Dominates(otherCandidate Candidate) bool {
+	// [Engrand et.al, 1992]:
+	//		V dominates O <=> forAll 0 <= j < |V|, it holds that, V[j] < O[j]
 	return v.allLessThanValuesIn(otherCandidate)
 }
 

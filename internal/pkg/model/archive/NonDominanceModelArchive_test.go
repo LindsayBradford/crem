@@ -196,7 +196,7 @@ func TestNonDominanceModelArchive_ChangesPreserveNonDominance(t *testing.T) {
 		g.Expect(archiveUnderTest.IsNonDominant()).To(BeTrue())
 	}
 
-	t.Logf("Model cnanges required for [%d] archive entrries = %d\n", actualArchiveSize, changesRequired)
+	t.Logf("Model changes required for [%d] archive entrries = %d\n", actualArchiveSize, changesRequired)
 
 	showArchiveState(t, archiveUnderTest)
 }
