@@ -4,7 +4,6 @@ package suppapitnarm
 
 import (
 	"github.com/LindsayBradford/crem/internal/pkg/parameters"
-
 	. "github.com/LindsayBradford/crem/internal/pkg/parameters/specification"
 )
 
@@ -24,6 +23,7 @@ const (
 	InitialReturnToBaseStep       = "InitialReturnToBaseStep"
 	MinimumReturnToBaseRate       = "MinimumReturnToBaseRate"
 	ReturnToBaseIsolationFraction = "ReturnToBaseIsolationFraction"
+	CheckNonDominance             = "CheckNonDominance"
 )
 
 type optimisationDirection int
@@ -59,6 +59,12 @@ func ParameterSpecifications() *Specifications {
 			Key:          ReturnToBaseIsolationFraction,
 			Validator:    IsDecimalBetweenZeroAndOne,
 			DefaultValue: float64(0.9), // following initial CRP hard-coded default
+		},
+	).Add(
+		Specification{
+			Key:          CheckNonDominance,
+			Validator:    IsBoolean,
+			DefaultValue: false, // following initial CRP hard-coded default
 		},
 	)
 	return specs

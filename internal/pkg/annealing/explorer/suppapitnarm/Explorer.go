@@ -205,6 +205,8 @@ func (ke *Explorer) TryRandomChange() {
 	ke.AcceptOrRevertChange(variableDifferences)
 	ke.ReturnToBaseIfRequired(compressedChangedModelState)
 
+	ke.checkNonDominanceIfRequired()
+
 	ke.currentIteration++
 }
 
@@ -388,6 +390,22 @@ func (ke *Explorer) deriveIterationsUntilReturnToBase() {
 	event := observer.NewEvent(observer.Explorer).
 		WithAttribute("IterationsUntilReturnToBase", ke.iterationsUntilReturnToBase)
 	ke.NotifyObserversOfEvent(*event)
+}
+
+func (ke *Explorer) checkNonDominanceIfRequired() {
+	if ke.parameters.GetBoolean(CheckNonDominance) {
+		result := "DOMINANCE DETECTED"
+		if ke.modelArchive.IsNonDominant() {
+			result = "NON-DOMINANT"
+		}
+
+		checkMsg := fmt.Sprintf("Checking Non-dominance of archive... [%s]", result)
+		ke.note(checkMsg)
+
+		if result == "DOMINANCE DETECTED" {
+			panic("Dominance detected in annealer non-dominance archive")
+		}
+	}
 }
 
 func (ke *Explorer) DeepClone() explorer.Explorer {

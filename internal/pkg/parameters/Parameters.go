@@ -113,3 +113,7 @@ func (p *Parameters) GetFloat64(key string) float64 {
 func (p *Parameters) GetString(key string) string {
 	return p.paramMap[key].(string)
 }
+
+func (p *Parameters) GetBoolean(key string) bool {
+	return p.paramMap[key].(bool)
+}

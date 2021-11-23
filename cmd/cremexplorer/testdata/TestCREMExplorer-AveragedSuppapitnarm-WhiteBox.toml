@@ -13,6 +13,7 @@ Annealing = "StandardOutput"
 [Annealer]
 Type="AveragedSuppapitnarm"
 [Annealer.Parameters]
+CheckNonDominance = true
 StartingTemperature = 10.0 #10
 CoolingFactor =  0.999  # 0.99
 MaximumIterations = 500

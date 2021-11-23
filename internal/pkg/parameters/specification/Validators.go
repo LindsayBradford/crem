@@ -104,6 +104,14 @@ func IsString(key string, value interface{}) error {
 	return NewValidSpecificationError(key, value)
 }
 
+func IsBoolean(key string, value interface{}) error {
+	_, typeIsOk := value.(bool)
+	if !typeIsOk {
+		return NewInvalidSpecificationError("Parameter [" + key + "] must be a boolean value")
+	}
+	return NewValidSpecificationError(key, value)
+}
+
 func IsReadableFile(key string, value interface{}) error {
 	valueAsString, typeIsOk := value.(string)
 	if !typeIsOk {
