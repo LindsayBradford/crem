@@ -42,9 +42,26 @@ func vectorLengthsMatch(firstVector *Float64Vector, secondVector *Float64Vector)
 }
 
 func (v *Float64Vector) Dominates(otherCandidate Candidate) bool {
-	// [Engrand et.al, 1992]:
-	//		V dominates O <=> forAll 0 <= j < |V|, it holds that, V[j] < O[j]
-	return v.allLessThanValuesIn(otherCandidate)
+	otherCandidateAsVector := *asFloat64Vector(otherCandidate)
+	thisCandidateAsVector := *v
+
+	// Efficient Learning Machines, 2015, Chapter 10.
+	// X dominates Y ⇔ ∀ i:ℕ ∈ 0..|X|-1 ⦁ X[i] ≤ Y[i] ∧ ∃ j:ℕ ∈ 0..|X|-1 ⦁ X[i] < Y[i]
+
+	// ∀ i:ℕ ∈ 0..|X|-1 ⦁ X[i] ≤ Y[i]
+	for index := range thisCandidateAsVector {
+		if thisCandidateAsVector[index] > otherCandidateAsVector[index] {
+			return false
+		}
+	}
+
+	// ∃ j:ℕ ∈ 0..|X|-1 ⦁ X[i] < Y[i]
+	for index := range thisCandidateAsVector {
+		if thisCandidateAsVector[index] < otherCandidateAsVector[index] {
+			return true
+		}
+	}
+	return false
 }
 
 func (v *Float64Vector) allLessThanValuesIn(otherCandidate Candidate) bool {

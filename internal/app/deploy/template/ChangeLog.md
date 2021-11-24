@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 0.9 (24 November 2021):
+* Updated to contain CREMExplorer 0.21. See its changelog for specific changes.
+
 ## Version 0.8 (08 October 2021):
 * Updated to contain CREMExplorer 0.20. See its changelog for specific changes.
 * Updated to contain CREMEngine 0.8. See its changelog for specific changes.

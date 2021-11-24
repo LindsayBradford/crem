@@ -109,16 +109,16 @@ func TestFloat64Vector_Dominates_ValidlyIdentifiesDomination(t *testing.T) {
 	indexedVectorUnderTest[0] = -1e-3
 
 	// then
-	t.Logf("Expecting vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
-	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
+	t.Logf("Expecting vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
 	// when
 	indexedVectorUnderTest[0] = 0
 	indexedOtherCandidateVector[0] = 1e-3
 
 	// then
-	t.Logf("Expecting vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
-	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
+	t.Logf("Expecting vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
 	// when
 	indexedVectorUnderTest[0] = 1e-3
@@ -131,8 +131,8 @@ func TestFloat64Vector_Dominates_ValidlyIdentifiesDomination(t *testing.T) {
 	indexedOtherCandidateVector[1] = 2e-3
 
 	// then
-	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
-	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
+	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
 	// when
 	indexedVectorUnderTest[1] = 2e-3
@@ -145,8 +145,8 @@ func TestFloat64Vector_Dominates_ValidlyIdentifiesDomination(t *testing.T) {
 	indexedOtherCandidateVector[2] = 3e-3
 
 	// then
-	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
-	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
+	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
 	// when
 	indexedVectorUnderTest[2] = 3e-3
@@ -159,8 +159,8 @@ func TestFloat64Vector_Dominates_ValidlyIdentifiesDomination(t *testing.T) {
 	indexedVectorUnderTest[2] = 1e-3
 
 	// then
-	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
-	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
+	t.Logf("Expected vectorUnderTest %v to %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
 	// when
 	indexedVectorUnderTest[0] = 3e-3
@@ -191,6 +191,18 @@ func TestFloat64Vector_Dominates_ValidlyIdentifiesDomination(t *testing.T) {
 	t.Logf("Expected vectorUnderTest %v ts %s otherCandidateVector: %v", vectorUnderTest, dominate, otherCandidateVector)
 	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeTrue())
 
+	// when
+	indexedVectorUnderTest[0] = 1
+	indexedVectorUnderTest[1] = 2
+	indexedVectorUnderTest[2] = 3
+
+	indexedOtherCandidateVector[0] = 0
+	indexedOtherCandidateVector[1] = 3
+	indexedOtherCandidateVector[2] = 3
+
+	// then
+	t.Logf("Expected vectorUnderTest %v ts %s otherCandidateVector: %v", vectorUnderTest, notDominate, otherCandidateVector)
+	g.Expect(vectorUnderTest.Dominates(otherCandidateVector)).To(BeFalse())
 }
 
 func TestFloat64Vector_Dominates_ValidlyIdentifiesNoDominancePresent(t *testing.T) {

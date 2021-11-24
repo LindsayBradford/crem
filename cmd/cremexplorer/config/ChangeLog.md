@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 0.21 (24 November 2021):
+### Bug Fixes
+* Fixed bug in MOSA non-dominance determination for pareto fronts. 
+
 ## Version 0.20 (07 October 2021):
 ### New Features
 * Catchment model now offers up a new decision variable 'TotalNitrogenProduction', summing the particulate and dissolved.
