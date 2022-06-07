@@ -171,8 +171,8 @@ func TestCoreModel_PlanningUnitValues_AsExpected(t *testing.T) {
 	verifyPlanningUnitValues(g, solution, implementationcost.VariableName, 0)
 	verifyPlanningUnitValues(g, solution, opportunitycost.VariableName, 0)
 
-	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, solution, particulatenitrogen.VariableName, 2.754)
+	verifyPlanningUnitValues(g, solution, sedimentproduction.VariableName, 1191.502)
+	verifyPlanningUnitValues(g, solution, particulatenitrogen.VariableName, 2.564)
 }
 
 func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.T) {
@@ -209,8 +209,8 @@ func TestCoreModel_AfterActionToggling_PlanningUnitValues_AsExpected(t *testing.
 	verifyPlanningUnitValues(g, newSolution, implementationcost.VariableName, 0)
 	verifyPlanningUnitValues(g, newSolution, opportunitycost.VariableName, 0)
 
-	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1322.548)
-	verifyPlanningUnitValues(g, newSolution, particulatenitrogen.VariableName, 2.754)
+	verifyPlanningUnitValues(g, newSolution, sedimentproduction.VariableName, 1191.502)
+	verifyPlanningUnitValues(g, newSolution, particulatenitrogen.VariableName, 2.564)
 }
 
 func TestCoreModel_IsEquivalentTo_AsExpected(t *testing.T) {
@@ -333,7 +333,7 @@ func TestCoreModel_ParticulateNitrogen_NoRoundingErrors(t *testing.T) {
 	variableUnderTest := solutionVariable(solution, particulatenitrogen.VariableName)
 	planningUnit18Entry := variableUnderTest.ValuePerPlanningUnit[1]
 
-	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.564))
 	g.Expect(planningUnit18Entry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
 	g.Expect(planningUnit18Entry.Value).To(BeNumerically(equalTo, 2.291))
 }
@@ -379,9 +379,9 @@ func TestCoreModel_ParticulateNitrogen_HillSlopeRiverbankDependency_NoRoundingEr
 	planningUnitEntry := variableUnderTest.ValuePerPlanningUnit[3]
 
 	g.Expect(planningUnitEntry.PlanningUnit).To(BeNumerically(equalTo, planningUnitUnderTest))
-	g.Expect(planningUnitEntry.Value).To(BeNumerically(equalTo, 0.404))
+	g.Expect(planningUnitEntry.Value).To(BeNumerically(equalTo, 0.214))
 
-	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.754))
+	g.Expect(variableUnderTest.Value).To(BeNumerically(equalTo, 2.564))
 }
 
 func TestCoreModel_TotalNitrogen_NoRoundingErrors(t *testing.T) {

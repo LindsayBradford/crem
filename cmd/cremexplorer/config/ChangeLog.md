@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.22 (06 June 2022):
+### New Features
+* Reduced lower bound for model parameter BankErosionFudgeFactor from 10^-4 to 10^-5.
+* Changed default value for model parameter BankErosionFudgeFactor from 5*10^-4 to 1.5*10^-4
+
 ## Version 0.21 (24 November 2021):
 ### Bug Fixes
 * Fixed bug in MOSA non-dominance determination for pareto fronts. 

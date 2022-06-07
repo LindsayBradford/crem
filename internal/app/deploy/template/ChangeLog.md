@@ -1,5 +1,11 @@
 # Change Log
 
+## Version 0.10 (06 June 2021):
+* Updated to contain CREMExplorer 0.22. See its changelog for specific changes.
+* Updated to contain CREMEngine 0.9. See its changelog for specific changes.
+* Now ships with and uses Laidley Data version 1.8.6.  
+* Example MOSA and SOSA TOML files have altered config to better model the Lately river.
+
 ## Version 0.9 (24 November 2021):
 * Updated to contain CREMExplorer 0.21. See its changelog for specific changes.
 

@@ -1,6 +1,10 @@
 # Change Log
 
-## Version 0.8 (08 October2021):
+## Version 0.9 (06 June 2022):
+### New Features
+* Compiled against v0.22 of CremExplorer.
+
+## Version 0.8 (08 October 2021):
 ### New Features
 * Compiled against v0.20 of CremExplorer, permitting usage of new catchment model variable "TotalNitrogenProduction"
 

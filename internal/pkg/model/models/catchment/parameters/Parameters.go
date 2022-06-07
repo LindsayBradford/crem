@@ -55,7 +55,7 @@ func ParameterSpecifications() *Specifications {
 		Specification{
 			Key:          BankErosionFudgeFactor,
 			Validator:    validateIsBankErosionFudgeFactor,
-			DefaultValue: 5 * math.Pow(10, -4),
+			DefaultValue: 1.5 * math.Pow(10, -4),
 		},
 	).Add(
 		Specification{
@@ -153,7 +153,7 @@ func ParameterSpecifications() *Specifications {
 }
 
 func validateIsBankErosionFudgeFactor(key string, value interface{}) error {
-	minValue := 1 * math.Pow(10, -4)
+	minValue := math.Pow(10, -5)
 	maxValue := 5 * math.Pow(10, -4)
 	return IsDecimalWithInclusiveBounds(key, value, minValue, maxValue)
 }
