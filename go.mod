@@ -13,10 +13,10 @@ require (
 	github.com/onsi/gomega v1.10.5
 	github.com/pkg/errors v0.9.1
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
-	golang.org/x/text v0.3.3
+	golang.org/x/text v0.3.8
 )
 
 require (
-	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
