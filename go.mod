@@ -12,11 +12,11 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d
 	github.com/onsi/gomega v1.10.5
 	github.com/pkg/errors v0.9.1
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
-	golang.org/x/text v0.3.8
+	golang.org/x/net v0.7.0
+	golang.org/x/text v0.7.0
 )
 
 require (
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/sys v0.5.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
